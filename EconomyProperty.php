@@ -236,8 +236,8 @@ class EconomyProperty implements Plugin{
 			}
 			check:
 			if($this->api->ban->isOp($data["player"]->username)){
-				if($data["target"]->x == $result["x"] and $data["target"]->y == $result["y"] and $data["target"]->z == $result["z"] and $data["target"]->level->getName() == $result["level"]){
-					if($data["type"] == "break"){
+				if($data["target"]->x === $result["x"] and $data["target"]->y === $result["y"] and $data["target"]->z === $result["z"] and $data["target"]->level->getName() === $result["level"]){
+					if($data["type"] === "break"){
 						$this->property->exec("DELETE FROM Property WHERE landNum = $result[landNum]");
 						$data["player"]->sendChat("The property has been removed.");
 						return;

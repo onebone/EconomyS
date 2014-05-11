@@ -3,7 +3,7 @@
 /*
 __PocketMine Plugin__
 name=EconomyShop
-version=1.2.3
+version=1.2.4
 author=onebone
 apiversion=12,13
 class=EconomyShop
@@ -67,6 +67,8 @@ V1.2.2 :
 V1.2.3 : 
 - Rewrote codes
 - Database is now SQLite3
+
+V1.2.4 : Bug fixed : Item name is not supported correctly
 
 */
 
@@ -206,7 +208,7 @@ class EconomyShop implements Plugin{
 				}
 				
 				// Item identify
-				$item = $this->getItem(strtolower($data->data["Text3"]));
+				$item = $this->getItem($data->data["Text3"]);
 				if($item === false){
 					$player->sendChat($this->getMessage("item-not-support", array($data->data["Text3"], "", "")));
 					return;
@@ -301,7 +303,7 @@ class EconomyShop implements Plugin{
 	public function loadItems(){ // I managed to align this all items list :P
 		$items = array();
 		if(!is_file(DATA_PATH."plugins/EconomyShop/items.properties")){
-			$this->items = new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES, array(
+			$this->items = array_change_key_case((new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES, array(
 				"air" => 0,
 				"stone" => 1,
 				"grassblock" => 2,
@@ -563,9 +565,9 @@ class EconomyShop implements Plugin{
 				"beetroot" => 457,
 				"beetrootseed" => 458,
 				"beetrootsoup" => 459
-			));
+			)))->getAll(), CASE_LOWER);
 		}else{
-			$this->items = new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES);
+			$this->items = array_change_key_case(((new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES))->getAll()), CASE_LOWER);
 		}
 	}
 }

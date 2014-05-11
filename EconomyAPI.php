@@ -103,6 +103,8 @@ V1.4.0 : Small optimization, reduced some data
 
 V1.4.1 : Added account related functions
 
+V1.4.2 : Added /pay to default command
+
 */
 
 // NOTE : I like K&R style!
@@ -187,7 +189,8 @@ class EconomyAPI{
 			"seemoney" => "<player>",
 			"bank" => "<deposit | withdraw | mymoney | seemoney> [amount | player]",
 			"mystatus" => "",
-			"bankadmin" => "<takemoney | givemoney> <player> <amount>"
+			"bankadmin" => "<takemoney | givemoney> <player> <amount>",
+			"pay" => "<player> <amount>"
 		);
 		$wcmd = array( // Whitelist commands
 			"mymoney",
@@ -198,7 +201,8 @@ class EconomyAPI{
 			"seemoney",
 			"economys",
 			"bank",
-			"mystatus"
+			"mystatus",
+			"pay"
 		);
 		$cmds = array();
 		$cnt = 0;
@@ -394,7 +398,10 @@ class EconomyAPI{
 			"bank-hismoney" => "%1 has \$%2 in his account",
 			"bank-takemoney-must-bigger-than-zero" => "You can't take his money smaller than $0",
 			"bank-takemoney-done" => "Has been took %1's \$%2.",
-			"bank-givemoney-done" => "Gave \$%2 to %1"
+			"bank-givemoney-done" => "Gave \$%2 to %1",
+			"pay-lack-money" => "You don't have $%1. Your money : $%2",
+			"pay-done" => "You have paid $%1 to %2",
+			"pay-got" => "%1 paid you $%2"
 		));
 	}
 	
@@ -447,6 +454,9 @@ class EconomyAPI{
 			),
 			"bankadmin" => array(
 				"bankadmin"
+			),
+			"pay" => array(
+				"pay"
 			)
 		));
 	}
@@ -851,6 +861,37 @@ class EconomyAPI{
 			$mymoneystatus = round($this->mymoney($issuer) / $all, 2);
 			$mydebtstatus = round($this->mydebt($issuer) / $debt, 2);
 			$output .= $this->getMessage("mystatus-show", array($mymoneystatus * 100, $mydebtstatus * 100, ""));
+			break;
+		case "pay":
+			$player = array_shift($params);
+			$amount = array_shift($params);
+			if(trim($player) === "" or trim($amount) === ""){
+				$output .= "Usage: /$alias <player> <amount>";
+				break;
+			}
+			$target = $this->api->player->get($player, false);
+			if(!$target instanceof Player){
+				$target = $this->api->player->get($player);
+				if(!$target instanceof Player){
+					$target = $player;
+				}
+			}
+			$user = $target;
+			if($target instanceof Player){
+				$target = $target->username;
+			}
+			if(isset($this->money[$target])){
+				if($this->money[$issuer->username] < $amount){
+					$output .= $this->getMessage("pay-lack-money", array($amount, $this->money[$issuer->username], "%3", "%4"));
+					break;
+				}
+				$this->money[$issuer->username] -= $amount;
+				$this->money[$target] += $amount;
+				$output .= $this->getMessage("pay-done", array($amount, $target, "%3", "%4"));
+				if($user instanceof Player){
+					$user->sendChat($this->getMessage("pay-got", array($issuer->username, $amount, "%3", "%4")));
+				}
+			}
 			break;
 		}
 		return $output;

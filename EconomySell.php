@@ -611,7 +611,7 @@ class EconomySell implements Plugin {
 	}else{
 		$items = new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES);
 	}
-	$this->items = $items->getAll();
+	$this->items = array_change_key_case($items->getAll(), CASE_LOWER);
 	}
 }
 class EconomySellAPI { // Use this API to control EconomySell!

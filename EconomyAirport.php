@@ -101,6 +101,7 @@ class EconomyAirport implements Plugin{
 		$this->lang = new Config(DATA_PATH."plugins/EconomyAirport/language.properties", CONFIG_PROPERTIES, array(
 			"line3-must-numeric" => "Line 3 must be numeric",
 			"no-permission" => "You don't have permission to create airport",
+			"arrival-exist" => "Same name of arrival already exists",
 			"created-departure" => "Created departure to %1",
 			"created-arrival" => "Created airport %1",
 			"no-arrival" => "There are no airport named \"%1\"",
@@ -196,6 +197,11 @@ class EconomyAirport implements Plugin{
 				$player->sendChat($this->getMessage("created-departure", array($data->data["Text4"], "%2", "%3")));
 				break;
 				case $this->id->get("arrival-id"):
+				$info = $this->airport->query("SELECT * FROM arrival WHERE name = '{$data->data["Text3"]}'")->fetchArray(SQLITE3_ASSOC);
+				if(!is_bool($info)){
+					$player->sendChat($this->getMessage("arrival-exist"));
+					return;
+				}
 				$this->airport->exec("INSERT INTO arrival (x, y, z, name, level) VALUES ({$data->x}, {$data->y}, {$data->z}, '{$data->data["Text3"]}', '{$data->level->getName()}');");
 				$data->setText(
 					$result[0],
