@@ -96,7 +96,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			new \EconomyAPI\commands\TakeDebtCommand($this),
 			new \EconomyAPI\commands\EconomySCommand($this),
 			new \EconomyAPI\commands\TopMoneyCommand($this),
-			new \EconomyAPI\commands\SetLangCommand($this)
+			new \EconomyAPI\commands\SetLangCommand($this),
+			new \EconomyAPI\commands\TakeMoneyCommand($this)
 		);
 		$commandMap = $this->getServer()->getCommandMap();
 		foreach($cmds as $cmd){
@@ -547,6 +548,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		$amount = round($amount, 2);
 		if(isset($this->money[$player]["money"])){
+			if($this->money[$player]["money"] - $amount < 0){
+				return self::RET_INVALID;
+			}
 			$event = new ReduceMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($event);
 			if($force === false and $event->isCancelled()){

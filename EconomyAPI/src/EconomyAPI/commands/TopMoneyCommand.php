@@ -47,7 +47,7 @@ class TopMoneyCommand extends EconomyAPICommand{
 			$current = (int)ceil($n / 5);
 			foreach($players as $player){
 				if($current === $page){
-					$output .= str_replace(array("%1", "%2", "%3"), $sender->getName(), array($n, $player, $money), $message);
+					$output .= str_replace(array("%1", "%2", "%3"), array($n, $player, $money), $message);
 				}elseif($current > $page){
 					break 2;
 				}
