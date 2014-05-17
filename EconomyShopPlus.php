@@ -53,8 +53,9 @@ class EconomyShopPlus implements Plugin {
 	public function TimeHandler(){
 		$min = $this->config["max-change-rate"] - $this->config["max-change-rate"] * 2;
 		$exchge = rand($min, $this->config["max-change-rate"]);
-		if(is_array(EconomyShopAPI::getShops())){
-			foreach(EconomyShopAPI::getShops() as $k => $s){
+		$shop = EconomyShop::getInstance();
+		if(is_array($shop->getShops())){
+			foreach($shop->getShops() as $k => $s){
 				$level = $this->api->level->get($s["level"]);
 				if($level instanceof Level){
 					$tile = $this->api->tile->get(new Position($s["x"], $s["y"], $s["z"], $level));
@@ -66,7 +67,8 @@ class EconomyShopPlus implements Plugin {
 						$tile->setText($tile->data["Text1"], $price."$", $tile->data["Text3"], $tile->data["Text4"]);
 						//   EconomyShopPlusHelper::handle($price);
 						//   $tile->data["Text2"] = "$price\$";
-						EconomyShopAPI::editShop(array("x" => $s["x"], "y" => $s["y"], "z" => $s["z"], "item" => $s["item"], "price" => $price, "amount" => $s["amount"], "level" => $s["level"], "meta" => $s["meta"]));
+						//$shop->editShop(array("x" => $s["x"], "y" => $s["y"], "z" => $s["z"], "item" => $s["item"], "price" => $price, "amount" => $s["amount"], "level" => $s["level"], "meta" => $s["meta"]));
+						$shop->editShop($x, $y, $z, $s["level"], $s["price"], $s["item"], $s["meta"], $s["amount"]);
 						continue;
 					}
 				}

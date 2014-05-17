@@ -68,12 +68,15 @@ V1.2.3 :
 - Rewrote codes
 - Database is now SQLite3
 
-V1.2.4 : Bug fixed : Item name is not supported correctly
+V1.2.4 : Bug fixed - Item name is not supported correctly
+
+V1.2.5 : Easily access of EconomyShop
 
 */
 
 class EconomyShop implements Plugin{
 	private $api, $shop, $config, $tap, $id, $shopSign;
+	private static $obj;
 	
 	public function __construct(ServerAPI $api, $server = false){
 		$this->api = $api;
@@ -106,9 +109,14 @@ class EconomyShop implements Plugin{
 		$this->api->event("tile.update", array($this, "onTileUpdate"), $priority);
 		$this->api->addHandler("player.block.touch", array($this, "onTouch"), $priority);
 		$this->api->economy->EconomySRegister("EconomyShop");
+		self::$obj = $this;
 	}
 	
 	public function __destruct(){}
+	
+	public static function getInstance(){
+		return self::$obj;
+	}
 	
 	private function createConfig(){
 		$this->config = new Config(DATA_PATH."plugins/EconomyShop/shop.properties", CONFIG_PROPERTIES, array(
@@ -135,6 +143,23 @@ class EconomyShop implements Plugin{
 				"Amount : %3"
 			)
 		));
+	}
+	
+	public function editShop($x, $y, $z, $level, $price, $item, $damage, $amount){
+		$info = $this->shop->query("SELECT * FROM shop WHERE x = $x AND y = $y AND z = $z AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
+		if(is_bool($info)){
+			return false;
+		}
+		$this->shop->exec("UPDATE shop SET (item, meta, price, amount) VALUES ($item, $damage, $price, $amount) WHERE ID = {$info["id"]}");
+	}
+	
+	public function getShops(){
+		$ret = array();
+		$s = $this->shop->query("SELECT * FROM shop");
+		while(($r = $s->fetchArray(SQLITE3_ASSOC)) !== false){
+			$ret[] = $r;
+		}
+		return $ret;
 	}
 	
 	private function convertData(){
