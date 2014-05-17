@@ -182,7 +182,7 @@ class EconomyShop implements Plugin{
 		if(array_key_exists($item, $this->items)){
 			return array($this->items[$item], true); // Returns Item ID
 		}else{
-			foreach($this->items->getAll() as $name => $id){
+			foreach($this->items as $name => $id){
 				$explode = explode(":", $id);
 				$explode[1] = isset($explode[1]) ? $explode[1]:0;
 				if($explode[0] == $e[0] and $explode[1] == $e[1]){

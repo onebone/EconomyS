@@ -919,8 +919,10 @@ class EconomyAPI{
 	}
 	
 	public function delAccount($player){
+		$player_instance = $player;
 		if($player instanceof Player){
 			$player = $player->username;
+			$player_instance->close("Your account has just removed");
 		}
 		if(!isset($this->money[$player])){
 			return false;

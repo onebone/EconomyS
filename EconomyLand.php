@@ -2,7 +2,7 @@
 /*
 __PocketMine Plugin__
 name=EconomyLand
-version=1.4.5
+version=1.4.6
 author=onebone
 apiversion=12,13
 class=EconomyLand
@@ -84,6 +84,8 @@ V1.4.4 : Fixed bug about server closing
 
 V1.4.5 : Limit of land is now applied to addLand()
 
+V1.4.6 : Added non-check-worlds
+
 */
 
 
@@ -106,6 +108,7 @@ class EconomyLand implements Plugin {
 		$this->api->plugin->createConfig($this, array(
 			"handler-priority" => 10,
 			"white-world-protection" => array(),
+			"non-check-worlds" => array(),
 			"player-land-limit" => "NaN"
 		));
 		$this->createMessageConfig();
@@ -298,6 +301,7 @@ class EconomyLand implements Plugin {
 				$result = $this->land->query("SELECT * FROM land");
 				if(is_bool($result)) $land = array();
 				else{
+					$land = array();
 					while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
 						$land[] = $d;
 					}
@@ -376,7 +380,7 @@ class EconomyLand implements Plugin {
 				}
 				$output .= "Invitee of land #$landnum : \n";
 				$output .= substr($info["invitee"], 1);
-				$output = substr($output, 0, -1);
+				$output = str_replace(",", ", ", substr($output, 0, -1));
 			}elseif($p == "give"){
 				$player = array_shift($param);
 				$landnum = array_shift($param);
@@ -540,6 +544,9 @@ class EconomyLand implements Plugin {
 				$level = $data["entity"]->level->getName();
 				break;
 		}
+		if(in_array($level, $this->config["non-check-worlds"])){
+			return;
+		}
 		$exist = false;
 		$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		$info = $result->fetchArray(SQLITE3_ASSOC);
@@ -561,7 +568,7 @@ class EconomyLand implements Plugin {
 	
 	private function createData(){
 		try{
-			$this->land = new SQLite3($this->path."LandData.sqlite3");
+			$this->land = new \SQLite3($this->path."LandData.sqlite3");
 			$this->land->exec("CREATE TABLE IF NOT EXISTS land(
 				ID INTEGER PRIMARY KEY AUTOINCREMENT,
 				startX INTEGER NOT NULL,
@@ -595,21 +602,32 @@ class EconomyLand implements Plugin {
 			while($result->fetchArray(SQLITE3_ASSOC) !== false){
 				++$cnt;
 				if($cnt >= $this->config["player-land-limit"]){
-					return false;
+					return 0;
 				}
 			}
 		}
+		if($this->checkLandOverlap($data["startX"], $data["startZ"], $data["endX"], $data["endZ"])){
+			return -1;
+		}
 		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, level, owner, price, invitee) VALUES ({$data["startX"]}, {$data["endX"]}, {$data["startZ"]}, {$data["endZ"]}, '{$data["level"]}', '{$data["owner"]}', {$data["price"]}, '')");
-		return true;
+		return 1;
+	}
+	
+	
+	/*
+	@param int $x
+	@param int $y
+	@param int $z
+	@param int $z
+	
+	@return boolean
+	*/
+	public function checkLandOverlap($startX, $startZ, $endX, $endZ, $level){
+		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
+		return !is_bool($result);
 	}
 	
 	public function __destruct(){}
-	
-	/*class LandFinderThread extends Thread{
-		public function run(){
-		
-		}
-	}*/ // WHY! WHY NO INNER CLASS!!!!
 }
 
 
