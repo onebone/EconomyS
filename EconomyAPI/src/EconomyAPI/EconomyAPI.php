@@ -447,6 +447,49 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	/*
 	@param Player|string $player
+	@param int $default_money
+	@param int $default_debt
+	@param int $default_bank_money
+	
+	@return boolean
+	*/
+	public function createAccount($player, $default_money = false, $default_debt = false, $default_bank_money = false){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		if(isset($this->money[$player])){
+			$this->money[$player] = array(
+				"money" => ($default_money === false ? $this->config->get("default-money") : $default_money),
+				"debt" => ($default_debt === false ? $this->config->get("default-debt") : $default_debt)
+			);
+			$this->bank[$player] = array(
+				"money" => ($default_bank_money === false ? $this->config->get("default-bank-money") : $default_bank_money)
+			);
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	@param Player|string $player
+	
+	@return boolean
+	*/
+	public function removeAccount($player){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		if(isset($this->money[$player])){
+			$this->money[$player] = null;
+			$this->bank[$player] = null;
+			unset($this->money[$player], $this->bank[$player]);
+			return true;
+		}
+		return false;
+	}
+	
+	/*
+	@param Player|string $player
 	
 	@return boolean
 	*/
