@@ -40,3 +40,6 @@ permissions:
      economyapi.command.topmoney:
       description: Allows player to see top money list
       default: true
+     economyapi.command.bank:
+      description: Allows player to manage bank account
+      default: true

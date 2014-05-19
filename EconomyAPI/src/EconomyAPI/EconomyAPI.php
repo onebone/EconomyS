@@ -97,7 +97,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			new \EconomyAPI\commands\EconomySCommand($this),
 			new \EconomyAPI\commands\TopMoneyCommand($this),
 			new \EconomyAPI\commands\SetLangCommand($this),
-			new \EconomyAPI\commands\TakeMoneyCommand($this)
+			new \EconomyAPI\commands\TakeMoneyCommand($this),
+			new \EconomyAPI\commands\BankCommand($this)
 		);
 		$commandMap = $this->getServer()->getCommandMap();
 		foreach($cmds as $cmd){
@@ -106,6 +107,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		// getServer().getPluginManager().registerEvents(this, this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		
 		$moneyConfig = new Config($this->path."MoneyData.yml", Config::YAML);
 		$bankConfig = new Config($this->path."BankData.yml", Config::YAML);
 		$this->money = $moneyConfig->getAll();
@@ -115,6 +117,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	private function initializePlayerLang($langData){
 		foreach($langData as $player => $lang){
+			if(trim($lang) === "") continue;
 			$this->playerLang[$player] = $this->langRes[$lang];
 		}
 	}
@@ -192,7 +195,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function setLang($lang, $target = "CONSOLE"){
 		if(($resource = $this->getResource("lang_".$lang.".json")) !== false){
 			$this->playerLang[$target] = get_object_vars(json_decode($resource));
-			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($this->langList[$lang], "%2", "%3", "%4")));
+		//	\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($this->langList[$lang], "%2", "%3", "%4")));
 			return true;
 		}else{
 			foreach($this->langList as $key => $l){
@@ -200,7 +203,7 @@ class EconomyAPI extends PluginBase implements Listener{
 					if(($resource = $this->langList($key)) !== false){
 						/*$this->playerLang[$target] = get_object_vars(json_decode($resource));*/
 						$this->playerLang[$target] = $resource;
-						\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($l, "%2", "%3", "%4")));
+						//\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($l, "%2", "%3", "%4")));
 						return $l;
 					}else{
 						return false;

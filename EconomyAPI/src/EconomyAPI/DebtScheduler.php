@@ -8,23 +8,24 @@ use pocketmine\scheduler\PluginTask;
 use pocketmine\Server;
 
 class DebtScheduler extends PluginTask{
-	private $api, $username;
+	private $plugin, $username;
 	
-	public function __construct(EconomyAPI $api, $username){
-		$this->api = $api;
+	public function __construct(EconomyAPI $plugin, $username){
+		parent::__construct($plugin);
+		$this->plugin = $plugin;
 		$this->username = $username;
 	}
 	
-	public function run($tick){
+	public function onRun($tick){
 		$server = Server::getInstance();
 		$player = $server->matchPlayer($this->username);
 		if(!$player instanceof Player){
 			return;
 		}
-		$per = $this->api->getConfigurationValue("percent-of-increase-debt");
-		$increase = $this->api->myDebt($player) * ($per / 100);
-		$this->api->addDebt($player, $increase, true, "DebtScheduler");
-		$player->sendMessage($this->api->getMessage("debt-increase", $player, array($this->api->myDebt($player), "", "", "")));
-		$this->api->lastTask["debt"][$player->getName()] = time();
+		$per = $this->plugin->getConfigurationValue("percent-of-increase-debt");
+		$increase = ($this->plugin->myDebt($player) * ($per / 100));
+		$this->plugin->addDebt($player, $increase, true, "DebtScheduler");
+		$player->sendMessage($this->plugin->getMessage("debt-increase", $player, array($this->plugin->myDebt($player), "", "", "")));
+		$this->plugin->lastTask["debt"][$player->getName()] = time();
 	}
 }
