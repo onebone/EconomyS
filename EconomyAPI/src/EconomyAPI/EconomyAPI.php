@@ -115,6 +115,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->registerList("EconomyAPI");
 	}
 	
+	
+	
 	private function initializePlayerLang($langData){
 		foreach($langData as $player => $lang){
 			if(trim($lang) === "") continue;
@@ -254,8 +256,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			$player = $player->getName();
 		}
 		$amount = round($amount, 2);
-		if(isset($this->money[$player])){
-			$debt = $this->money[$player]["debt"];
+		if(isset($this->money["debt"][$player])){
+			$debt = $this->money["debt"][$player];
 			if($amount <= 0){
 				return self::RET_INVALID;
 			}
@@ -270,7 +272,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money[$player]["debt"] += $amount;
+			$this->money["debt"][$player] += $amount;
 			
 			$this->schedule["debt"][$player] = time();
 			$this->task[$player]["debt"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $player), $this->config->get("time-for-increase-debt"))->getTaskId();
@@ -292,8 +294,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$amount = round($amount, 2);
-		if(isset($this->money[$player])){
-			$debt = $this->money[$player]["debt"];
+		if(isset($this->money["debt"][$player])){
+			$debt = $this->money["debt"][$player];
 			if($amount <= 0 or $debt < $amount){
 				return self::RET_INVALID;
 			}
@@ -302,8 +304,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money[$player]["debt"] -= $amount;
-			if($this->money[$player]["debt"] <= 0){
+			$this->money["debt"][$player] -= $amount;
+			if($this->money["debt"][$player] <= 0){
 				$this->getServer()->getScheduler()->cancelTask($this->task[$player]["debt"]);
 				$this->lastTask["debt"][$player] = null;
 				$this->schedule["debt"][$player] = null;
@@ -328,13 +330,13 @@ class EconomyAPI extends PluginBase implements Listener{
 			$player = $player->getName();
 		}
 		$amount = round($amount, 2);
-		if(isset($this->bank[$player])){
+		if(isset($this->bank["money"][$player])){
 			$ev = new \EconomyAPI\event\bank\AddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \EconomyAPI\event\money\AddMoneyEvent
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->bank[$player]["money"] += $amount;
+			$this->bank["money"][$player] += $amount;
 			
 			$this->schedule["bank"][$player] = time();
 			$this->task[$player]["bank"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $player), $this->schedule["bank"][$player] * 20)->getTaskId();
@@ -356,8 +358,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$amount = round($amount, 2);
-		if(isset($this->bank[$player])){
-			if($amount <= 0 or $amount > $this->bank[$player]["money"]){
+		if(isset($this->bank["money"][$player])){
+			if($amount <= 0 or $amount > $this->bank["money"][$player]){
 				return self::RET_INVALID;
 			}
 			$ev = new \EconomyAPI\event\bank\ReduceMoneyEvent($this, $player, $amount, $issuer);
@@ -365,8 +367,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->bank[$player]["money"] -= $amount;
-			if($this->bank[$player]["money"] <= 0){
+			$this->bank["money"][$player] -= $amount;
+			if($this->bank["money"][$player] <= 0){
 				$this->getServer()->getScheduler()->cancelTask($this->task[$player]["bank"]);
 				$this->schedule["bank"][$player] = null;
 				$this->lastTask["bank"][$player] = null;
@@ -396,10 +398,10 @@ class EconomyAPI extends PluginBase implements Listener{
 	@return Map<string, int>
 	*/
 	public function sortMoney(){
-		$cnt = 0;
+		/*$cnt = 0;
 		$data = array();
 		$banList = $this->getServer()->getNameBans();
-		foreach($this->money as $p => $m){
+		foreach($this->money["money"] as $p => $m){
 			if($banList->isBanned($p)) continue;
 			$data[$m["money"]][] = $p;
 			++$cnt;
@@ -415,7 +417,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				++$n;
 			}
 		}
-		return $ret;
+		return $ret;*/
 	}
 	
 	/*
@@ -445,7 +447,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		return isset($this->money[$player]);
+		return isset($this->money["money"][$player]);
 	}
 	
 	/*
@@ -460,14 +462,17 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(isset($this->money[$player])){
-			$this->money[$player] = array(
+		if(isset($this->money["money"][$player])){
+			/*$this->money[$player] = array(
 				"money" => ($default_money === false ? $this->config->get("default-money") : $default_money),
 				"debt" => ($default_debt === false ? $this->config->get("default-debt") : $default_debt)
 			);
 			$this->bank[$player] = array(
 				"money" => ($default_bank_money === false ? $this->config->get("default-bank-money") : $default_bank_money)
-			);
+			);*/
+			$this->money["money"][$player] = ($default_money === false ? $this->config->get("default-money") : $default_money);
+			$this->money["debt"][$player] = ($default_debt === false ? $this->config->get("default-debt") : $default_debt);
+			$this->bank["money"][$player] = ($default_bank_money === false ? $this->config->get("default-bank-money") : $default_bank_money);
 			return true;
 		}
 		return false;
@@ -482,10 +487,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(isset($this->money[$player])){
-			$this->money[$player] = null;
-			$this->bank[$player] = null;
-			unset($this->money[$player], $this->bank[$player]);
+		if(isset($this->money["money"][$player])){
+			$this->money["money"][$player] = null;
+			$this->money["debt"][$player] = null;
+			$this->bank["money"][$player] = null;
+			unset($this->money["money"][$player], $this->money["debt"][$player], $this->bank["money"][$player]);
 			return true;
 		}
 		return false;
@@ -500,7 +506,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		return isset($this->bank[$player]);
+		return isset($this->bank["money"][$player]);
 	}
 	
 	/*
@@ -512,10 +518,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(!isset($this->money[$player]["money"])){
+		if(!isset($this->money["money"][$player])){
 			return false;
 		}
-		return $this->money[$player]["money"];
+		return $this->money["money"][$player];
 	}
 	
 	/*
@@ -527,10 +533,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(!isset($this->money[$player]["debt"])){
+		if(!isset($this->money["debt"][$player])){
 			return false;
 		}
-		return $this->money[$player]["debt"];
+		return $this->money["debt"][$player];
 	}
 	
 	/*
@@ -542,10 +548,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(!isset($this->bank[$player]["money"])){
+		if(!isset($this->bank["money"][$player])){
 			return false;
 		}
-		return $this->bank[$player]["money"];
+		return $this->bank["money"][$player];
 	}
 	
 	/*
@@ -564,13 +570,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$amount = round($amount, 2);
-		if(isset($this->money[$player])){
+		if(isset($this->money["money"][$player])){
 			$event = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($event);
 			if($force === false and $event->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money[$player]["money"] += $amount;
+			$this->money["money"][$player] += $amount;
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -593,8 +599,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$amount = round($amount, 2);
-		if(isset($this->money[$player]["money"])){
-			if($this->money[$player]["money"] - $amount < 0){
+		if(isset($this->money["money"][$player])){
+			if($this->money["money"][$player] - $amount < 0){
 				return self::RET_INVALID;
 			}
 			$event = new ReduceMoneyEvent($this, $player, $amount, $issuer);
@@ -602,7 +608,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($force === false and $event->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money[$player]["money"] -= $amount;
+			$this->money["money"][$player] -= $amount;
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -625,13 +631,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$money = round($money, 2);
-		if(isset($this->money[$player])){
+		if(isset($this->money["money"][$player])){
 			$ev = new SetMoneyEvent($this, $player, $money, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money[$player]["money"] = $money;
+			$this->money["money"][$player] = $money;
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -668,16 +674,19 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	public function onJoinEvent(PlayerJoinEvent $event){
 		$username = $event->getPlayer()->getName();
-		if(!isset($this->money[$username])){
-			$this->money[$username] = array(
+		if(!isset($this->money["money"][$username])){
+			/*$this->money[$username] = array(
 				"money" => $this->config->get("default-money"),
 				"debt" => $this->config->get("default-debt")
-			);
+			);*/
+			$this->money["money"][$username] = $this->config->get("default-money");
+			$this->money["debt"][$username] = $this->config->get("default-debt");
 		}
-		if(!isset($this->bank[$username])){
-			$this->bank[$username] = array(
+		if(!isset($this->bank["money"][$username])){
+			/*$this->bank[$username] = array(
 				"money" => $this->config->get("default-bank-money")
-			);
+			);*/
+			$this->bank["money"][$username] = $this->config->get("default-bank-money");
 		}
 		if(!isset($this->playerLang[$username])){
 			$this->playerLang[$username] = $this->setLang($this->config->get("default-lang"), $username);
