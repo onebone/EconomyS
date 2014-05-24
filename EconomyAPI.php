@@ -224,7 +224,7 @@ class EconomyAPI{
 			}
 		}
 		$this->EconomySRegister("EconomyAPI");
-		$this->server->api->addHandler("console.command", array($this, "handle"));
+		$this->server->api->addHandler("console.command", array($this, "handle"), 10000);
 		$this->server->api->event("server.close", array($this, "handle"));
 		if(!is_numeric($this->config["default-money"])){
 			$this->config["default-money"] = 1000;
@@ -579,6 +579,7 @@ class EconomyAPI{
 				}
 			}
 			unset($money, $data);
+			///arsort($this->money);
 			break;
 		case "bank":
 			$sub = array_shift($param);

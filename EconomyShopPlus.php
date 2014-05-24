@@ -2,7 +2,7 @@
 /*
 __PocketMine Plugin__
 name=EconomyShopPlus
-version=1.0.6
+version=1.0.7
 author=onebone
 apiversion=12,13
 class=EconomyShopPlus
@@ -24,6 +24,8 @@ V1.0.4 : Compatible with API 11
 V1.0.5 : Minor bug fix
 
 V1.0.6 : Compatible with API 12 (Amai Beetroot)
+
+V1.0.7 : Compatible with new EconomyShop
 
 */
 class EconomyShopPlus implements Plugin {
@@ -50,6 +52,7 @@ class EconomyShopPlus implements Plugin {
 		$this->api->schedule(20 * 60 * $mul, array($this, "TimeHandler"), array(), true);
 		$this->api->economy->EconomySRegister("EconomyShopPlus");
 	}
+	
 	public function TimeHandler(){
 		$min = $this->config["max-change-rate"] - $this->config["max-change-rate"] * 2;
 		$exchge = rand($min, $this->config["max-change-rate"]);
