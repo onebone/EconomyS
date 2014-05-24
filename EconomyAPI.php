@@ -3,7 +3,7 @@
 __PocketMine Plugin__
 name=EconomyAPI
 description=The main controller of EconomyS
-version=1.4.1
+version=1.4.2
 author=onebone
 class=LoadEconomyAPI
 apiversion=12,13
