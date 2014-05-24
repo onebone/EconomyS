@@ -2,14 +2,15 @@
 
 namespace EconomyAPI\commands;
 
-use pocketmine\plugin\Plugin;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+
+use EconomyAPI\EconomyAPI;
 
 class EconomySCommand extends EconomyAPICommand{
 	private $plugin;
 	
-	public function __construct(Plugin $plugin, $cmd = "economys"){
+	public function __construct(EconomyAPI $plugin, $cmd = "economys"){
 		parent::__construct($cmd, $plugin);
 		$this->plugin = $plugin;
 		$this->setPermission("economyapi.command.economys");

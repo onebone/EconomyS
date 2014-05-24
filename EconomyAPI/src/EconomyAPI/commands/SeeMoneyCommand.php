@@ -2,10 +2,12 @@
 
 namespace EconomyAPI\commands;
 
+use EconomyAPI\EconomyAPI;
+
 class SeeMoneyCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
 	
-	public function __construct(\pocketmine\plugin\Plugin $plugin, $cmd = "seemoney"){
+	public function __construct(EconomyAPI $plugin, $cmd = "seemoney"){
 		parent::__construct($cmd, $plugin);
 		$this->cmd = $cmd;
 		$this->setUsage("/$cmd <player>");

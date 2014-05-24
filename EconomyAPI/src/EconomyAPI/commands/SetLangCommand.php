@@ -4,10 +4,12 @@ namespace EconomyAPI\commands;
 
 use pocketmine\command\CommandSender;
 
+use EconomyAPI\EconomyAPI;
+
 class SetLangCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
 	
-	public function __construct(\EconomyAPI\EconomyAPI $plugin, $cmd = "setlang"){
+	public function __construct(EconomyAPI $plugin, $cmd = "setlang"){
 		parent::__construct($cmd, $plugin);
 		$this->cmd = $cmd;
 		$this->setUsage("/$cmd <lang>");

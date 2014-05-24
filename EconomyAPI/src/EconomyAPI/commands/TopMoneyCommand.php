@@ -5,10 +5,12 @@ namespace EconomyAPI\commands;
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
 
+use EconomyAPI\EconomyAPI;
+
 class TopMoneyCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
 	
-	public function __construct(\EconomyAPI\EconomyAPI $plugin, $cmd = "topmoney"){
+	public function __construct(EconomyAPI $plugin, $cmd = "topmoney"){
 		parent::__construct($cmd, $plugin);
 		$this->plugin = $plugin;
 		$this->setUsage("/$cmd <page>");
@@ -27,8 +29,8 @@ class TopMoneyCommand extends EconomyAPICommand{
 		
 		$cnt = 0;
 		$data = array();
-		$banList = Server::getInstance()->getNameBans();
-		foreach($moneyData as $p => $m){
+		$banList = Server::getInstance()->getNameBans(); // TODO TopMoney Command
+		/*foreach($moneyData as $p => $m){
 			if($banList->isBanned($p)) continue;
 			$data[$m["money"]][] = $p;
 			++$cnt;
@@ -53,7 +55,7 @@ class TopMoneyCommand extends EconomyAPICommand{
 				}
 				++$n;
 			}
-		}
+		}*/
 		$sender->sendMessage($output);
 		return true;
 	}

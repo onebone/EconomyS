@@ -3,13 +3,14 @@
 namespace EconomyAPI\commands;
 
 use pocketmine\Player;
-use pocketmine\plugin\Plugin;
 use pocketmine\command\CommandSender;
+
+use EconomyAPI\EconomyAPI;
 
 class TakeDebtCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
 	
-	public function __construct(Plugin $plugin, $cmd = "takedebt"){
+	public function __construct(EconomyAPI $plugin, $cmd = "takedebt"){
 		parent::__construct($cmd, $plugin);
 		$this->cmd = $cmd;
 		$this->setUsage("/$cmd <amount>");

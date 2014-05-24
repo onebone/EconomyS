@@ -4,11 +4,13 @@ namespace EconomyAPI\event\money;
 
 use EconomyAPI\event\EconomyAPIEvent;
 
+use EconomyAPI\EconomyAPI;
+
 class SetMoneyEvent extends EconomyAPIEvent{
 	private $plugin, $username, $money, $issuer;
 	public static $handlerList;
 	
-	public function __construct(\pocketmine\plugin\Plugin $plugin, $username, $money, $issuer){
+	public function __construct(EconomyAPI $plugin, $username, $money, $issuer){
 		$this->plugin = $plugin;
 		$this->username = $username;
 		$this->money = $money;

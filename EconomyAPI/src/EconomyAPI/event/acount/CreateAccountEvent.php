@@ -3,12 +3,13 @@
 namespace EconomyAPI\event\account;
 
 use EconomyAPI\event\EconomyAPIEvent;
+use EconomyAPI\EconomyAPI;
 
 class CreateAccountEvent extends EconomyAPIEvent{
 	private $player, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer;
 	public static $handlerList;
 	
-	public function __construct(\EconomyAPI\EconomyAPI $plugin, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer){
+	public function __construct(EconomyAPI $plugin, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer){
 		$this->plugin = $plugin;
 		$this->username = $username;
 		$this->defaultMoney = $defaultMoney;

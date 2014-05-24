@@ -4,10 +4,12 @@ namespace EconomyAPI\commands;
 
 use pocketmine\command\CommandSender;
 
+use EconomyAPI\EconomyAPI;
+
 class SetMoneyCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
 	
-	public function __construct(\EconomyAPI\EconomyAPI $api, $cmd = "setmoney"){
+	public function __construct(EconomyAPI $api, $cmd = "setmoney"){
 		parent::__construct($cmd, $api);
 		$this->cmd = $cmd;
 		$this->setUsage("/$cmd <player> <money>");

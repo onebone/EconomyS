@@ -2,10 +2,12 @@
 
 namespace EconomyAPI\commands;
 
+use EconomyAPI\EconomyAPI;
+
 class MyMoneyCommand extends EconomyAPICommand{
 	private $plugin;
 	
-	public function __construct(\EconomyAPI\EconomyAPI $api, $cmd = "mymoney"){
+	public function __construct(EconomyAPI $api, $cmd = "mymoney"){
 		parent::__construct($cmd, $api);
 		$this->setUsage("/$cmd");
 		$this->setDescription("Shows your money");
