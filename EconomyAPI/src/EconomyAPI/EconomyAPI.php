@@ -64,7 +64,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->createConfig();
 		$this->scanResources();
 		
-		file_put_contents($this->path."ReadMe.txt", $this->getResource("ReadMe.txt"));
+		file_put_contents($this->path."ReadMe.txt", $this->readResource("ReadMe.txt"));
 		if(!is_file($this->path."ScheduleData.dat")){
 			file_put_contents($this->path."ScheduleData.dat", serialize(array(
 				"debt" => array(),
@@ -133,7 +133,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	private function createConfig(){
-		$this->config = new Config($this->path."economy.properties", Config::PROPERTIES, unserialize($this->getResource("config.txt")));
+		$this->config = new Config($this->path."economy.properties", Config::PROPERTIES, unserialize($this->readResource("config.txt")));
 	}
 	
 	private function scanResources(){
@@ -141,7 +141,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$s = explode("\\", $resource);
 			$res = $s[count($s) - 1];
 			if(substr($res, 0, 5) === "lang_"){
-				$this->langRes[substr($res, 5, -5)] = get_object_vars(json_decode($this->getResource($res)));
+				$this->langRes[substr($res, 5, -5)] = get_object_vars(json_decode($this->readResource($res)));
 			}
 		}
 	}
@@ -169,9 +169,15 @@ class EconomyAPI extends PluginBase implements Listener{
 		return $default;
 	}
 	
+	private function readResource($res){
+		$path = $this->getFile()."resources/".$res;
+		$resource = $this->getResource($res);
+		return fread($resource, filesize($path));
+	}
+	
 	private function getLangFile(){
 		$lang = $this->config->get("default-lang");
-		if(($resource = $this->getResource("lang_".$lang.".json")) !== false){
+		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
 			$vars = get_object_vars(json_decode($resource));
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
@@ -182,7 +188,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->playerLang["RCON"] = $vars;
 			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
 		}else{
-			$vars = get_object_vars(json_decode($this->getResource("lang_def.json")));
+			$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
 			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
@@ -195,7 +201,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	@return boolean
 	*/
 	public function setLang($lang, $target = "CONSOLE"){
-		if(($resource = $this->getResource("lang_".$lang.".json")) !== false){
+		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
 			$this->playerLang[$target] = get_object_vars(json_decode($resource));
 		//	\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($this->langList[$lang], "%2", "%3", "%4")));
 			return true;
