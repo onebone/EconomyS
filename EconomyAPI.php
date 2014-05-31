@@ -793,11 +793,6 @@ class EconomyAPI{
 			}
 			break;
 		case "moneyload":
-			if($issuer instanceof Player){
-				//$output .= "Must be run"." "."in"." "."co"."nso"."le"; This is weird!
-				$output .= "Must be run in console";
-				break;
-			}
 			$moneydat = $this->server->api->plugin->readYAML(self::$path."MoneyData.yml");
 			$this->money = array();
 			foreach($moneydat as $player => $data){
@@ -810,10 +805,6 @@ class EconomyAPI{
 			$output .= "Money data has been loaded.";
 			break;
 		case "moneysave":
-			if($issuer instanceof Player){
-				$output .= "Must be run"." "."in"." "."co"."nso"."le";
-				break;
-			}
 			$this->moneydata->setAll($this->money);
 			$this->moneydata->save();
 			$this->bankdata->setAll($this->bank);
