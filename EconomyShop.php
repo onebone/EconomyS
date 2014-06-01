@@ -146,11 +146,15 @@ class EconomyShop implements Plugin{
 	}
 	
 	public function editShop($x, $y, $z, $level, $price, $item, $damage, $amount){
+		if(!is_numeric($x) or !is_numeric($y) or !is_numeric($z) or !is_string($level) or !is_numeric($price) or !is_numeric($item) or !is_numeric($damage) or !is_numeric($amount))
+			return false;
+			
 		$info = $this->shop->query("SELECT * FROM shop WHERE x = $x AND y = $y AND z = $z AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		if(is_bool($info)){
 			return false;
 		}
-		$this->shop->exec("UPDATE shop SET (item, meta, price, amount) VALUES ($item, $damage, $price, $amount) WHERE ID = {$info["id"]}");
+		$this->shop->exec("UPDATE shop SET item=$item, meta=$damage, price=$price, amount=$amount WHERE ID = {$info["id"]}");
+		return true;
 	}
 	
 	public function getShops(){
