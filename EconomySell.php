@@ -3,7 +3,7 @@
 __PocketMine Plugin__
 name=EconomySell
 description=Plugin of sell center supports EconomyAPI
-version=1.1.15
+version=1.2.0
 author=onebone
 class=EconomySell
 apiversion=12,13
@@ -62,11 +62,14 @@ V1.1.14 : Added the configuration about frequent saving
 
 V1.1.15 : Some fix of data file parsing
 
+V1.2.0 : Rewrote EconomySell database
+
 */
 
 class EconomySell implements Plugin {
 	private $api, $items, $tap;
 	public $sell;
+	
 	public function __construct(ServerAPI $api, $server = false){
 		$this->api = $api;
 		$this->sell = array();
@@ -75,243 +78,231 @@ class EconomySell implements Plugin {
 
 	public function init(){
 		$this->createConfig();
-		foreach($this->api->plugin->getList() as $p){
-			if($p["name"] == "EconomyAPI" and $this->config["compatible-to-economyapi"] or $p["name"] == "PocketMoney" and !$this->config["compatible-to-economyapi"]){
-				$exist = true;
-				break;
-			}
-
-		}
-		if(!isset($exist)){
-			console("[ERROR] ".($this->config["compatible-to-economyapi"] ? "EconomyAPI" : "PocketMoney")." does not exist");
+		if(!isset($this->api->economy) or !$this->api->economy instanceof EconomyAPI){
+			console("[ERROR] Cannot find EconomyAPI");
 			$this->api->console->defaultCommands("stop", array(), "plugin", false);
 			return;
 		}
-
+		
+		$centers = new Config(DATA_PATH."plugins/EconomySell/Sell.yml", CONFIG_YAML);
+		$this->sell = $centers->getAll();
+		
 		$this->loadItems();
-		$path = $this->api->plugin->configPath($this);
+		$this->convertData();
+		
 		EconomySellAPI::set($this);
 		$this->api->event("server.close", array($this, "handler"));
-		//  $this->api->addHandler("player.block.break", array($this, "handler"));
 		$this->api->addHandler("player.block.touch", array($this, "handler"));
 		$this->api->event("tile.update", array($this, "handler"));
-		$this->centers = new Config($path."SellCenter.yml", CONFIG_YAML);
-		$centerd = $this->api->plugin->readYAML($path."SellCenter.yml");
-		if(is_array($centerd)){
-			foreach($centerd as $c){
-				$this->sell[] = array("x" => $c["x"], "y" => $c["y"], "z" => $c["z"], "item" => $c["item"], "amount" => $c["amount"], "cost" => $c["cost"], "level" => $c["level"], "meta" => $c["meta"]);
-			}
-		}
 		$this->api->economy->EconomySRegister("EconomySell");
 	}
-
+	
 	public function __destruct(){}
 	
-	public function createConfig(){
+	private function convertData(){
+		if(is_file(DATA_PATH."plugins/EconomySell/SellCenter.yml")){
+			$cnt = 0;
+			foreach($this->api->plugin->readYAML(DATA_PATH."plugins/EconomySell/SellCenter.yml") as $sell){
+				$this->sell[$sell["x"].":".$sell["y"].":".$sell["z"].":".$sell["level"]] = $sell;
+				++$cnt;
+			}
+			var_dump($this->sell);
+			@unlink(DATA_PATH."plugins/EconomySell/SellCenter.yml");
+			console(FORMAT_AQUA."[EconomySell] $cnt of sell center data(m) has been converted into new database");
+		}
+	}
+	
+	private function createConfig(){
 		$this->config = $this->api->plugin->readYAML($this->api->plugin->createConfig($this, array(
 			"compatible-to-economyapi" => true,
 			"frequent-save" => false
 		))."config.yml");
+		
+		$this->lang = new Config(DATA_PATH."plugins/EconomySell/language.properties", CONFIG_PROPERTIES, array(
+			"wrong-format" => "Please write your sign with right format",
+			"item-not-support" => "Item %1 is not supported on EconomySell",
+			"no-permission-create" => "You don't have permission to create sell center",
+			"sell-created" => "Sell center has been created (%1:%2 = $%3)",
+			"removed-sell" => "Sell center has been removed",
+			"creative-mode" => "You are in creative mode",
+			"no-permission-break" => "You don't have permission to break sell center",
+			"tap-again" => "Are you sure to sell %1 ($%2)? Tap again to confirm",
+			"no-item" => "You have no item to sell",
+			"sold-item" => "Has been sold %1 of %2 for $%3"
+		));
+		
+		$this->sellSign = new Config(DATA_PATH."plugins/EconomySell/SellSign.yml", CONFIG_YAML, array(
+			"sell" => array(
+				"[SELL]",
+				"$%1",
+				"%2",
+				"Amount : %3"
+			)
+		));
+	}
+	
+	public function getMessage($key, $val = array("%1", "%2", "%3")){
+		if($this->lang->exists($key)){
+			return str_replace(array("%1", "%2", "%3"), array($val[0], $val[1], $val[2]), $this->lang->get($key));
+		}
+		return "There's no message named \"$key\"";
 	}
 	
 	public function editSell($data){
-		foreach($this->sell as $k => $s){
+		if(isset($this->sell[$data["x"].":".$data["y"].":".$data["z"].":".$data["level"]])){
 			$level = $this->api->level->get($data["level"]);
-			if($level == false) 
+			if(!$level instanceof Level){
 				return false;
+			}
 			$t = $this->api->tile->get(new Position($data["x"], $data["y"], $data["z"], $level));
-			if($t !== false and $s["x"] == $data["x"]and $data["y"] == $s["y"]and $s["z"] == $data["z"]and $data["level"] == $s["level"]){
-				$this->sell[$k] = array("x" => $data["x"], "y" => $data["y"], "z" => $data["z"], "level" => $data["level"], "cost" => $data["cost"], "amount" => $data["amount"], "item" => $s["item"], "meta" => $s["meta"],);
-				$t->setText($t->data["Text1"], $data["cost"]."$", $t->data["Text3"], $t->data["Text4"]);
-				if($this->config["frequent-save"]){
-					$this->centers->setAll($this->sell);
-					$this->centers->save();
-				}
-				return true;
+			if($t !== false){
+				$t->setText($t->data["Text1"], "$".$data["cost"], $t->data["Text3"], $data["Text4"]);
+			}
+			$this->sell[$data["x"].":".$data["y"].":".$data["z"].":".$data["level"]] = array(
+				"x" => $data["x"],
+				"y" => $data["y"],
+				"z" => $data["z"],
+				"level" => $data["level"],
+				"item" => $data["item"],
+				"meta" => $data["meta"],
+				"cost" => $data["cost"],
+				"amount" => $data["amount"]
+			);
+			return true;
+		}
+		return false;
+	}
+	
+	public function checkTag($line1){
+		foreach($this->sellSign->getAll() as $tag => $val){
+			if($tag == $line1){
+				return $val;
 			}
 		}
 		return false;
 	}
-	public function handler( &$data, $event){
+	
+	public function handler($data, $event){
 		$output = "";
 		switch ($event){
 		case "tile.update":
 			if($data->class === TILE_SIGN){
-				if($data->data["Text1"] == "sell" or $data->data["Text1"] == "노점상"){
-					$lang = $data->data["Text1"] == "sell" ? "english" : "korean";
+				if(($val = $this->checkTag($data->data["Text1"])) !== false){
 					$player = $this->api->player->get($data->data["creator"], false);
-					if($this->api->ban->isOp($this->api->player->get($data->data["creator"], false)->username) == false){
-						if($lang == "english"){
-							$this->api->player->get($data->data["creator"], false)->sendChat("You don't have permission to open sell center");
-						}else{
-							$this->api->player->get($data->data["creator"], false)->sendChat("당신은 노점상을 생성할 권한이 없습니다");
-						}
-						break;
+					if(!$this->api->ban->isOp($data->data["creator"])){
+						$player->sendChat($this->getMessage("no-permission-create"));
+						return;
 					}
-					if($data->data["Text2"] == "" or $data->data["Text3"] == "" or $data->data["Text4"] == ""){
-						if($lang == "english"){
-							$output .= "Incorrect sell center data";
-
-						}else{
-							$output .= "노점상의 데이터가 올바르지 않습니다.";
-						}
-						$player->sendChat($output);
-						break;
+					if(!is_numeric($data->data["Text2"]) or !is_numeric($data->data["Text4"])){
+						$player->sendChat($this->getMessage("wrong-format"));
+						return;
+					}
+					
+					// Item identify
+					$item = $this->getItem($data->data["Text3"]);
+					if($item === false){
+						$player->sendChat($this->getMessage("item-not-support", array($data->data["Text3"], "", "")));
+						return;
+					}
+					if($item[1] === false){ // Item name found
+						$id = explode(":", strtolower($data->data["Text3"]));
+						$data->data["Text3"] = $item[0];
 					}else{
-						if(strpos($data->data["Text3"], ":") !== false){
-							$e = explode(":", $data->data["Text3"]);
-						}else{
-							$e = explode(":", $data->data["Text3"]);
-							$e[1] = isset($e[1]) ? $e[1] : 0;
-							if(is_numeric($e[0]) and is_numeric($e[1])){
-								$e[0] = $data->data["Text3"];
-								$e[1] = 0;
-							}else{
-								$e = explode(":", $data->data["Text3"]);
-								$e[1] = isset($e[1]) ? $e[1] : 0;
-							}
-						}
-						if(is_numeric($e[0]) and is_numeric($e[1])){
-							$name = $this->getItem($e[0].":".$e[1]);
-							if($name == false){
-								$player->sendChat($lang == "english" ? "Item ".$data->data["Text3"]." does not support at EconomySell" : "아이템 ".$data->data["Text3"]."는 EconomySell 에서 지원하지 않습니다");
-								break;
-							}
-						}else{
-							$id = $this->getItem($data->data["Text3"]);
-							if($id == false){
-								$player->sendChat($lang == "english" ? "Item ".$data->data["Text3"]." does not support at EconomySell" : "아이템 ".$data->data["Text3"]."는 EconomySell 에서 지원하지 않습니다");
-								break;
-							}
-							$e = explode(":", $id);
-							$e[1] = isset($e[1]) ? $e[1] : 0;
-						}
-						if($this->api->dhandle("economysell.sellcenter.create", array("x" => $data->x, "y" => $data->y, "z" => $data->z, "item" => $e[0], "meta" => $e[1], "cost" => str_replace("$", "", $data->data["Text2"]), "amount" => $data->data["Text4"], "level" => $data->level->getName())) !== false){
-							$this->createSellCenter(array("meta" => $e[1], "x" => $data->data["x"], "y" => $data->data["y"], "z" => $data->data["z"], "item" => $e[0], "cost" => str_replace("$", "", $data->data["Text2"]), "amount" => $data->data["Text4"], "level" => $data->level->getName()));
-							if($lang == "english"){
-								$data->setText("[SELL]", $data->data["Text2"]."$", isset($name) ? $name : $data->data["Text3"], "Amount : ".$data->data["Text4"]);
-								$output .= "Sell center created";
-							}else{
-								$data->setText("[노점상]", $data->data["Text2"]."$", isset($name) ? $name : $data->data["Text3"], "수량 : ".$data->data["Text4"]);
-								$output .= "노점상이 생성되었습니다.";
-							}
-						}else{
-							$output .= "Failed to create sell center due to unknown error.";
-						}
+						$tmp = $this->getItem(strtolower($data->data["Text3"]));
+						$id = explode(":", $tmp[0]);
 					}
-					$player->sendChat($output);
+					$id[0] = (int)$id[0];
+					if(!isset($id[1])){
+						$id[1] = 0;
+					}
+					// Item identify end
+					
+					$this->sell[$data->x.":".$data->y.":".$data->z.":".$data->level->getName()] = array(
+						"x" => $data->x,
+						"y" => $data->y,
+						"z" => $data->z,
+						"level" => $data->level->getName(),
+						"cost" => (int) $data->data["Text2"],
+						"item" => (int) $id[0],
+						"meta" => (int) $id[1],
+						"amount" => (int) $data->data["Text4"]
+					);
+				
+					$player->sendChat($this->getMessage("sell-created", array($id[0], $id[1], $data->data["Text2"])));
+					
+					$data->data["Text1"] = $val[0];
+					$data->data["Text2"] = str_replace("%1", $data->data["Text2"], $val[1]);
+					$data->data["Text3"] = str_replace("%2", $data->data["Text3"], $val[2]);
+					$data->data["Text4"] = str_replace("%3", $data->data["Text4"], $val[3]);
+					
+					$this->api->tile->spawnToAll($data);
 				}
 			}
 
 			break;
 		case "player.block.touch":
-			if($data["type"] == "break"){
-				if($data["target"]->getID() == 323 or $data["target"]->getID() === 68 or $data["target"]->getID() == 63){
-					if($this->sell == null){
-						break;
-					}
-					foreach($this->sell as $s){
-						if($s["x"] == $data["target"]->x and $s["y"] == $data["target"]->y and $data["target"]->z == $s["z"]){
-							foreach($this->sell as $key => $value){
-								if($value["x"] == $data["target"]->x and $value["y"] == $data["target"]->y and $value["z"] == $data["target"]->z and $value["level"] == $data["target"]->level->getName()){
-									if($this->api->ban->isOp($data["player"]) == false){
-										$data["player"]->close("tried to destroy sell center");
-										return false;
-
-									}
-									unset($this->sell[$key]);
-									if($this->config["frequent-save"]){
-										$this->centers->setAll($this->sell);
-										$this->centers->save();
-									}
-								}
-							}
-						}
-					}
-				}
-				break; /// here ///
-			}
-			if($data["target"]->getID() == 323 or $data["target"]->getID() == 68 or $data["target"]->getID() == 63){
-				if(!is_array($this->sell)){
-					break;
-				}
-				foreach($this->sell as $s){
-					if($s["x"] == $data["target"]->x and $s["y"] == $data["target"]->y and $data["target"]->z == $s["z"]and $s["level"] == $data["target"]->level->getName()){
-						$can = false;
-						if($data["player"]->gamemode == CREATIVE){
-							$data["player"]->sendChat("You are in creative mode");
-							return false;
-						}
-						if(!isset($this->tap[$data["player"]->username])){
-							$this->tap[$data["player"]->username] = array("x" => $s["x"], "y" => $s["y"], "z" => $s["z"]);
-							$this->api->schedule(20, array($this, "removeTap"), $data["player"]->username);
-							$data["player"]->sendChat("Are you sure to sell this? Tap again to confirm.");
-							break;
-						}
-						if(!($s["x"] == $this->tap[$data["player"]->username]["x"]and $s["y"] == $this->tap[$data["player"]->username]["y"]and $s["z"] == $this->tap[$data["player"]->username]["z"])){
-							$data["player"]->sendChat("Are you sure to sell this? Tap again to confirm.");
-							$this->tap[$data["player"]->username] = array("x" => $s["x"], "y" => $s["y"], "z" => $s["z"]);
-							$this->api->schedule(20, array($this, "removeTap"), $data["player"]->username);
-							$this->cancel[$data["player"]->username] = true;
-							break;
-						}
-						$cnnt = 0;
-						$ss = null;
-						foreach($data["player"]->inventory as $slot => $item){
-							if($s["item"] == $item->getID() and $item->getMetadata() == $s["meta"]){
-								$iii = $item;
-								$cnnt += $item->count;
-								if($cnnt >= $s["amount"]){
-									$can = true;
-								}else{
-									//  $cnnt += $item->count;
-									$ss[] = array("sl" => $slot, "count" => $item->count);
-								}
-							}
-						}
-						if($can == false){
-							$data["player"]->sendChat("You don't have the item to sell");
-							return false;
-						}
-						if($ss !== null){
-							foreach($ss as $slots){
-								extract($slots);
-								$s["amount"] -= $count;
-								$data["player"]->setSlot($sl, BlockAPI::getItem(AIR, 0, 0));
-							}
-						}
-						$data["player"]->removeItem($iii->getID(), $iii->getMetadata(), $s["amount"]);
-						if($this->config["compatible-to-economyapi"]){
-							$this->api->economy->takeMoney($data["player"], $s["cost"]);
+			if($data["type"] === "break"){
+				if($data["target"]->getID() === 323 or $data["target"]->getID() === 68 or $data["target"]->getID() === 63){
+					if(isset($this->sell[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()])){
+						if($this->api->ban->isOp($data["player"]->iusername)){
+							unset($this->sell[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()]);
+							$data["player"]->sendChat($this->getMessage("removed-sell"));
+							return;
 						}else{
-							$this->api->dhandle("money.handle", array(
-								"username" => $data["player"]->username,
-								"method" => "grant",
-								"amount" => $s["cost"],
-								"issuer" => "EconomySell" // Disappeared?
-							));
+							$data["player"]->sendChat($this->getMessage("no-permission-break"));
+							return false;
 						}
-						unset($this->tap[$data["player"]->username]);
-						$data["player"]->sendChat("You have been sold your item");
+					}
+				}
+			}
+			
+			if($data["target"]->getID() == 323 or $data["target"]->getID() == 68 or $data["target"]->getID() == 63){
+				if(isset($this->sell[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()])){
+					if($data["player"]->gamemode === CREATIVE){
+						$data["player"]->sendChat($this->getMessage("creative-mode"));
+						return false;
+					}
+					$sellInfo = $this->sell[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()];
+					if(isset($this->tap[$data["player"]->iusername])){
+						if((time() - $this->tap[$data["player"]->iusername][1]) > 2){
+							$this->tap[$data["player"]->iusername] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time());
+							$data["player"]->sendChat($this->getMessage("tap-again", array($sellInfo["item"].":".$sellInfo["meta"], $sellInfo["cost"], "%3")));
+							break;
+						}
+						$cnt = 0;
+						foreach($data["player"]->inventory as $slot => $item){
+							if($item->getID() === $sellInfo["item"] and $item->getMetadata() === $sellInfo["meta"]){
+								$cnt += $item->count;
+								if($cnt >= $sellInfo["amount"]) break;
+							}
+						}
+						
+						if($cnt >= $sellInfo["amount"]){
+							$data["player"]->removeItem($sellInfo["item"], $sellInfo["meta"], $sellInfo["amount"]);
+							$this->api->economy->takeMoney($data["player"], $sellInfo["cost"]);
+							$data["player"]->sendChat($this->getMessage("sold-item", array($sellInfo["amount"], $sellInfo["item"].":".$sellInfo["meta"], $sellInfo["cost"])));
+							unset($this->tap[$data["player"]->iusername]);
+						}else{
+							unset($this->tap[$data["player"]->iusername]);
+							$data["player"]->sendChat($this->getMessage("no-item"));
+						}
+						return false;
+					}else{
+						$this->tap[$data["player"]->iusername] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time());
+						$data["player"]->sendChat($this->getMessage("tap-again", array($sellInfo["item"].":".$sellInfo["meta"], $sellInfo["cost"], "%3")));
 						return false;
 					}
 				}
 			}
 			break;
 		case "server.close":
-			$this->centers->setAll($this->sell);
-			$this->centers->save();
+			$sellCfg = new Config(DATA_PATH."plugins/EconomySell/Sell.yml", CONFIG_YAML);
+			$sellCfg->setAll($this->sell);
+			$sellCfg->save();
 			break;
 		}
 	}
-	public function removeTap($username){
-		if(isset($this->cancel[$username])){
-			unset($this->cancel[$username]);
-			return false;
-		}
-		if(isset($this->tap[$username])) 
-			unset($this->tap[$username]);
-		}
+		
 	public function createSellCenter($c){
 		$this->sell[] = array("x" => $c["x"], "y" => $c["y"], "z" => $c["z"], "item" => $c["item"], "cost" => $c["cost"], "amount" => $c["amount"], "level" => $c["level"], "meta" => $c["meta"]);
 		if($this->config["frequent-save"]){
@@ -319,31 +310,26 @@ class EconomySell implements Plugin {
 			$this->centers->save();
 		}
 	}
+	
 	public function getItem($item){ // gets ItemID and ItemName
+		$item = strtolower($item);
 		$e = explode(":", $item);
-		if(count($e) > 1){
-			if(is_numeric($e[0])){
-				foreach($this->items as $k => $i){
-					$item = explode(":", $i);
-					$e[1] = isset($e[1]) ? $e[1] : 0;
-					$item[1] = isset($item[1]) ? $item[1] : 0;
-					if($e[0] == $item[0]and $e[1] == $item[1]){
-						return $k;
-					}
-				}
-				return false;
-			}
+		$e[1] = isset($e[1]) ? $e[1] : 0;
+		if(array_key_exists($item, $this->items)){
+			return array($this->items[$item], true); // Returns Item ID
 		}else{
-			$item = strtolower($item);
-			if(isset($this->items[$item])){
-				return $this->items[$item];
-			}else{
-				return false;
+			foreach($this->items as $name => $id){
+				$explode = explode(":", $id);
+				$explode[1] = isset($explode[1]) ? $explode[1]:0;
+				if($explode[0] == $e[0] and $explode[1] == $e[1]){
+					return array($name, false);
+				}
 			}
 		}
+		return false;
 	}
+	
 	public function loadItems(){
-		$items = array();
 		if(!is_file(DATA_PATH."plugins/EconomySell/items.properties")){
 		$items = new Config(DATA_PATH."plugins/EconomySell/items.properties", CONFIG_PROPERTIES, array(
 		"air" => 0,
@@ -609,7 +595,7 @@ class EconomySell implements Plugin {
 		"beetrootsoup" => 459
 		));
 	}else{
-		$items = new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES);
+		$items = new Config(DATA_PATH."plugins/EconomySell/items.properties", CONFIG_PROPERTIES);
 	}
 	$this->items = array_change_key_case($items->getAll(), CASE_LOWER);
 	}
