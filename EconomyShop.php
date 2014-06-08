@@ -3,7 +3,7 @@
 /*
 __PocketMine Plugin__
 name=EconomyShop
-version=1.2.4
+version=1.3.0
 author=onebone
 apiversion=12,13
 class=EconomyShop
@@ -72,32 +72,23 @@ V1.2.4 : Bug fixed - Item name is not supported correctly
 
 V1.2.5 : Easily access of EconomyShop
 
+V1.3.0 : Database rewrite
+
 */
 
 class EconomyShop implements Plugin{
-	private $api, $shop, $config, $tap, $id, $shopSign;
+	private $api, $shop, $config, $tap, $shopSign;
 	private static $obj;
 	
 	public function __construct(ServerAPI $api, $server = false){
 		$this->api = $api;
 		$this->tap = array();
-		$this->id = array();
 	}
 	
 	public function init(){
 		@mkdir(DATA_PATH."plugins/EconomyShop/");
-		$this->shop = new SQLite3(DATA_PATH."plugins/EconomyShop/Shops.sqlite3");
-		$this->shop->exec("CREATE TABLE IF NOT EXISTS shop(
-			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			x INTEGER NOT NULL,
-			y INTEGER NOT NULL,
-			z INTEGER NOT NULL,
-			level TEXT NOT NULL,
-			price NUMERIC NOT NULL,
-			item INTEGER NOT NULL,
-			meta INTEGER NOT NULL,
-			amount INTEGER NOT NULL
-		);");
+		$shopCfg = new Config(DATA_PATH."plugins/EconomyShop/Shops.yml", CONFIG_YAML);
+		$this->shop = $shopCfg->getAll();
 		$this->createConfig();
 		$this->loadItems();
 		$this->convertData();
@@ -107,12 +98,19 @@ class EconomyShop implements Plugin{
 		}
 		$priority &= PHP_INT_MAX;
 		$this->api->event("tile.update", array($this, "onTileUpdate"), $priority);
+		$this->api->event("server.close", array($this, "onClose"));
 		$this->api->addHandler("player.block.touch", array($this, "onTouch"), $priority);
 		$this->api->economy->EconomySRegister("EconomyShop");
 		self::$obj = $this;
 	}
 	
 	public function __destruct(){}
+	
+	public function onClose(){
+		$shopCfg = new Config(DATA_PATH."plugins/EconomyShop/Shops.yml", CONFIG_YAML);
+		$shopCfg->setAll($this->shop);
+		$shopCfg->save();
+	}
 	
 	public static function getInstance(){
 		return self::$obj;
@@ -127,10 +125,11 @@ class EconomyShop implements Plugin{
 			"wrong-format" => "Please write your sign with right format",
 			"item-not-support" => "Item %1 is not supported on EconomyShop",
 			"no-permission-create" => "You don't have permission to create shop",
-			"shop-created" => "Shop has been created",
+			"shop-created" => "Shop has been created (%1:%2 = $%3)",
 			"removed-shop" => "Shop has been removed",
 			"no-permission-break" => "You don't have permission to break shop",
 			"tap-again" => "Are you sure to buy %1 ($%2)? Tap again to confirm",
+			"full-inventory" => "Sorry, your inventory is full",
 			"no-money" => "You don't have to buy $%1",
 			"bought-item" => "Has been bought %1 of %2 for $%3"
 		));
@@ -149,33 +148,38 @@ class EconomyShop implements Plugin{
 		if(!is_numeric($x) or !is_numeric($y) or !is_numeric($z) or !is_string($level) or !is_numeric($price) or !is_numeric($item) or !is_numeric($damage) or !is_numeric($amount))
 			return false;
 			
-		$info = $this->shop->query("SELECT * FROM shop WHERE x = $x AND y = $y AND z = $z AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
-		if(is_bool($info)){
+		if(!isset($this->shop[$x.":".$y.":".$z.":".$level])){
 			return false;
 		}
-		$this->shop->exec("UPDATE shop SET item=$item, meta=$damage, price=$price, amount=$amount WHERE ID = {$info["id"]}");
+		$this->shop[$x.":".$y.":".$z.":".$level] = array(
+			"x" => $x,
+			"y" => $y,
+			"z" => $z,
+			"level" => $level,
+			"item" => (int) $item,
+			"meta" => (int) $damage,
+			"price" => (int) $price,
+			"amount" => (int) $amount
+		);
 		return true;
 	}
 	
 	public function getShops(){
-		$ret = array();
-		$s = $this->shop->query("SELECT * FROM shop");
-		while(($r = $s->fetchArray(SQLITE3_ASSOC)) !== false){
-			$ret[] = $r;
-		}
-		return $ret;
+		return $this->shop;
 	}
 	
 	private function convertData(){
-		if(is_file(DATA_PATH."plugins/EconomyShop/Shops.yml")){
+		if(is_file(DATA_PATH."plugins/EconomyShop/Shops.sqlite3")){
 			$cnt = 0;
-			$data = $this->api->plugin->readYAML(DATA_PATH."plugins/EconomyShop/Shops.yml");
-			foreach($data as $d){
-				$this->shop->exec("INSERT INTO shop (x, y, z, level, price, item, meta, amount) VALUES ($d[x], $d[y], $d[z], '$d[level]', $d[price], $d[item], $d[meta], $d[amount]);");
+			$data = new SQLite3(DATA_PATH."plugins/EconomyShop/Shops.sqlite3");
+			$result = $data->query("SELECT * FROM shop");
+			while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
+				$this->shop[$d["x"].":".$d["y"].":".$d["z"].":".$d["level"]] = $d;
 				++$cnt;
 			}
-			@unlink(DATA_PATH."plugins/EconomyShop/Shops.yml");
-			console(FORMAT_AQUA."[EconomyShop] Converted $cnt of shops into new database");
+			$data->close();
+			@unlink(DATA_PATH."plugins/EconomyShop/Shops.sqlite3");
+			console(FORMAT_AQUA."[EconomyShop] Converted $cnt of shop(s) into new database");
 		}
 	}
 	
@@ -255,7 +259,18 @@ class EconomyShop implements Plugin{
 				}
 				// Item identify end
 				
-				$this->shop->exec("INSERT INTO shop (x, y, z, level, price, item, meta, amount) VALUES ({$data->x}, {$data->y}, {$data->z}, '{$data->level->getName()}', {$data->data["Text2"]}, $id[0], $id[1], {$data->data["Text4"]});");
+				$this->shop[$data->x.":".$data->y.":".$data->z.":".$data->level->getName()] = array(
+					"x" => $data->x,
+					"y" => $data->y,
+					"z" => $data->z,
+					"level" => $data->level->getName(),
+					"price" => (int) $data->data["Text2"],
+					"item" => (int) $id[0],
+					"meta" => (int) $id[1],
+					"amount" => (int) $data->data["Text4"]
+				);
+				
+				$player->sendChat($this->getMessage("shop-created", array($id[0], $id[1], $data->data["Text2"])));
 				
 				$d = $this->getData($data->data["Text1"]);
 				$data->data["Text1"] = $d[0];
@@ -264,21 +279,18 @@ class EconomyShop implements Plugin{
 				$data->data["Text4"] = str_replace("%3", $data->data["Text4"], $d[3]);
 				
 				$this->api->tile->spawnToAll($data);
-				$player->sendChat($this->getMessage("shop-created"));
 			}
 		}
 	}
 	
 	public function onTouch($data){
-	//	$signArr = array(63, 68, 323);
 		$id = $data["target"]->getID();
-	//	if(in_array($data["target"]->getID(), $signArr)){
 		if($id === 63 or $id === 68 or $id === 323){
-			$info = $this->shop->query("SELECT * FROM shop WHERE x = {$data["target"]->x} AND y = {$data["target"]->y} AND z = {$data["target"]->z} AND level = '{$data["target"]->level->getName()}'")->fetchArray(SQLITE3_ASSOC);
-			if(!is_bool($info)){
+			if(isset($this->shop[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()])){
+				$shopInfo = $this->shop[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()];
 				if($data["type"] === "break"){
 					if($this->api->ban->isOp($data["player"]->iusername)){
-						$this->shop->exec("DELETE FROM shop WHERE id = $info[id]");
+						unset($this->shop[$data["target"]->x.":".$data["target"]->y.":".$data["target"]->z.":".$data["target"]->level->getName()]);
 						$data["player"]->sendChat($this->getMessage("removed-shop"));
 					}else{
 						$data["player"]->sendChat($this->getMessage("no-permission-break"));
@@ -286,53 +298,38 @@ class EconomyShop implements Plugin{
 					}
 					return;
 				}
-				if(!in_array($data["player"]->iusername, $this->tap)){
-					$id = $this->getRandIdentifier();
-					$this->tap[$id] = $data["player"]->iusername;
-					$this->api->schedule(25, array($this, "removeTapSchedule"), $id);
-					$data["player"]->sendChat($this->getMessage("tap-again", array($info["item"].":".$info["meta"], $info["price"], "")));
-					return false;
-				}else{
-					if($this->api->economy->useMoney($data["player"], $info["price"])){
-						$data["player"]->addItem($info["item"], $info["meta"], $info["amount"]);
-						$data["player"]->sendChat($this->getMessage("bought-item", array($info["amount"], $info["item"].":".$info["meta"], $info["price"])));
-						$this->removeTapSchedule(array_search($data["player"]->iusername, $this->tap));
-						return false;
-					}else{
-						$data["player"]->sendChat($this->getMessage("no-money", array($info["price"], $info["item"].":".$info["meta"], "")));
+				if(isset($this->tap[$data["player"]->iusername])){
+					if(!$data["player"]->hasSpace($shopInfo["item"], $shopInfo["meta"], $shopInfo["amount"])){
+						$data["player"]->sendChat($this->getMessage("full-inventory"));
 						return false;
 					}
+					$now = time();
+					if(($now - $this->tap[$data["player"]->iusername][1]) > 2){
+						unset($this->tap[$data["player"]->iusername]);
+						$data["player"]->sendChat($this->getMessage("tap-again", array($shopInfo["item"].":".$shopInfo["meta"], $shopInfo["price"], "")));
+						return false;
+					}
+					if($this->api->economy->useMoney($data["player"], $shopInfo["price"])){
+						$data["player"]->addItem($shopInfo["item"], $shopInfo["meta"], $shopInfo["amount"]);
+						$data["player"]->sendChat($this->getMessage("bought-item", array($shopInfo["amount"], $shopInfo["item"].":".$shopInfo["meta"], $shopInfo["price"])));
+						unset($this->tap[$data["player"]->iusername]);
+					}else{
+						$data["player"]->sendChat($this->getMessage("no-money", array($shopInfo["price"], $shopInfo["item"].":".$shopInfo["meta"], "")));
+						return false;
+					}
+				}else{
+					$id = $data["player"]->iusername;
+					$this->tap[$id] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time()); // I don't think that player can teleport to other world and touch shop sign immediately
+					$data["player"]->sendChat($this->getMessage("tap-again", array($shopInfo["item"].":".$shopInfo["meta"], $shopInfo["price"], "")));
+					return false;
 				}
 			}
 		}
 	}
 	
-	public function removeTapSchedule($id){
-		if(isset($this->tap[$id])){
-			$this->tap[$id] = null;
-			unset($this->tap[$id]);
-		}
-	}
-	
-	public function getRandIdentifier($len = 20){
-		$i = "";
-		for($a = 0; $a < $len; $a++){
-			$rand = rand(0, 15);
-			$i .= dechex($rand);
-		}
-		return $i;
-	}
-	
-	/*
-	$this->api->schedule(15, function($data){
-		
-	}, array());
-	*/ // I just wanted to use anonymous function!!
-	
-	public function loadItems(){ // I managed to align this all items list :P
-		$items = array();
+	private function loadItems(){ // I managed to align this all items list :P
 		if(!is_file(DATA_PATH."plugins/EconomyShop/items.properties")){
-			$this->items = array_change_key_case((new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES, array(
+			$config = new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES, array(
 				"air" => 0,
 				"stone" => 1,
 				"grassblock" => 2,
@@ -594,7 +591,9 @@ class EconomyShop implements Plugin{
 				"beetroot" => 457,
 				"beetrootseed" => 458,
 				"beetrootsoup" => 459
-			)))->getAll(), CASE_LOWER);
+			));
+			$this->items = array_change_key_case($config->getAll(), CASE_LOWER);
+			$config->save();
 		}else{
 			$this->items = array_change_key_case(((new Config(DATA_PATH."plugins/EconomyShop/items.properties", CONFIG_PROPERTIES))->getAll()), CASE_LOWER);
 		}
