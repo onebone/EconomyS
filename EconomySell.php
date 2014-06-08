@@ -106,7 +106,6 @@ class EconomySell implements Plugin {
 				$this->sell[$sell["x"].":".$sell["y"].":".$sell["z"].":".$sell["level"]] = $sell;
 				++$cnt;
 			}
-			var_dump($this->sell);
 			@unlink(DATA_PATH."plugins/EconomySell/SellCenter.yml");
 			console(FORMAT_AQUA."[EconomySell] $cnt of sell center data(m) has been converted into new database");
 		}
