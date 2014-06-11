@@ -83,14 +83,14 @@ class BankCommand extends EconomyAPICommand{
 			
 			$money = $this->plugin->myBankMoney($player);
 			if($money === false){
-				$sender->sendMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4"));
+				$sender->sendMessage($this->plugin->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4")));
 			}else{
-				$sender->sendMessage("bank-hismoney", $sender->getName(), array($player, $money, "%3", "%4"));
+				$sender->sendMessage($this->plugin->getMessage("bank-hismoney", $sender->getName(), array($player, $money, "%3", "%4")));
 			}
 			return true;
 			case "mymoney":
-			$money = $this->plugin->myBankMoney($player);
-			$sender->sendMessage("bank-mymoney", $sender->getName(), array($money, "%2", "%3", "%4"));
+			$money = $this->plugin->myBankMoney($sender);
+			$sender->sendMessage($this->plugin->getMessage("bank-mymoney", $sender->getName(), array($money, "%2", "%3", "%4")));
 			break;
 			default:
 			$sender->sendMessage("Usage: /".$this->cmd." <deposit|withdraw|seemoney|mymoney>");
