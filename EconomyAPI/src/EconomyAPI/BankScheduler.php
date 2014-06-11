@@ -6,6 +6,7 @@ use EconomyAPI\EconomyAPI;
 
 use pocketmine\scheduler\PluginTask;
 use pocketmine\Server;
+use pocketmine\Player;
 
 class BankScheduler extends PluginTask{
 	private $plugin, $username;

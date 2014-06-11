@@ -39,12 +39,12 @@ class TakeDebtCommand extends EconomyAPICommand{
 		}
 		$result = $this->getPlugin()->addDebt($sender, $amount, false, "TakeDebtCommand");
 		$output = "";
-		switch($result[0]){
+		switch($result){
 			case -4: // RET_ERROR_1
-			$output .= $this->getPlugin()->getMessage("takedebt-over-range", array($amount, $sender->getName(), $this->getPlugin()->getConfigurationValue("debt-limit"), "%3", "%4"));
+			$output .= $this->getPlugin()->getMessage("takedebt-over-range", $sender->getName(), array($amount, $sender->getName(), $this->getPlugin()->getConfigurationValue("debt-limit"), "%3", "%4"));
 			break;
 			case -3: // RET_ERROR2
-			$output .= $this->getPlugin()->getMessage("takedebt-over-range-once", array($amount, $sender->getName(), $this->getPlugin()->getConfigurationValue("once-debt-limit"), "%3", "%4"));
+			$output .= $this->getPlugin()->getMessage("takedebt-over-range-once", $sender->getName(), array($amount, $sender->getName(), $this->getPlugin()->getConfigurationValue("once-debt-limit"), "%3", "%4"));
 			break;	
 			case -2: // RET_CANCELLED
 			$output .= $this->getPlugin()->getMessage("request-cancelled", $sender->getName());
@@ -53,7 +53,7 @@ class TakeDebtCommand extends EconomyAPICommand{
 			$output .= $this->getPlugin()->getMessage("takedebt-must-bigger-than-zero", $sender->getName());
 			break;
 			case 1: // RET_SUCCESS
-			$output .= $this->getPlugin()->getMessage("takedebt-takedebt", array($amount, "%2", "%3", "%4"));
+			$output .= $this->getPlugin()->getMessage("takedebt-takedebt", $sender->getName(), array($amount, "%2", "%3", "%4"));
 			break;
 		}
 		$sender->sendMessage($output);

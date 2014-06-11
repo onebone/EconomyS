@@ -6,6 +6,7 @@ use EconomyAPI\EconomyAPI;
 
 use pocketmine\scheduler\PluginTask;
 use pocketmine\Server;
+use pocketmine\Player;
 
 class DebtScheduler extends PluginTask{
 	private $plugin, $username;
@@ -18,7 +19,7 @@ class DebtScheduler extends PluginTask{
 	
 	public function onRun($tick){
 		$server = Server::getInstance();
-		$player = $server->matchPlayer($this->username);
+		$player = $server->getPlayerExact($this->username);
 		if(!$player instanceof Player){
 			return;
 		}

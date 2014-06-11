@@ -29,5 +29,3 @@ Links:
 
 forums.pocketmine.net (PocketMine Forums)
 cafe.naver.com/minecraftpe (MCPE KOREA)
-
-Made in Korea

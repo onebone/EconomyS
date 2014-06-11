@@ -53,7 +53,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->money = array();
 		$this->bank = array();
 		$this->task = array();
-		$this->lastTask = array();
+		$this->lastTask = array(
+			"debt" => array(),
+			"bank" => array()
+		);
 		$this->playerLang = array();
 		$this->langRes = array();
 	}
@@ -74,6 +77,23 @@ class EconomyAPI extends PluginBase implements Listener{
 		if(!is_file($this->path."PlayerLang.dat")){
 			file_put_contents($this->path."PlayerLang.dat", serialize(array()));
 		}
+		/*if(!is_file($this->path."Task.dat")){
+			file_put_contents($this->path."Task.dat", serialize(array(
+				"debt" => array(),
+				"bank" => array()
+			)));
+		}*/
+		
+		//$tasks = unserialize(file_get_contents($this->path."Task.dat"));
+		
+		/*foreach($tasks["debt"] as $player => $task){
+			$this->task["debt"][$player] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $player), $this->config->get("time-for-increase-debt"))->getTaskId();
+			$this->lastTask[$player]["debt"] = time();
+		}
+		foreach($tasks["bank"] as $player => $task){
+			$this->task["bank"][$player] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $player), $this->config->get("time-for-increase-debt"))->getTaskId();
+			$this->lastTask[$player]["debt"] = time();
+		}*/
 		
 		$this->schedule = unserialize(file_get_contents($this->path."ScheduleData.dat"));
 		$playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
@@ -98,7 +118,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			new \EconomyAPI\commands\TopMoneyCommand($this),
 			new \EconomyAPI\commands\SetLangCommand($this),
 			new \EconomyAPI\commands\TakeMoneyCommand($this),
-			new \EconomyAPI\commands\BankCommand($this)
+			new \EconomyAPI\commands\BankCommand($this),
+			new \EconomyAPI\commands\MyDebtCommand($this)
 		);
 		$commandMap = $this->getServer()->getCommandMap();
 		foreach($cmds as $cmd){
@@ -172,6 +193,9 @@ class EconomyAPI extends PluginBase implements Listener{
 	private function readResource($res){
 		$path = $this->getFile()."resources/".$res;
 		$resource = $this->getResource($res);
+		if($resource === false){
+			return false;
+		}
 		return fread($resource, filesize($path));
 	}
 	
@@ -181,17 +205,17 @@ class EconomyAPI extends PluginBase implements Listener{
 			$vars = get_object_vars(json_decode($resource));
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
-			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}elseif($lang === "user-define"){
 			$vars = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, get_object_vars(json_decode($this->getResource("lang_def.json")))))->getAll();
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
-			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
 		}else{
 			$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
-			\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}
 	}
 	
@@ -203,15 +227,12 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function setLang($lang, $target = "CONSOLE"){
 		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
 			$this->playerLang[$target] = get_object_vars(json_decode($resource));
-		//	\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($this->langList[$lang], "%2", "%3", "%4")));
 			return true;
 		}else{
 			foreach($this->langList as $key => $l){
 				if(strtolower($lang) === strtolower($l)){
 					if(($resource = $this->langList($key)) !== false){
-						/*$this->playerLang[$target] = get_object_vars(json_decode($resource));*/
 						$this->playerLang[$target] = $resource;
-						//\pocketmine\console(TextFormat::GREEN."[EconomyAPI] ".$this->getMessage("language-set", $target, array($l, "%2", "%3", "%4")));
 						return $l;
 					}else{
 						return false;
@@ -258,15 +279,16 @@ class EconomyAPI extends PluginBase implements Listener{
 	@return int
 	*/
 	public function addDebt($player, $amount, $force = false, $issuer = "external"){
+		if($amount <= 0){
+			return self::RET_INVALID;
+		}
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$amount = round($amount, 2);
 		if(isset($this->money["debt"][$player])){
 			$debt = $this->money["debt"][$player];
-			if($amount <= 0){
-				return self::RET_INVALID;
-			}
+			
 			if(($debt + $amount > $this->config->get("debt-limit")) and $force === false){
 				return self::RET_ERROR_1;
 			}
@@ -280,8 +302,11 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 			$this->money["debt"][$player] += $amount;
 			
-			$this->schedule["debt"][$player] = time();
-			$this->task[$player]["debt"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $player), $this->config->get("time-for-increase-debt"))->getTaskId();
+		//	$this->schedule["debt"][$player] = time(); // changed
+			if(!isset($this->task[$player]["debt"])){
+				$this->task[$player]["debt"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $player), ($this->config->get("time-for-increase-debt") * 1200))->getTaskId();
+				$this->schedule["debt"][$player] = ($this->config->get("time-for-increase-debt") * 1200);
+			}
 			$this->lastTask["debt"][$player] = time();
 			return self::RET_SUCCESS;
 		}else{
@@ -344,8 +369,11 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 			$this->bank["money"][$player] += $amount;
 			
-			$this->schedule["bank"][$player] = time();
-			$this->task[$player]["bank"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $player), $this->schedule["bank"][$player] * 20)->getTaskId();
+			//$this->schedule["bank"][$player] = time(); // changed
+			if(!isset($this->task[$player]["bank"])){
+				$this->schedule["bank"][$player] = ($this->config->get("time-for-increase-money") * 1200);
+				$this->task[$player]["bank"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $player), $this->config->get("time-for-increase-money") * 1200)->getTaskId();
+			}
 			$this->lastTask["bank"][$player] = time();
 			return self::RET_SUCCESS;
 		}else{
@@ -659,6 +687,17 @@ class EconomyAPI extends PluginBase implements Listener{
 		$bankConfig->save();
 		file_put_contents($this->path."ScheduleData.dat", serialize($this->schedule));
 		file_put_contents($this->path."PlayerLang.dat", serialize($this->getSavingPlayerLangData()));
+		$saveDat = array(
+			"debt" => array(),
+			"bank" => array()
+		);
+		foreach($this->lastTask["debt"] as $player => $trash){
+			$saveDebt["debt"][] = $player;
+		}
+		foreach($this->lastTask["bank"] as $player => $trash){
+			$saveDebt["bank"][] = $player;
+		}
+		file_put_contents($this->path."Task.dat", serialize($saveDat));
 	}
 	
 	public function onQuitEvent(PlayerQuitEvent $event){
@@ -681,27 +720,20 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function onJoinEvent(PlayerJoinEvent $event){
 		$username = $event->getPlayer()->getName();
 		if(!isset($this->money["money"][$username])){
-			/*$this->money[$username] = array(
-				"money" => $this->config->get("default-money"),
-				"debt" => $this->config->get("default-debt")
-			);*/
 			$this->money["money"][$username] = $this->config->get("default-money");
 			$this->money["debt"][$username] = $this->config->get("default-debt");
 		}
 		if(!isset($this->bank["money"][$username])){
-			/*$this->bank[$username] = array(
-				"money" => $this->config->get("default-bank-money")
-			);*/
 			$this->bank["money"][$username] = $this->config->get("default-bank-money");
 		}
 		if(!isset($this->playerLang[$username])){
-			$this->playerLang[$username] = $this->setLang($this->config->get("default-lang"), $username);
+			$this->setLang($this->config->get("default-lang"), $username);
 		}
 		if(isset($this->schedule["debt"][$username])){
-			$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $username), $this->schedule["debt"][$username] * 20)->getTaskId();
+			$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new DebtScheduler($this, $username), ($this->schedule["debt"][$username] * 20))->getTaskId();
 		}
 		if(isset($this->schedule["bank"][$username])){
-			$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $username), $this->schedule["bank"][$username] * 20)->getTaskId();
+			$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleRepeatingTask(new BankScheduler($this, $username), ($this->schedule["bank"][$username] * 20))->getTaskId();
 		}
 	}
 	
