@@ -27,18 +27,21 @@ class TopMoneyCommand extends EconomyAPICommand{
 		
 		$moneyData = $this->getPlugin()->getAllMoney();
 		
-		$banList = Server::getInstance()->getNameBans(); // TODO TopMoney Command
+		$server = Server::getInstance();
+		$banList = $server->getNameBans(); // TODO TopMoney Command
 		arsort($moneyData["money"]);
 		$n = 1;
-		$max = ceil(count($moneyData["money"]) / 5);
+		$max = ceil((count($moneyData["money"]) - count($banList) - ($this->getPlugin()->getConfigurationValue("add-op-at-rank") ? 0 : count($server->getOPs()->getAll()))) / 5);
 		$page = max(1, $page);
 		$page = min($max, $page);
 		$page = (int)$page;
 		
 		$output = "- Showing top money list ($page of $max) -\n";
 		$message = ($this->getPlugin()->getMessage("topmoney-format", $sender->getName(), array("%1", "%2", "%3", "%4"))."\n");
+		
 		foreach($moneyData["money"] as $player => $money){
 			if($banList->isBanned($player)) continue;
+			if($server->isOp(strtolower($player)) and ($this->getPlugin()->getConfigurationValue("add-op-at-rank") === false)) continue;
 			$current = (int)ceil($n / 5);
 			if($current === $page){
 				$output .= str_replace(array("%1", "%2", "%3"), array($n, $player, $money), $message);

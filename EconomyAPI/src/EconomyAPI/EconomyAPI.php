@@ -101,7 +101,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			"bank" => "EconomyAPI\\commands\\BankCommand",
 			"mydebt" => "EconomyAPI\\commands\\MyDebtCommand",
 			"returndebt" => "EconomyAPI\\commands\\ReturnDebtCommand",
-			"bankadmin" => "EconomyAPI\\commands\\BankAdminCommand"
+			"bankadmin" => "EconomyAPI\\commands\\BankAdminCommand",
+			"mystatus" => "EconomyAPI\\commands\\MyStatusCommand"
 		);
 		$commandMap = $this->getServer()->getCommandMap();
 		foreach($cmds as $key => $cmd){
