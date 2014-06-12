@@ -96,17 +96,17 @@ class EconomyLand extends PluginBase implements Listener{
 					while($result->fetchArray(SQLITE3_ASSOC) !== false){
 						++$cnt;
 						if($cnt >= $this->config->get("player-land-limit")){
-							$output .= $this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit")));
-							break 2;
+							$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"))));
+							return true;
 						}
 					}
 				}
 				if(!isset($this->start[$sender->getName()])){
-					$output .= $this->getMessage("set-first-position");
-					break;
+					$sender->sendMessage($this->getMessage("set-first-position"));
+					return true;
 				}elseif(!isset($this->end[$sender->getName()])){
-					$output .= $this->getMessage("set-second-position");
-					break;
+					$sender->sendMessage($this->getMessage("set-second-position"));
+					return true;
 				}
 				$l = $this->start[$sender->getName()];
 				$endp = $this->end[$sender->getName()];
