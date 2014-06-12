@@ -31,7 +31,7 @@ class TopMoneyCommand extends EconomyAPICommand{
 		$banList = $server->getNameBans(); // TODO TopMoney Command
 		arsort($moneyData["money"]);
 		$n = 1;
-		$max = ceil((count($moneyData["money"]) - count($banList) - ($this->getPlugin()->getConfigurationValue("add-op-at-rank") ? 0 : count($server->getOPs()->getAll()))) / 5);
+		$max = ceil((count($moneyData["money"]) - count($banList->getEntries()) - ($this->getPlugin()->getConfigurationValue("add-op-at-rank") ? 0 : count($server->getOPs()->getAll()))) / 5);
 		$page = max(1, $page);
 		$page = min($max, $page);
 		$page = (int)$page;
