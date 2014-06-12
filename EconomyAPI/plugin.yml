@@ -1,6 +1,6 @@
 name: EconomyAPI
 main: EconomyAPI\EconomyAPI
-version: "1.0"
+version: "1.0.0"
 author: onebone
 api: [1.0.0]
 
@@ -42,4 +42,10 @@ permissions:
       default: true
      economyapi.command.bank:
       description: Allows player to manage bank account
+      default: true
+     economyapi.command.bankadmin:
+      description: Allows player to manage others' bank account
+      default: op
+     economyapi.command.mystatus:
+      description: Allows player to see his/her financial status
       default: true
