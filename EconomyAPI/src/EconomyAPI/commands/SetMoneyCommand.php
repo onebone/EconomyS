@@ -3,6 +3,7 @@
 namespace EconomyAPI\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\Server;
 
 use EconomyAPI\EconomyAPI;
 
@@ -32,6 +33,14 @@ class SetMoneyCommand extends EconomyAPICommand{
 			$sender->sendMessage("Usage: /".$this->cmd." <player> <money>");
 			return true;
 		}
+		
+		//  Player finder  //
+		$server = Server::getInstance();
+		$p = $server->getPlayer($player);
+		if($p instanceof Player){
+			$player = $p->getName();
+		}
+		// END //
 		
 		$result = $this->getPlugin()->setMoney($player, $money, "SetMoneyCommand");
 		$output = "";

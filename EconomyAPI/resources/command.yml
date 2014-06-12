@@ -1,0 +1,28 @@
+setmoney:
+- setmoney
+seemoney:
+- seemoney
+mymoney:
+- mymoney
+pay:
+- pay
+givemoney:
+- givemoney
+takedebt:
+- takedebt
+economys:
+- economys
+topmoney:
+- topmoney
+setlang:
+- setlang
+takemoney:
+- takemoney
+bank:
+- bank
+mydebt:
+- mydebt
+returndebt:
+- returndebt
+bankadmin:
+- bankadmin

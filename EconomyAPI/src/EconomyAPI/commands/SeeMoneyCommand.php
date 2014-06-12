@@ -2,6 +2,9 @@
 
 namespace EconomyAPI\commands;
 
+use pocketmine\command\CommandSender;
+use pocketmine\Server;
+
 use EconomyAPI\EconomyAPI;
 
 class SeeMoneyCommand extends EconomyAPICommand{
@@ -15,7 +18,7 @@ class SeeMoneyCommand extends EconomyAPICommand{
 		$this->setPermission("economyapi.command.seemoney");
 	}
 	
-	public function execute(\pocketmine\command\CommandSender $sender, $label, array $args){
+	public function execute(CommandSender $sender, $label, array $args){
 		if(!$this->getPlugin()->isEnabled()){
 			return false;
 		}
@@ -28,6 +31,14 @@ class SeeMoneyCommand extends EconomyAPICommand{
 			$sender->sendMessage("Usage: /".$this->cmd." <player>");
 			return true;
 		}
+		
+		//  Player finder  //
+		$server = Server::getInstance();
+		$p = $server->getPlayer($player);
+		if($p instanceof Player){
+			$player = $p->getName();
+		}
+		// END //
 		$result = $this->getPlugin()->myMoney($player);
 		if($result === false){
 			$sender->sendMessage($this->getPlugin()->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4")));

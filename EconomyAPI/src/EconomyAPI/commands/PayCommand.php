@@ -39,8 +39,14 @@ class PayCommand extends EconomyAPICommand{
 		}
 		
 		$server = Server::getInstance();
+		//  Player finder  //
+		$p = $server->getPlayer($player);
+		if($p instanceof Player){
+			$player = $p->getName();
+		}
+		// END //
 		
-		$playerArr = $server->matchPlayer($player);
+		/*$playerArr = $server->matchPlayer($player);
 		if(count($playerArr) === 0){
 			if($plugin->accountExists($player)){
 				$target = $player;
@@ -50,7 +56,7 @@ class PayCommand extends EconomyAPICommand{
 			}
 		}else{
 			$target = $playerArr[0];
-		}
+		}*/
 		
 		$result = $plugin->reduceMoney($sender, $amount);
 		if($result !== \EconomyAPI\EconomyAPI::RET_SUCCESS){

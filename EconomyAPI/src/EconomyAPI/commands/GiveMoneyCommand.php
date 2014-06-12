@@ -4,6 +4,7 @@ namespace EconomyAPI\commands;
 
 use pocketmine\Player;
 use pocketmine\command\CommandSender;
+use pocketmine\Server;
 
 use EconomyAPI\EconomyAPI;
 
@@ -40,10 +41,13 @@ class GiveMoneyCommand extends EconomyAPICommand{
 			return true;
 		}
 		
-		$p = \pocketmine\Server::getInstance()->matchPlayer($player);
+		//  Player finder  //
+		$server = Server::getInstance();
+		$p = $server->getPlayer($player);
 		if($p instanceof Player){
-			$player = $player->username;
+			$player = $p->getName();
 		}
+		// END //
 		
 		$result = $plugin->addMoney($player, $amount);
 		$output = "";
@@ -54,7 +58,7 @@ class GiveMoneyCommand extends EconomyAPICommand{
 			case -1: // NOT_FOUND
 			$output .= $plugin->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4"));
 			break;
-			// INVALID is already processed
+			// INVALID is already checked
 			case 1: // SUCCESS
 			$output .= $plugin->getMessage("givemoney-gave-money", $sender->getName(), array($amount, $player, "%3", "%4"));
 			if($p instanceof Player){

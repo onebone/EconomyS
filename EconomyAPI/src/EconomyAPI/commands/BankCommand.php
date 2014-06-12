@@ -6,6 +6,7 @@ use EconomyAPI\EconomyAPI;
 
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+use pocketmine\Server;
 
 class BankCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
@@ -80,6 +81,14 @@ class BankCommand extends EconomyAPICommand{
 				$sender->sendMessage("Usage: /$cmd seemoney <player>");
 				return true;
 			}
+			
+			//  Player finder  //
+			$server = Server::getInstance();
+			$p = $server->getPlayer($player);
+			if($p instanceof Player){
+				$player = $p->getName();
+			}
+			// END //
 			
 			$money = $this->plugin->myBankMoney($player);
 			if($money === false){
