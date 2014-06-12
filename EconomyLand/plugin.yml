@@ -1,0 +1,66 @@
+name: EconomyLand
+main: EconomyLand\EconomyLand
+api: [1.0.0]
+version: "1.0.0"
+author: onebone
+
+permissions:
+ economyland.*:
+  description: Allows player to use all functions in EconomyLand
+  default: op
+  children:
+   economyland.command.*:
+    description: Allows player to use all commands in EconomyLand
+    default: op
+    children:
+     economyland.command.startp:
+      description: Allows player to set start position
+      default: true
+     economyland.command.endp:
+      description: Allows player to set end position
+      default: true
+     economyland.command.land:
+      description: Allows player to use land command
+      default: true
+      children:
+       economyland.command.land.buy:
+        description: Allows player to buy land
+        default: true
+       economyland.command.land.move:
+        description: Allows player to move to other land
+        default: true
+       economyland.command.land.list:
+        description: Allows player to see list of lands
+        default: true
+       economyland.command.land.whose:
+        description: Allows player to see list of lands with specified keyword
+        default: true
+     economyland.command.landsell:
+      description: Allows player to sell lands
+      default: op
+      children:
+       economyland.command.landsell.here:
+        description: Allows player to sell land here
+        default: true
+       economyland.command.landsell.number:
+        description: Allows player to sell land with numbers
+        default: true
+       economyland.command.landsell.mine:
+        description: Allows player to sell my land
+        default: true
+       economyland.command.landsell.others:
+        description: Allows player to sell others' land
+        default: op
+commands:
+ startp:
+  description: Sets start position
+  permission: economyland.command.startp
+ endp:
+  description: Sets second position
+  permission: economyland.command.endp
+ land:
+  description: Manage land
+  permission: economyland.command.land;economyland.command.land.list;economyland.command.buy;economyland.command.whose;economyland.land.move
+ landsell:
+  description: Sell land
+  permission: economyland.command.landsell;economyland.command.landsell.here;economyland.command.landsell.number;economyland.command.land.mine;economyland.command.land.others
