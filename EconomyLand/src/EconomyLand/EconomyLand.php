@@ -4,7 +4,6 @@ namespace EconomyLand;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
-use pocketmine\event\block\BlockEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\utils\Config;
@@ -338,10 +337,12 @@ class EconomyLand extends PluginBase implements Listener{
 		return false;
 	}
 	
-	public function eventHandler(BlockEvent $event){
-		if($event instanceof BlockPlaceEvent or $event instanceof BlockBreakEvent){
-			$this->permissionCheck($event);
-		}
+	public function onBlockPlace(BlockPlaceEvent $event){
+		$this->permissionCheck($event);
+	}
+	
+	public function onBlockBreak(BlockBreakEvent $event){
+		$this->permissionCheck($event);
 	}
 	
 	public function permissionCheck(BlockEvent $event){
