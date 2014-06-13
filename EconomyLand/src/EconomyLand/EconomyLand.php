@@ -4,6 +4,7 @@ namespace EconomyLand;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
+use pocketmine\event\block\BlockEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\utils\Config;
@@ -199,7 +200,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$player = array_shift($param);
 				$alike = true;
 				if(str_replace(" ", "", $player) === ""){
-					$player = $issuer->username;
+					$player = $sender->getName();
 					$alike = false;
 				}
 				$result = $this->land->query("SELECT * FROM land WHERE owner ".($alike ? "LIKE '%".$player."%'" : "= '".$player."'"));
@@ -362,7 +363,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		$info = $result->fetchArray(SQLITE3_ASSOC);
 		if(!is_array($info)) goto checkLand;
-		if($info["owner"] !== $player->getName() and !$sender->hasPermission("economyland.land.modify.others") and stripos($info["invitee"], $data["player"]->iusername.",") === false){
+		if($info["owner"] !== $player->getName() and !$sender->hasPermission("economyland.land.modify.others") and stripos($info["invitee"], $player->getName().",") === false){
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
 			$event->setCancelled(true);
 		}else{
