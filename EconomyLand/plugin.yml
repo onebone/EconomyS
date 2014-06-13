@@ -9,6 +9,26 @@ permissions:
   description: Allows player to use all functions in EconomyLand
   default: op
   children:
+   economyland.land.*:
+    description: Allows player to access all lands
+    default: op
+    children:
+     economyland.land.modify.others:
+      description: Allows player to modify others' lands
+      default: op
+     economyland.land.modify.whiteland:
+      description: Allows player to modify white lands
+      default: op
+     economyland.land.give.others:
+      description: Allows player to give others' land to others'
+      default: op
+    economyland.landsell.*:
+     description: Gives permission player to access all land selling function
+     default: op
+     children:
+      economyland.landsell.others:
+       description: Allows player to sell others' land
+       default: op
    economyland.command.*:
     description: Allows player to use all commands in EconomyLand
     default: op
@@ -35,6 +55,9 @@ permissions:
        economyland.command.land.whose:
         description: Allows player to see list of lands with specified keyword
         default: true
+       economyland.command.land.give:
+        description: Allows player give land to other
+        default: true
      economyland.command.landsell:
       description: Allows player to sell lands
       default: op
@@ -45,22 +68,20 @@ permissions:
        economyland.command.landsell.number:
         description: Allows player to sell land with numbers
         default: true
-       economyland.command.landsell.mine:
-        description: Allows player to sell my land
-        default: true
-       economyland.command.landsell.others:
-        description: Allows player to sell others' land
-        default: op
 commands:
  startp:
   description: Sets start position
+  usage: /startp
   permission: economyland.command.startp
  endp:
   description: Sets second position
+  usage: /endp
   permission: economyland.command.endp
  land:
   description: Manage land
-  permission: economyland.command.land;economyland.command.land.list;economyland.command.buy;economyland.command.whose;economyland.land.move
+  usage: /land <buy|move|list|whose|give>
+  permission: economyland.command.land;economyland.command.land.list;economyland.command.land.buy;economyland.command.land.whose;economyland.command.land.move;economyland.land.give;economyland.command.land.whose
  landsell:
   description: Sell land
-  permission: economyland.command.landsell;economyland.command.landsell.here;economyland.command.landsell.number;economyland.command.land.mine;economyland.command.land.others
+  usage: /landsell <here|land num>
+  permission: economyland.command.landsell;economyland.command.landsell.here;economyland.command.landsell.number

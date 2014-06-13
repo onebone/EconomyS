@@ -10,8 +10,11 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\utils\Config;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\Server;
 use pocketmine\Player;
+use pocketmine\level\Position;
+use pocketmine\level\Level;
+use pocketmine\math\Vector3;
+use pocketmine\block\AirBlock;
 
 use EconomyAPI\EconomyAPI;
 
@@ -45,6 +48,10 @@ class EconomyLand extends PluginBase implements Listener{
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $params){
 		switch($cmd->getName()){
 			case "startp":
+			if(!$sender instanceof Player){
+				$sender->sendMessage("Please run this command in-game.");
+				return true;
+			}
 			$x = (int) $sender->x;
 			$z = (int) $sender->z;
 			$level = $sender->getLevel()->getName();
@@ -52,6 +59,10 @@ class EconomyLand extends PluginBase implements Listener{
 			$sender->sendMessage($this->getMessage("first-position-saved"));
 			return true;
 			case "endp":
+			if(!$sender instanceof Player){
+				$sender->sendMessage("Please run this command in-game.");
+				return true;
+			}
 			if(!isset($this->start[$sender->getName()])){
 				$sender->sendMessage($this->getMessage("set-first-position"));
 				return true;
@@ -90,6 +101,13 @@ class EconomyLand extends PluginBase implements Listener{
 			$sub = array_shift($params);
 			switch($sub){
 				case "buy":
+				if(!$sender->hasPermission("economyland.command.land.buy")){
+					return true;
+				}
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
 				$result = $this->land->query("SELECT * FROM land WHERE owner = '{$sender->getName()}'");
 				$cnt = 0;
 				if(is_numeric($this->config->get("player-land-limit"))){
@@ -143,18 +161,178 @@ class EconomyLand extends PluginBase implements Listener{
 				$sender->sendMessage($this->getMessage("bought-land", array($price, "", "")));
 				break;
 				case "list":
-				
+				if(!$sender->hasPermission("economyland.command.land.list")){
+					return true;
+				}
+				$page = isset($param[0]) ? (int) $param[0] : 1;
+				$result = $this->land->query("SELECT * FROM land");
+				if(is_bool($result)) $land = array();
+				else{
+					$land = array();
+					while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
+						$land[] = $d;
+					}
+				}
+				$output = "";
+				$max = ceil(count($land) / 5);
+				$pro = 1;
+				$page = (int)$page;
+				$output .= $this->getMessage("land-list-top", array($page, $max, ""));
+				$current = 1;
+				foreach($land as $l){
+					$cur = (int) ceil($current / 5);
+					if($cur > $page) 
+						continue;
+					if($pro == 6) 
+						break;
+					if($page === $cur){
+						$output .= $this->getMessage("land-list-format", array($l["ID"], ($l["endX"] - $l["startX"]) * ($l["endZ"] - $l["startZ"]), $l["owner"]));
+						$pro++;
+					}
+					$current++;
+				}
+				$sender->sendMessage($output);
 				break;
 				case "whose":
-				
+				if(!$sender->hasPermission("economyland.command.land.whose")){
+					return true;
+				}
+				$player = array_shift($param);
+				$alike = true;
+				if(str_replace(" ", "", $player) === ""){
+					$player = $issuer->username;
+					$alike = false;
+				}
+				$result = $this->land->query("SELECT * FROM land WHERE owner ".($alike ? "LIKE '%".$player."%'" : "= '".$player."'"));
+				$sender->sendMessage("Results from query : $player\n");
+				while(($info = $result->fetchArray(SQLITE3_ASSOC)) !== false){
+					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], ($info["endX"] - $info["startX"]) * ($info["endZ"] - $info["startZ"]), $info["owner"])));
+				}
 				break;
 				case "move":
-				
-				break;
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
+				if(!$sender->hasPermission("economyland.command.land.move")){
+					return true;
+				}
+				$num = array_shift($param);
+				if(trim($num) == ""){
+					$sender->sendMessage("Usage: /land move <land num>");
+					return true;
+				}
+				if(!is_numeric($num)){
+					$sender->sendMessage("Usage: /land move <land num>");
+					return true;
+				}
+				$result = $this->land->query("SELECT * FROM land WHERE ID = $num");
+				$info = $result->fetchArray(SQLITE3_ASSOC);
+				if($info === true or $info === false){
+					$sender->sendMessage($this->getMessage("no-land-found", array($num, "", "")));
+					return true;
+				}
+				$level = $this->getServer()->getLevel($info["level"]);
+				if(!$level instanceof Level){
+					$sender->sendMessage($this->getMessage("land-corrupted", array($num, "", "")));
+					return true;
+				}
+				$x = (int) $info["startX"] + (($info["endX"] - $info["startX"]) / 2);
+				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
+				for($y = 1;; $y++){
+					if($level->getBlock(new Vector3($x, $y, $z)) instanceof AirBlock){
+						break;
+					}
+					if($cnt === 5){
+						break;
+					}
+					if($y > 255){
+						++$cnt;
+						++$x;
+						--$z;
+						$y = 1;
+						continue;
+					}
+				}
+				$sender->teleport(new Position($x, $y, $z, $level));
+				$sender->sendMessage($this->getMessage("success-moving", array($num, "", "")));
+				return true;
+				case "give":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
+				if(!$sender->hasPermission("economyland.command.land.give")){
+					return true;
+				}
+				$player = array_shift($param);
+				$landnum = array_shift($param);
+				if(trim($player) == "" or trim($landnum) == "" or !is_numeric($landnum)){
+					$sender->sendMessage("Usage: /$cmd give <player> <land number>");
+					return true;
+				}
+				$username = $player;
+				$player = $this->getServer()->getPlayer($username);
+				$info = $this->land->query("SELECT * FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
+				if(is_bool($info)){
+					$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+					return true;
+				}
+				if($sender->getName() !== $info["owner"] and !$sender->hasPermission("economyland.land.give.others")){
+					$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "", "")));
+				}else{
+					if($sender->getName() === $player->getName()){
+						$sender->sendMessage($this->getMessage("cannot-give-land-myself"));
+					}else{
+						$this->land->exec("UPDATE land SET owner = '{$player->getName()}' WHERE ID = {$info["ID"]}");
+						$sender->sendMessage($this->getMessage("gave-land", array($landnum, $player->getName())));
+						$player->sendMessage($this->getMessage("got-land", array($sender->getName(), $landnum)));
+					}
+				}
+				return true;
+				default:
+				$sender->sendMessage("Usage: ".$cmd->getUsage());
+				return true;
 			}
 			return true;
 			case "landsell":
-			
+			switch ($param[0]){
+			case "here":
+				$x = $sender->x;
+				$z = $sender->z;
+				$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getName()}'");
+				$info = $result->fetchArray(SQLITE3_ASSOC);
+				if(is_bool($info)){
+					$sender->sendMessage($this->getMessage("no-one-owned"));
+					return true;
+				}
+				if($info["owner"] !== $sender->getName()){
+					$sender->sendMessage($this->getMessage("not-my-land"));
+				}else{
+					$this->api->economy->takeMoney($sender, $info["price"] / 2);
+					$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
+					$this->land->exec("DELETE FROM land WHERE ID = {$info["ID"]}");
+				}
+				return true;
+			default:
+				$p = $param[0];
+				if(is_numeric($p)){
+					$info = $this->land->query("SELECT * FROM land WHERE ID = $p")->fetchArray(SQLITE3_ASSOC);
+					if(is_bool($info)){
+						$sender->sendMessage("Usage: /landsell <here | land number>");
+						return true;
+					}
+					if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")){
+						EconomyAPI::getInstance()->addMoney($sender, ($info["price"] / 2), true, "EconomyLand");
+						$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
+						$this->land->exec("DELETE FROM land WHERE ID = $p");
+					}else{
+						$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "")));
+					}
+				}else{
+					$sender->sendMessage($this->getMessage("no-land-found", array($p, "", "")));
+				}
+			}
 			return true;
 		}
 		return false;
@@ -183,17 +361,17 @@ class EconomyLand extends PluginBase implements Listener{
 		$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		$info = $result->fetchArray(SQLITE3_ASSOC);
 		if(!is_array($info)) goto checkLand;
-		if($info["owner"] != $player->getName() and !$this->getServer()->isOp(strtolower($player->getName())) and strpos($info["invitee"], $data["player"]->iusername.",") === false){
+		if($info["owner"] !== $player->getName() and !$sender->hasPermission("economyland.land.modify.others") and stripos($info["invitee"], $data["player"]->iusername.",") === false){
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
-			$this->setCancelled(true);
+			$event->setCancelled(true);
 		}else{
 			$exist = true;
 		}
 		checkLand:
 		if($this->config->get("white-world-protection")){
-			if(!$exist and in_array($level, $this->config->get("white-world-protection")) and !$this->getServer()->isOp(strtolower($player->getName()))){
+			if(!$exist and in_array($level, $this->config->get("white-world-protection")) and !$sender->hasPermission("economyland.land.modify.whiteland")){
 				$player->sendMessage($this->getMessage("not-owned"));
-				$this->setCancelled(true);
+				$event->setCancelled(true);
 			}
 		}
 	}
