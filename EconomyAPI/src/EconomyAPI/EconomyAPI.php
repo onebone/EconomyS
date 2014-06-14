@@ -1,6 +1,6 @@
 <?php
 
-namespace EconomyAPI;
+namespace economyapi;
 
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
@@ -11,12 +11,12 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
 use pocketmine\scheduler\CallbackTask;
 
-use EconomyAPI\event\money\AddMoneyEvent;
-use EconomyAPI\event\money\ReduceMoneyEvent;
-use EconomyAPI\event\money\SetMoneyEvent;
-use EconomyAPI\event\account\CreateAccountEvent;
-use EconomyAPI\event\debt\AddDebtEvent;
-use EconomyAPI\event\debt\ReduceDebtEvent;
+use economyapi\event\money\AddMoneyEvent;
+use economyapi\event\money\ReduceMoneyEvent;
+use economyapi\event\money\SetMoneyEvent;
+use economyapi\event\account\CreateAccountEvent;
+use economyapi\event\debt\AddDebtEvent;
+use economyapi\event\debt\ReduceDebtEvent;
 
 class EconomyAPI extends PluginBase implements Listener{
 	private static $obj = null;
@@ -26,11 +26,34 @@ class EconomyAPI extends PluginBase implements Listener{
 	private $schedule, $task, $lastTask;
 	private $list, $playerLang, $langRes;
 	
+	/*
+	@var int RET_ERROR_1 Unknown error 1
+	*/
 	const RET_ERROR_1 = -4;
+	
+	/*
+	@var int RET_ERROR_2 Unknown error 2
+	*/
 	const RET_ERROR_2 = -3;
+	
+	/*
+	@var int RET_CANCELLED Task cancelled by event
+	*/
 	const RET_CANCELLED = -2;
+	
+	/*
+	@var int RET_NOT_FOUND Unable to process task due to not found data
+	*/
 	const RET_NOT_FOUND = -1;
+	
+	/*
+	@var int RET_INVALID Invalid amount of data
+	*/
 	const RET_INVALID = 0;
+	
+	/*
+	@var int RET_SUCCESS The task was successful
+	*/
 	const RET_SUCCESS = 1;
 	
 	private $langList = array(
@@ -88,21 +111,21 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->initializePlayerLang($playerLang);
 		$this->getLangFile();
 		$cmds = array(
-			"setmoney" => "EconomyAPI\\commands\\SetMoneyCommand",
-			"seemoney" => "EconomyAPI\\commands\\SeeMoneyCommand",
-			"mymoney" => "EconomyAPI\\commands\\MyMoneyCommand",
-			"pay" => "EconomyAPI\\commands\\PayCommand",
-			"givemoney" => "EconomyAPI\\commands\\GiveMoneyCommand",
-			"takedebt" => "EconomyAPI\\commands\\TakeDebtCommand",
-			"economys" => "EconomyAPI\\commands\\EconomySCommand",
-			"topmoney" => "EconomyAPI\\commands\\TopMoneyCommand",
-			"setlang" => "EconomyAPI\\commands\\SetLangCommand",
-			"takemoney" => "EconomyAPI\\commands\\TakeMoneyCommand",
-			"bank" => "EconomyAPI\\commands\\BankCommand",
-			"mydebt" => "EconomyAPI\\commands\\MyDebtCommand",
-			"returndebt" => "EconomyAPI\\commands\\ReturnDebtCommand",
-			"bankadmin" => "EconomyAPI\\commands\\BankAdminCommand",
-			"mystatus" => "EconomyAPI\\commands\\MyStatusCommand"
+			"setmoney" => "economyapi\\commands\\SetMoneyCommand",
+			"seemoney" => "economyapi\\commands\\SeeMoneyCommand",
+			"mymoney" => "economyapi\\commands\\MyMoneyCommand",
+			"pay" => "economyapi\\commands\\PayCommand",
+			"givemoney" => "economyapi\\commands\\GiveMoneyCommand",
+			"takedebt" => "economyapi\\commands\\TakeDebtCommand",
+			"economys" => "economyapi\\commands\\EconomySCommand",
+			"topmoney" => "economyapi\\commands\\TopMoneyCommand",
+			"setlang" => "economyapi\\commands\\SetLangCommand",
+			"takemoney" => "economyapi\\commands\\TakeMoneyCommand",
+			"bank" => "economyapi\\commands\\BankCommand",
+			"mydebt" => "economyapi\\commands\\MyDebtCommand",
+			"returndebt" => "economyapi\\commands\\ReturnDebtCommand",
+			"bankadmin" => "economyapi\\commands\\BankAdminCommand",
+			"mystatus" => "economyapi\\commands\\MyStatusCommand"
 		);
 		$commandMap = $this->getServer()->getCommandMap();
 		foreach($cmds as $key => $cmd){
@@ -139,7 +162,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	private function createConfig(){
-		$this->config = new Config($this->path."economy.properties", Config::PROPERTIES, unserialize($this->readResource("config.txt")));
+		$this->config = new Config($this->path."economy.properties", Config::PROPERTIES, yaml_parse($this->readResource("config.yml")));
 		$this->command = new Config($this->path."command.yml", Config::YAML, yaml_parse($this->readResource("command.yml")));
 	}
 	
@@ -179,7 +202,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	private function readResource($res){
 		$path = $this->getFile()."resources/".$res;
 		$resource = $this->getResource($res);
-		if($resource === false){
+		if(!is_resource($resource)){
+			$this->getLogger()->debug("Tried to load unknown resource ".TextFormat::AQUA.$res.TextFormat::RESET);
 			return false;
 		}
 		return fread($resource, filesize($path));
@@ -348,7 +372,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$amount = round($amount, 2);
 		if(isset($this->bank["money"][$player])){
-			$ev = new \EconomyAPI\event\bank\AddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \EconomyAPI\event\money\AddMoneyEvent
+			$ev = new \economyapi\event\bank\AddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \economyapi\event\money\AddMoneyEvent
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
@@ -381,7 +405,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($amount <= 0 or $amount > $this->bank["money"][$player]){
 				return self::RET_INVALID;
 			}
-			$ev = new \EconomyAPI\event\bank\ReduceMoneyEvent($this, $player, $amount, $issuer);
+			$ev = new \economyapi\event\bank\ReduceMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;

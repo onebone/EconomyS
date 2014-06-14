@@ -1,10 +1,10 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
 use pocketmine\command\CommandSender;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class SetLangCommand extends EconomyAPICommand{
 	private $plugin, $cmd;

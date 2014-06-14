@@ -1,12 +1,12 @@
 <?php
 
-namespace EconomyAPI\event;
+namespace economyapi\event;
 
 use pocketmine\plugin\Plugin;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\event\Cancellable;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class EconomyAPIEvent extends PluginEvent implements Cancellable{
 	public function __construct(EconomyAPI $plugin, $issuer){

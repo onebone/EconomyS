@@ -1,6 +1,6 @@
 <?php
 
-namespace EconomyLand;
+namespace economyland;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -18,14 +18,14 @@ use pocketmine\block\AirBlock;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class EconomyLand extends PluginBase implements Listener{
 	private $land, $config;
 	private $start, $end;
 	
 	public function onEnable(){
-		if(!class_exists("EconomyAPI\\EconomyAPI")){
+		if(!class_exists("economyapi\\EconomyAPI")){
 			$this->getLogger()->severe("Couldn't find EconomyAPI");
 			return;
 		}
@@ -295,6 +295,21 @@ class EconomyLand extends PluginBase implements Listener{
 					}
 				}
 				return true;
+				case "here":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
+				$x = $sender->x;
+				$z = $sender->z;
+				
+				$info = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z)")->fetchArray(SQLITE3_ASSOC);
+				if(is_bool($info)){
+					$sender->sendMessage($this->getMessage("no-one-owned"));
+					return true;
+				}
+				$sender->sendMessage($this->getMessage("here-land", array($info["ID"], $info["owner"])));
+				return true;
 				default:
 				$sender->sendMessage("Usage: ".$cmd->getUsage());
 			}
@@ -302,6 +317,10 @@ class EconomyLand extends PluginBase implements Listener{
 			case "landsell":
 			switch ($param[0]){
 			case "here":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
 				$x = $sender->x;
 				$z = $sender->z;
 				$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getName()}'");

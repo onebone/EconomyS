@@ -1,9 +1,9 @@
 <?php
 
-namespace EconomyAPI\event\debt;
+namespace economyapi\event\debt;
 
-use EconomyAPI\event\EconomyAPIEvent;
-use EconomyAPI\EconomyAPI;
+use economyapi\event\EconomyAPIEvent;
+use economyapi\EconomyAPI;
 
 class ReduceDebtEvent extends EconomyAPIEvent{
 	private $plugin, $username, $amount, $issuer;

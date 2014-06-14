@@ -1,11 +1,11 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class SeeMoneyCommand extends EconomyAPICommand{
 	private $plugin, $cmd;

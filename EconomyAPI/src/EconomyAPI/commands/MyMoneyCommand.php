@@ -1,8 +1,8 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class MyMoneyCommand extends EconomyAPICommand{
 	private $plugin;

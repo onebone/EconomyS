@@ -1,5 +1,5 @@
 name: EconomyLand
-main: EconomyLand\EconomyLand
+main: economyland\EconomyLand
 api: [1.0.0]
 version: "1.0.0"
 author: onebone
@@ -58,6 +58,9 @@ permissions:
        economyland.command.land.give:
         description: Allows player give land to other
         default: true
+       economyland.command.land.here:
+        description: Allows player to see what land player is standing on
+        default: true
      economyland.command.landsell:
       description: Allows player to sell lands
       default: op
@@ -79,8 +82,8 @@ commands:
   permission: economyland.command.endp
  land:
   description: Manage land
-  usage: /land <buy|move|list|whose|give>
-  permission: economyland.command.land;economyland.command.land.list;economyland.command.land.buy;economyland.command.land.whose;economyland.command.land.move;economyland.land.give;economyland.command.land.whose
+  usage: /land <buy|move|list|whose|give|here>
+  permission: economyland.command.land;economyland.command.land.list;economyland.command.land.buy;economyland.command.land.whose;economyland.command.land.move;economyland.land.give;economyland.command.land.whose;economyland.command.land.here
  landsell:
   description: Sell land
   usage: /landsell <here|land num>

@@ -1,10 +1,10 @@
 <?php
 
-namespace EconomyAPI\event\money;
+namespace economyapi\event\money;
 
-use EconomyAPI\event\EconomyAPIEvent;
+use economyapi\event\EconomyAPIEvent;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class AddMoneyEvent extends EconomyAPIEvent{
 	private $plugin, $username, $amount, $issuer;

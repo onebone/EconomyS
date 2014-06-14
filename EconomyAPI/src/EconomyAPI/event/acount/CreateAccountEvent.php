@@ -1,9 +1,9 @@
 <?php
 
-namespace EconomyAPI\event\account;
+namespace economyapi\event\account;
 
-use EconomyAPI\event\EconomyAPIEvent;
-use EconomyAPI\EconomyAPI;
+use economyapi\event\EconomyAPIEvent;
+use economyapi\EconomyAPI;
 
 class CreateAccountEvent extends EconomyAPIEvent{
 	private $player, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer;

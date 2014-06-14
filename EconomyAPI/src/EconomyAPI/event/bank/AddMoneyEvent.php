@@ -1,9 +1,9 @@
 <?php
 
-namespace EconomyAPI\event\bank;
+namespace economyapi\event\bank;
 
-use EconomyAPI\event\EconomyAPIEvent;
-use EconomyAPI\EconomyAPI;
+use economyapi\event\EconomyAPIEvent;
+use economyapi\EconomyAPI;
 
 class AddMoneyEvent extends EconomyAPIEvent{
 	private $plugin, $username, $amount, $issuer;

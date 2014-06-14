@@ -1,11 +1,11 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
 use pocketmine\Player;
 use pocketmine\command\CommandSender;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class TakeDebtCommand extends EconomyAPICommand{
 	private $plugin, $cmd;

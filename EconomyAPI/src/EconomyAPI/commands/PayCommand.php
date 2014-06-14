@@ -1,10 +1,10 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
 use pocketmine\Server;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 class PayCommand extends EconomyAPICommand{
 	private $plugin, $cmd;
@@ -59,12 +59,12 @@ class PayCommand extends EconomyAPICommand{
 		}*/
 		
 		$result = $plugin->reduceMoney($sender, $amount);
-		if($result !== \EconomyAPI\EconomyAPI::RET_SUCCESS){
+		if($result !== \economyapi\EconomyAPI::RET_SUCCESS){
 			$sender->sendMessage("Your request have been denied");
 			return true;
 		}
 		$result = $plugin->addMoney($target, $amount);
-		if($result !== \EconomyAPI\EconomyAPI::RET_SUCCESS){
+		if($result !== \economyapi\EconomyAPI::RET_SUCCESS){
 			$sender->sendMessage("Your request have been denied");
 			$plugin->addMoney($target, $amount, true);
 			return true;

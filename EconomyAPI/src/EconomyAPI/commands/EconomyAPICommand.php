@@ -1,11 +1,11 @@
 <?php
 
-namespace EconomyAPI\commands;
+namespace economyapi\commands;
 
 use pocketmine\command\Command;
 use pocketmine\command\PluginIdentifiableCommand;
 
-use EconomyAPI\EconomyAPI;
+use economyapi\EconomyAPI;
 
 abstract class EconomyAPICommand extends Command implements PluginIdentifiableCommand{
 	private $owingPlugin;
