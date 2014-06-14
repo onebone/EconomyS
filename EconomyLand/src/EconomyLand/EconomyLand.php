@@ -15,6 +15,8 @@ use pocketmine\level\Position;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
 use pocketmine\block\AirBlock;
+use pocketmine\event\EventPriority;
+use pocketmine\plugin\MethodEventExecutor;
 
 use EconomyAPI\EconomyAPI;
 
@@ -42,10 +44,12 @@ class EconomyLand extends PluginBase implements Listener{
 			price INTEGER NOT NULL
 		);");
 		
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlaceEvent"), $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onBreakEvent"), $this);
 		$this->createConfig();
 	}
 	
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $cmd, $label, array $param){
 		switch($cmd->getName()){
 			case "startp":
 			if(!$sender instanceof Player){
@@ -98,7 +102,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$sender->sendMessage($this->getMessage("confirm-buy-land", array($price, "%2", "%3")));
 			return true;
 			case "land":
-			$sub = array_shift($params);
+			$sub = array_shift($param);
 			switch($sub){
 				case "buy":
 				if(!$sender->hasPermission("economyland.command.land.buy")){
@@ -239,8 +243,9 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$x = (int) $info["startX"] + (($info["endX"] - $info["startX"]) / 2);
 				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
+				$cnt = 0;
 				for($y = 1;; $y++){
-					if($level->getBlock(new Vector3($x, $y, $z)) instanceof AirBlock){
+					if($level->level->getBlock($x, $y, $z)[0] === 0){
 						break;
 					}
 					if($cnt === 5){
@@ -292,7 +297,6 @@ class EconomyLand extends PluginBase implements Listener{
 				return true;
 				default:
 				$sender->sendMessage("Usage: ".$cmd->getUsage());
-				return true;
 			}
 			return true;
 			case "landsell":
@@ -319,7 +323,7 @@ class EconomyLand extends PluginBase implements Listener{
 				if(is_numeric($p)){
 					$info = $this->land->query("SELECT * FROM land WHERE ID = $p")->fetchArray(SQLITE3_ASSOC);
 					if(is_bool($info)){
-						$sender->sendMessage("Usage: /landsell <here | land number>");
+						$sender->sendMessage("Usage: /landsell <here|land number>");
 						return true;
 					}
 					if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")){
@@ -338,11 +342,11 @@ class EconomyLand extends PluginBase implements Listener{
 		return false;
 	}
 	
-	public function onBlockPlace(BlockPlaceEvent $event){
+	public function onPlaceEvent(BlockPlaceEvent $event){
 		$this->permissionCheck($event);
 	}
 	
-	public function onBlockBreak(BlockBreakEvent $event){
+	public function onBreakEvent(BlockBreakEvent $event){
 		$this->permissionCheck($event);
 	}
 	
@@ -363,7 +367,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		$info = $result->fetchArray(SQLITE3_ASSOC);
 		if(!is_array($info)) goto checkLand;
-		if($info["owner"] !== $player->getName() and !$sender->hasPermission("economyland.land.modify.others") and stripos($info["invitee"], $player->getName().",") === false){
+		if($info["owner"] !== $player->getName() and !$player->hasPermission("economyland.land.modify.others") and stripos($info["invitee"], $player->getName().",") === false){
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
 			$event->setCancelled(true);
 		}else{
