@@ -8,7 +8,6 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
@@ -58,7 +57,7 @@ class EconomyJob extends PluginBase implements Listener{
 	public function onBlockBreak(BlockBreakEvent $event){
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
-		
+
 		$job = $this->jobs->get($this->player->get($player->getName()));
 		if(isset($job[$block->getID().":".$block->getDamage()])){
 			$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage()]);
@@ -77,10 +76,10 @@ class EconomyJob extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @return Config
+	 * @return array
 	 */
 	public function getJobs(){
-		return $this->jobs;
+		return $this->jobs->getAll();
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
@@ -110,7 +109,8 @@ class EconomyJob extends PluginBase implements Listener{
 					$sender->sendMessage("Please run this command in-game.");
 				}
 				if($this->player->exists($sender->getName())){
-					$this->player->remove($this->player->get($sender->getName()));
+					$job = $this->player->get($sender->getName());
+					$this->player->remove($sender->getName());
 					$sender->sendMessage("You have retired from the job \"$job\"");
 				}else{
 					$sender->sendMessage("You don't have job that you've joined");
@@ -136,10 +136,10 @@ class EconomyJob extends PluginBase implements Listener{
 
 				$output = "Showing job list page $page of $max : \n";
 				foreach($this->jobs->getAll() as $name => $job){
-					$cur = (int)ceil(($n / 5));
 					$info = "";
 					foreach($job as $id => $money){
-						if($cur === $page){
+						$cur = (int)ceil(($n / 5));
+					 	if($cur === $page){
 							$info .= $name." : ".$id." | $".$money."\n";
 						}elseif($cur > $page){
 							break;
