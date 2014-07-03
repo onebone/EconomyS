@@ -1,0 +1,31 @@
+name: EconomyJob
+main: economyjob\EconomyJob
+version: "1.0.0"
+api: [1.0.0]
+author: onebone
+
+commands:
+ job:
+  description: Job master command
+  usage: /job <join|retire|list|me>
+  permission: economyjob.command.job
+permissions:
+ economyjob.command.*:
+  description: Allows player to use all of job command
+  default: op
+  children:
+   economyjob.command.job:
+    description: Allows player to use /job command
+    default: true
+    children:
+     economyjob.command.job.join:
+      description: Allows player to use command that allows to join job
+      default: true
+     economyjob.command.job.retire:
+      description: Allows player to use command that allows to retire job
+      default: true
+     economyjob.command.job.list:
+      description: Allows player to use command that allows to see job list
+      default: true
+     economyjob.command.job.me:
+      description: Allows player to use command that allows to see its job
