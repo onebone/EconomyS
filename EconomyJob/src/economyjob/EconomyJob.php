@@ -9,6 +9,7 @@ use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\utils\TextFormat;
 
 use economyapi\EconomyAPI;
 
@@ -28,7 +29,7 @@ class EconomyJob extends PluginBase implements Listener{
 
         @mkdir($this->getDataFolder());
         if(!is_file($this->getDataFolder()."jobs.yml")){
-            $this->jobs = new Config($this->getDataFolder()."jobs.yml", Config::YAML, $this->getResource("jobs.yml"));
+            $this->jobs = new Config($this->getDataFolder()."jobs.yml", Config::YAML, yaml_parse($this->readResource("jobs.yml")));
         }else{
             $this->job = new Config($this->getDataFolder()."jobs.yml", Config::YAML);
         }
@@ -39,6 +40,16 @@ class EconomyJob extends PluginBase implements Listener{
 		$api = EconomyAPI::getInstance();
         $instance = $this;
     }
+
+	private function readResource($res){
+		$path = $this->getFile()."resources/".$res;
+		$resource = $this->getResource($res);
+		if(!is_resource($resource)){
+			$this->getLogger()->debug("Tried to load unknown resource ".TextFormat::AQUA.$res.TextFormat::RESET);
+			return false;
+		}
+		return fread($resource, filesize($path));
+	}
 
     public function onDisable(){
         $this->player->save();
