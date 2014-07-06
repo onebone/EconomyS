@@ -280,7 +280,7 @@ class EconomyLand implements Plugin {
 				$x = (int) $info["startX"] + (($info["endX"] - $info["startX"]) / 2);
 				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
 				for($y = 1;; $y++){
-					if($level->getBlock(new Vector3($x, $y, $z))->getID() === AIR){
+					if($level->level->getBlock(new Position($x, $y, $z, $level))[0] === 0){
 						break;
 					}
 					if($cnt === 5){

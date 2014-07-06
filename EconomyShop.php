@@ -305,7 +305,7 @@ class EconomyShop implements Plugin{
 					}
 					$now = time();
 					if(($now - $this->tap[$data["player"]->iusername][1]) > 2){
-						unset($this->tap[$data["player"]->iusername]);
+						$this->tap[$data["player"]->iusername] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time());
 						$data["player"]->sendChat($this->getMessage("tap-again", array($shopInfo["item"].":".$shopInfo["meta"], $shopInfo["price"], "")));
 						return false;
 					}
@@ -318,8 +318,7 @@ class EconomyShop implements Plugin{
 						return false;
 					}
 				}else{
-					$id = $data["player"]->iusername;
-					$this->tap[$id] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time()); // I don't think that player can teleport to other world and touch shop sign immediately
+					$this->tap[$data["player"]->iusername] = array($data["target"]->x.":".$data["target"]->y.":".$data["target"]->z, time()); // I don't think that player can teleport to other world and touch shop sign immediately
 					$data["player"]->sendChat($this->getMessage("tap-again", array($shopInfo["item"].":".$shopInfo["meta"], $shopInfo["price"], "")));
 					return false;
 				}
