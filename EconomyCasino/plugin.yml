@@ -36,7 +36,7 @@ permissions:
       default: true
 commands:
  casino:
-  usage: /casino <start|stop|join|leave|list|do>
+  usage: /casino <start|stop|join|leave|list|gamble>
   description: Casino master command
   permission: economycasino.command.casino;economycasino.command.casino.start;economycasino.command.casino.stop;economycasino.command.casino.join;economycasino.command.casino.leave;economycasino.command.casino.list;economycasino.command.casino.gamble
  jackpot:
