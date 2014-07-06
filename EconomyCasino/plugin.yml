@@ -1,0 +1,45 @@
+name: EconomyCasino
+main: economycasino\EconomyCasino
+version: "2.0.0"
+author: onebone
+api: [1.0.0]
+
+permissions:
+ economycasino.command.*:
+  description: Allows player to use all commands of EconomyCasino
+  default: op
+  children:
+   economycasino.command.jackpot:
+    description: Allows player to use do jackpot by command
+    default: true
+   economycasino.command.casino:
+    description: Allows player to do casino by command
+    default: true
+    children:
+     economycasino.command.casino.start:
+      description: Allows player to start casino by command
+      default: true
+     economycasino.command.casino.stop:
+      description: Allows player to finish casino by command
+      default: true
+     economycasino.command.casino.join:
+      description: Allows player to join casino
+      default: true
+     economycasino.command.casino.leave:
+      description: Allows player to leave casino
+      default: true
+     economycasino.command.casino.list:
+      description: Allows player to see list of casino game
+      default: true
+     economycasino.command.casino.gamble:
+      description: Allows player to gamble the money
+      default: true
+commands:
+ casino:
+  usage: /casino <start|stop|join|leave|list|do>
+  description: Casino master command
+  permission: economycasino.command.casino;economycasino.command.casino.start;economycasino.command.casino.stop;economycasino.command.casino.join;economycasino.command.casino.leave;economycasino.command.casino.list;economycasino.command.casino.gamble
+ jackpot:
+  usage: /jackpot <money>
+  description: Try jackpot
+  permission: economycasino.command.jackpot
