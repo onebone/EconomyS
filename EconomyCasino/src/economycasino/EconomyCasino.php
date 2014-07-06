@@ -46,8 +46,7 @@ class EconomyCasino extends PluginBase implements Listener{
 
 	public function onQuitEvent(PlayerQuitEvent $event){
 		$player = $event->getPlayer();
-		if($player === null) return;
-		$this->getLogger()->info(is_callable(array($player, "getName")) ? "1":"0");
+		
 		foreach($this->casino as $pl => &$casino){
 			if(isset($casino["players"][$pl])){
 				unset($casino["players"][$pl]);
