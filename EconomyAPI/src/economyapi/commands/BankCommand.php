@@ -31,7 +31,7 @@ class BankCommand extends EconomyAPICommand{
 		switch($sub){
 			case "deposit":
 			if(trim($amount) === "" or !is_numeric($amount)){
-				$sender->sendMessage("Usage: /$cmd deposit <amount>");
+				$sender->sendMessage("Usage: /".$this->getName()." deposit <amount>");
 				return true;
 			}
 			if(!$sender instanceof Player){
@@ -56,7 +56,7 @@ class BankCommand extends EconomyAPICommand{
 			break;
 			case "withdraw":
 			if(trim($amount) === "" or !is_numeric($amount)){
-				$sender->sendMessage("Usage: /$cmd withdraw <amount>");
+				$sender->sendMessage("Usage: /".$this->getName()." withdraw <amount>");
 				return true;
 			}
 			if(!$sender instanceof Player){
@@ -78,7 +78,7 @@ class BankCommand extends EconomyAPICommand{
 			break;
 			case "seemoney":
 			if(trim($amount) === ""){
-				$sender->sendMessage("Usage: /$cmd seemoney <player>");
+				$sender->sendMessage("Usage: /".$this->getName()." seemoney <player>");
 				return true;
 			}
 			

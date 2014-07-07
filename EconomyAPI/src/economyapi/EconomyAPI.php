@@ -19,40 +19,52 @@ use economyapi\event\debt\AddDebtEvent;
 use economyapi\event\debt\ReduceDebtEvent;
 
 class EconomyAPI extends PluginBase implements Listener{
+
+	/**
+	 * @var EconomyAPI
+	 */
 	private static $obj = null;
 	private $path;
 	private $money, $bank;
-	private $config, $lang, $command;
+	/**
+	 * @var Config
+	 */
+	private $config;
+	/**
+	 * @var Config
+	 */
+	private $command;
+
 	private $schedule, $task, $lastTask;
 	private $list, $playerLang, $langRes;
 	
-	/*
-	@var int RET_ERROR_1 Unknown error 1
+	/**
+	 * @var int RET_ERROR_1 Unknown error 1
 	*/
 	const RET_ERROR_1 = -4;
 	
-	/*
-	@var int RET_ERROR_2 Unknown error 2
+	/**
+	 * @var int RET_ERROR_2 Unknown error 2
 	*/
 	const RET_ERROR_2 = -3;
 	
-	/*
+	/**
 	@var int RET_CANCELLED Task cancelled by event
 	*/
 	const RET_CANCELLED = -2;
 	
-	/*
-	@var int RET_NOT_FOUND Unable to process task due to not found data
+	/**
+	 * @var int RET_NOT_FOUND Unable to process task due to not found data
 	*/
 	const RET_NOT_FOUND = -1;
 	
-	/*
-	@var int RET_INVALID Invalid amount of data
+	/**
+	 * @var int RET_INVALID Invalid amount of data
 	*/
 	const RET_INVALID = 0;
 	
-	/*
-	@var int RET_SUCCESS The task was successful
+	/**
+	 * @var int RET_SUCCESS The task was successful
 	*/
 	const RET_SUCCESS = 1;
 	
@@ -176,6 +188,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
+	/**
+	 * @param string $name
+	*/
 	public function registerList($name){
 		if(trim($name) === ""){
 			return false;
@@ -186,12 +201,31 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->list[] = $name;
 			return true;
 		}
+	}	
+	
+	/**
+	 * @param string $name
+	*/
+	public function unregisterList($name){
+		foreach($this->list as $key => $n){
+			if($n === $name){
+				unset($this->list[$key]);
+				return true;
+			}
+		}
+		return false;
 	}
 	
+	/**
+	 * @return string[]
+	*/
 	public function getList(){
 		return $this->list;
 	}
 	
+	/**
+	 * @return object
+	*/
 	public function getConfigurationValue($key, $default = false){
 		if($this->config->exists($key)){
 			return $this->config->get($key);
@@ -202,6 +236,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	private function readResource($res){
 		$path = $this->getFile()."resources/".$res;
 		$resource = $this->getResource($res);
+
 		if(!is_resource($resource)){
 			$this->getLogger()->debug("Tried to load unknown resource ".TextFormat::AQUA.$res.TextFormat::RESET);
 			return false;
@@ -217,7 +252,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->playerLang["RCON"] = $vars;
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}elseif($lang === "user-define"){
-			$vars = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, get_object_vars(json_decode($this->getResource("lang_def.json")))))->getAll();
+			$vars = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, get_object_vars(json_decode($this->readResource("lang_def.json")))))->getAll();
 			$this->playerLang["CONSOLE"] = $vars;
 			$this->playerLang["RCON"] = $vars;
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
@@ -229,10 +264,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param string $lang
-	
-	@return boolean
+	/**
+	 * @param string $lang
+	 *
+	 * @return bool
 	*/
 	public function setLang($lang, $target = "CONSOLE"){
 		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
@@ -253,24 +288,24 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@return array
+	/**
+	 * @return array
 	*/
 	public function getLangList(){
 		return $this->langList;
 	}
 	
-	/*
-	@return array
+	/**
+	 * @return array
 	*/
 	public function getLangResource(){
 		return $this->langRes;
 	}
 	
-	/*
-	@param string|Player $player
-	
-	@return string|boolean
+	/**
+	 * @param string|Player $player
+	 *
+	 * @return string|boolean
 	*/
 	public function getPlayerLang($player){
 		if($player instanceof Player){
@@ -283,10 +318,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
+	 *
+	 * @return int
 	*/
 	public function addDebt($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0){
@@ -323,10 +361,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
+	 *
+	 * @return int
 	*/
 	public function reduceDebt($player, $amount, $force = false, $issuer = "external"){
 		if($player instanceof Player){
@@ -358,10 +399,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
+	 *
+	 * @return int
 	*/
 	public function addBankMoney($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0){
@@ -390,10 +434,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
+	 *
+	 * @return int
 	*/
 	public function reduceBankMoney($player, $amount, $force = false, $issuer = "external"){
 		if($player instanceof Player){
@@ -423,26 +470,26 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@return Map<string, Map<string, int>>
+	/**
+	 * @return array
 	*/
 	public function getAllMoney(){
 		return $this->money;
 	}
 	
-	/*
-	@return Map<string, Map<string, int>>
+	/**
+	 * @return array
 	*/
 	public function getAllBankMoney(){
 		return $this->bank;
 	}
 	
-	/*
-	@param string $key
-	@param string|Player $player
-	@param array $value
-	
-	@return string
+	/**
+	 * @param string $key
+	 * @param Player|string $player
+	 * @param array $value
+	 *
+	 * @return string
 	*/
 	public function getMessage($key, $player = "CONSOLE", array $value = array("%1", "%2", "%3", "%4")){
 		if($player instanceof Player){
@@ -455,10 +502,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return boolean
+	/**
+	 * @param Player|string $player
+	 *
+	 * @return boolean
 	*/
 	public function accountExists($player){
 		if($player instanceof Player){
@@ -467,31 +514,34 @@ class EconomyAPI extends PluginBase implements Listener{
 		return isset($this->money["money"][$player]);
 	}
 	
-	/*
-	@param Player|string $player
-	@param int $default_money
-	@param int $default_debt
-	@param int $default_bank_money
-	
-	@return boolean
+	/**
+	 * @param Player|string $player
+	 * @param float $default_money
+	 * @param float $default_debt
+	 * @param float $default_bank_money
+	 *
+	 * @return boolean
 	*/
-	public function createAccount($player, $default_money = false, $default_debt = false, $default_bank_money = false){
+	public function createAccount($player, $default_money = false, $default_debt = false, $default_bank_money = false, $force = false){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(isset($this->money["money"][$player])){
-			$this->money["money"][$player] = ($default_money === false ? $this->config->get("default-money") : $default_money);
-			$this->money["debt"][$player] = ($default_debt === false ? $this->config->get("default-debt") : $default_debt);
-			$this->bank["money"][$player] = ($default_bank_money === false ? $this->config->get("default-bank-money") : $default_bank_money);
-			return true;
+		if(!isset($this->money["money"][$player])){
+			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $player, $default_money, $default_debt, $default_bank_money, "EconomyAPI")));
+			if(!$ev->isCancelled() and $force === false){
+				$this->money["money"][$player] = ($default_money === false ? $this->config->get("default-money") : $default_money);
+				$this->money["debt"][$player] = ($default_debt === false ? $this->config->get("default-debt") : $default_debt);
+				$this->bank["money"][$player] = ($default_bank_money === false ? $this->config->get("default-bank-money") : $default_bank_money);
+				return true;
+			}
 		}
 		return false;
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return boolean
+	/**
+	 * @param Player|string $player
+	 *
+	 * @return boolean
 	*/
 	public function removeAccount($player){
 		if($player instanceof Player){
@@ -507,10 +557,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		return false;
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return boolean
+	/**
+	 * @param Player|string $player
+	 *
+	 * @return boolean
 	*/
 	public function bankAccountExists($player){
 		if($player instanceof Player){
@@ -519,10 +569,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		return isset($this->bank["money"][$player]);
 	}
 	
-	/*
-	@param Player|string $player
+	/**
+	 * @param Player|string $player
 	
-	@return boolean|int
+	 * @return boolean|float
 	*/
 	public function myMoney($player){ // To identify the result, use '===' operator
 		if($player instanceof Player){
@@ -534,10 +584,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		return $this->money["money"][$player];
 	}
 	
-	/*
-	@param Player|string $player
+	/**
+	 * @param Player|string $player
 	
-	@return boolean|int
+	 * @return boolean|float
 	*/
 	public function myDebt($player){ // To identify the result, use '===' operator
 		if($player instanceof Player){
@@ -549,10 +599,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		return $this->money["debt"][$player];
 	}
 	
-	/*
-	@param Player|string $player
-	
-	@return boolean|int
+	/**
+	 * @param Player|string $player
+	 *
+	 * @return boolean|float
 	*/
 	public function myBankMoney($player){ // To identify the result, use '===' operator
 		if($player instanceof Player){
@@ -564,11 +614,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		return $this->bank["money"][$player];
 	}
 	
-	/*
-	@param Player|string $player
-	@param int $amount
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 *
+	 * @return int
 	*/
 	public function addMoney($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0 or !is_numeric($amount)){
@@ -593,11 +643,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	@param int $amount
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $amount
+	 *
+	 * @return int
 	*/
 	public function reduceMoney($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0 or !is_numeric($amount)){
@@ -625,11 +675,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 	
-	/*
-	@param Player|string $player
-	@param int $money
-	
-	@return int
+	/**
+	 * @param Player|string $player
+	 * @param float $money
+	 *
+	 * @return int
 	*/
 	public function setMoney($player, $money, $force = false, $issuer = "external"){
 		if($money < 0 or !is_numeric($money)){
@@ -685,21 +735,23 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function onJoinEvent(PlayerJoinEvent $event){
 		$username = $event->getPlayer()->getName();
 		if(!isset($this->money["money"][$username])){
-			$this->money["money"][$username] = $this->config->get("default-money");
-			$this->money["debt"][$username] = $this->config->get("default-debt");
+			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, $this->config->get("default-money"), $this->config->get("default-debt"), null, "EconomyAPI")));
+			$this->money["money"][$username] = $ev->getDefaultMoney();
+			$this->money["debt"][$username] = $ev->getDefaultDebt();
 		}
 		if(!isset($this->bank["money"][$username])){
-			$this->bank["money"][$username] = $this->config->get("default-bank-money");
+			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, null, null, $this->config->get("default-bank-money"), "EconomyAPI")));
+			$this->bank["money"][$username] = $ev->getDefaultBankMoney();
 		}
 		if(!isset($this->playerLang[$username])){
 			$this->setLang($this->config->get("default-lang"), $username);
 		}
 		if(isset($this->schedule["debt"][$username])){
-			$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask(/*new DebtScheduler($this, $username)*/ new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->schedule["debt"][$username]))->getTaskId();
+			$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->schedule["debt"][$username]))->getTaskId();
 			$this->lastTask["debt"][$username] = time();
 		}
 		if(isset($this->schedule["bank"][$username])){
-			$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleDelayedTask(/*new BankScheduler($this, $username)*/ new CallbackTask(array($this, "bankScheduler"), array($username)), ($this->schedule["bank"][$username]))->getTaskId();
+			$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "bankScheduler"), array($username)), ($this->schedule["bank"][$username]))->getTaskId();
 			$this->lastTask[$username]["bank"] = time();
 		}
 	}
@@ -740,12 +792,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		$player->sendMessage($this->getMessage("debt-increase", $player, array($this->myDebt($player), "", "", "")));
 		$this->lastTask["debt"][$username] = time();
 		$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->config->get("time-for-increase-debt") * 1200))->getTaskId();
-	}
+	} 
 	
-	//public function 
-	
-	/*
-	@return string
+	/**
+	 * @return string
 	*/
 	public function __toString(){
 		return "EconomyAPI (accounts:".count($this->money).", bank: ".count($this->money).")";
