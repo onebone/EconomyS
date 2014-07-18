@@ -8,6 +8,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
@@ -59,14 +60,24 @@ class EconomyJob extends PluginBase implements Listener{
 		$block = $event->getBlock();
 
 		$job = $this->jobs->get($this->player->get($player->getName()));
-		if(isset($job[$block->getID().":".$block->getDamage()])){
-			$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage()]);
+		if($job !== false){
+			if(isset($job[$block->getID().":".$block->getDamage().":break"])){
+				$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage().":break"]);
+			}
 		}
 	}
 
-  /*  public function onBlockPlace(BlockPlaceEvent $event){
+	public function onBlockPlace(BlockPlaceEvent $event){
+		$player = $event->getPlayer();
+		$block = $event->getBlock();
 
-	}*/
+		$job = $this->jobs->get($this->player->get($player->getName()));
+		if($job !== false){
+			if(isset($job[$block->getID().":".$block->getDamage().":place"])){
+				$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage().":place"]);
+			}
+		}
+	}
 
 	/**
 	 * @return EconomyJob
