@@ -80,7 +80,9 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function onLoad(){
-		self::$obj = $this;
+		if(!self::$obj instanceof EconomyAPI){
+			self::$obj = $this;
+		}
 		$this->path = $this->getDataFolder();
 		$this->schedule = array();
 		$this->list = array();
