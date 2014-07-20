@@ -150,15 +150,45 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		// getServer().getPluginManager().registerEvents(this, this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		
-		$moneyConfig = new Config($this->path."MoneyData.yml", Config::YAML);
-		$bankConfig = new Config($this->path."BankData.yml", Config::YAML);
+		$this->convertData();
+		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
 		$this->money = $moneyConfig->getAll();
 		$this->bank = $bankConfig->getAll();
 		$this->registerList("EconomyAPI");
 	}
 	
-	
+	private function convertData(){
+		$cnt = 0;
+		if(is_file($this->path."MoneyData.yml")){
+			$data = (new Config($this->path."MoneyData.yml", Config::YAML))->getAll();
+			$saveData = array();
+			foreach($data as $player => $money){
+				$saveData["money"][$player] = (float)$money["money"];
+				$saveData["debt"][$player] = (float)$money["debt"];
+				++$cnt;
+			}
+			@unlink($this->path."MoneyData.yml");
+			$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+			$moneyConfig->setAll($saveData);
+			$moneyConfig->save();
+		}
+		if(is_file($this->path."BankData.yml")){
+			$data = (new Config($this->path."BankData.yml", Config::YAML))->getAll();
+			$saveData = array();
+			foreach($data as $player => $money){
+				$saveData["money"][$player] = (float)$money["money"];
+				++$cnt;
+			}
+			@unlink($this->path."BankData.yml");
+			$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+			$bankConfig->setAll($saveData);
+			$bankConfig->save();
+		}
+		if($cnt > 0){
+			$this->getLogger()->info(TextFormat::AQUA."Converted $cnt data(m) into new format");
+		}
+	}
 	
 	private function initializePlayerLang($langData){
 		foreach($langData as $player => $lang){
@@ -707,8 +737,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function onDisable(){
-		$moneyConfig = new Config($this->path."MoneyData.yml", Config::YAML);
-		$bankConfig = new Config($this->path."BankData.yml", Config::YAML);
+		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
 		$moneyConfig->setAll($this->money);
 		$moneyConfig->save();
 		$bankConfig->setAll($this->bank);
