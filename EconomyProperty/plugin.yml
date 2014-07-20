@@ -1,0 +1,21 @@
+name: EconomyProperty
+main: economyproperty\EconomyProperty
+version: "2.0.0"
+author: onebone
+api: [1.1.0]
+
+permissions:
+ economyproperty.*:
+  description: Includes all permissions related to EconomyProperty
+  default: op
+  children:
+   economyproperty.property.*:
+    description: Includes all permission related to property area
+    default: op
+    children:
+     economyproperty.property.modify:
+      description: Allows player to modify property area
+      default: op
+     economyproperty.property.remove:
+      description: Allows player to remove property
+      default: op
