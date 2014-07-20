@@ -19,3 +19,6 @@ permissions:
      economyproperty.property.remove:
       description: Allows player to remove property
       default: op
+   economyproperty.command.property:
+    description: Allows player to use property command
+    default: op

@@ -51,3 +51,12 @@ permissions:
      economyapi.command.mystatus:
       description: Allows player to see his/her financial status
       default: true
+     economyapi.command.takemoney:
+      description: Allows player to take money from others
+      default: op
+     economyapi.command.returndebt:
+      description: Allows player to return debt
+      default: true
+     economyapi.command.mydebt:
+      description: Allows player to see his/her money
+      default: true
