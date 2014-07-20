@@ -105,7 +105,3 @@ You can access to EconomyAPI by using `EconomyAPI::getInstance()`
 
 example)
 EconomyAPI::getInstance()->addMoney($player_instance, $amount);
-
-
-EconomySDataConverter uses library :
-[SnakeYaml](https://code.google.com/p/snakeyaml/)
