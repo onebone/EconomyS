@@ -1,5 +1,5 @@
 name: EconomyLand
-main: economyland\EconomyLand
+main: onebone\economyland\EconomyLand
 api:
 - 1.0.0
 - 1.1.0
