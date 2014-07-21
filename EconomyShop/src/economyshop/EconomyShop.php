@@ -2,6 +2,7 @@
 
 namespace economyshop;
 
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -75,7 +76,7 @@ class EconomyShop extends PluginBase implements Listener{
 		$e = explode(":", $item);
 		$e[1] = isset($e[1]) ? $e[1] : 0;
 		if(array_key_exists($item, ItemList::$items)){
-			return array(Itemlist::$items[$item], true); // Returns Item ID
+			return array(ItemList::$items[$item], true); // Returns Item ID
 		}else{
 			foreach(ItemList::$items as $name => $id){
 				$explode = explode(":", $id);
@@ -238,6 +239,21 @@ class EconomyShop extends PluginBase implements Listener{
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
+		}
+	}
+
+	public function onBreakEvent(BlockBreakEvent $event){
+		$block = $event->getBlock();
+		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
+			$player = $event->getPlayer();
+			if(!$player->hasPermission("economyshop.shop.remove")){
+				$player->sendMessage($this->getMessage("no-permission-break"));
+				$event->setCancelled(true);
+				return;
+			}
+			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] = null;
+			unset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()]);
+			$player->sendMessage($this->getMessage("removed-shop"));
 		}
 	}
 

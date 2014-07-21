@@ -2,6 +2,7 @@
 
 namespace onebone\economysell;
 
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -154,7 +155,7 @@ class EconomySell extends PluginBase implements Listener{
 			if($cnt > $sell["amount"]){
 				$player->getInventory()->removeItem(new Item($sell["item"], $sell["meta"], $sell["amount"]));
 				EconomyAPI::getInstance()->addMoney($player, $sell["cost"], true, "EconomySell");
-				$player->sendMessage($this->getMessage("sold-item", array($sell["amount"], $sell["item"].":".$sell["item"], $sell["cost"])));
+				$player->sendMessage($this->getMessage("sold-item", array($sell["amount"], $sell["item"].":".$sell["meta"], $sell["cost"])));
 			}else{
 				$player->sendMessage($this->getMessage("no-item"));
 			}
@@ -170,6 +171,21 @@ class EconomySell extends PluginBase implements Listener{
 		if(isset($this->placeQueue[$username])){
 			$event->setCancelled(true);
 			unset($this->placeQueue[$username]);
+		}
+	}
+
+	public function onBreak(BlockBreakEvent $event){
+		$block = $event->getBlock();
+		if(isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
+			$player = $event->getPlayer();
+			if(!$player->hasPermission("economysell.sell.remove")){
+				$player->sendMessage($this->getMessage("no-permission-break"));
+				$event->setCancelled(true);
+				return;
+			}
+			$this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] = null;
+			unset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()]);
+			$player->sendMessage($this->getMessage("removed-sell"));
 		}
 	}
 
