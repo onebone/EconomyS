@@ -52,8 +52,8 @@ class EconomyShop extends PluginBase implements Listener{
 	}
 
 	public function prepareLangPref(){
-		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, yaml_parse_file($this->getFile()."resources/language.yml"));
-		$this->shopSign = new Config($this->getDataFolder()."ShopText.yml", Config::YAML, yaml_parse_file($this->getFile()."resources/ShopText.yml"));
+		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, yaml_parse(stream_get_contents($this->getResource("language.yml"))));
+		$this->shopSign = new Config($this->getDataFolder()."ShopText.yml", Config::YAML, yaml_parse(stream_get_contents($this->getResource("ShopText.yml"))));
 	}
 	
 	public function onDisable(){
