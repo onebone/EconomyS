@@ -1,0 +1,21 @@
+name: EconomyShop
+version: "1.0.0"
+api: [1.0.0]
+main: economyshop\EconomyShop
+author: onebone
+
+permissions:
+ economyshop.*:
+  description: Allows all functions in EconomyShop
+  default: op
+  children:
+   economyshop.shop.*:
+    description: Allows all functions about shops
+    default: op
+    children:
+     economyshop.shop.create:
+      description: Allows player to create shop
+      default: op
+     economyshop.shop.remove:
+      description: Allows player to remove shop
+      default: op
