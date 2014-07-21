@@ -7,13 +7,14 @@ use pocketmine\event\Listener;
 use pocketmine\event\block\BlockEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\scheduler\CallbackTask;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\level\Position;
 use pocketmine\level\Level;
-use pocketmine\math\Vector3;
 use pocketmine\block\AirBlock;
 use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
@@ -21,32 +22,93 @@ use pocketmine\plugin\MethodEventExecutor;
 use economyapi\EconomyAPI;
 
 class EconomyLand extends PluginBase implements Listener{
-	private $land, $config;
+	/**
+	 * @var \SQLite3
+	 */
+	private $land;
+	/**
+	 * @var Config
+	 */
+	private $config;
 	private $start, $end;
+	private $expire;
+
+	private static $instance;
 	
 	public function onEnable(){
 		if(!class_exists("economyapi\\EconomyAPI")){
 			$this->getLogger()->severe("Couldn't find EconomyAPI");
 			return;
 		}
+
+		if(!static::$instance instanceof EconomyLand){
+			static::$instance = $this;
+		}
 		
 		@mkdir($this->getDataFolder());
-		$this->land = new \SQLite3($this->getDataFolder()."LandData.sqlite3");
-		$this->land->exec("CREATE TABLE IF NOT EXISTS land(
-			ID INTEGER PRIMARY KEY AUTOINCREMENT,
-			startX INTEGER NOT NULL,
-			startZ INTEGER NOT NULL,
-			endX INTEGER NOT NULL,
-			endZ INTEGER NOT NULL,
-			level TEXT NOT NULL,
-			owner TEXT NOT NULL,
-			invitee TEXT NOT NULL,
-			price INTEGER NOT NULL
-		);");
-		
+		if(!is_file($this->getDataFolder()."Expire.dat")){
+			file_put_contents($this->getDataFolder()."Expire.dat", serialize(array()));
+		}
+		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
+
+		$now = time();
+		foreach($this->expire as $landId => &$time){
+			$time[1] = $now;
+			$this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "expireLand"), array($landId)), ($time[0] * 20));
+		}
+
+		$this->land = new \SQLite3($this->getDataFolder()."Land.sqlite3");
+		$this->land->exec(stream_get_contents($this->getResource("sqlite3.sql")));
+		$this->parseOldData();
+
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlaceEvent"), $this);
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onBreakEvent"), $this);
 		$this->createConfig();
+	}
+
+	private function parseOldData(){
+		if(is_file($this->getDataFolder()."LandData.sqlite3")){
+			$cnt = 0;
+			$land = new \SQLite3($this->getDataFolder()."LandData.sqlite3");
+			$result = $land->query("SELECT * FROM land");
+			while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
+				$this->land->exec("INSERT INTO land (price, level, startX, startZ, endX, endZ, owner, invitee) VALUES ($d[price], '$d[level]', $d[startX], $d[startZ], $d[endX], $d[endZ], '$d[owner]', '$d[invitee]')");
+				++$cnt;
+			}
+			$land->close();
+			$this->getLogger()->info(TextFormat::AQUA."Parsed $cnt of old data to new format database.");
+			@unlink($this->getDataFolder()."LandData.sqlite3");
+		}
+	}
+
+	public function expireLand($landId){
+		if(!isset($this->expire[$landId])) return;
+		$landId = (int)$landId;
+		$info = $this->land->query("SELECT * FROM land WHERE ID = $landId")->fetchArray(SQLITE3_ASSOC);
+		if(is_bool($info)) return;
+		$player = $info["owner"];
+		if(($player = $this->getServer()->getPlayerExact($player)) instanceof Player){
+			$player->sendMessage("[EconomyLand] Your land #$landId has expired.");
+		}
+		$this->land->exec("DELETE FROM land WHERE ID = $landId");
+		unset($this->expire[$landId]);
+		return;
+	}
+
+	public function onDisable(){
+		$this->land->close();
+		$now = time();
+		foreach($this->expire as $landId => $time){
+			$this->expire[$landId][0] -= ($now - $time[1]);
+		}
+		file_put_contents($this->getDataFolder()."Expire.dat", serialize($this->expire));
+	}
+
+	/**
+	 * @return self
+	 */
+	public static function getInstance(){
+		return static::$instance;
 	}
 	
 	public function onCommand(CommandSender $sender, Command $cmd, $label, array $param){
@@ -136,12 +198,12 @@ class EconomyLand extends PluginBase implements Listener{
 				$endX = (int) $endp["x"];
 				$startZ = (int) $l["z"];
 				$endZ = (int) $endp["z"];
-				if($startX > $endX){ // startX 가 endX 보다 클 경우 둘이 바꿔치기
+				if($startX > $endX){
 					$backup = $startX;
 					$startX = $endX;
 					$endX = $backup;
 				}
-				if($startZ > $endZ){ // startZ 가 endZ 보다 클 경우 둘이 바꿔치기
+				if($startZ > $endZ){
 					$backup = $startZ;
 					$startZ = $endZ;
 					$endZ = $backup;
@@ -245,7 +307,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
 				$cnt = 0;
 				for($y = 1;; $y++){
-					if($level->level->getBlock($x, $y, $z)[0] === 0){
+					if($level->getBlock($x, $y, $z)->getID() === Block::AIR){
 						break;
 					}
 					if($cnt === 5){
@@ -308,7 +370,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("no-one-owned"));
 					return true;
 				}
-				$sender->sendMessage($this->getMessage("here-land", array($info["ID"], $info["owner"])));
+				$sender->sendMessage($this->getMessage("here-land", array($info["ID"], $info["owner"], "%3")));
 				return true;
 				default:
 				$sender->sendMessage("Usage: ".$cmd->getUsage());
@@ -394,11 +456,49 @@ class EconomyLand extends PluginBase implements Listener{
 		}
 		checkLand:
 		if($this->config->get("white-world-protection")){
-			if(!$exist and in_array($level, $this->config->get("white-world-protection")) and !$sender->hasPermission("economyland.land.modify.whiteland")){
+			if(!$exist and in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
 				$player->sendMessage($this->getMessage("not-owned"));
 				$event->setCancelled(true);
 			}
 		}
+	}
+
+	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
+		if($level instanceof Level){
+			$level = $level->getName();
+		}
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		if($startX > $endX){
+			$tmp = $startX;
+			$startX = $endX;
+			$endX = $tmp;
+		}
+		if($startZ > $endZ){
+			$tmp = $startZ;
+			$startZ = $endZ;
+			$endZ = $tmp;
+		}
+		$startX--;
+		$endX++;
+		$startZ--;
+		$endZ++;
+		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
+		if(!is_bool($result)){
+			return false;
+		}
+		if($expires !== null){
+			$info = $this->land->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
+			$this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "expireLand"), array($info["seq"])), $expires * 1200);
+			$this->expire[$info["seq"]] = array(
+				$expires * 60,
+				time()
+			);
+		}
+		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * 100;
+		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, ','".($expires === null ? "":", $expires").")");
+		return true;
 	}
 	
 	public function getMessage($key, $value = array("%1", "%2", "%3")){

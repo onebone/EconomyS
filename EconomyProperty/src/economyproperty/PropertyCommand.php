@@ -47,6 +47,10 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				if(!$sender->hasPermission("economyproperty.command.property.pos1")){
 					return false;
 				}
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					break;
+				}
 				$this->pos[$sender->getName()][0] = array(
 					(int)$sender->getX(),
 					(int)$sender->getZ(),
@@ -57,6 +61,10 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 			case $this->pos2:
 				if(!$sender->hasPermission("economyproperty.command.property.pos2")){
 					return false;
+				}
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					break;
 				}
 				if(!isset($this->pos[$sender->getName()][0])){
 					$sender->sendMessage("[EconomyProperty] Please set your first position.");
@@ -72,9 +80,13 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				if(!$sender->hasPermission("economyproperty.command.property.make")){
 					return false;
 				}
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					break;
+				}
 				$price = array_shift($params);
-				if(!is_numeric($price)){
-					$sender->sendMessage("Usage: /{$this->command} {$this->make} <price>");
+				if(!is_numeric($price) and (isset($params[0]) and !is_numeric($params[0]))){
+					$sender->sendMessage("Usage: /{$this->command} {$this->make} <price> [rent time]");
 					break;
 				}
 				if(!isset($this->pos[$sender->getName()][1])){
@@ -94,7 +106,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 					$this->pos[$sender->getName()][1][0],
 					$this->pos[$sender->getName()][1][1]
 				);
-				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY());
+				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY(), isset($params[0]) ? $params[0] : null);
 				if($result){
 					$sender->sendMessage("[EconomyProperty] Property has successfully created.");
 				}else{

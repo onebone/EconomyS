@@ -32,8 +32,10 @@ class EconomyProperty extends PluginBase implements Listener{
 
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
-		$this->property = new \SQLite3($this->getDataFolder()."Properties.sqlite3");
+
+		$this->property = new \SQLite3($this->getDataFolder()."Property.sqlite3");
 		$this->property->exec(stream_get_contents($this->getResource("sqlite3.sql")));
+		$this->parseOldData();
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 
@@ -43,6 +45,21 @@ class EconomyProperty extends PluginBase implements Listener{
 
 		$this->tap = array();
 		$this->placeQueue = array();
+	}
+
+	private function parseOldData(){
+		if(is_file($this->getDataFolder()."Properties.sqlite3")){
+			$cnt = 0;
+			$property = new \SQLite3($this->getDataFolder()."Properties.sqlite3");
+			$result = $property->query("SELECT * FROM Property");
+			while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
+				$this->property->exec("INSERT INTO Property (x, y, z, price, level, startX, startZ, landX, landZ) VALUES ($d[x], $d[y], $d[z], $d[price], '$d[level]', $d[startX], $d[startZ], $d[landX], $d[landZ])");
+				++$cnt;
+			}
+			$property->close();
+			$this->getLogger()->info("Parsed $cnt of old data to new format database.");
+			@unlink($this->getDataFolder()."Properties.sqlite3");
+		}
 	}
 
 	public function onDisable(){
@@ -78,8 +95,9 @@ class EconomyProperty extends PluginBase implements Listener{
 			if(isset($this->tap[$player->getName()]) and $this->tap[$player->getName()][0] === $block->x.":".$block->y.":".$block->z and ($now - $this->tap[$player->getName()][1]) <= 2){
 				if(EconomyAPI::getInstance()->myMoney($player) < $info["price"]){
 					$player->sendMessage("You don't have enough money to buy here.");
+					return;
 				}else{
-					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"]);
+					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"], $info["rentTime"]);
 					if($result){
 						EconomyAPI::getInstance()->reduceMoney($player, $info["price"], true , "EconomyProperty");
 						$player->sendMessage("Successfully bought land.");
@@ -134,7 +152,7 @@ class EconomyProperty extends PluginBase implements Listener{
 		}
 	}
 
-	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $expectedYaw = 0){
+	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $rentTime = null, $expectedYaw = 0){
 		if(!$level instanceof Level){
 			$level = $this->getServer()->getLevelByName($level);
 			if(!$level instanceof Level){
@@ -168,7 +186,7 @@ class EconomyProperty extends PluginBase implements Listener{
 		$lastBlock = 0;
 		for(; $y < 127; $y++){
 			$b = $level->getBlock(new Vector3($centerx, $y, $centerz));
-			if($b->getID() === Block::AIR and $lastBlock !== Block::AIR){
+			if($b->getID() === 0 and $lastBlock != 0){
 				$difference = abs($expectedY - $y);
 				if($difference > $diff){ // Finding the closest location with player or something
 					$y = $tmpY;
@@ -194,13 +212,13 @@ class EconomyProperty extends PluginBase implements Listener{
 			new Int("x", $centerx),
 			new Int("y", $y),
 			new Int("z", $centerz),
-			new String("Text1", "[PROPERTY]"),
+			new String("Text1", ($rentTime === null ? "[PROPERTY]" : "[RENT]")),
 			new String("Text2", "Price : $price"),
 			new String("Text3", "Blocks : ".($x*$z*128)),
-			new String("Text4", "Property #".$info["seq"])
+			new String("Text4", ($rentTime === null ? "Property #".$info["seq"] : "Time : ".($rentTime)."min"))
 		)));
 		$tile->spawnToAll();
-		$this->property->exec("INSERT INTO Property (price, x, y, z, level, startX, startZ, landX, landZ) VALUES ($price, $centerx, $y, $centerz, '{$level->getName()}', $first[0], $first[1], $sec[0], $sec[1])");
+		$this->property->exec("INSERT INTO Property (price, x, y, z, level, startX, startZ, landX, landZ".($rentTime === null ? "":", rentTime").") VALUES ($price, $centerx, $y, $centerz, '{$level->getName()}', $first[0], $first[1], $sec[0], $sec[1]".($rentTime === null?"":", $rentTime").")");
 		return [$centerx, $y, $centerz];
 	}
 
