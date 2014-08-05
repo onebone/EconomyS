@@ -217,19 +217,20 @@ class EconomyProperty extends PluginBase implements Listener{
 		$lastBlock = 0;
 		for(; $y < 127; $y++){
 			$b = $level->getBlock(new Vector3($centerx, $y, $centerz));
-			if($b->getID() === 0 and $lastBlock != 0){
-				$difference = abs($expectedY - $y);
-				if($difference > $diff){ // Finding the closest location with player or something
-					$y = $tmpY;
-					break;
-				}else{
+			$id = $b->getID();
+			$difference = abs($expectedY - $y);
+			if($difference > $diff){ // Finding the closest location with player or something
+				$y = $tmpY;
+				break;
+			}else{
+				if($id === 0 and $lastBlock !== 0){
 					$tmpY = $y;
 					$diff = $difference;
 				}
 			}
-			$lastBlock = $b->getID();
+			$lastBlock = $id;
 		}
-		if($y >= 127){
+		if($y >= 126){
 			$y = $expectedY;
 		}
 
