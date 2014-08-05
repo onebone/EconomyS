@@ -11,11 +11,11 @@ use pocketmine\Server;
 
 class PropertyCommand extends Command implements PluginIdentifiableCommand{
 	private $plugin;
-	private $command, $pos1, $pos2, $make;
+	private $command, $pos1, $pos2, $make, $touchPos;
 
 	private $pos;
 
-	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make"){
+	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make", $touchPos = "touchpos"){
 		parent::__construct($command, $plugin);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
 		$this->setPermission("economyproperty.command.property");
@@ -24,6 +24,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 		$this->pos1 = $pos1;
 		$this->pos2 = $pos2;
 		$this->make = $make;
+		$this->touchPos = $touchPos;
 
 		$this->pos = array();
 	}
@@ -56,7 +57,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 					(int)$sender->getZ(),
 					$sender->getLevel()->getName()
 				);
-				$sender->sendMessage("[EconomyProperty] First position has saved.");
+				$sender->sendMessage("[EconomyProperty] First position has been saved.");
 				break;
 			case $this->pos2:
 				if(!$sender->hasPermission("economyproperty.command.property.pos2")){
@@ -74,7 +75,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 					(int)$sender->getX(),
 					(int)$sender->getZ(),
 				);
-				$sender->sendMessage("[EconomyProperty] Second position has saved.");
+				$sender->sendMessage("[EconomyProperty] Second position has been saved.");
 				break;
 			case $this->make:
 				if(!$sender->hasPermission("economyproperty.command.property.make")){
@@ -113,9 +114,21 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 					$sender->sendMessage("[EconomyProperty] You are trying to overlap with other property area.");
 				}
 				break;
+			case $this->touchPos:
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					break;
+				}
+				$result = $this->plugin->switchTouchQueue($sender->getName());
+				$sender->sendMessage($result ? "[EconomyProperty] Your touch queue has been turned on.":"[EconomyProperty] Your touch queue has been turned off.");
+				break;
 			default:
 				$sender->sendMessage("Usage: ".$this->usageMessage);
 		}
 		return true;
+	}
+
+	public function mergePosition($player, $index, $data){
+		$this->pos[$player][$index] = $data;
 	}
 }

@@ -2,6 +2,7 @@
 
 namespace onebone\economyproperty;
 
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -10,7 +11,6 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
-use pocketmine\block\Block;
 use pocketmine\block\SignPost;
 use pocketmine\block\Air;
 use pocketmine\tile\Sign;
@@ -28,7 +28,17 @@ class EconomyProperty extends PluginBase implements Listener{
 	 */
 	private $property;
 
-	private $tap, $placeQueue;
+	/**
+	 * @var array $touch
+	 * key : player name
+	 * value : null
+	 */
+	private $tap, $placeQueue, $touch;
+
+	/**
+	 * @var PropertyCommand $command
+	 */
+	private $command;
 
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
@@ -41,9 +51,11 @@ class EconomyProperty extends PluginBase implements Listener{
 
 		$this->saveDefaultConfig();
 		$command = $this->getConfig()->get("commands");
-		$this->getServer()->getCommandMap()->register("economyproperty", new PropertyCommand($this, $command["command"], $command["pos1"], $command["pos2"], $command["make"]));
+		$this->command = new PropertyCommand($this, $command["command"], $command["pos1"], $command["pos2"], $command["make"], $command["touchPos"]);
+		$this->getServer()->getCommandMap()->register("economyproperty", $this->command);
 
 		$this->tap = array();
+		$this->touch = array();
 		$this->placeQueue = array();
 	}
 
@@ -68,16 +80,26 @@ class EconomyProperty extends PluginBase implements Listener{
 
 	public function onBlockTouch(PlayerInteractEvent $event){
 		$block = $event->getBlock();
+		$player = $event->getPlayer();
+
+		if(isset($this->touch[$player->getName()])){
+		//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
+			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()]);
+			$player->sendMessage("[EconomyProperty] First position has been saved.");
+			$event->setCancelled(true);
+			if($event->getItem()->isPlaceable()){
+				$this->placeQueue[$player->getName()] = true;
+			}
+			return;
+		}
 
 		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(!is_bool($info)){
-			$player = $event->getPlayer();
-
 			if(!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())){
 				if($player->hasPermission("economyproperty.property.modify") === false){
 					$event->setCancelled(true);
 					if($event->getItem()->isPlaceable()){
-						$this->placeQueue[$player->getName()] = true;//$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName();
+						$this->placeQueue[$player->getName()] = true;
 					}
 					$player->sendMessage("You don't have permission to modify property area.");
 					return;
@@ -132,9 +154,18 @@ class EconomyProperty extends PluginBase implements Listener{
 
 	public function onBlockBreak(BlockBreakEvent $event){
 		$block = $event->getBlock();
+		$player = $event->getPlayer();
+
+		if(isset($this->touch[$player->getName()])){
+			//$mergeData[$player->getName()][1] = [(int)$block->getX(), (int)$block->getZ()];
+			$this->command->mergePosition($player->getName(), 1, [(int)$block->getX(), (int)$block->getZ()]);
+			$player->sendMessage("[EconomyProperty] Second position has been saved.");
+			$event->setCancelled(true);
+			return;
+		}
+
 		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(is_bool($info) === false){
-			$player = $event->getPlayer();
 			if($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ()){
 				if($player->hasPermission("economyproperty.property.remove")){
 					$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
@@ -228,5 +259,29 @@ class EconomyProperty extends PluginBase implements Listener{
 		}
 		$d = $this->property->query("SELECT * FROM Property WHERE (((startX <= $first[0] AND landX >= $first[0]) AND (startZ <= $first[1] AND landZ >= $first[1])) OR ((startX <= $sec[0] AND landX >= $sec[0]) AND (startZ <= $first[1] AND landZ >= $sec[1]))) AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		return !is_bool($d);
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @return bool
+	 */
+	public function switchTouchQueue($player){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		if(isset($this->touch[$player])){
+			unset($this->touch[$player]);
+			return false;
+		}else{
+			$this->touch[$player] = true;
+			return true;
+		}
+	}
+
+	public function touchQueueExists($player){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		return isset($this->touch[$player]) === true;
 	}
 }
