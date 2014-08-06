@@ -55,7 +55,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				$this->pos[$sender->getName()][0] = array(
 					(int)$sender->getX(),
 					(int)$sender->getZ(),
-					$sender->getLevel()->getName()
+					$sender->getLevel()->getFolderName()
 				);
 				$sender->sendMessage("[EconomyProperty] First position has been saved.");
 				break;
