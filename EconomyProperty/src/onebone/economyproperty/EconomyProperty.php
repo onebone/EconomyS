@@ -84,7 +84,7 @@ class EconomyProperty extends PluginBase implements Listener{
 
 		if(isset($this->touch[$player->getName()])){
 		//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
-			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()]);
+			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getFolderName()]);
 			$player->sendMessage("[EconomyProperty] First position has been saved.");
 			$event->setCancelled(true);
 			if($event->getItem()->isPlaceable()){
