@@ -17,6 +17,8 @@ use onebone\economyapi\event\money\SetMoneyEvent;
 use onebone\economyapi\event\account\CreateAccountEvent;
 use onebone\economyapi\event\debt\AddDebtEvent;
 use onebone\economyapi\event\debt\ReduceDebtEvent;
+use onebone\economyapi\event\bank\AddMoneyEvent as BankAddMoneyEvent;
+use onebone\economyapi\event\bank\ReduceMoneyEvent as BankReduceMoneyEvent;
 
 class EconomyAPI extends PluginBase implements Listener{
 
@@ -219,10 +221,12 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 		}
 	}
-	
+
 	/**
 	 * @param string $name
-	*/
+	 * 
+	 * @return bool
+	 */
 	public function registerList($name){
 		if(trim($name) === ""){
 			return false;
@@ -233,11 +237,13 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->list[] = $name;
 			return true;
 		}
-	}	
-	
+	}
+
 	/**
 	 * @param string $name
-	*/
+	 *
+	 * @return bool
+	 */
 	public function unregisterList($name){
 		foreach($this->list as $key => $n){
 			if($n === $name){
@@ -254,10 +260,13 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function getList(){
 		return $this->list;
 	}
-	
+
 	/**
-	 * @return object
-	*/
+	 * @param string $key
+	 * @param mixed $default
+	 *
+	 * @return mixed
+	 */
 	public function getConfigurationValue($key, $default = false){
 		if($this->config->exists($key)){
 			return $this->config->get($key);
@@ -295,12 +304,13 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}
 	}
-	
+
 	/**
 	 * @param string $lang
+	 * @param string $target
 	 *
 	 * @return bool
-	*/
+	 */
 	public function setLang($lang, $target = "CONSOLE"){
 		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
 			$this->playerLang[$target] = get_object_vars(json_decode($resource));
@@ -308,7 +318,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		}else{
 			foreach($this->langList as $key => $l){
 				if(strtolower($lang) === strtolower($l)){
-					if(($resource = $this->langList($key)) !== false){
+					if(($resource = $this->langList[$key]) !== false){
 						$this->playerLang[$target] = $resource;
 						return $l;
 					}else{
@@ -448,7 +458,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$amount = round($amount, 2);
 		if(isset($this->bank["money"][$player])){
-			$ev = new \onebone\economyapi\event\bank\AddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \onebone\economyapi\event\money\AddMoneyEvent
+			$ev = new BankAddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \onebone\economyapi\event\money\AddMoneyEvent
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
@@ -484,7 +494,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($amount <= 0 or $amount > $this->bank["money"][$player]){
 				return self::RET_INVALID;
 			}
-			$ev = new \onebone\economyapi\event\bank\ReduceMoneyEvent($this, $player, $amount, $issuer);
+			$ev = new BankReduceMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
@@ -545,15 +555,16 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		return isset($this->money["money"][$player]);
 	}
-	
+
 	/**
 	 * @param Player|string $player
-	 * @param float $default_money
-	 * @param float $default_debt
-	 * @param float $default_bank_money
+	 * @param bool|float $default_money
+	 * @param bool|float $default_debt
+	 * @param bool|float $default_bank_money
+	 * @param bool $force
 	 *
 	 * @return boolean
-	*/
+	 */
 	public function createAccount($player, $default_money = false, $default_debt = false, $default_bank_money = false, $force = false){
 		if($player instanceof Player){
 			$player = $player->getName();
@@ -645,13 +656,15 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		return $this->bank["money"][$player];
 	}
-	
+
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
 	 *
 	 * @return int
-	*/
+	 */
 	public function addMoney($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0 or !is_numeric($amount)){
 			return self::RET_INVALID;
@@ -674,13 +687,15 @@ class EconomyAPI extends PluginBase implements Listener{
 			return self::RET_NOT_FOUND;
 		}
 	}
-	
+
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
+	 * @param bool $force
+	 * @param string $issuer
 	 *
 	 * @return int
-	*/
+	 */
 	public function reduceMoney($player, $amount, $force = false, $issuer = "external"){
 		if($amount <= 0 or !is_numeric($amount)){
 			return self::RET_INVALID;
@@ -706,13 +721,15 @@ class EconomyAPI extends PluginBase implements Listener{
 			return self::RET_NOT_FOUND;
 		}
 	}
-	
+
 	/**
 	 * @param Player|string $player
 	 * @param float $money
+	 * @param bool $force
+	 * @param string $issuer
 	 *
 	 * @return int
-	*/
+	 */
 	public function setMoney($player, $money, $force = false, $issuer = "external"){
 		if($money < 0 or !is_numeric($money)){
 			return self::RET_INVALID;
