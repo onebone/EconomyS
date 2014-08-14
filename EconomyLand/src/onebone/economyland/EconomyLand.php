@@ -160,7 +160,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$endX++;
 			$startZ--;
 			$endZ++;
-			$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * 100;
+			$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
 			$sender->sendMessage($this->getMessage("confirm-buy-land", array($price, "%2", "%3")));
 			return true;
 			case "land":
@@ -513,7 +513,8 @@ class EconomyLand extends PluginBase implements Listener{
 			"handler-priority" => 10,
 			"white-world-protection" => array(),
 			"non-check-worlds" => array(),
-			"player-land-limit" => "NaN"
+			"player-land-limit" => "NaN",
+			"price-per-y-axis" => 100
 		));
 		
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
