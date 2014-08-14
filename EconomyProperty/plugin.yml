@@ -2,7 +2,10 @@ name: EconomyProperty
 main: onebone\economyproperty\EconomyProperty
 version: "2.0.0"
 author: onebone
-api: [1.1.0]
+api:
+- 1.1.0
+- 1.2.0
+- 1.2.1
 
 permissions:
  economyproperty.*:

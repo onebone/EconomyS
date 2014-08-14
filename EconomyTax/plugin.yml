@@ -5,6 +5,8 @@ version: "2.0.0"
 api:
 - 1.0.0
 - 1.1.0
+- 1.2.0
+- 1.2.1
 permissions:
  economytax.tax.avoid:
   description: The permission that allows player to avoid paying tax
