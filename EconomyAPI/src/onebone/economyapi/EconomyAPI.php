@@ -526,6 +526,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		if(isset($this->playerLang[$player]) and isset($this->langRes[$this->playerLang[$player]][$key])){
 			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
+		}elseif(isset($this->langRes["def"][$key])){
+			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes["def"][$key]);
 		}else{
 			return "Couldn't find message resource";
 		}
