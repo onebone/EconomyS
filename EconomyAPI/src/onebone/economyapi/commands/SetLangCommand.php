@@ -22,7 +22,7 @@ class SetLangCommand extends EconomyAPICommand{
 			return false;
 		}
 		
-		$lang = array_shift($params);
+		$lang = implode(" ", $params);
 		
 		if(trim($lang) === ""){
 			$sender->sendMessage("Usage : /".$this->cmd." <lang>");
@@ -32,6 +32,9 @@ class SetLangCommand extends EconomyAPICommand{
 		$result = $this->getPlugin()->setLang($lang, $sender->getName());
 		if($result === false){
 			$sender->sendMessage("Requested language does not exist");
+		}else{
+			$sender->sendMessage("Your language have been set to ".$result);
 		}
+		return true;
 	}
 }

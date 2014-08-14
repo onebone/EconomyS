@@ -37,9 +37,11 @@ class EconomyAPI extends PluginBase implements Listener{
 	 */
 	private $command;
 
-	private $schedules, $scheduleId, $lastActivity;
+	private $schedules, $scheduleId, $lastActivity;  // scheduler related
 
-	private $list, $playerLang, $langRes;
+	private $list;
+
+	private $langRes, $playerLang; // language system related
 	
 	/**
 	 * @var int RET_ERROR_1 Unknown error 1
@@ -77,6 +79,12 @@ class EconomyAPI extends PluginBase implements Listener{
 		"ko" => "한국어",
 		"user-define" => "User Define"
 	);
+
+	public function __construct(){
+		if(self::$obj instanceof EconomyAPI){
+			throw new \Exception("Cannot create more than one EconomyAPI instance.");
+		}
+	}
 	
 	public static function getInstance(){
 		return self::$obj;
@@ -118,14 +126,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		$this->schedules = unserialize(file_get_contents($this->path."ScheduleData.dat"));
-		$playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
+		$this->playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
 		
 		if(isset($playerLang["CONSOLE"])){
 			$this->config->set("default-lang", $playerLang["CONSOLE"]);
 			$this->config->save();
 		}
-		
-		$this->initializePlayerLang($playerLang);
+
 		$this->getLangFile();
 		$cmds = array(
 			"setmoney" => "onebone\\economyapi\\commands\\SetMoneyCommand",
@@ -167,8 +174,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			$data = (new Config($this->path."MoneyData.yml", Config::YAML))->getAll();
 			$saveData = array();
 			foreach($data as $player => $money){
-				$saveData["money"][$player] = (float)$money["money"];
-				$saveData["debt"][$player] = (float)$money["debt"];
+				$saveData["money"][$player] = round($money["money"], 2);
+				$saveData["debt"][$player] = round($money["debt"], 2);
 				++$cnt;
 			}
 			@unlink($this->path."MoneyData.yml");
@@ -180,7 +187,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$data = (new Config($this->path."BankData.yml", Config::YAML))->getAll();
 			$saveData = array();
 			foreach($data as $player => $money){
-				$saveData["money"][$player] = (float)$money["money"];
+				$saveData["money"][$player] = round($money["money"], 2);
 				++$cnt;
 			}
 			@unlink($this->path."BankData.yml");
@@ -191,21 +198,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($cnt > 0){
 			$this->getLogger()->info(TextFormat::AQUA."Converted $cnt data(m) into new format");
 		}
-	}
-	
-	private function initializePlayerLang($langData){
-		foreach($langData as $player => $lang){
-			if(trim($lang) === "") continue;
-			$this->playerLang[$player] = $this->langRes[$lang];
-		}
-	}
-	
-	private function getSavingPlayerLangData(){
-		$ret = array();
-		foreach($this->playerLang as $player => $lang){
-			$ret[$player] = $lang["language"];
-		}
-		return $ret;
 	}
 	
 	private function createConfig(){
@@ -289,14 +281,12 @@ class EconomyAPI extends PluginBase implements Listener{
 	private function getLangFile(){
 		$lang = $this->config->get("default-lang");
 		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
-			$vars = get_object_vars(json_decode($resource));
-			$this->playerLang["CONSOLE"] = $vars;
-			$this->playerLang["RCON"] = $vars;
+			$this->playerLang["CONSOLE"] = $lang;
+			$this->playerLang["RCON"] = $lang;
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}elseif($lang === "user-define"){
-			$vars = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, get_object_vars(json_decode($this->readResource("lang_def.json")))))->getAll();
-			$this->playerLang["CONSOLE"] = $vars;
-			$this->playerLang["RCON"] = $vars;
+			$this->playerLang["CONSOLE"] = "user-define";
+			$this->playerLang["RCON"] = "user-define";
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
 		}else{
 			$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
@@ -313,22 +303,18 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return bool
 	 */
 	public function setLang($lang, $target = "CONSOLE"){
-		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
-			$this->playerLang[$target] = get_object_vars(json_decode($resource));
-			return true;
+		if(is_file($this->getFile()."resources/lang_".$lang.".json")){
+			$this->playerLang[$target] = $lang;
+			return $lang;
 		}else{
 			foreach($this->langList as $key => $l){
 				if(strtolower($lang) === strtolower($l)){
-					if(($resource = $this->langList[$key]) !== false){
-						$this->playerLang[$target] = $resource;
-						return $l;
-					}else{
-						return false;
-					}
+					$this->playerLang[$target] = $key;
+					return $l;
 				}
 			}
-			return false;
 		}
+		return false;
 	}
 	
 	/**
@@ -538,8 +524,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		if(isset($this->playerLang[$player][$key])){
-			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->playerLang[$player][$key]);
+		if(isset($this->playerLang[$player]) and isset($this->langRes[$this->playerLang[$player]][$key])){
+			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
 		}else{
 			return "Couldn't find message resource";
 		}
@@ -611,7 +597,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 			$p = $this->getServer()->getPlayerExact($player);
 			if($p instanceof Player){
-				$p->kick("Your account has been removed.");
+				$p->kick("Your account have been removed.");
 			}
 			return true;
 		}
@@ -779,7 +765,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$bankConfig->setAll($this->bank);
 		$bankConfig->save();
 		file_put_contents($this->path."ScheduleData.dat", serialize($this->schedules));
-		file_put_contents($this->path."PlayerLang.dat", serialize($this->getSavingPlayerLangData()));
+		file_put_contents($this->path."PlayerLang.dat", serialize($this->playerLang));
 	}
 	
 	public function onQuitEvent(PlayerQuitEvent $event){
