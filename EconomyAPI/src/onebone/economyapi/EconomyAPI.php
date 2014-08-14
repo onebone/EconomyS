@@ -680,6 +680,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		$amount = round($amount, 2);
 		if(isset($this->money["money"][$player])){
+			$amount = min($this->config->get("max-money"), $amount);
 			$event = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($event);
 			if($force === false and $event->isCancelled()){
@@ -745,6 +746,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		$money = round($money, 2);
 		if(isset($this->money["money"][$player])){
+			$money = min($this->config->get("max-money"), $money);
 			$ev = new SetMoneyEvent($this, $player, $money, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){

@@ -4,6 +4,7 @@ debt-limit: 500
 add-op-at-rank: false
 default-money: 1000
 default-debt: 0
+max-money: 9999999999
 time-for-increase-debt: 10
 percent-of-increase-debt: 5
 default-bank-money: 0
