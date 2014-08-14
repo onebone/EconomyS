@@ -37,7 +37,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	 */
 	private $command;
 
-	private $schedule, $task, $lastTask;
+	private $schedules, $scheduleId, $lastActivity;
+
 	private $list, $playerLang, $langRes;
 	
 	/**
@@ -86,15 +87,15 @@ class EconomyAPI extends PluginBase implements Listener{
 			self::$obj = $this;
 		}
 		$this->path = $this->getDataFolder();
-		$this->schedule = array();
+
+		$this->scheduleId = array();
+		$this->lastActivity = array();
+		$this->schedules = array();
+
 		$this->list = array();
 		$this->money = array();
 		$this->bank = array();
-		$this->task = array();
-		$this->lastTask = array(
-			"debt" => array(),
-			"bank" => array()
-		);
+
 		$this->playerLang = array();
 		$this->langRes = array();
 	}
@@ -116,7 +117,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			file_put_contents($this->path."PlayerLang.dat", serialize(array()));
 		}
 		
-		$this->schedule = unserialize(file_get_contents($this->path."ScheduleData.dat"));
+		$this->schedules = unserialize(file_get_contents($this->path."ScheduleData.dat"));
 		$playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
 		
 		if(isset($playerLang["CONSOLE"])){
@@ -224,7 +225,7 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	/**
 	 * @param string $name
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function registerList($name){
@@ -391,12 +392,12 @@ class EconomyAPI extends PluginBase implements Listener{
 				return self::RET_CANCELLED;
 			}
 			$this->money["debt"][$player] += $amount;
-			
-			if(!isset($this->task[$player]["debt"])){
-				$this->task[$player]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask( new CallbackTask(array($this, "debtScheduler"), array($player)), ($this->config->get("time-for-increase-debt") * 1200))->getTaskId();
-				$this->schedule["debt"][$player] = ($this->config->get("time-for-increase-debt") * 1200);
+
+			if(!isset($this->schedules["debt"][$player])){
+				$this->scheduleId["debt"][$player] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "debtScheduler"], [$player]), $this->config->get("time-for-increase-debt")*1200);
+				$this->schedules["debt"][$player] = $this->config->get("time-for-increase-debt") * 60;
+				$this->lastActivity["debt"][$player] = time();
 			}
-			$this->lastTask["debt"][$player] = time();
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -430,10 +431,10 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 			$this->money["debt"][$player] -= $amount;
 			if($this->money["debt"][$player] <= 0){
-				$this->getServer()->getScheduler()->cancelTask($this->task[$player]["debt"]);
-				$this->lastTask["debt"][$player] = null;
-				$this->schedule["debt"][$player] = null;
-				unset($this->task[$player]["debt"], $this->schedule["debt"][$player], $this->lastTask["debt"][$player]);
+				$this->getServer()->getScheduler()->cancelTask($this->scheduleId["debt"][$player]);
+				$this->lastActivity["debt"][$player] = null;
+				$this->schedules["debt"][$player] = null;
+				unset($this->lastActivity["debt"][$player], $this->schedules["debt"][$player], $this->scheduleId["debt"][$player]);
 			}
 			return self::RET_SUCCESS;
 		}else{
@@ -458,18 +459,18 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$amount = round($amount, 2);
 		if(isset($this->bank["money"][$player])){
-			$ev = new BankAddMoneyEvent($this, $player, $amount, $issuer); // I have to declare package because there's same named class at \onebone\economyapi\event\money\AddMoneyEvent
+			$ev = new BankAddMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
 			$this->bank["money"][$player] += $amount;
-			
-			if(!isset($this->task[$player]["bank"])){
-				$this->schedule["bank"][$player] = ($this->config->get("time-for-increase-money") * 1200);
-				$this->task[$player]["bank"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "bankScheduler"), array($player)), $this->config->get("time-for-increase-money") * 1200)->getTaskId();
+
+			if(!isset($this->schedules["bank"][$player])){
+				$this->schedules["bank"][$player] = $this->config->get("time-for-increase-money") * 60;
+				$this->scheduleId["bank"][$player] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$player]), $this->config->get("time-for-increase-money")*1200);
+				$this->lastActivity["bank"][$player] = time();
 			}
-			$this->lastTask["bank"][$player] = time();
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -501,10 +502,10 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 			$this->bank["money"][$player] -= $amount;
 			if($this->bank["money"][$player] <= 0){
-				$this->getServer()->getScheduler()->cancelTask($this->task[$player]["bank"]);
-				$this->schedule["bank"][$player] = null;
-				$this->lastTask["bank"][$player] = null;
-				unset($this->schedule["bank"][$player], $this->lastTask["bank"][$player], $this->task[$player]["bank"]);
+				$this->getServer()->getScheduler()->cancelTask($this->scheduleId["bank"][$player]);
+				$this->schedules["bank"][$player] = null;
+				$this->lastActivity["bank"][$player] = null;
+				unset($this->schedules["bank"][$player], $this->lastActivity["bank"][$player], $this->scheduleId["bank"][$player]);
 			}
 			return self::RET_SUCCESS;
 		}else{
@@ -553,7 +554,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
-		return isset($this->money["money"][$player]);
+		return isset($this->money["money"][$player]) === true;
 	}
 
 	/**
@@ -595,6 +596,23 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->money["debt"][$player] = null;
 			$this->bank["money"][$player] = null;
 			unset($this->money["money"][$player], $this->money["debt"][$player], $this->bank["money"][$player]);
+
+			if(isset($this->schedules["debt"][$player])){
+				$this->getServer()->getScheduler()->cancelTask($this->scheduleId["debt"][$player]);
+				$this->schedules["debt"][$player] = null;
+				$this->scheduleId["debt"][$player] = null;
+				unset($this->schedules["debt"][$player], $this->scheduleId["debt"][$player]);
+			}
+			if(isset($this->schedules["bank"][$player])){
+				$this->getServer()->getScheduler()->cancelTask($this->scheduleId["bank"][$player]);
+				$this->schedules["bank"][$player] = null;
+				$this->scheduleId["bank"][$player] = null;
+				unset($this->schedules["bank"][$player], $this->scheduleId["bank"][$player]);
+			}
+			$p = $this->getServer()->getPlayerExact($player);
+			if($p instanceof Player){
+				$p->kick("Your account has been removed.");
+			}
 			return true;
 		}
 		return false;
@@ -760,88 +778,103 @@ class EconomyAPI extends PluginBase implements Listener{
 		$moneyConfig->save();
 		$bankConfig->setAll($this->bank);
 		$bankConfig->save();
-		file_put_contents($this->path."ScheduleData.dat", serialize($this->schedule));
+		file_put_contents($this->path."ScheduleData.dat", serialize($this->schedules));
 		file_put_contents($this->path."PlayerLang.dat", serialize($this->getSavingPlayerLangData()));
 	}
 	
 	public function onQuitEvent(PlayerQuitEvent $event){
 		$username = $event->getPlayer()->getName();
-		if(isset($this->task[$username])){
-			$now = time();
-			if(isset($this->task[$username]["debt"])){
-				$this->schedule["debt"][$username] -= (($now - $this->lastTask["debt"][$username]) * 20);
-				$this->getServer()->getScheduler()->cancelTask($this->task[$username]["debt"]);
-				unset($this->task[$username]["debt"]);
-			}
-			if(isset($this->task[$username]["bank"])){
-				$this->schedule["bank"][$username] -= (($now - $this->lastTask["bank"][$username]) * 20);
-				$this->getServer()->getScheduler()->cancelTask($this->task[$username]["bank"]);
-				unset($this->task[$username]["bank"]);
-			}
+		$now = time();
+		if(isset($this->schedules["debt"][$username])){
+			$this->schedules["debt"][$username] = ($this->schedules["debt"][$username] - $now + $this->lastActivity["debt"][$username]);
+			$this->getServer()->getScheduler()->cancelTask($this->scheduleId["debt"][$username]);
+			unset($this->scheduleId["debt"][$username]);
 		}
+		if(isset($this->schedules["bank"][$username])){
+			$this->schedules["bank"][$username] = ($this->schedules["bank"][$username] - $now + $this->lastActivity["bank"][$username]);
+			$this->getServer()->getScheduler()->cancelTask($this->scheduleId["bank"][$username]);
+			unset($this->scheduleId["bank"][$username]);
+		}
+
+		$this->lastActivity["bank"][$username] = null;
+		$this->lastActivity["debt"][$username] = null;
+		unset($this->lastActivity["bank"][$username], $this->lastActivity["debt"][$username]);
 	}
 	
 	public function onJoinEvent(PlayerJoinEvent $event){
 		$username = $event->getPlayer()->getName();
 		if(!isset($this->money["money"][$username])){
 			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, $this->config->get("default-money"), $this->config->get("default-debt"), null, "EconomyAPI")));
-			$this->money["money"][$username] = $ev->getDefaultMoney();
-			$this->money["debt"][$username] = $ev->getDefaultDebt();
+			$this->money["money"][$username] = round($ev->getDefaultMoney(), 2);
+			$this->money["debt"][$username] = round($ev->getDefaultDebt(), 2);
 		}
 		if(!isset($this->bank["money"][$username])){
 			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, null, null, $this->config->get("default-bank-money"), "EconomyAPI")));
-			$this->bank["money"][$username] = $ev->getDefaultBankMoney();
+			$this->bank["money"][$username] = round($ev->getDefaultBankMoney(), 2);
 		}
 		if(!isset($this->playerLang[$username])){
 			$this->setLang($this->config->get("default-lang"), $username);
 		}
-		if(isset($this->schedule["debt"][$username])){
-			$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->schedule["debt"][$username]))->getTaskId();
-			$this->lastTask["debt"][$username] = time();
+
+		if(isset($this->schedules["debt"][$username])){
+			$this->scheduleId["debt"][$username] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), [$username]), $this->schedules["debt"][$username]*20);
+			$this->lastActivity["debt"][$username] = time();
 		}
-		if(isset($this->schedule["bank"][$username])){
-			$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "bankScheduler"), array($username)), ($this->schedule["bank"][$username]))->getTaskId();
-			$this->lastTask[$username]["bank"] = time();
+		if(isset($this->schedules["bank"][$username])){
+			$this->scheduleId["bank"][$username] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$username]), $this->schedules["bank"][$username]*20);
+			$this->lastActivity["bank"][$username] = time();
 		}
 	}
-	
+
+	/**
+	 * This function is non-API part. Do not call this function.
+	 */
 	public function bankScheduler($username){
 		$player = $this->getServer()->getPlayerExact($username);
 		if(!$player instanceof Player){
 			return;
 		}
+
 		if($this->bank["money"][$username] <= 0){
-			$this->lastTask["bank"][$username] = null;
-			$this->schedule["bank"][$username] = null;
-			unset($this->lastTask["bank"][$username], $this->schedule["bank"][$username]);
+			$this->lastActivity["bank"][$username] = null;
+			$this->schedules["bank"][$username] = null;
+			$this->scheduleId["bank"][$username] = null;
+			unset($this->schedules["bank"][$username], $this->lastActivity["bank"][$username], $this->scheduleId["bank"][$username]);
 			return;
 		}
 		$per = $this->getConfigurationValue("bank-increase-money-rate");
 		$increase = ($this->myBankMoney($player) * ($per / 100));
 		$this->addBankMoney($player, $increase, true, "bankScheduler");
 		$player->sendMessage($this->getMessage("bank-credit-increase", $player->getName()));
-		$this->lastTask["bank"][$username] = time();
-		$this->task[$username]["bank"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "bankScheduler"), array($username)), ($this->config->get("time-for-increase-money") * 1200))->getTaskId();
+		$this->lastActivity["bank"][$username] = time();
+		$this->schedules["debt"][$username] = $this->config->get("time-for-increase-money") * 60;
+		$this->scheduleId["bank"][$username] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$username]), ($this->config->get("time-for-increase-money") * 1200))->getTaskId();
 	}
-	
+
+	/**
+	 * This function is non-API part. Do not call this function.
+	 */
 	public function debtScheduler($username){
 		$player = $this->getServer()->getPlayerExact($username);
 		if(!$player instanceof Player){
 			return;
 		}
 		if($this->money["debt"][$username] <= 0){
-			$this->lastTask["debt"][$username] = null;
-			$this->schedule["debt"][$username] = null;
-			unset($this->lastTask["debt"][$username], $this->schedule["debt"][$username]);
+			$this->lastActivity["debt"][$username] = null;
+			$this->schedules["debt"][$username] = null;
+			$this->scheduleId["debt"][$username] = null;
+			unset($this->lastActivity["debt"][$username], $this->schedules["debt"][$username], $this->scheduleId["debt"][$username]);
 			return;
 		}
 		$per = $this->getConfigurationValue("percent-of-increase-debt");
 		$increase = ($this->myDebt($player) * ($per / 100));
 		$this->addDebt($player, $increase, true, "DebtScheduler");
 		$player->sendMessage($this->getMessage("debt-increase", $player, array($this->myDebt($player), "", "", "")));
-		$this->lastTask["debt"][$username] = time();
-		$this->task[$username]["debt"] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->config->get("time-for-increase-debt") * 1200))->getTaskId();
-	} 
+
+		$this->lastActivity["debt"][$username] = time();
+		$this->schedules["debt"][$username] = $this->config->get("time-for-increase-debt") * 60;
+		$this->scheduleId["debt"][$username] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "debtScheduler"), array($username)), ($this->config->get("time-for-increase-debt") * 1200))->getTaskId();
+	}
 	
 	/**
 	 * @return string
