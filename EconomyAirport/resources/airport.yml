@@ -1,0 +1,15 @@
+## This is a file which configures tags of airports
+
+departure:
+ airport:
+  - "[AIRPORT]"
+  - "departure"
+  - "cost : $%1" # cost
+  - "%2" # destination
+
+arrival:
+ airport:
+  - "[AIRPORT]"
+  - "arrival" # type
+  - "%1" # airport name
+  - ""
