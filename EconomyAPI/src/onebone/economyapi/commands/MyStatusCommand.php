@@ -12,7 +12,7 @@ class MyStatusCommand extends EconomyAPICommand{
 		parent::__construct($cmd, $plugin);
 		$this->setUsage("/$cmd");
 		$this->setDescription("Shows your money status");
-		$this->setPermission("economyapi.command.mystatys");
+		$this->setPermission("economyapi.command.mystatus");
 	}
 	
 	public function execute(CommandSender $sender, $label, array $params){
