@@ -289,9 +289,9 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->playerLang["RCON"] = "user-define";
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
 		}else{
-			$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
-			$this->playerLang["CONSOLE"] = $vars;
-			$this->playerLang["RCON"] = $vars;
+			//$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
+			$this->playerLang["CONSOLE"] = "def";
+			$this->playerLang["RCON"] = "def";
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
 		}
 	}
