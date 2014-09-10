@@ -19,6 +19,7 @@ use onebone\economyapi\event\debt\AddDebtEvent;
 use onebone\economyapi\event\debt\ReduceDebtEvent;
 use onebone\economyapi\event\bank\AddMoneyEvent as BankAddMoneyEvent;
 use onebone\economyapi\event\bank\ReduceMoneyEvent as BankReduceMoneyEvent;
+use onebone\economyapi\database\DataConverter;
 
 class EconomyAPI extends PluginBase implements Listener{
 
@@ -72,6 +73,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @var int RET_SUCCESS The task was successful
 	*/
 	const RET_SUCCESS = 1;
+	
+	const CURRENT_DATABASE_VERSION = 0x02;
 	
 	private $langList = array(
 		"def" => "Default",
@@ -163,8 +166,19 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->convertData();
 		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
 		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+		
+		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){ // TODO: This code is too slow. Do optimization.
+			$converter = new DataConverter($this->path."Money.yml", $this->path."Bank.yml");
+			$result = $converter->convertData(self::CURRENT_DATABASE_VERSION);
+			if($result !== false){
+				$this->getLogger()->info("Converted data into new database. Database version : ".self::CURRENT_DATABASE_VERSION);
+			}
+			$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+			$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+		}
 		$this->money = $moneyConfig->getAll();
 		$this->bank = $bankConfig->getAll();
+		
 		$this->registerList("EconomyAPI");
 	}
 	
@@ -340,6 +354,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		if(isset($this->playerLang[$player])){
 			return $this->playerLang[$player];
 		}else{
@@ -362,6 +377,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		$amount = round($amount, 2);
 		if(isset($this->money["debt"][$player])){
 			$debt = $this->money["debt"][$player];
@@ -402,6 +418,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		
 		$amount = round($amount, 2);
 		if(isset($this->money["debt"][$player])){
@@ -443,6 +460,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		$amount = round($amount, 2);
 		if(isset($this->bank["money"][$player])){
 			$ev = new BankAddMoneyEvent($this, $player, $amount, $issuer);
@@ -475,6 +494,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		
 		$amount = round($amount, 2);
 		if(isset($this->bank["money"][$player])){
@@ -524,6 +544,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(isset($this->playerLang[$player]) and isset($this->langRes[$this->playerLang[$player]][$key])){
 			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
 		}elseif(isset($this->langRes["def"][$key])){
@@ -542,6 +564,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		return isset($this->money["money"][$player]) === true;
 	}
 
@@ -558,6 +582,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(!isset($this->money["money"][$player])){
 			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $player, $default_money, $default_debt, $default_bank_money, "EconomyAPI")));
 			if(!$ev->isCancelled() and $force === false){
@@ -579,6 +605,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(isset($this->money["money"][$player])){
 			$this->money["money"][$player] = null;
 			$this->money["debt"][$player] = null;
@@ -615,6 +643,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		return isset($this->bank["money"][$player]);
 	}
 	
@@ -627,6 +657,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(!isset($this->money["money"][$player])){
 			return false;
 		}
@@ -642,6 +674,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(!isset($this->money["debt"][$player])){
 			return false;
 		}
@@ -657,6 +691,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
+		
 		if(!isset($this->bank["money"][$player])){
 			return false;
 		}
@@ -679,6 +715,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		
 		$amount = round($amount, 2);
 		if(isset($this->money["money"][$player])){
@@ -711,6 +748,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		
 		$amount = round($amount, 2);
 		if(isset($this->money["money"][$player])){
@@ -745,6 +783,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		$player = strtolower($player);
 		
 		$money = round($money, 2);
 		if(isset($this->money["money"][$player])){
@@ -773,7 +812,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function onQuitEvent(PlayerQuitEvent $event){
-		$username = $event->getPlayer()->getName();
+		$username = strtolower($event->getPlayer()->getName());
 		$now = time();
 		if(isset($this->schedules["debt"][$username])){
 			$this->schedules["debt"][$username] = ($this->schedules["debt"][$username] - $now + $this->lastActivity["debt"][$username]);
@@ -792,7 +831,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function onJoinEvent(PlayerJoinEvent $event){
-		$username = $event->getPlayer()->getName();
+		$username = strtolower($event->getPlayer()->getName());
 		if(!isset($this->money["money"][$username])){
 			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, $this->config->get("default-money"), $this->config->get("default-debt"), null, "EconomyAPI")));
 			$this->money["money"][$username] = round($ev->getDefaultMoney(), 2);
