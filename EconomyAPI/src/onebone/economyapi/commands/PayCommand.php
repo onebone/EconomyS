@@ -3,6 +3,8 @@
 namespace onebone\economyapi\commands;
 
 use pocketmine\Server;
+use pocketmine\command\CommandSender;
+use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -16,7 +18,7 @@ class PayCommand extends EconomyAPICommand{
 		$this->setDescription("Pay or give the money to the others");
 	}
 	
-	public function execute(\pocketmine\command\CommandSender $sender, $label, array $params){
+	public function execute(CommandSender $sender, $label, array $params){
 		$plugin = $this->getPlugin();
 		if(!$plugin->isEnabled()){
 			return false;

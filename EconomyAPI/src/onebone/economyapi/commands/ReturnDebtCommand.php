@@ -3,6 +3,7 @@
 namespace onebone\economyapi\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -21,6 +22,11 @@ class ReturnDebtCommand extends EconomyAPICommand{
 	public function execute(CommandSender $sender, $label, array $params){
 		if(!$this->plugin->isEnabled() or !$this->testPermission($sender)){
 			return false;
+		}
+		
+		if(!$sender instanceof Player){
+			$sender->sendMessage("Please run this command in-game.");
+			return true;
 		}
 		
 		$amount = array_shift($params);

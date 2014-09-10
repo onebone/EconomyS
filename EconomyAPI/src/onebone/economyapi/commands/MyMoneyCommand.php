@@ -2,6 +2,9 @@
 
 namespace onebone\economyapi\commands;
 
+use pocketmine\command\CommandSender;
+use pocketmine\Player;
+
 use onebone\economyapi\EconomyAPI;
 
 class MyMoneyCommand extends EconomyAPICommand{
@@ -14,7 +17,7 @@ class MyMoneyCommand extends EconomyAPICommand{
 		$this->setPermission("economyapi.command.mymoney");
 	}
 	
-	public function execute(\pocketmine\command\CommandSender $sender, $label, array $args){
+	public function execute(CommandSender $sender, $label, array $args){
 		if(!$this->getPlugin()->isEnabled()){
 			return false;
 		}
@@ -22,7 +25,7 @@ class MyMoneyCommand extends EconomyAPICommand{
 			return false;
 		}
 		
-		if(!$sender instanceof \pocketmine\Player){
+		if(!$sender instanceof Player){
 			$sender->sendMessage("Please run this command in-game");
 			return true;
 		}

@@ -4,6 +4,7 @@ namespace onebone\economyapi\commands;
 
 use pocketmine\command\CommandSender;
 use pocketmine\Server;
+use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
