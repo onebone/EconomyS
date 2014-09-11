@@ -78,16 +78,18 @@ class EconomySell extends PluginBase implements Listener{
 
 	public function onSignChange(SignChangeEvent $event){
 		$tag = $event->getLine(0);
-		if(($val = $this->checkTag($tag)) !== false){
+		if(($result = $this->checkTag($tag)) !== false){
 			$player = $event->getPlayer();
 			if(!$player->hasPermission("economysell.sell.create")){
 				$player->sendMessage($this->getMessage("no-permission-create"));
 				return;
 			}
-			if(!is_numeric($event->getLine(1) or !is_numeric($event->getLine(3)))){
+			
+			if(!is_numeric($event->getLine(1)) or !is_numeric($event->getLine(3))){
 				$player->sendMessage($this->getMessage("wrong-format"));
 				return;
 			}
+
 			$item = $this->getItem($event->getLine(2));
 			if($item === false){
 				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine(2), "", "")));
@@ -95,7 +97,7 @@ class EconomySell extends PluginBase implements Listener{
 			}
 			if($item[1] === false){ // Item name found
 				$id = explode(":", strtolower($event->getLine(2)));
-				$nbt["Text3"] = $item[0];
+				$event->setLine(2, $item[0]);
 			}else{
 				$tmp = $this->getItem(strtolower($event->getLine(2)));
 				$id = explode(":", $tmp[0]);
@@ -115,6 +117,14 @@ class EconomySell extends PluginBase implements Listener{
 				"meta" => (int) $id[1],
 				"amount" => (int)$event->getLine(3)
 			);
+			$player->sendMessage($this->getMessage("sell-created", [$id[0], $id[1], (int)$event->getLine(3)]));
+			
+			$event->setLine(0, $result[0]); // TAG
+			$event->setLine(1, str_replace("%1", $event->getLine(1), $result[1])); // PRICE
+			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2])); // ID AND DAMAGE
+			$event->setLine(3, str_replace("%3", $event->getLine(3), $result[3])); // AMOUNT
+			
+			$this->getLogger()->debug("Sell center has been created at ".$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName());
 		}
 
 	}
