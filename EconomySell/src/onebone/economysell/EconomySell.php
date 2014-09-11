@@ -3,6 +3,7 @@
 namespace onebone\economysell;
 
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -19,7 +20,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 
-use economyapi\EconomyAPI;
+use onebone\economyapi\EconomyAPI;
 
 class EconomySell extends PluginBase implements Listener{
 	private $sell;
@@ -75,69 +76,47 @@ class EconomySell extends PluginBase implements Listener{
 		return "There's no message named \"$key\"";
 	}
 
-	public function onDataPacketReceive(DataPacketReceiveEvent $event){
-		$pk = $event->getPacket();
-		if($pk instanceof EntityDataPacket){
+	public function onSignChange(SignChangeEvent $event){
+		$tag = $event->getLine(0);
+		if(($val = $this->checkTag($tag)) !== false){
 			$player = $event->getPlayer();
-
-			$nbt = new NBT();
-			$nbt->read($pk->namedtag);
-			$nbt = $nbt->getData();
-			$tile = $player->getLevel()->getTile(new Vector3($pk->x, $pk->y, $pk->z));
-			if(!$tile instanceof Sign) return;
-			if(($val = $this->checkTag($nbt["Text1"])) === false) return;
 			if(!$player->hasPermission("economysell.sell.create")){
 				$player->sendMessage($this->getMessage("no-permission-create"));
 				return;
 			}
-			if(!is_numeric($nbt["Text2"]) or !is_numeric($nbt["Text4"])){
+			if(!is_numeric($event->getLine(1) or !is_numeric($event->getLine(3)))){
 				$player->sendMessage($this->getMessage("wrong-format"));
 				return;
 			}
-
-			// Item identify
-			$item = $this->getItem($nbt["Text3"]);
+			$item = $this->getItem($event->getLine(2));
 			if($item === false){
-				$player->sendMessage($this->getMessage("item-not-support", array($nbt["Text3"], "", "")));
+				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine(2), "", "")));
 				return;
 			}
 			if($item[1] === false){ // Item name found
-				$id = explode(":", strtolower($nbt["Text3"]));
+				$id = explode(":", strtolower($event->getLine(2)));
 				$nbt["Text3"] = $item[0];
 			}else{
-				$tmp = $this->getItem(strtolower($nbt["Text3"]));
+				$tmp = $this->getItem(strtolower($event->getLine(2)));
 				$id = explode(":", $tmp[0]);
 			}
 			$id[0] = (int)$id[0];
 			if(!isset($id[1])){
 				$id[1] = 0;
 			}
-			$this->sell[$pk->x.":".$pk->y.":".$pk->z.":".$player->getLevel()->getName()] = array(
-				"x" => $pk->x,
-				"y" => $pk->y,
-				"z" => $pk->z,
+			$block = $event->getBlock();
+			$this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$player->getLevel()->getName()] = array(
+				"x" => $block->getX(),
+				"y" => $block->getY(),
+				"z" => $block->getZ(),
 				"level" => $player->getLevel()->getName(),
-				"cost" => (int) $nbt["Text2"],
+				"cost" => (int)$event->getLine(1),
 				"item" => (int) $id[0],
 				"meta" => (int) $id[1],
-				"amount" => (int) $nbt["Text4"]
+				"amount" => (int)$event->getLine(3)
 			);
-
-			$player->sendMessage($this->getMessage("sell-created", array($id[0], $id[1], $nbt["Text2"])));
-
-			$n = new NBT();
-			$n->setData(new Compound(false, array(
-				new String("id", Sign::SIGN),
-				new Int("x", $pk->x),
-				new Int("y", $pk->y),
-				new Int("z", $pk->z),
-				new String("Text1", $val[0]),
-				new String("Text2", str_replace("%1", $nbt["Text2"], $val[1])),
-				new String("Text3", str_replace("%2", $nbt["Text3"], $val[2])),
-				new String("Text4", str_replace("%3", $nbt["Text4"], $val[3]))
-			)));
-			$pk->namedtag = $n->write();
 		}
+
 	}
 
 	public function onTouch(PlayerInteractEvent $event){
@@ -202,7 +181,7 @@ class EconomySell extends PluginBase implements Listener{
 		$item = strtolower($item);
 		$e = explode(":", $item);
 		$e[1] = isset($e[1]) ? $e[1] : 0;
-		if(array_key_exists($item, ItemList::$items)){
+		if(isset(ItemList::$items[$item])){
 			return array(ItemList::$items[$item], true); // Returns Item ID
 		}else{
 			foreach(ItemList::$items as $name => $id){

@@ -6,21 +6,11 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
-// use pocketmine\event\block\SignChangeEvent;// TODO Uncomment this when the event implemented
-use pocketmine\Server;
-use pocketmine\Player;
-use pocketmine\math\Vector3;
-use pocketmine\utils\Config;
+use pocketmine\event\block\SignChangeEvent;
 use pocketmine\tile\Sign;
+use pocketmine\utils\Config;
 use pocketmine\item\Item;
 use pocketmine\event\block\BlockPlaceEvent;
-
-use pocketmine\event\server\DataPacketReceiveEvent;
-use pocketmine\network\protocol\EntityDataPacket;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\String;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -43,12 +33,79 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private $placeQueue;
 
+	/**
+	 * @var EconomyShop
+	 */
+	private static $instance;
+
 	public function onEnable(){
+		if(self::$instance instanceof EconomyShop){
+			return;
+		}
+		self::$instance = $this;
 		@mkdir($this->getDataFolder());
 		$this->shop = (new Config($this->getDataFolder()."Shops.yml", Config::YAML))->getAll();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->prepareLangPref();
 		$this->placeQueue = array();
+	}
+
+	public function getShops(){
+		return $this->shop;
+	}
+
+	/**
+	 * @param string $locationIndex
+	 * @param float|null $price
+	 * @param int|null $amount
+	 *
+	 * @return bool
+	 */
+	public function editShop($locationIndex, $price = null, $amount = null){
+		if(isset($this->shop[$locationIndex])){
+			$price = ($price === null) ? $this->shop[$locationIndex]["price"]: $price;
+			$amount = ($amount === null) ? $this->shop[$locationIndex]["amount"]:$amount;
+
+			$location = explode(":", $locationIndex);
+			$tile = $this->getServer()->getLevelByName($location[3]);
+			if($tile instanceof Sign){
+				$tag = $tile->getText()[0];
+				$data = [];
+				foreach($this->shopSign->getAll() as $value){
+					if($value[0] == $tag){
+						$data = $value;
+						break;
+					}
+				}
+				$tile->setText(
+					$data[0],
+					str_replace("%1", $price, $data[1]),
+					$tile->getText()[2],
+					str_replace("%3", $amount, $data[3])
+				);
+			}
+
+			save:
+			$this->shop[$locationIndex] = [
+				"x" => (int)$location[0],
+				"y" => (int)$location[1],
+				"z" => (int)$location[2],
+				"level" => $location[3],
+				"price" => $price,
+				"item" => $this->shop[$locationIndex]["item"],
+				"meta" => $this->shop[$locationIndex]["meta"],
+				"amount" => $amount
+			];
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * @return EconomyShop
+	 */
+	public static function getInstance(){
+		return self::$instance;
 	}
 
 	public function prepareLangPref(){
@@ -96,74 +153,7 @@ class EconomyShop extends PluginBase implements Listener{
 		return "There are no message which has key \"$key\"";
 	}
 
-	public function onDataPacketReceive(DataPacketReceiveEvent $event){
-		$pk = $event->getPacket();
-		if($pk instanceof EntityDataPacket){
-			$nbt = new NBT(NBT::LITTLE_ENDIAN);
-			$nbt->read($pk->namedtag);
-			$nbt = $nbt->getData();
-			if($nbt["id"] === Sign::SIGN){
-				$player = $event->getPlayer();
-				$tile = $player->getLevel()->getTile(new Vector3($pk->x, $pk->y, $pk->z));
-				if(!$tile instanceof Sign) return;
-				if(($result = $this->tagExists($nbt["Text1"])) !== false){
-					if(!$player->hasPermission("economyshop.shop.create")){
-						$player->sendMessage($this->getMessage("no-permission-create"));
-						return;
-					}
-				}else{
-					return;
-				}
-				if(!is_numeric($nbt["Text2"]) or !is_numeric($nbt["Text4"])){
-					$player->sendMessage($this->getMessage("wrong-format"));
-					return;
-				}
-				// Item identify
-				$item = $this->getItem($nbt["Text3"]);
-				if($item === false){
-					$player->sendMessage($this->getMessage("item-not-support", array($nbt["Text3"], "", "")));
-					return;
-				}
-				if($item[1] === false){ // Item name found
-					$id = explode(":", strtolower($nbt["Text3"]));
-					$nbt["Text3"] = $item[0];
-				}else{
-					$tmp = $this->getItem(strtolower($nbt["Text3"]));
-					$id = explode(":", $tmp[0]);
-				}
-				$id[0] = (int)$id[0];
-				if(!isset($id[1])){
-					$id[1] = 0;
-				}
-				// Item identify end
-				$this->shop[$tile->getX().":".$tile->getY().":".$tile->getZ().":".$tile->getLevel()->getName()] = array(
-					"x" => $tile->getX(),
-					"y" => $tile->getY(),
-					"z" => $tile->getZ(),
-					"level" => $tile->getLevel()->getName(),
-					"price" => (int) $nbt["Text2"],
-					"item" => (int) $id[0],
-					"meta" => (int) $id[1],
-					"amount" => (int) $nbt["Text4"]
-				);
-				$player->sendMessage($this->getMessage("shop-created", array($id[0], $id[1], $nbt["Text2"])));
-				$n = new NBT();
-				$n->setData(new Compound(false, array(
-					new String("id", Sign::SIGN),
-					new Int("x", $pk->x),
-					new Int("y", $pk->y),
-					new Int("z", $pk->z),
-					new String("Text1", $result[0]),
-					new String("Text2", str_replace("%1", $nbt["Text2"], $result[1])),
-					new String("Text3", str_replace("%2", $nbt["Text3"], $result[2])),
-					new String("Text4", str_replace("%3", $nbt["Text4"], $result[3]))
-				)));
-				$pk->namedtag = $n->write();
-			}
-		}
-	}
-	
-	public function onSignChange(/*SignChangeEvent */$event){  // TODO Uncomment when the event implemented
+	public function onSignChange(SignChangeEvent $event){
 		$result = $this->tagExists($event->getLine(0));
 		if($result !== false){
 			$player = $event->getPlayer();
@@ -196,11 +186,11 @@ class EconomyShop extends PluginBase implements Listener{
 			// Item identify end
 
 			$block = $event->getBlock();
-			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] = array(
+			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = array(
 				"x" => $block->getX(),
 				"y" => $block->getY(),
 				"z" => $block->getZ(),
-				"level" => $block->getLevel()->getName(),
+				"level" => $block->getLevel()->getFolderName(),
 				"price" => (int) $event->getLine(1),
 				"item" => (int) $id[0],
 				"meta" => (int) $id[1],
@@ -209,18 +199,17 @@ class EconomyShop extends PluginBase implements Listener{
 
 			$player->sendMessage($this->getMessage("shop-created", array($id[0], $id[1], $event->getLine(1))));
 
-		//	$d = $this->getData($event->getLine(0));
-			$event->setLine(0, $result[0]);
-			$event->setLine(1, str_replace("%1", $event->getLine(1), $result[1]));
-			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2]));
-			$event->setLine(3, str_replace("%3", $event->getLine(3), $result[3]));
+			$event->setLine(0, $result[0]); // TAG
+			$event->setLine(1, str_replace("%1", $event->getLine(1), $result[1])); // PRICE
+			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2])); // ID AND DAMAGE
+			$event->setLine(3, str_replace("%3", $event->getLine(3), $result[3])); // AMOUNT
 		}
 	}
 
 	public function onPlayerTouch(PlayerInteractEvent $event){
 		$block = $event->getBlock();
-		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
-			$shop = $this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()];
+		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()])){
+			$shop = $this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()];
 			$player = $event->getPlayer();
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
@@ -244,15 +233,15 @@ class EconomyShop extends PluginBase implements Listener{
 
 	public function onBreakEvent(BlockBreakEvent $event){
 		$block = $event->getBlock();
-		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
+		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()])){
 			$player = $event->getPlayer();
 			if(!$player->hasPermission("economyshop.shop.remove")){
 				$player->sendMessage($this->getMessage("no-permission-break"));
 				$event->setCancelled(true);
 				return;
 			}
-			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] = null;
-			unset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()]);
+			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = null;
+			unset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()]);
 			$player->sendMessage($this->getMessage("removed-shop"));
 		}
 	}
