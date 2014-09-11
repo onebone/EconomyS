@@ -18,7 +18,7 @@ class DataConverter{
 		$moneyCfg = new Config($moneyFile, Config::YAML);
 		$bankCfg = new Config($bankFile, Config::YAML);
 		$this->moneyFile = $moneyCfg;
-		$this->bankFile = $moneyCfg;
+		$this->bankFile = $bankCfg;
 		
 		if($moneyCfg->exists("version")){
 			$this->version = $moneyCfg->get("version");
@@ -29,12 +29,25 @@ class DataConverter{
 		if($this->version === self::VERSION_1){
 			$this->moneyData = $moneyCfg->get("money");
 			$this->debtData = $moneyCfg->get("debt");
-			$this->bankData =$bankCfg->getAll();
+			$this->bankData = $bankCfg->get("money");
 		}else{
 			switch($this->version){
 				case self::VERSION_2:
-				$this->moneyData = array_change_key_case($moneyCfg->get("money"));
-				$this->debtData = $moneyCfg->get("debt");
+				$money = [];
+				foreach($moneyCfg->get("money") as $player => $m){
+					$money[strtolower($player)] = $m;
+				}
+				$debt = [];
+				foreach($moneyCfg->get("debt") as $player => $d){
+					$debt[strtolower($player)] = $d;
+				}
+				$bank = [];
+				foreach($bankCfg->get("money") as $player => $b){
+					$bank[strtolower($player)] = $b;
+				}
+				$this->moneyData = $money;
+				$this->debtData = $debt;
+				$this->bankData = $bank;
 				break;
 			}
 		}
@@ -50,9 +63,18 @@ class DataConverter{
 				case self::VERSION_2:
 				$this->moneyFile->set("version", self::VERSION_2);
 				
-				$money = array_change_key_case($this->moneyFile->get("money"));
-				$debt = array_change_key_case($this->moneyFile->get("debt"));
-				$bank = array_change_key_case($this->bankFile->get("money"));
+				$money = [];
+				foreach($this->moneyData as $player => $m){
+					$money[strtolower($player)] = $m;
+				}
+				$debt = [];
+				foreach($this->debtData as $player => $d){
+					$debt[strtolower($player)] = $d;
+				}
+				$bank = [];
+				foreach($this->bankData as $player => $b){
+					$bank[strtolower($player)] = $b;
+				}
 				
 				$this->moneyFile->set("money", $money);
 				$this->moneyFile->set("debt", $debt);
