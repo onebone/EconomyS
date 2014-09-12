@@ -11,4 +11,4 @@ default-bank-money: 0
 time-for-increase-money: 10
 bank-increase-money-rate: 5
 debug: true
-default-lang: def
+default-lang: user-define

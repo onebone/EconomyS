@@ -227,6 +227,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->langRes[substr($res, 5, -5)] = get_object_vars(json_decode($this->readResource($res)));
 			}
 		}
+		$this->langRes["user-define"] = (new Config($this->path."language.properties", Config::PROPERTIES, $this->langRes["def"]))->getAll();
 	}
 
 	/**
@@ -317,7 +318,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return bool
 	 */
 	public function setLang($lang, $target = "CONSOLE"){
-		if(is_file($this->getFile()."resources/lang_".$lang.".json")){
+		if(isset($this->langRes[$lang])){
 			$this->playerLang[$target] = $lang;
 			return $lang;
 		}else{
