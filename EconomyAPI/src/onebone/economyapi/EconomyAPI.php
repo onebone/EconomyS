@@ -164,7 +164,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		// getServer().getPluginManager().registerEvents(this, this);
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->convertData();
-		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+		$moneyConfig = new Config($this->path."Money.yml", Config::YAML, array(
+			"version" => 2,
+			"money" => [],
+			"debt" => []
+		));
 		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
 		
 		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){ // TODO: This code is too slow. Do optimization.
@@ -221,7 +225,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	private function scanResources(){
 		foreach($this->getResources() as $resource){
-			$s = explode("\\", $resource);
+			$s = explode(\DIRECTORY_SEPARATOR, $resource);
 			$res = $s[count($s) - 1];
 			if(substr($res, 0, 5) === "lang_"){
 				$this->langRes[substr($res, 5, -5)] = get_object_vars(json_decode($this->readResource($res)));
@@ -283,14 +287,11 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	private function readResource($res){
-		$path = $this->getFile()."resources/".$res;
 		$resource = $this->getResource($res);
-
-		if(!is_resource($resource)){
-			$this->getLogger()->debug("Tried to load unknown resource ".TextFormat::AQUA.$res.TextFormat::RESET);
-			return false;
+		if($resource !== null){
+			return stream_get_contents($resource);
 		}
-		return fread($resource, filesize($path));
+		return false;
 	}
 	
 	private function getLangFile(){
@@ -304,7 +305,6 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->playerLang["RCON"] = "user-define";
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
 		}else{
-			//$vars = get_object_vars(json_decode($this->readResource("lang_def.json")));
 			$this->playerLang["CONSOLE"] = "def";
 			$this->playerLang["RCON"] = "def";
 			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
@@ -322,8 +322,9 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->playerLang[$target] = $lang;
 			return $lang;
 		}else{
+			$lower = strtolower($lang);
 			foreach($this->langList as $key => $l){
-				if(strtolower($lang) === strtolower($l)){
+				if($lower === strtolower($l)){
 					$this->playerLang[$target] = $key;
 					return $l;
 				}
