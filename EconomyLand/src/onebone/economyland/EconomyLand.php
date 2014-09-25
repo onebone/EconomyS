@@ -120,7 +120,7 @@ class EconomyLand extends PluginBase implements Listener{
 			}
 			$x = (int) $sender->x;
 			$z = (int) $sender->z;
-			$level = $sender->getLevel()->getName();
+			$level = $sender->getLevel()->getFolderName();
 			$this->start[$sender->getName()] = array("x" => $x, "z" => $z, "level" => $level);
 			$sender->sendMessage($this->getMessage("first-position-saved"));
 			return true;
@@ -133,7 +133,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$sender->sendMessage($this->getMessage("set-first-position"));
 				return true;
 			}
-			if($sender->getLevel()->getName() !== $this->start[$sender->getName()]["level"]){
+			if($sender->getLevel()->getFolderName() !== $this->start[$sender->getName()]["level"]){
 				$sender->sendMessage($this->getMessage("cant-set-position-in-different-world"));
 				return true;
 			}
@@ -212,7 +212,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$endX++;
 				$startZ--;
 				$endZ++;
-				$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '{$sender->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
+				$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '{$sender->getLevel()->getFolderName()}'")->fetchArray(SQLITE3_ASSOC);
 				if(!is_bool($result)){
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
 					return true;
@@ -298,7 +298,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("no-land-found", array($num, "", "")));
 					return true;
 				}
-				$level = $this->getServer()->getLevel($info["level"]);
+				$level = $this->getServer()->getLevelByName($info["level"]);
 				if(!$level instanceof Level){
 					$sender->sendMessage($this->getMessage("land-corrupted", array($num, "", "")));
 					return true;
@@ -385,7 +385,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$x = $sender->x;
 				$z = $sender->z;
-				$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getName()}'");
+				$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getFolderName()}'");
 				$info = $result->fetchArray(SQLITE3_ASSOC);
 				if(is_bool($info)){
 					$sender->sendMessage($this->getMessage("no-one-owned"));
@@ -438,7 +438,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$x = $player->x;
 		$y = $player->y;
 		$z = $player->z;
-		$level = $player->getLevel()->getName();
+		$level = $player->getLevel()->getFolderName();
 		
 		if(in_array($level, $this->config->get("non-check-worlds"))){
 			return;
@@ -465,10 +465,10 @@ class EconomyLand extends PluginBase implements Listener{
 
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
 		if($level instanceof Level){
-			$level = $level->getName();
+			$level = $level->getFolderName();
 		}
 		if($player instanceof Player){
-			$player = $player->getName();
+			$player = $player->getFolderName();
 		}
 		if($startX > $endX){
 			$tmp = $startX;
@@ -485,7 +485,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$startZ--;
 		$endZ++;
 		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
-		if(!is_bool($result)){
+		if(is_bool($result)){
 			return false;
 		}
 		if($expires !== null){

@@ -143,7 +143,6 @@ class EconomyProperty extends PluginBase implements Listener{
 	}
 
 	public function onBlockPlace(BlockPlaceEvent $event){
-		$block = $event->getBlock();
 		$username = $event->getPlayer()->getName();
 		if(isset($this->placeQueue[$username])){
 			$event->setCancelled(true);
