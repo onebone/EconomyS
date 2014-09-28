@@ -17,6 +17,7 @@ use pocketmine\tile\Sign;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\String;
 use pocketmine\nbt\tag\Int;
+use pocketmine\tile\Tile;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -238,7 +239,7 @@ class EconomyProperty extends PluginBase implements Listener{
 		$level->setBlock($sign, $sign);
 
 		$info = $this->property->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
-		$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, array(
+		/*$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, array(
 			new String("id", Sign::SIGN),
 			new Int("x", $centerx),
 			new Int("y", $y),
@@ -247,8 +248,18 @@ class EconomyProperty extends PluginBase implements Listener{
 			new String("Text2", "Price : $price"),
 			new String("Text3", "Blocks : ".($x*$z*128)),
 			new String("Text4", ($rentTime === null ? "Property #".$info["seq"] : "Time : ".($rentTime)."min"))
-		)));
-		$tile->spawnToAll();
+		)));*/
+		$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, [
+			"id" => new String("id", Tile::SIGN),
+			"x" => new Int("x", $centerx),
+			"y" => new Int("y", $y),
+			"z" => new Int("z", $centerz),
+			"Text1" => new String("Text1", ""),
+			"Text2" => new String("Text2", ""),
+			"Text3" => new String("Text3", ""),
+			"Text4" => new String("Text4", "")
+		]));
+		$tile->setText($rentTime === null ? "[PROPERTY]" : "[RENT]", "Price : $price", "Blocks : ".($x*$z*128), ($rentTime === null ? "Property #".$info["seq"] : "Time : ".($rentTime)."min"));
 		$this->property->exec("INSERT INTO Property (price, x, y, z, level, startX, startZ, landX, landZ".($rentTime === null ? "":", rentTime").") VALUES ($price, $centerx, $y, $centerz, '{$level->getName()}', $first[0], $first[1], $sec[0], $sec[1]".($rentTime === null?"":", $rentTime").")");
 		return [$centerx, $y, $centerz];
 	}
