@@ -2,6 +2,7 @@
 
 namespace onebone\economyland;
 
+use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockEvent;
@@ -115,6 +116,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->expire[$landId][0] -= ($now - $time[1]);
 		}
 		file_put_contents($this->getDataFolder()."Expire.dat", serialize($this->expire));
+		$this->db->close();
 	}
 
 	/**
@@ -341,7 +343,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
 				$cnt = 0;
 				for($y = 1;; $y++){
-					if($level->getBlock($x, $y, $z)->getID() === 0){
+					if($level->getBlock(new Vector3($x, $y, $z))->getID() === 0){
 						break;
 					}
 					if($cnt === 5){
@@ -375,7 +377,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$username = $player;
 				$player = $this->getServer()->getPlayer($username);
 				if(!$player instanceof Player){
-					$sender->sendMessage("player-not-connected", [$username, "%2", "%3"]);
+					$sender->sendMessage($this->getMessage("player-not-connected", [$username, "%2", "%3"]));
 				}
 			//	$info = $this->land->query("SELECT * FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getLandById($landnum);
@@ -396,6 +398,66 @@ class EconomyLand extends PluginBase implements Listener{
 					}
 				}
 				return true;
+				case "invite":
+					$landnum = array_shift($param);
+					$player = array_shift($param);
+					if(trim($player) == "" or trim($landnum) == ""){
+						$sender->sendMessage("Usage : /land <invite> [land number] [(r:)player]");
+						return true;
+					}
+					if(!is_numeric($landnum)){
+						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "", "")));
+						return true;
+					}
+					//$result = $this->land->query("SELECT * FROM land WHERE ID = $landnum");
+					//$info = $result->fetchArray(SQLITE3_ASSOC);
+					$info = $this->db->getLandById($landnum);
+					if($info === false){
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+						return true;
+					}elseif($info["owner"] !== $sender->getName()){
+						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "", "")));
+						return true;
+					}elseif(substr($player, 0, 2) === "r:"){
+						$player = substr($player, 2);
+
+						//$this->land->exec("UPDATE land SET invitee = '".str_replace($player.",", "", $info["invitee"])."' WHERE ID = {$info["ID"]};");
+						$result = $this->db->removeInviteeById($landnum, $player);
+						if($result === false){
+							$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "")));
+							return true;
+						}
+						$sender->sendMessage($this->getMessage("removed-invitee", array($player, $landnum, "")));
+					}else{
+						/*if(strpos($info["invitee"], ",".$player.",") !== false){
+							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
+							return true;
+						}
+						$this->land->exec("UPDATE land SET invitee = '".$info["invitee"].$player.",' WHERE ID = {$info["ID"]};");*/
+						$result = $this->db->addInviteeById($landnum, $player);
+						if($result === false){
+							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
+							return true;
+						}
+						$sender->sendMessage($this->getMessage("success-invite", array($player, $landnum, "")));
+					}
+					return true;
+				case "invitee":
+					$landnum = array_shift($param);
+					if(trim($landnum) == "" or !is_numeric($landnum)){
+						$sender->sendMessage("Usage: /land invitee <land number>");
+						return true;
+					}
+				//	$info = $this->land->query("SELECT invitee FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
+					$info = $this->db->getInviteeById($landnum);
+					if($info === false){
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+						return true;
+					}
+					$output = "Invitee of land #$landnum : \n";
+					$output .= implode(", ", $info);
+					$sender->sendMessage(str_replace(",", ", ", substr($output, 0, -1)));
+					return true;
 				case "here":
 				if(!$sender instanceof Player){
 					$sender->sendMessage("Please run this command in-game.");
