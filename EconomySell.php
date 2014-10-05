@@ -86,7 +86,7 @@ class EconomySell extends PluginBase implements Listener {
 				$player->sendMessage ( $this->getMessage ( "no-permission-create" ) );
 				return;
 			}
-			if (! is_numeric ( $event->getLine ( 1 ) or ! is_numeric ( $event->getLine ( 3 ) ) )) {
+			if (! is_numeric ( $event->getLine ( 1 ) ) or ! is_numeric ( $event->getLine ( 3 ) )) {
 				$player->sendMessage ( $this->getMessage ( "wrong-format" ) );
 				return;
 			}
@@ -121,6 +121,13 @@ class EconomySell extends PluginBase implements Listener {
 					"meta" => ( int ) $id [1],
 					"amount" => ( int ) $event->getLine ( 3 ) 
 			);
+			
+			$player->sendMessage ( $this->getMessage ( "sell-created", ( int )$id [0], ( int )$id [1]), ( int )$event->getLine ( 3 )  );
+			
+			$event->setLine(0, $val[0]);
+			$event->setLine(1, str_replace("%1", $event->getLine(1), $val[1]));
+			$event->setLine(2, str_replace("%2", $event->getLine(2), $item[0]));
+			$event->setLine(3, str_replace("%3", $event->getLine(3), $val[3]));
 		}
 	}
 	public function onTouch(PlayerInteractEvent $event) {
@@ -205,7 +212,7 @@ class EconomySell extends PluginBase implements Listener {
 		}
 		return false;
 	}
-	public function removeItem(Player $sender, Item $getitem) {
+	public function removeItem($sender, $getitem) {
 		$getcount = $getitem->getCount ();
 		if ($getcount <= 0)
 			return;
