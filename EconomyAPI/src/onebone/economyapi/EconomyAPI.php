@@ -83,12 +83,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		"user-define" => "User Define"
 	);
 
-	public function __construct(){
-		if(self::$obj instanceof EconomyAPI){
-			throw new \Exception("Cannot create more than one EconomyAPI instance.");
-		}
-	}
-	
 	public static function getInstance(){
 		return self::$obj;
 	}
