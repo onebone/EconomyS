@@ -153,16 +153,17 @@ class YamlDatabase implements Database{
 	}
 
 	public function canTouch($x, $z, $level, Player $player){
-		if($player->hasPermission("economyland.land.modify.others")) return true;
 		foreach($this->land as $land){
 			if($level === $land["level"] and $land["startX"] < $x and $land["endX"] > $x and $land["startZ"] < $z and $land["endZ"] > $z){
-				if($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()])){
+				if($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()]) or $player->hasPermission("economyland.land.modify.others")){ // If owner is correct
+					return true;
+				}else{ // If owner is not correct
 					return $land;
 				}
 			}
 		}
 	//	return !in_array($level, $this->config["white-land"]) or $player->hasPermission("economyland.land.modify.whiteland");
-		return false;
+		return -1; // If no land found
 	}
 
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level){

@@ -378,6 +378,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$player = $this->getServer()->getPlayer($username);
 				if(!$player instanceof Player){
 					$sender->sendMessage($this->getMessage("player-not-connected", [$username, "%2", "%3"]));
+					return true;
 				}
 			//	$info = $this->land->query("SELECT * FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getLandById($landnum);
@@ -552,17 +553,21 @@ class EconomyLand extends PluginBase implements Listener{
 		$exist = false;
 		//$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		//if(!is_array($info)) goto checkLand;
-		if(($info = $this->db->canTouch($x, $z, $level, $player)) === false){
+		$info = $this->db->canTouch($x, $z, $level, $player);
+		if($info === -1){
+			if($this->config->get("white-world-protection")){
+				if(in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
+					$player->sendMessage($this->getMessage("not-owned"));
+					$event->setCancelled(true);
+					return false;
+				}
+			}
+		}elseif($info !== true){
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
 			$event->setCancelled(true);
-			return;
+			return false;
 		}
-		if($this->config->get("white-world-protection")){
-			if(!$exist and in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
-				$player->sendMessage($this->getMessage("not-owned"));
-				$event->setCancelled(true);
-			}
-		}
+
 	}
 
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){

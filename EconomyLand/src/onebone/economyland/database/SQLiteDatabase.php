@@ -105,14 +105,15 @@ class SQLiteDatabase implements Database{
 	}
 
 	public function canTouch($x, $z, $level, Player $player){
-		if($player->hasPermission("economyland.land.modify.others")) return true;
 		if(!is_bool($land = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z")->fetchArray(SQLITE3_ASSOC))){
-			if($player->getName() === $land["owner"] or stripos($player->getName().self::INVITEE_SEPERATOR, $land["invitee"])){
+			if($player->getName() === $land["owner"] or stripos($player->getName().self::INVITEE_SEPERATOR, $land["invitee"]) or $player->hasPermission("economyland.land.modify.others")){
+				return true;
+			}else{
 				return $land;
 			}
 		}
 		//return !in_array($level, $this->config["white-land"]) or $player->hasPermission("economyland.land.modify.whiteland");
-		return false;
+		return true;
 	}
 
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level){
