@@ -12,3 +12,4 @@ time-for-increase-money: 10
 bank-increase-money-rate: 5
 debug: true
 default-lang: user-define
+auto-save-interval: 10

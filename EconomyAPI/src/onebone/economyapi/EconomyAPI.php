@@ -177,6 +177,13 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->money = $moneyConfig->getAll();
 		$this->bank = $bankConfig->getAll();
 		
+		$time = $this->config->get("auto-save-interval");
+		if(is_numeric($time)){
+			$interval = $time * 1200;
+			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new CallbackTask([$this, "save"], []), $interval, $interval);
+			$this->getLogger()->notice("Auto save has been set to interval : ".$time." min(s)");
+		}
+		
 		$this->registerList("EconomyAPI");
 	}
 	
@@ -797,6 +804,10 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function onDisable(){
+		$this->save();
+	}
+	
+	public function save(){
 		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
 		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
 		$moneyConfig->setAll($this->money);
