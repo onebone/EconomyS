@@ -1,0 +1,68 @@
+name: EconomyAPI
+main: onebone\economyapi\EconomyAPI
+version: "2.0.0"
+author: onebone
+api:
+- 1.0.0
+- 1.1.0
+- 1.2.0
+- 1.2.1
+- 1.3.0
+- 1.3.1
+- 1.4.0
+- 1.4.1
+
+permissions:
+ economyapi.*:
+  default: op
+  description: Allows to control all of functions in EconomyAPI
+  children:
+   economyapi.command.*:
+    default: op
+    description: Allows to use all of commands in EconomyAPI
+    children:
+     economyapi.command.setmoney:
+      default: op
+      description: Allows to set player's money
+     economyapi.command.mymoney:
+      description: Allows player to see his/her money
+      default: true
+     economyapi.command.economys:
+      description: Allows player to see list of registered plugin compatiable with EconomyAPI
+      default: true
+     economyapi.command.givemoney:
+      description: Allows player to give money to others
+      default: op
+     economyapi.command.pay:
+      description: Allows player to pay to someone
+      default: true
+     economyapi.command.seemoney:
+      description: Allows player to see others' money
+      default: true
+     economyapi.command.setlang:
+      description: Allows player to set his/her language
+      default: true
+     economyapi.command.takedebt:
+      description: Allows player to take debt from plugin
+      default: true
+     economyapi.command.topmoney:
+      description: Allows player to see top money list
+      default: true
+     economyapi.command.bank:
+      description: Allows player to manage bank account
+      default: true
+     economyapi.command.bankadmin:
+      description: Allows player to manage others' bank account
+      default: op
+     economyapi.command.mystatus:
+      description: Allows player to see his/her financial status
+      default: true
+     economyapi.command.takemoney:
+      description: Allows player to take money from others
+      default: op
+     economyapi.command.returndebt:
+      description: Allows player to return debt
+      default: true
+     economyapi.command.mydebt:
+      description: Allows player to see his/her money
+      default: true

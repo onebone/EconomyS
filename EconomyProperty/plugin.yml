@@ -1,0 +1,33 @@
+name: EconomyProperty
+main: onebone\economyproperty\EconomyProperty
+version: "2.0.0"
+author: onebone
+api:
+- 1.1.0
+- 1.2.0
+- 1.2.1
+- 1.3.0
+- 1.3.1
+- 1.4.0
+- 1.4.1
+depend:
+- EconomyLand
+- EconomyAPI
+permissions:
+ economyproperty.*:
+  description: Includes all permissions related to EconomyProperty
+  default: op
+  children:
+   economyproperty.property.*:
+    description: Includes all permission related to property area
+    default: op
+    children:
+     economyproperty.property.modify:
+      description: Allows player to modify property area
+      default: op
+     economyproperty.property.remove:
+      description: Allows player to remove property
+      default: op
+   economyproperty.command.property:
+    description: Allows player to use property command
+    default: op

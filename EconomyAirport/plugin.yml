@@ -1,0 +1,21 @@
+name: EconomyAirport
+version: "2.0.0"
+author: onebone
+api:
+- 1.2.0
+- 1.2.1
+- 1.3.0
+- 1.3.1
+- 1.4.0
+- 1.4.1
+main: onebone\economyairport\EconomyAirport
+depend: [EconomyAPI]
+
+permissions:
+ economyairport.*:
+  description: Includes all permissions related to EconomyAirport
+  children:
+   economyairport.create:
+    description: Allows player construction of airport
+   economyairport.remove:
+    description: Allows player to remove airport

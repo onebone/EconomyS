@@ -1,0 +1,6 @@
+commands:
+ command: property
+ pos1: pos1
+ pos2: pos2
+ make: make
+ touchPos: touchpos

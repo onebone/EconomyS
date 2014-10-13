@@ -1,5 +1,5 @@
 #EconomyS
-## For PocketMine-MP below 1.4 Core-Rewrite
+## For PocketMine-MP 1.4 Core-Rewrite
 
 Feel free to make a pull request!
 
@@ -101,10 +101,7 @@ If there's no target airport to fly, it aborts riding a flight.
 
 ## For Developers
 
-You can access to EconomyAPI same as an default PocketMine-MP API.
+You can access to EconomyAPI by using `EconomyAPI::getInstance()`
 
-$serverapi_instance->economy->(function)
-
-Example:
-$serverapi_instance->economy->takeMoney($player_instance, $amount);
-$serverapi_instance->economy->takeMoney($username, $amount);
+example)
+EconomyAPI::getInstance()->addMoney($player_instance, $amount);

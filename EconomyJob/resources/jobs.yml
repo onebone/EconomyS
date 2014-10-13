@@ -1,0 +1,15 @@
+---
+tree-cutter:
+ "17:0:break": 10
+ "17:1:break": 10
+ "17:2:break": 10
+ "18:0:break": 10
+ "18:1:break": 3
+ "18:2:break": 3
+miner:
+ "1:0:break": 5
+ "4:0:break": 3
+tree-planter:
+ "6:0:place": 5
+ "6:1:place": 5
+ "6:2:place": 5
