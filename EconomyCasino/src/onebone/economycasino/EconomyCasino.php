@@ -47,13 +47,14 @@ class EconomyCasino extends PluginBase implements Listener{
 	public function onQuitEvent(PlayerQuitEvent $event){
 		$player = $event->getPlayer();
 		
-		foreach($this->casino as $pl => &$casino){
+		foreach($this->casino as $pl => $casino){
 			if(isset($casino["players"][$pl])){
-				unset($casino["players"][$pl]);
-				$players = $casino["players"];
+				unset($this->casino[$pl]["players"][$pl]);
+				$players = $this->casino[$pl]["players"];
 
+				$name = $player->getName();
 				foreach($players as $p => $v){
-					$this->getServer()->getPlayerExact($p)->sendMessage("[EconomyCasino] ".$player->getName()." left the casino game.");
+					$this->getServer()->getPlayerExact($p)->sendMessage("[EconomyCasino] ".$name." left the casino game.");
 				}
 				break;
 			}
@@ -82,12 +83,9 @@ class EconomyCasino extends PluginBase implements Listener{
 						}else{
 							foreach($this->casino as $player => $casino){
 								if(isset($casino["players"][$sender->getName()])){
-									$exist = true;
-									break;
+									$sender->sendMessage("You already have joined casino.");
+									return true;
 								}
-							}
-							if(isset($exist)){
-								$sender->sendMessage("You already have joined casino.");
 							}
 						}
 						$this->casino[$sender->getName()] = array(
@@ -144,8 +142,8 @@ class EconomyCasino extends PluginBase implements Listener{
 							break;
 						}
 						if(isset($this->casino[$player])){
-							foreach($this->casino[$player]["players"] as $p){
-								$this->getServer()->getPlayerExact($p)->sendMessage("[EconomyCasino] ".$sender->getName()." has joined the game.");
+							foreach($this->casino[$player]["players"] as $player => $v){
+								$this->getServer()->getPlayerExact($player)->sendMessage("[EconomyCasino] ".$sender->getName()." has joined the game.");
 							}
 							$this->casino[$player]["players"][$sender->getName()] = true;
 							$sender->sendMessage("You've joined the casino.");
@@ -222,9 +220,7 @@ class EconomyCasino extends PluginBase implements Listener{
 								$this->api->reduceMoney($player, $tmp);
 								$all += $tmp;
 							}
-							$randPlayer = rand(0, count($this->casino[$sender->getName()]["players"]) - 1);
-							$var = $this->casino[$sender->getName()]["players"];
-							$got = array_keys($var)[$randPlayer];
+							$got = array_rand($this->casino[$sender->getName()]);
 							
 							$this->api->addMoney($got, $all, true, "EconomyCasino");
 							
@@ -244,12 +240,10 @@ class EconomyCasino extends PluginBase implements Listener{
 										$this->api->reduceMoney($p, $tmp);
 										$all += $tmp;
 									}
-									$randPlayer = rand(0, count($this->casino[$player]["players"]) - 1);
-									$var = $this->casino[$player]["players"];
-									$got = array_keys($var)[$randPlayer];
+									$got = array_rand($this->casino[$player]["players"]);
 									$this->api->addMoney($got, $all, true, "EconomyCasino");
 									foreach($this->casino[$player]["players"] as $p => $v){
-										if($got === $p->getName()){
+										if($got === $p){
 											$this->getServer()->getPlayerExact($p)->sendMessage("You've win $$all!");
 										}else{
 											$this->getServer()->getPlayerExact($p)->sendMessage("You've lost $$money");
