@@ -596,7 +596,7 @@ class EconomyLand extends PluginBase implements Listener{
 		if($result){
 			return false;
 		}
-		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $tiis->config->get("price-per-y-axis");
+		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
 	//	$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, ','".($expires === null ? "":", $expires").")");
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
 		if($expires !== null){
