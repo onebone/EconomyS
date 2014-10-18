@@ -124,13 +124,17 @@ class EconomyAuction extends PluginBase{
 				}
 				$auction = strtolower($auction);
 				if(!isset($this->auctions[$auction])){
-					$sender->sendMessage((strtolower($sender->getName()) === $auction ? "You have":$player->getName()." has")." no ongoing auction");
+					$sender->sendMessage((strtolower($sender->getName()) === $auction ? "You have":"$auction has")." no ongoing auction");
 					break;
 				}
 				$this->quitAuction($auction);
 				$sender->sendMessage((strtolower($sender->getName()) === $auction ? "Your":"$auction's")." auction has successfully stopped.");
 				break;
 				case "time":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					return true;
+				}
 				$item = array_shift($params);
 				$count = array_shift($params);
 				$startPrice = array_shift($params);
