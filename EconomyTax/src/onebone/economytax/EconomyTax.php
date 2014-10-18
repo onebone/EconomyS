@@ -26,52 +26,32 @@ class EconomyTax extends PluginBase{
 		$this->config = new Config($this->getDataFolder()."tax.properties", Config::PROPERTIES, array(
 			"time-for-tax" => 10,
 			"tax-as-percentage" => "",
-			"tax-as-money" => 100,
-			"take-online" => true
+			"tax-as-money" => 100
 		));
 		$this->getServer()->getScheduler()->scheduleRepeatingTask(new CallbackTask(array($this, "onSchedule")), $this->config->get("time-for-tax")*1200);
 	}
 
 	public function onSchedule(){
 		if(($percent = $this->config->get("tax-as-percentage")) !== ""){
-			if($this->config->get("take-online")){
-				$players = $this->getServer()->getOnlinePlayers();
-				foreach($players as $player){
-					if($player->hasPermission("economytax.tax.avoid")){
-						continue;
-					}
-					$money = $this->api->myMoney($player);
-					$taking = $money * ($percent / 100);
-					$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
-					$player->sendMessage("Your $$taking has taken by tax.");
+			$players = $this->getServer()->getOnlinePlayers();
+			foreach($players as $player){
+				if($player->hasPermission("economytax.tax.avoid")){
+					continue;
 				}
-			}else{
-				foreach($this->api->getAllMoney()["money"] as $player => $money){
-					if($this->getServer()->getOfflinePlayer($player)->hasPermission("economytax.tax.avoid")){
-						continue;
-					}
-					$taking = $money * ($percent / 100);
-					$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
-				}
+				$money = $this->api->myMoney($player);
+				$taking = $money * ($percent / 100);
+				$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
+				$player->sendMessage("Your $$taking has taken by tax.");
 			}
 		}else{
 			$money = $this->config->get("tax-as-money");
-			if($this->config->get("take-online")){
-				$players = $this->getServer()->getOnlinePlayers();
+			$players = $this->getServer()->getOnlinePlayers();
 				foreach($players as $player){
-					if($player->hasPermission("economytax.tax.avoid")){
-						continue;
-					}
-					$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");
-					$player->sendMessage("Your $$money has taken by tax.");
+				if($player->hasPermission("economytax.tax.avoid")){
+					continue;
 				}
-			}else{
-				foreach($this->api->getAllMoney()["money"] as $player => $m){
-					if($this->getServer()->getOfflinePlayer($player)->hasPermission("economytax.tax.avoid")){
-						continue;
-					}
-					$this->api->reduceMoney($player, min($money, $m), true, "EconomyTax");
-				}
+				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");
+				$player->sendMessage("Your $$money has taken by tax.");
 			}
 		}
 	}
