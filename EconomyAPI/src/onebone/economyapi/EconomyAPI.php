@@ -80,6 +80,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"def" => "Default",
 		"en" => "English",
 		"ko" => "한국어",
+		"it" => "Italiano",
 		"user-define" => "User Define"
 	);
 
@@ -124,13 +125,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		
 		$this->schedules = unserialize(file_get_contents($this->path."ScheduleData.dat"));
 		$this->playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
-		
-		if(isset($playerLang["CONSOLE"])){
-			$this->config->set("default-lang", $playerLang["CONSOLE"]);
-			$this->config->save();
-		}
 
-		$this->getLangFile();
+		if(!isset($this->playerLang["console"])){
+			$this->getLangFile();
+		}
 		$cmds = array(
 			"setmoney" => "onebone\\economyapi\\commands\\SetMoneyCommand",
 			"seemoney" => "onebone\\economyapi\\commands\\SeeMoneyCommand",
@@ -297,18 +295,18 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	private function getLangFile(){
 		$lang = $this->config->get("default-lang");
-		if(($resource = $this->readResource("lang_".$lang.".json")) !== false){
-			$this->playerLang["CONSOLE"] = $lang;
-			$this->playerLang["RCON"] = $lang;
-			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
+		if(isset($this->langRes[$lang])){
+			$this->playerLang["console"] = $lang;
+			$this->playerLang["rcon"] = $lang;
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", array($this->langList[$lang], "%2", "%3", "%4")));
 		}elseif($lang === "user-define"){
-			$this->playerLang["CONSOLE"] = "user-define";
-			$this->playerLang["RCON"] = "user-define";
-			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array("User Define", "%2", "%3", "%4")));
+			$this->playerLang["console"] = "user-define";
+			$this->playerLang["rcon"] = "user-define";
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", array("User Define", "%2", "%3", "%4")));
 		}else{
-			$this->playerLang["CONSOLE"] = "def";
-			$this->playerLang["RCON"] = "def";
-			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "CONSOLE", array($this->langList[$lang], "%2", "%3", "%4")));
+			$this->playerLang["console"] = "def";
+			$this->playerLang["rcon"] = "def";
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", array($this->langList[$lang], "%2", "%3", "%4")));
 		}
 	}
 
@@ -318,15 +316,15 @@ class EconomyAPI extends PluginBase implements Listener{
 	 *
 	 * @return bool
 	 */
-	public function setLang($lang, $target = "CONSOLE"){
+	public function setLang($lang, $target = "console"){
 		if(isset($this->langRes[$lang])){
-			$this->playerLang[$target] = $lang;
+			$this->playerLang[strtolower($target)] = $lang;
 			return $lang;
 		}else{
 			$lower = strtolower($lang);
 			foreach($this->langList as $key => $l){
 				if($lower === strtolower($l)){
-					$this->playerLang[$target] = $key;
+					$this->playerLang[strtolower($target)] = $key;
 					return $l;
 				}
 			}
@@ -543,7 +541,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 *
 	 * @return string
 	*/
-	public function getMessage($key, $player = "CONSOLE", array $value = array("%1", "%2", "%3", "%4")){
+	public function getMessage($key, $player = "console", array $value = array("%1", "%2", "%3", "%4")){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
