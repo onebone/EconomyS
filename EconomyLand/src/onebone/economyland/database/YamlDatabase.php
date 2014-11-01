@@ -2,10 +2,13 @@
 
 namespace onebone\economyland\database;
 
+use onebone\economyland\event\LandRemoveEvent;
 use pocketmine\level\Level;
 use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\Player;
+
+use onebone\economyland\event\LandAddedEvent;
 
 class YamlDatabase implements Database{
 	/**
@@ -136,6 +139,7 @@ class YamlDatabase implements Database{
 			"invitee" => [],
 			"expires" => $expires
 		];
+		Server::getInstance()->getPluginManager()->callEvent(new LandAddedEvent($this->landNum, $startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires));
 		return $this->landNum++;
 	}
 
@@ -149,8 +153,11 @@ class YamlDatabase implements Database{
 
 	public function removeLandById($id){
 		if(isset($this->land[$id])){
-			unset($this->land[$id]);
-			return true;
+			Server::getInstance()->getPluginManager()->callEvent(($ev = new LandRemoveEvent($id)));
+			if(!$ev->isCancelled()){
+				unset($this->land[$id]);
+				return true;
+			}
 		}
 		return false;
 	}

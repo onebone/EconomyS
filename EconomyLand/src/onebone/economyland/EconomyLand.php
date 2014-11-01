@@ -2,6 +2,7 @@
 
 namespace onebone\economyland;
 
+use onebone\economyland\event\LandAddedEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -71,26 +72,10 @@ class EconomyLand extends PluginBase implements Listener{
 				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->config, $this->getDataFolder()."Land.sqlite3");
 				$this->getLogger()->alert("Specified database type is unavailable. Database type is YAML.");
 		}
-		//$this->parseOldData();
 
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlaceEvent"), $this);
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onBreakEvent"), $this);
 	}
-
-/*	private function parseOldData(){
-		if(is_file($this->getDataFolder()."LandData.sqlite3")){
-			$cnt = 0;
-			$land = new \SQLite3($this->getDataFolder()."LandData.sqlite3");
-			$result = $land->query("SELECT * FROM land");
-			while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
-				$this->land->exec("INSERT INTO land (price, level, startX, startZ, endX, endZ, owner, invitee) VALUES ($d[price], '$d[level]', $d[startX], $d[startZ], $d[endX], $d[endZ], '$d[owner]', '$d[invitee]')");
-				++$cnt;
-			}
-			$land->close();
-			$this->getLogger()->info(TextFormat::AQUA."Parsed $cnt of old data to new format database.");
-			@unlink($this->getDataFolder()."LandData.sqlite3");
-		}
-	}*/
 
 	public function expireLand($landId){
 		if(!isset($this->expire[$landId])) return;
@@ -110,7 +95,6 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	public function onDisable(){
-		//$this->land->close();
 		$now = time();
 		foreach($this->expire as $landId => $time){
 			$this->expire[$landId][0] -= ($now - $time[1]);
@@ -120,7 +104,7 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @return self
+	 * @return EconomyLand
 	 */
 	public static function getInstance(){
 		return static::$instance;
@@ -258,14 +242,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 				$page = isset($param[0]) ? (int) $param[0] : 1;
-			//	$result = $this->land->query("SELECT * FROM land");
-			/*	if(is_bool($result)) $land = array();
-				else{
-					$land = array();
-					while(($d = $result->fetchArray(SQLITE3_ASSOC)) !== false){
-						$land[] = $d;
-					}
-				}*/
+				
 				$land = $this->db->getAll();
 				$output = "";
 				$max = ceil(count($land) / 5);
@@ -449,7 +426,7 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage("Usage: /land invitee <land number>");
 						return true;
 					}
-				//	$info = $this->land->query("SELECT invitee FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
+					
 					$info = $this->db->getInviteeById($landnum);
 					if($info === false){
 						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
@@ -457,7 +434,7 @@ class EconomyLand extends PluginBase implements Listener{
 					}
 					$output = "Invitee of land #$landnum : \n";
 					$output .= implode(", ", $info);
-					$sender->sendMessage(str_replace(",", ", ", substr($output, 0, -1)));
+					$sender->sendMessage($output);
 					return true;
 				case "here":
 				if(!$sender instanceof Player){
@@ -467,7 +444,6 @@ class EconomyLand extends PluginBase implements Listener{
 				$x = $sender->x;
 				$z = $sender->z;
 				
-			//	$info = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z)")->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-one-owned"));
@@ -547,7 +523,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$level = $player->getLevel()->getFolderName();
 		
 		if(in_array($level, $this->config->get("non-check-worlds"))){
-			return;
+			return false;
 		}
 		
 		$exist = false;
@@ -607,7 +583,7 @@ class EconomyLand extends PluginBase implements Listener{
 				time()
 			);
 		}
-				return true;
+		return true;
 	}
 	
 	public function getMessage($key, $value = array("%1", "%2", "%3")){
