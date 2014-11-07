@@ -517,10 +517,11 @@ class EconomyLand extends PluginBase implements Listener{
 	public function permissionCheck(BlockEvent $event){
 		/** @var $player Player */
 		$player = $event->getPlayer();
+		$block = $event->getBlock();
 		
-		$x = $player->x;
-		$z = $player->z;
-		$level = $player->getLevel()->getFolderName();
+		$x = $block->getX();
+		$z = $block->getZ();
+		$level = $block->getLevel()->getFolderName();
 		
 		if(in_array($level, $this->config->get("non-check-worlds"))){
 			return false;
