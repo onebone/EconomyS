@@ -5,6 +5,8 @@ namespace onebone\economyland\event;
 use pocketmine\event\Event;
 
 class LandAddedEvent extends  Event{
+	public static $handlerList = null;
+
 	private $id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires;
 
 	public function __construct($id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires){
