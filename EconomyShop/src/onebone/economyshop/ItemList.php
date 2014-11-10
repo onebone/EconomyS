@@ -130,7 +130,7 @@ class ItemList{
 		"netherbrickstair" => 114,
 		"endportalframe" => 120,
 		"endstone" => 121,
-		"Cocoa" => 127,
+		"cocoa" => 127,
 		"sandstair" => 128,
 		"emeraldore" => 129,
 		"emeraldblock" => 133,
