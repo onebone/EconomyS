@@ -160,7 +160,7 @@ class ItemList{
 		"haybale" => 170,
 		"carpet" => 171,
 		"coalblock" => 173,
-		"Podzol" => 243,
+		"podzol" => 243,
 		"beetroot" => 244,
 		"stonecutter" => 245,
 		"glowingobsidian" => 246,
