@@ -19,6 +19,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 		parent::__construct($command, $plugin);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
 		$this->setPermission("economyproperty.command.property");
+		$this->setDescription("Property manage command");
 		$this->plugin = $plugin;
 		$this->command = $command;
 		$this->pos1 = $pos1;
