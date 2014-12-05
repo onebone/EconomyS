@@ -20,6 +20,8 @@ use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 use onebone\economyapi\EconomyAPI;
 
+#define TAG 1
+
 class EconomySell extends PluginBase implements Listener {
 	private $sell;
 	private $placeQueue;
@@ -36,7 +38,7 @@ class EconomySell extends PluginBase implements Listener {
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->prepareLangPref();
 		$this->placeQueue = array();
-		
+
 		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
 	}
 
@@ -140,7 +142,7 @@ class EconomySell extends PluginBase implements Listener {
 					$cnt += $item->getCount();
 				}
 			}
-			if ($cnt > $sell ["amount"]){
+			if ($cnt >= $sell ["amount"]){
 				// $player->getInventory()->removeItem(new Item($sell["item"], $sell["meta"], $sell["amount"]));
 				$this->removeItem($player, new Item($sell["item"], $sell["meta"], $sell["amount"]));
 				EconomyAPI::getInstance()->addMoney($player, $sell ["cost"], true, "EconomySell");
