@@ -473,7 +473,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->bank["money"][$player] += $amount;
 
 			if(!isset($this->schedules["bank"][$player])){
-				$this->schedules["bank"][$player] = $this->config->get("time-for-increase-money") * 60;
+				$this->schedules["bank"][$player] = $this->config->get("time-for-increase-money") * 1200;
 				$this->scheduleId["bank"][$player] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$player]), $this->config->get("time-for-increase-money")*1200);
 				$this->lastActivity["bank"][$player] = time();
 			}
