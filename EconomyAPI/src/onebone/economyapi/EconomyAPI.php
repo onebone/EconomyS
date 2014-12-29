@@ -2,6 +2,8 @@
 
 namespace onebone\economyapi;
 
+use onebone\economyapi\event\debt\DebtChangedEvent;
+use onebone\economyapi\event\money\MoneyChangedEvent;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
@@ -19,6 +21,7 @@ use onebone\economyapi\event\debt\AddDebtEvent;
 use onebone\economyapi\event\debt\ReduceDebtEvent;
 use onebone\economyapi\event\bank\AddMoneyEvent as BankAddMoneyEvent;
 use onebone\economyapi\event\bank\ReduceMoneyEvent as BankReduceMoneyEvent;
+use onebone\economyapi\event\bank\MoneyChangedEvent as BankMoneyChangedEvent;
 use onebone\economyapi\database\DataConverter;
 
 class EconomyAPI extends PluginBase implements Listener{
@@ -401,6 +404,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->schedules["debt"][$player] = $this->config->get("time-for-increase-debt") * 60;
 				$this->lastActivity["debt"][$player] = time();
 			}
+			$this->getServer()->getPluginManager()->callEvent(new DebtChangedEvent($this, $player, $this->money["debt"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -440,6 +444,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->schedules["debt"][$player] = null;
 				unset($this->lastActivity["debt"][$player], $this->schedules["debt"][$player], $this->scheduleId["debt"][$player]);
 			}
+			$this->getServer()->getPluginManager()->callEvent(new DebtChangedEvent($this, $player, $this->money["debt"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -477,6 +482,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->scheduleId["bank"][$player] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$player]), $this->config->get("time-for-increase-money")*1200)->getTaskId();
 				$this->lastActivity["bank"][$player] = time();
 			}
+			$this->getServer()->getPluginManager()->callEvent(new BankMoneyChangedEvent($this, $player, $this->bank["money"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -514,6 +520,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->lastActivity["bank"][$player] = null;
 				unset($this->schedules["bank"][$player], $this->lastActivity["bank"][$player], $this->scheduleId["bank"][$player]);
 			}
+			$this->getServer()->getPluginManager()->callEvent(new BankMoneyChangedEvent($this, $player, $this->bank["money"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -727,6 +734,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				return self::RET_CANCELLED;
 			}
 			$this->money["money"][$player] += $amount;
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -762,6 +770,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				return self::RET_CANCELLED;
 			}
 			$this->money["money"][$player] -= $amount;
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -795,6 +804,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				return self::RET_CANCELLED;
 			}
 			$this->money["money"][$player] = $money;
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
