@@ -48,7 +48,9 @@ class EconomyJob extends PluginBase implements Listener{
 			$this->getLogger()->debug("Tried to load unknown resource ".TextFormat::AQUA.$res.TextFormat::RESET);
 			return false;
 		}
-		return fread($resource, filesize($path));
+		$content = stream_get_contents($resource);
+		@fclose($content);
+		return $content;
 	}
 
 	public function onDisable(){
