@@ -24,12 +24,14 @@ class EconomyAirport extends PluginBase  implements Listener{
 	private $lang, $tag;
 
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())){
+			mkdir($this->getDataFolder());
+		}
 
 		$this->airport = array();
 
-		file_put_contents($this->getDataFolder()."language.properties", stream_get_contents($this->getResource("language.properties")));
-		file_put_contents($this->getDataFolder()."airport.yml", stream_get_contents($this->getResource("airport.yml")));
+		$this->saveResource("language.properties");
+		$this->saveResource("airport.yml");
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES);
 		$this->tag = new Config($this->getDataFolder()."airport.yml", Config::YAML);
 
