@@ -42,10 +42,13 @@ class EconomyProperty extends PluginBase implements Listener{
 	private $command;
 
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())){
+			mkdir($this->getDataFolder());
+		}
 
 		$this->property = new \SQLite3($this->getDataFolder()."Property.sqlite3");
-		$this->property->exec(stream_get_contents($this->getResource("sqlite3.sql")));
+		$this->property->exec(stream_get_contents($resource = $this->getResource("sqlite3.sql")));
+		@fclose($resource);
 		$this->parseOldData();
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
