@@ -23,7 +23,7 @@ class YamlDatabase implements Database{
 		$this->land = (new Config($fileName, Config::YAML))->getAll();
 		if(count($this->land) > 0){
 			$land = $this->land;
-			$this->landNum = key(end($land)) + 1;
+			$this->landNum = end($land)["ID"] + 1;
 		}
 		if(is_file($otherName)){
 			$sq = new \SQLite3($otherName);
