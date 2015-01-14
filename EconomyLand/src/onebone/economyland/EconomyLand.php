@@ -227,7 +227,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
 					return true;
 				}
-				$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * 100;
+				$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
 				if(EconomyAPI::getInstance()->reduceMoney($sender, $price, true, "EconomyLand") === EconomyAPI::RET_INVALID){
 					$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 					return true;
