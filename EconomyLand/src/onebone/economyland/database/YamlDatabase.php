@@ -106,7 +106,7 @@ class YamlDatabase implements Database{
 
 	public function addInviteeById($id, $name){
 		if(isset($this->land[$id])){
-			$this->land[$id][$name] = true;
+			$this->land[$id]["invitee"][$name] = true;
 			return true;
 		}
 		return false;
