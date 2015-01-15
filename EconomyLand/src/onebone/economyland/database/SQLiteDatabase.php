@@ -47,7 +47,7 @@ class SQLiteDatabase implements Database{
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		return $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND $level")->fetchArray(SQLITE3_ASSOC);
+		return $this->land->query("SELECT * FROM land WHERE (startX <= $x AND endX >= $x) AND (startZ <= $z AND endZ >= $z) AND $level")->fetchArray(SQLITE3_ASSOC);
 	}
 
 	public function getAll(){
@@ -105,7 +105,7 @@ class SQLiteDatabase implements Database{
 	}
 
 	public function canTouch($x, $z, $level, Player $player){
-		if(!is_bool($land = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z")->fetchArray(SQLITE3_ASSOC))){
+		if(!is_bool($land = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX >= $x AND endZ >= $z AND startX <= $x AND startZ <= $z")->fetchArray(SQLITE3_ASSOC))){
 			if($player->getName() === $land["owner"] or stripos($player->getName().self::INVITEE_SEPERATOR, $land["invitee"]) or $player->hasPermission("economyland.land.modify.others")){
 				return true;
 			}else{

@@ -62,7 +62,7 @@ class YamlDatabase implements Database{
 			$level = $level->getFolderName();
 		}
 		foreach($this->land as $land){
-			if($level === $land["level"] and $land["startX"] < $x and $land["endX"] > $x and $land["startZ"] < $z and $land["endZ"] > $z){
+			if($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z){
 				return $land;
 			}
 		}
@@ -164,7 +164,7 @@ class YamlDatabase implements Database{
 
 	public function canTouch($x, $z, $level, Player $player){
 		foreach($this->land as $land){
-			if($level === $land["level"] and $land["startX"] < $x and $land["endX"] > $x and $land["startZ"] < $z and $land["endZ"] > $z){
+			if($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z){
 				if($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()]) or $player->hasPermission("economyland.land.modify.others")){ // If owner is correct
 					return true;
 				}else{ // If owner is not correct
@@ -181,7 +181,7 @@ class YamlDatabase implements Database{
 			$level = $level->getFolderName();
 		}
 		foreach($this->land as $land){
-			if((($land["startX"] < $startX and $land["endX"] > $startX) or ($land["startX"] < $endX and $land["endX"] > $endX)) and (($land["startZ"] < $startZ and $land["endZ"] > $startZ and $level === $land["level"]) or ($land["endZ"] < $endZ and $land["endZ"] > $endZ))){
+			if((($land["startX"] <= $startX and $land["endX"] >= $startX) or ($land["startX"] <= $endX and $land["endX"] >= $endX)) and (($land["startZ"] <= $startZ and $land["endZ"] >= $startZ and $level === $land["level"]) or ($land["endZ"] <= $endZ and $land["endZ"] >= $endZ))){
 				return true;
 			}
 		}
