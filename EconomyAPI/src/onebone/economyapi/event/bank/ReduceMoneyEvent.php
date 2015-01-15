@@ -6,7 +6,7 @@ use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\EconomyAPI;
 
 class ReduceMoneyEvent extends EconomyAPIEvent{
-	private $plugin, $username, $amount, $issuer;
+	private $plugin, $username, $amount;
 	public static $handlerList;
 	
 	public function __construct(EconomyAPI $api, $username, $amount, $issuer){

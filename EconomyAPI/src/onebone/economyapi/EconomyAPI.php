@@ -7,7 +7,7 @@ use onebone\economyapi\event\money\MoneyChangedEvent;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
@@ -845,7 +845,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		unset($this->lastActivity["bank"][$username], $this->lastActivity["debt"][$username]);
 	}
 	
-	public function onJoinEvent(PlayerJoinEvent $event){
+	public function onLoginEvent(PlayerLoginEvent $event){
 		$username = strtolower($event->getPlayer()->getName());
 		if(!isset($this->money["money"][$username])){
 			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, $this->config->get("default-money"), $this->config->get("default-debt"), null, "EconomyAPI")));

@@ -6,7 +6,7 @@ use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\EconomyAPI;
 
 class CreateAccountEvent extends EconomyAPIEvent{
-	private $player, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer;
+	private $player, $username, $defaultMoney, $defaultDebt, $defaultBankMoney;
 	public static $handlerList;
 	
 	public function __construct(EconomyAPI $plugin, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer){
