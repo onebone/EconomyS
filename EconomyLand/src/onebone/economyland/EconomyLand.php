@@ -22,6 +22,7 @@ use pocketmine\plugin\MethodEventExecutor;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\database\SQLiteDatabase;
 use onebone\economyland\database\YamlDatabase;
+use onebone\economyland\database\Database;
 
 class EconomyLand extends PluginBase implements Listener{
 	/**
@@ -100,7 +101,9 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->expire[$landId][0] -= ($now - $time[1]);
 		}
 		file_put_contents($this->getDataFolder()."Expire.dat", serialize($this->expire));
-		$this->db->close();
+		if($this->db instanceof Database){
+			$this->db->close();
+		}
 	}
 
 	/**
