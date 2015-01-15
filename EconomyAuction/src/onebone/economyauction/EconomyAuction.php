@@ -28,7 +28,10 @@ class EconomyAuction extends PluginBase{
 	private $auctions, $queue;
 	
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())){
+			mkdir($this->getDataFolder());
+		}
+		$this->saveDefaultConfig();
 		if(!is_file($this->getDataFolder()."Auctions.dat")){
 			file_put_contents($this->getDataFolder()."Auctions.dat", serialize(array()));
 		}
@@ -72,6 +75,12 @@ class EconomyAuction extends PluginBase{
 					$sender->sendMessage("You already have ongoing auction");
 					break;
 				}
+				$tax = $this->getConfig()->get("auction-tax");
+				if($tax > EconomyAPI::getInstance()->myMoney($sender)){
+					$sender->sendMessage("You don't have enough money to start auction. Auction tax : ".$tax);
+					break;
+				}
+				
 				$item = array_shift($params);
 				$count = (int)array_shift($params);
 				$startPrice = array_shift($params);
@@ -105,6 +114,7 @@ class EconomyAuction extends PluginBase{
 						$e[0], $e[1], (int) $count, (int) $startPrice, null, (int) $startPrice, null, null
 					);
 					$this->getServer()->broadcastMessage($sender->getName()."'s auction has just started.");
+					EconomyAPI::getInstance()->reduceMoney($sender, $tax);
 				}else{
 					$sender->sendMessage("You don't have enough items");
 				}
