@@ -84,17 +84,17 @@ class BankCommand extends EconomyAPICommand{
 			
 			//  Player finder  //
 			$server = Server::getInstance();
-			$p = $server->getPlayer($player);
+			$p = $server->getPlayer($amount);
 			if($p instanceof Player){
 				$player = $p->getName();
 			}
 			// END //
 			
-			$money = $this->plugin->myBankMoney($player);
+			$money = $this->plugin->myBankMoney($amount);
 			if($money === false){
-				$sender->sendMessage($this->plugin->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4")));
+				$sender->sendMessage($this->plugin->getMessage("player-never-connected", $sender->getName(), array($amount, "%2", "%3", "%4")));
 			}else{
-				$sender->sendMessage($this->plugin->getMessage("bank-hismoney", $sender->getName(), array($player, $money, "%3", "%4")));
+				$sender->sendMessage($this->plugin->getMessage("bank-hismoney", $sender->getName(), array($amount, $money, "%3", "%4")));
 			}
 			return true;
 			case "mymoney":

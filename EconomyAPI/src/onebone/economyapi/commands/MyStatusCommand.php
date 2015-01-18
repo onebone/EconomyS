@@ -31,12 +31,18 @@ class MyStatusCommand extends EconomyAPICommand{
 		foreach($money["money"] as $m){
 			$allMoney += $m;
 		}
-		$topMoney = (($money["money"][$sender->getName()] / $allMoney) * 100);
+		$topMoney = 0;
+		if($allMoney > 0){
+			$topMoney = round((($money["money"][$sender->getName()] / $allMoney) * 100), 2);
+		}
 		$allDebt = 0;
 		foreach($money["debt"] as $d){
 			$allDebt += $d;
 		}
-		$topDebt = (($money["debt"][$sender->getName()] / $allDebt) * 100);
+		$topDebt = 0;
+		if($allDebt > 0){
+			$topDebt = round((($money["debt"][$sender->getName()] / $allDebt) * 100), 2);
+		}
 		$sender->sendMessage($this->getPlugin()->getMessage("mystatus-show", $sender->getName(), array($topMoney, $topDebt, "%3", "%4")));
 		return true;
 	}
