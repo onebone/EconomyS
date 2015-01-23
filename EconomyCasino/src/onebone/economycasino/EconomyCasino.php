@@ -143,7 +143,9 @@ class EconomyCasino extends PluginBase implements Listener{
 						}
 						if(isset($this->casino[$player])){
 							foreach($this->casino[$player]["players"] as $player => $v){
-								$this->getServer()->getPlayerExact($player)->sendMessage("[EconomyCasino] ".$sender->getName()." has joined the game.");
+								if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+									$p->sendMessage("[EconomyCasino] ".$sender->getName()." has joined the game.");
+								}
 							}
 							$this->casino[$player]["players"][$sender->getName()] = true;
 							$sender->sendMessage("You've joined the casino.");
@@ -235,7 +237,7 @@ class EconomyCasino extends PluginBase implements Listener{
 							foreach($this->casino as $player => $casino){
 								if(isset($casino["players"][$sender->getName()])){
 									$all = 0;
-									foreach($this->casino[$sender->getName()][$player] as $p){
+									foreach($this->casino[$player]["players"] as $p => $true){
 										$tmp = min($this->api->myMoney($p), $money);
 										$this->api->reduceMoney($p, $tmp);
 										$all += $tmp;
