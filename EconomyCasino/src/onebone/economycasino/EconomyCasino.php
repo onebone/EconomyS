@@ -212,7 +212,7 @@ class EconomyCasino extends PluginBase implements Listener{
 						}
 						$money = (int)$money;
 						if($this->api->myMoney($sender) < $money){
-							$sender->sendMessage("You don't have money to gamble $$money");
+							$sender->sendMessage("You don't have money to gamble ".$this->api->monetaryUnit()."$money");
 							break;
 						}
 						if(isset($this->casino[$sender->getName()])){
@@ -228,9 +228,9 @@ class EconomyCasino extends PluginBase implements Listener{
 							
 							foreach($this->casino[$sender->getName()]["players"] as $p => $v){
 								if($got === $p){
-									$this->getServer()->getPlayerExact($p)->sendMessage("You've win $$all!");
+									$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->monetaryUnit()."$all!");
 								}else{
-									$this->getServer()->getPlayerExact($p)->sendMessage("You've lost $$money");
+									$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->monetaryUnit()."$money");
 								}
 							}
 						}else{
@@ -246,9 +246,9 @@ class EconomyCasino extends PluginBase implements Listener{
 									$this->api->addMoney($got, $all, true, "EconomyCasino");
 									foreach($this->casino[$player]["players"] as $p => $v){
 										if($got === $p){
-											$this->getServer()->getPlayerExact($p)->sendMessage("You've win $$all!");
+											$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->monetaryUnit()."$all!");
 										}else{
-											$this->getServer()->getPlayerExact($p)->sendMessage("You've lost $$money");
+											$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->monetaryUnit()."$money");
 										}
 									}
 								}
@@ -269,9 +269,9 @@ class EconomyCasino extends PluginBase implements Listener{
 				$rand = rand(0, $this->config->get("jackpot-winning"));
 				if($rand === 0){
 					$this->api->addMoney($sender, $money);
-					$sender->sendMessage("You've wined jackpot! You've got $$money");
+					$sender->sendMessage("You've wined jackpot! You've got ".$this->api->monetaryUnit()."$money");
 				}else{
-					$sender->sendMessage("You've failed your jackpot! You've lost $$money");
+					$sender->sendMessage("You've failed your jackpot! You've lost ".$this->api->monetaryUnit()."$money");
 				}
 				break;
 		}

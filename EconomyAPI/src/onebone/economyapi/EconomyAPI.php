@@ -47,6 +47,8 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	private $langRes, $playerLang; // language system related
 	
+	private $monetaryUnit;
+	
 	/**
 	 * @var int RET_ERROR_1 Unknown error 1
 	*/
@@ -178,6 +180,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$this->money = $moneyConfig->getAll();
 		$this->bank = $bankConfig->getAll();
+		
+		$this->monetaryUnit = $this->config->get("monetary-unit");
 		
 		$time = $this->config->get("auto-save-interval");
 		if(is_numeric($time)){
@@ -543,6 +547,13 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	  * @return string
+	  */
+	 public function getMonetaryUnit(){
+		return $this->monetaryUnit;
+	 }
+	
+	/**
 	 * @param string $key
 	 * @param Player|string $player
 	 * @param array $value
@@ -556,9 +567,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		$player = strtolower($player);
 		
 		if(isset($this->playerLang[$player]) and isset($this->langRes[$this->playerLang[$player]][$key])){
-			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
+			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "%4"), array($this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
 		}elseif(isset($this->langRes["def"][$key])){
-			return str_replace(array("%1", "%2", "%3", "%4"), array($value[0], $value[1], $value[2], $value[3]), $this->langRes["def"][$key]);
+			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "%4"), array($this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]), $this->langRes["def"][$key]);
 		}else{
 			return "Couldn't find message resource";
 		}

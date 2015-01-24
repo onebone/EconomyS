@@ -592,7 +592,7 @@ class EconomyLand extends PluginBase implements Listener{
 	
 	public function getMessage($key, $value = array("%1", "%2", "%3")){
 		if($this->lang->exists($key)){
-			return str_replace(array("%1", "%2", "%3", "\\n"), array($value[0], $value[1], $value[2], "\n"), $this->lang->get($key));
+			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "\\n"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $value[0], $value[1], $value[2], "\n"), $this->lang->get($key));
 		}
 		return "Couldn't find message \"$key\"";
 	}
@@ -608,7 +608,7 @@ class EconomyLand extends PluginBase implements Listener{
 		));
 		
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
-			"sold-land" => "Has been sold the land for $%1",
+			"sold-land" => "Has been sold the land for %MONETARY_UNIT%%1",
 			"not-my-land" => "Here is not your land",
 			"no-one-owned" => "Anyone doesn't have this land",
 			"not-your-land" => "Land number %1 is not your land",
@@ -633,11 +633,11 @@ class EconomyLand extends PluginBase implements Listener{
 			"set-second-position" => "Please set second position",
 			"land-around-here" => "There are %1's land around here",
 			"no-money-to-buy-land" => "You don't have money to buy this land",
-			"bought-land" => "Has been bought land for $%1",
+			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
 			"second-position-saved" => "Second position saved",
 			"cant-set-position-in-different-world" => "You can't set position in different world",
-			"confirm-buy-land" => "Land price : $%1\\nBuy land with command /land buy",
+			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"not-owned" => "You must buy land to edit this block"
 		));

@@ -41,7 +41,7 @@ class EconomySell extends PluginBase implements Listener {
 
 		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
 	}
-
+	
 	public function onDisable(){
 		$cfg = new Config($this->getDataFolder()."Sell.yml", Config::YAML);
 		$cfg->setAll($this->sell);
@@ -53,13 +53,13 @@ class EconomySell extends PluginBase implements Listener {
 				"wrong-format" => "Please write your sign with right format",
 				"item-not-support" => "Item %1 is not supported on EconomySell",
 				"no-permission-create" => "You don't have permission to create sell center",
-				"sell-created" => "Sell center has been created (%1 = $%2)",
+				"sell-created" => "Sell center has been created (%1 = %MONETARY_UNIT%%2)",
 				"removed-sell" => "Sell center has been removed",
 				"creative-mode" => "You are in creative mode",
 				"no-permission-break" => "You don't have permission to break sell center",
-				"tap-again" => "Are you sure to sell %1 ($%2)? Tap again to confirm",
+				"tap-again" => "Are you sure to sell %1 (%MONETARY_UNIT%%2)? Tap again to confirm",
 				"no-item" => "You have no item to sell",
-				"sold-item" => "Has been sold %1 of %2 for $%3" 
+				"sold-item" => "Has been sold %1 of %2 for %MONETARY_UNIT%%3" 
 		));
 		
 		$this->sellSign = new Config($this->getDataFolder()."SellSign.yml", Config::YAML, array(
@@ -74,7 +74,7 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function getMessage($key, $val = array("%1", "%2", "%3")){
 		if ($this->lang->exists($key)){
-			return str_replace(array("%1","%2", "%3"), array($val[0], $val[1], $val[2]),$this->lang->get($key));
+			return str_replace(array("%MONETARY_UNIT%", "%1","%2", "%3"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $val[0], $val[1], $val[2]),$this->lang->get($key));
 		}
 		return "There's no message named \"$key\"";
 	}

@@ -41,7 +41,7 @@ class EconomyTax extends PluginBase{
 				$money = $this->api->myMoney($player);
 				$taking = $money * ($percent / 100);
 				$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
-				$player->sendMessage("Your $$taking has taken by tax.");
+				$player->sendMessage("Your ".EconomyAPI::getInstance()->getMonetaryUnit()."$taking has taken by tax.");
 			}
 		}else{
 			$money = $this->config->get("tax-as-money");
@@ -51,7 +51,7 @@ class EconomyTax extends PluginBase{
 					continue;
 				}
 				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");
-				$player->sendMessage("Your $$money has taken by tax.");
+				$player->sendMessage("Your ".EconomyAPI::getInstance()->getMonetaryUnit()."$money has taken by tax.");
 			}
 		}
 	}

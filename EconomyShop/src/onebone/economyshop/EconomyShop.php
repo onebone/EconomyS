@@ -152,7 +152,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 	public function getMessage($key, $val = array("%1", "%2", "%3")){
 		if($this->lang->exists($key)){
-			return str_replace(array("%1", "%2", "%3"), array($val[0], $val[1], $val[2]), $this->lang->get($key));
+			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $val[0], $val[1], $val[2]), $this->lang->get($key));
 		}
 		return "There are no message which has key \"$key\"";
 	}

@@ -161,7 +161,7 @@ class EconomyJob extends PluginBase implements Listener{
 					foreach($job as $id => $money){
 						$cur = (int)ceil(($n / 5));
 					 	if($cur === $page){
-							$info .= $name." : ".$id." | $".$money."\n";
+							$info .= $name." : ".$id." | ".EconomyAPI::getInstance()->getMonetaryUnit()."".$money."\n";
 						}elseif($cur > $page){
 							break;
 						}

@@ -1,4 +1,5 @@
 # EconomyS configuration resource
+monetary-unit: "$"
 once-debt-limit: 100
 debt-limit: 500
 add-op-at-rank: false

@@ -203,7 +203,7 @@ class EconomyAuction extends PluginBase{
 				if($price > (int)$this->auctions[$player][5]){
 					$this->auctions[$player][5] = $price;
 					$this->auctions[$player][4] = $sender->getName();
-					$sender->sendMessage("You have bid $$price to auction by \"$player\"");
+					$sender->sendMessage("You have bid ".EconomyAPI::getInstance()->getMonetaryUnit()."$price to auction by \"$player\"");
 				}else{
 					$sender->sendMessage("Current price is bigger than you have tried to bid");
 				}
@@ -213,7 +213,7 @@ class EconomyAuction extends PluginBase{
 				foreach($this->auctions as $player => $data){
 					$price = $data[5] === null ? $data[3] : $data[5];
 					$p = $data[4] === null ? "No player":$data[4];
-					$output .= "##".$player." | $$price | $p\n";
+					$output .= "##".$player." | ".EconomyAPI::getInstance()->getMonetaryUnit()."$price | $p\n";
 				}
 				$output = substr($output, 0, -1);
 				$sender->sendMessage($output);

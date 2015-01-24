@@ -210,8 +210,8 @@ class EconomyProperty extends PluginBase implements Listener{
 		}
 		$price = round($price, 2);
 
-		$centerx = (int) $first[0] + round((($sec[0] - $first[0]) / 2));
-		$centerz = (int) $first[1] + round((($sec[1] - $first[1]) / 2));
+		$centerx = (int) $first[0] + round(((($sec[0]) - $first[0])) / 2);
+		$centerz = (int) $first[1] + round(((($sec[1]) - $first[1])) / 2);
 		$x = (int) round(($sec[0] - $first[0]));
 		$z = (int) round(($sec[1] - $first[1]));
 		$y = 0;
@@ -242,16 +242,6 @@ class EconomyProperty extends PluginBase implements Listener{
 		$level->setBlock($sign, $sign);
 
 		$info = $this->property->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
-		/*$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, array(
-			new String("id", Sign::SIGN),
-			new Int("x", $centerx),
-			new Int("y", $y),
-			new Int("z", $centerz),
-			new String("Text1", ($rentTime === null ? "[PROPERTY]" : "[RENT]")),
-			new String("Text2", "Price : $price"),
-			new String("Text3", "Blocks : ".($x*$z*128)),
-			new String("Text4", ($rentTime === null ? "Property #".$info["seq"] : "Time : ".($rentTime)."min"))
-		)));*/
 		$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, [
 			"id" => new String("id", Tile::SIGN),
 			"x" => new Int("x", $centerx),
