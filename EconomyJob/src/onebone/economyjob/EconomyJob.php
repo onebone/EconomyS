@@ -18,7 +18,7 @@ class EconomyJob extends PluginBase implements Listener{
 	/** @var Config */
 	private $jobs;
 	/** @var Config */
-	private $player;
+	public $player;
 
 	/** @var  EconomyAPI */
 	private $api;
