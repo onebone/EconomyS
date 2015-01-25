@@ -8,7 +8,6 @@ api:
 main: onebone\economyshop\EconomyShop
 author: onebone
 depend: [EconomyAPI]
-load: POSTWORLD
 
 permissions:
  economyshop.*:

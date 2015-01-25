@@ -39,10 +39,6 @@ class EconomyShop extends PluginBase implements Listener{
 	private static $instance;
 
 	public function onEnable(){
-		if(self::$instance instanceof EconomyShop){
-			return;
-		}
-		self::$instance = $this;
 		@mkdir($this->getDataFolder());
 		$this->shop = (new Config($this->getDataFolder()."Shops.yml", Config::YAML))->getAll();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -50,6 +46,8 @@ class EconomyShop extends PluginBase implements Listener{
 		$this->placeQueue = array();
 		
 		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
+		
+		self::$instance = $this;
 	}
 
 	public function getShops(){
