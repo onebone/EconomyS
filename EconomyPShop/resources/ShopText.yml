@@ -1,0 +1,5 @@
+pshop:
+- "[PSHOP]"
+-  "%MONETARY_UNIT%%1"
+-  "%2"
+- "Amount: %3"

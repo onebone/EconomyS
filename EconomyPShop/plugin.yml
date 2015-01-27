@@ -1,0 +1,24 @@
+name: EconomyPShop
+version: "2.0.0"
+author: onebone
+main: onebone\economypshop\EconomyPShop
+
+api:
+- 1.6.0
+- 1.7.0
+depend:
+- EconomyAPI
+- ItemCloud
+
+permissions:
+ economypshop.*:
+  description: Allows all permissions to the player
+  children:
+   economypshop.shop.*:
+    description: Allows player all permissions related to shop
+    children:
+     economypshop.shop.create:
+      description: Allows player to create shop
+      default: true
+     economypshop.shop.destroy.others:
+      description: Allows player to destroy others' shop
