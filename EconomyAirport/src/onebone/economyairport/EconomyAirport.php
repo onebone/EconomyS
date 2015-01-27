@@ -88,10 +88,11 @@ class EconomyAirport extends PluginBase  implements Listener{
 						"targetZ" => $targetZ,
 						"targetLevel" => $targetLevel
 					);
-					$event->setLine(0, $data[0]);
-					$event->setLine(1, $data[1]);
-					$event->setLine(2, str_replace("%1", $cost, $data[2]));
-					$event->setLine(3, str_replace("%2", $event->getLine(3), $data[3]));
+					$mu = EconomyAPI::getInstance()->getMonetaryUnit();
+					$event->setLine(0, str_replace("%MONETARY_UNIT%", $mu, $data[0]));
+					$event->setLine(1, str_replace("%MONETARY_UNIT%", $mu, $data[1]));
+					$event->setLine(2, str_replace(["%1", "%MONETARY_UNIT%"], [$cost, $mu], $data[2]));
+					$event->setLine(3, str_replace(["%2", "%MONETARY_UNIT%"], [$event->getLine(3)], $data[3]));
 
 					$player->sendMessage($this->getMessage("departure-created", [$event->getLine(3), $cost]));
 					break;

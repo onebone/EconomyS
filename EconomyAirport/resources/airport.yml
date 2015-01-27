@@ -4,7 +4,7 @@ departure:
  airport:
   - "[AIRPORT]"
   - "departure"
-  - "cost : $%1" # cost
+  - "cost : %MONETARY_UNIT%%1" # cost
   - "%2" # destination
 
 arrival:
