@@ -59,7 +59,7 @@ class EconomySell extends PluginBase implements Listener {
 				"no-permission-break" => "You don't have permission to break sell center",
 				"tap-again" => "Are you sure to sell %1 (%MONETARY_UNIT%%2)? Tap again to confirm",
 				"no-item" => "You have no item to sell",
-				"sold-item" => "Has been sold %1 of %2 for %MONETARY_UNIT%%3" 
+				"sold-item" => "Has been sold %1 of %2 for %MONETARY_UNIT%%3"
 		));
 		
 		$this->sellSign = new Config($this->getDataFolder()."SellSign.yml", Config::YAML, array(
@@ -73,7 +73,7 @@ class EconomySell extends PluginBase implements Listener {
 	}
 	
 	public function getMessage($key, $val = array("%1", "%2", "%3")){
-		if ($this->lang->exists($key)){
+		if($this->lang->exists($key)){
 			return str_replace(array("%MONETARY_UNIT%", "%1","%2", "%3"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $val[0], $val[1], $val[2]),$this->lang->get($key));
 		}
 		return "There's no message named \"$key\"";
@@ -81,9 +81,9 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function onSignChange(SignChangeEvent $event){
 		$tag = $event->getLine(0);
-		if (($val = $this->checkTag($tag)) !== false){
+		if(($val = $this->checkTag($tag)) !== false){
 			$player = $event->getPlayer();
-			if (! $player->hasPermission ("economysell.sell.create")){
+			if(!$player->hasPermission ("economysell.sell.create")){
 				$player->sendMessage($this->getMessage("no-permission-create"));
 				return;
 			}
@@ -92,19 +92,19 @@ class EconomySell extends PluginBase implements Listener {
 				return;
 			}
 			$item = $this->getItem($event->getLine(2));
-			if ($item === false){
+			if($item === false){
 				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine (2),"", "" )));
 				return;
 			}
 			if($item[1] === false){ // Item name found
 				$id = explode(":", strtolower($event->getLine(2)));
 				$event->setLine(2, $item[0]);
-			} else {
+			}else{
 				//$tmp = $this->getItem(strtolower($event->getLine(2)));
 				$id = explode(":", $item[0]);
 			}
 			$id[0] = (int) $id[0];
-			if (!isset($id[1])){
+			if(!isset($id[1])){
 				$id[1] = 0;
 			}
 			$itemName = $item[1] === false ? $item[0]:$event->getLine(2);
@@ -115,10 +115,11 @@ class EconomySell extends PluginBase implements Listener {
 					"y" => $block->getY(),
 					"z" => $block->getZ(),
 					"level" => $player->getLevel()->getName(),
-					"cost" => (int) $event->getLine (1),
+					"cost" => (int) $event->getLine(1),
 					"item" =>  (int) $id[0],
+					"itemName" => $event->getLine(2),
 					"meta" => (int) $id[1],
-					"amount" => (int) $event->getLine (3)
+					"amount" => (int) $event->getLine(3)
 			);
 			
 			$player->sendMessage($this->getMessage("sell-created", [$itemName, (int)$event->getLine(3), ""]));
@@ -132,26 +133,46 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function onTouch(PlayerInteractEvent $event){
 		$block = $event->getBlock();
-		if (isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
-			$sell = $this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()];
+		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName();
+		if(isset($this->sell[$loc])){
+			$sell = $this->sell[$loc];
 			$player = $event->getPlayer();
 			
 			$cnt = 0;
 			foreach($player->getInventory()->getContents() as $item){
-				if ($item->getID() == $sell["item"] and $item->getDamage() == $sell["meta"]){
+				if($item->getID() == $sell["item"] and $item->getDamage() == $sell["meta"]){
 					$cnt += $item->getCount();
 				}
 			}
-			if ($cnt >= $sell ["amount"]){
-				// $player->getInventory()->removeItem(new Item($sell["item"], $sell["meta"], $sell["amount"]));
+			
+			if(!isset($sell["itemName"])){
+				$item = $this->getItem($sell["item"], $sell["meta"], $sell["amount"]);
+				if($item === false){
+					$item = $sell["item"].":".$sell["meta"];
+				}else{
+					$item = $item[0];
+				}
+				$this->sell[$loc]["itemName"] = $item;
+				$sell["itemName"] = $item;
+			}
+			$now = microtime(true);
+			if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
+				$this->tap[$player->getName()] = [$loc, $now];
+				$player->sendMessage($this->getMessage("tap-again", [$sell["itemName"], $sell["cost"], $sell["amount"]]));
+				return;
+			}else{
+				unset($this->tap[$player->getName()]);
+			}
+			
+			if($cnt >= $sell ["amount"]){
 				$this->removeItem($player, new Item($sell["item"], $sell["meta"], $sell["amount"]));
 				EconomyAPI::getInstance()->addMoney($player, $sell ["cost"], true, "EconomySell");
 				$player->sendMessage($this->getMessage("sold-item", array($sell ["amount"], $sell ["item"].":".$sell ["meta"], $sell ["cost"] )));
-			} else {
+			}else{
 				$player->sendMessage($this->getMessage("no-item"));
 			}
 			$event->setCancelled(true);
-			if ($event->getItem()->isPlaceable()){
+			if($event->getItem()->isPlaceable()){
 				$this->placeQueue [$player->getName()] = true;
 			}
 		}
@@ -159,7 +180,7 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function onPlace(BlockPlaceEvent $event){
 		$username = $event->getPlayer()->getName();
-		if (isset($this->placeQueue [$username] )){
+		if(isset($this->placeQueue [$username])){
 			$event->setCancelled(true);
 			unset($this->placeQueue [$username]);
 		}
@@ -167,9 +188,9 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function onBreak(BlockBreakEvent $event){
 		$block = $event->getBlock();
-		if (isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] )){
+		if(isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] )){
 			$player = $event->getPlayer();
-			if (! $player->hasPermission("economysell.sell.remove" )){
+			if(!$player->hasPermission("economysell.sell.remove" )){
 				$player->sendMessage($this->getMessage("no-permission-break"));
 				$event->setCancelled(true);
 				return;
@@ -181,7 +202,7 @@ class EconomySell extends PluginBase implements Listener {
 	}
 	public function checkTag($line1){
 		foreach($this->sellSign->getAll() as $tag => $val){
-			if ($tag == $line1){
+			if($tag == $line1){
 				return $val;
 			}
 		}
@@ -192,13 +213,13 @@ class EconomySell extends PluginBase implements Listener {
 		$item = strtolower($item);
 		$e = explode(":", $item);
 		$e[1] = isset($e[1])? $e[1] : 0;
-		if (isset(ItemList::$items [$item] )){
+		if(isset(ItemList::$items [$item] )){
 			return array(ItemList::$items [$item], true); // Returns Item ID
-		} else {
+		}else{
 			foreach(ItemList::$items as $name => $id){
 				$explode = explode(":", $id);
 				$explode[1] = isset($explode[1])? $explode[1] : 0;
-				if ($explode[0] == $e[0] and $explode[1] == $e[1]){
+				if($explode[0] == $e[0] and $explode[1] == $e[1]){
 					return array($name, false);
 				}
 			}
@@ -208,15 +229,15 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function removeItem($sender, $getitem){
 		$getcount = $getitem->getCount();
-		if ($getcount <= 0)
+		if($getcount <= 0)
 			return;
 		for($index = 0; $index < $sender->getInventory()->getSize(); $index ++){
 			$setitem = $sender->getInventory()->getItem($index);
-			if ($getitem->getID() == $setitem->getID() and $getitem->getDamage() == $setitem->getDamage()){
-				if ($getcount >= $setitem->getCount()){
+			if($getitem->getID() == $setitem->getID() and $getitem->getDamage() == $setitem->getDamage()){
+				if($getcount >= $setitem->getCount()){
 					$getcount -= $setitem->getCount();
 					$sender->getInventory()->setItem($index, Item::get(Item::AIR, 0, 1));
-				} else if ($getcount < $setitem->getCount()){
+				}else if($getcount < $setitem->getCount()){
 					$sender->getInventory()->setItem($index, Item::get($getitem->getID(), 0, $setitem->getCount() - $getcount));
 					break;
 				}
