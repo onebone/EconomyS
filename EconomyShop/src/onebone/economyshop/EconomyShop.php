@@ -195,6 +195,7 @@ class EconomyShop extends PluginBase implements Listener{
 				"level" => $block->getLevel()->getFolderName(),
 				"price" => (int) $event->getLine(1),
 				"item" => (int) $id[0],
+				"itemName" => $event->getLine(2),
 				"meta" => (int) $id[1],
 				"amount" => (int) $event->getLine(3)
 			);
@@ -203,15 +204,16 @@ class EconomyShop extends PluginBase implements Listener{
 
 			$event->setLine(0, $result[0]); // TAG
 			$event->setLine(1, str_replace("%1", $event->getLine(1), $result[1])); // PRICE
-			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2])); // ID AND DAMAGE
+			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2])); // ITEM NAME
 			$event->setLine(3, str_replace("%3", $event->getLine(3), $result[3])); // AMOUNT
 		}
 	}
 
 	public function onPlayerTouch(PlayerInteractEvent $event){
 		$block = $event->getBlock();
-		if(isset($this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()])){
-			$shop = $this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()];
+		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName();
+		if(isset($this->shop[$loc])){
+			$shop = $this->shop[$loc];
 			$player = $event->getPlayer();
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
@@ -222,9 +224,28 @@ class EconomyShop extends PluginBase implements Listener{
 				}
 				return;
 			}else{
+				if(!isset($shop["itemName"])){
+					$item = $this->getItem($shop["item"], $shop["meta"], $shop["amount"]);
+					if($item === false){
+						$item = $shop["item"].":".$shop["meta"];
+					}else{
+						$item = $item[0];
+					}
+					$this->shop[$loc]["itemName"] = $item;
+					$shop["itemName"] = $item;
+				}
+				$now = microtime(true);
+				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
+					$this->tap[$player->getName()] = [$loc, $now];
+					$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
+					return;
+				}else{
+					unset($this->tap[$player->getName()]);
+				}
+				
 				$player->getInventory()->addItem(new Item($shop["item"], $shop["meta"], $shop["amount"]));
 				EconomyAPI::getInstance()->reduceMoney($player, $shop["price"], true, "EconomyShop");
-				$player->sendMessage("[EconomyShop] You have bought $shop[item]:$shop[meta] ($$shop[price])");
+				$player->sendMessage($this->getMessage("bought-item", [$shop["amount"], $shop["itemName"], $shop["price"]]));
 				$event->setCancelled(true);
 				if($event->getItem()->isPlaceable()){
 					$this->placeQueue[$player->getName()] = true;
