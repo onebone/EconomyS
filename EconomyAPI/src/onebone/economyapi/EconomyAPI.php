@@ -482,7 +482,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->bank["money"][$player] += $amount;
 
 			if(!isset($this->schedules["bank"][$player])){
-				$this->schedules["bank"][$player] = $this->config->get("time-for-increase-money") * 1200;
+				$this->schedules["bank"][$player] = $this->config->get("time-for-increase-money") * 60;
 				$this->scheduleId["bank"][$player] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$player]), $this->config->get("time-for-increase-money")*1200)->getTaskId();
 				$this->lastActivity["bank"][$player] = time();
 			}
@@ -840,12 +840,12 @@ class EconomyAPI extends PluginBase implements Listener{
 	public function onQuitEvent(PlayerQuitEvent $event){
 		$username = strtolower($event->getPlayer()->getName());
 		$now = time();
-		if(isset($this->schedules["debt"][$username])){
+		if(isset($this->schedules["debt"][$username]) and isset($this->lastActivity["debt"][$username])){
 			$this->schedules["debt"][$username] = ($this->schedules["debt"][$username] - $now + $this->lastActivity["debt"][$username]);
 			$this->getServer()->getScheduler()->cancelTask($this->scheduleId["debt"][$username]);
 			unset($this->scheduleId["debt"][$username]);
 		}
-		if(isset($this->schedules["bank"][$username])){
+		if(isset($this->schedules["bank"][$username]) and isset($this->lastActivity["bank"][$username])){
 			$this->schedules["bank"][$username] = ($this->schedules["bank"][$username] - $now + $this->lastActivity["bank"][$username]);
 			$this->getServer()->getScheduler()->cancelTask($this->scheduleId["bank"][$username]);
 			unset($this->scheduleId["bank"][$username]);
@@ -902,7 +902,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->addBankMoney($player, $increase, true, "bankScheduler");
 		$player->sendMessage($this->getMessage("bank-credit-increase", $player->getName()));
 		$this->lastActivity["bank"][$username] = time();
-		$this->schedules["debt"][$username] = $this->config->get("time-for-increase-money") * 60;
+		$this->schedules["bank"][$username] = $this->config->get("time-for-increase-money") * 60;
 		$this->scheduleId["bank"][$username] = $this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask([$this, "bankScheduler"], [$username]), ($this->config->get("time-for-increase-money") * 1200))->getTaskId();
 	}
 
