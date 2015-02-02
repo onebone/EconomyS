@@ -49,15 +49,15 @@ class PayCommand extends EconomyAPICommand{
 		
 		$result = $plugin->reduceMoney($sender, $amount);
 		if($result !== EconomyAPI::RET_SUCCESS){
-			$sender->sendMessage("Your request have been denied");
+			$sender->sendMessage($plugin->getMessage("pay-failed", $sender));
 			return true;
 		}
 		$result = $plugin->addMoney($player, $amount);
 		if($result !== EconomyAPI::RET_SUCCESS){
-			$sender->sendMessage("Your request have been denied");
+			$sender->sendMessage($plugin->getMessage("request-cancelled", $sender));
 			$plugin->addMoney($sender, $amount, true);
 			return true;
 		}
-		$sender->sendMessage("Paid \$$amount to $player");
+		$sender->sendMessage($plugin->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
 	}
 }
