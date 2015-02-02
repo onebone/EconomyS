@@ -57,6 +57,10 @@ class EconomyJob extends PluginBase implements Listener{
 		$this->player->save();
 	}
 
+	/**
+		@priority LOWEST
+		@ignoreCancelled true
+	*/
 	public function onBlockBreak(BlockBreakEvent $event){
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
@@ -69,6 +73,10 @@ class EconomyJob extends PluginBase implements Listener{
 		}
 	}
 
+	/**
+		@priority LOWEST
+		@ignoreCancelled true
+	*/
 	public function onBlockPlace(BlockPlaceEvent $event){
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
