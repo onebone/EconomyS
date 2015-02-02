@@ -126,8 +126,11 @@ class EconomyAirport extends PluginBase  implements Listener{
 		$block = $event->getBlock();
 		if(isset($this->airport[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()])){
 			$airport = $this->airport[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()];
+			if($airport["type"] === 1)
+				return;
+				
 			$player = $event->getPlayer();
-			if(isset($this->airport[$airport["targetX"].":".$airport["targetY"].":".$airport["targetZ"].":".$airport["targetLevel"]])){
+			if(isset($this->airport[$airport["targetX"].":".$airport["targetY"].":".$airport["targetZ"].":".$airport["targetLevel"]]) and $this->airport[$airport["targetX"].":".$airport["targetY"].":".$airport["targetZ"].":".$airport["targetLevel"]]["type"] === 1){
 				$money = EconomyAPI::getInstance()->myMoney($player);
 				if(!$block->getLevel()->getTile(new Vector3($airport["targetX"], $airport["targetY"], $airport["targetZ"], $airport["targetLevel"])) instanceof Sign){
 					$player->sendMessage($this->getMessage("no-airport", [$airport["target"], "%2"]));
