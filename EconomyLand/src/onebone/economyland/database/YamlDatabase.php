@@ -99,7 +99,7 @@ class YamlDatabase implements Database{
 
 	public function getInviteeById($id){
 		if(isset($this->land[$id])){
-			return $this->land[$id]["invitee"];
+			return array_keys($this->land[$id]["invitee"]);
 		}
 		return false;
 	}
@@ -113,8 +113,8 @@ class YamlDatabase implements Database{
 	}
 
 	public function removeInviteeByid($id, $name){
-		if(isset($this->land[$id][$name])){
-			unset($this->land[$id][$name]);
+		if(isset($this->land[$id]["invitee"][$name])){
+			unset($this->land[$id]["invitee"][$name]);
 			return true;
 		}
 		return false;
