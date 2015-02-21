@@ -187,7 +187,7 @@ class EconomyLand extends PluginBase implements Listener{
 
 				if(is_numeric($this->config->get("player-land-limit"))){
 					if($cnt >= $this->config->get("player-land-limit")){
-						$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"))));
+						$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"), "%3", "%4")));
 						return true;
 					}
 				/*	while($result->fetchArray(SQLITE3_ASSOC) !== false){
@@ -319,6 +319,13 @@ class EconomyLand extends PluginBase implements Listener{
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-land-found", array($num, "", "")));
 					return true;
+				}
+				
+				if($info["owner"] !== $sender->getName()){
+					if(!$sender->hasPermission("economyland.land.move.others")){
+						$sender->sendMessage($this->getMessage("no-permission-move", [$info["ID"], $info["owner"], "%3"]));
+						return true;
+					}
 				}
 				$level = $this->getServer()->getLevelByName($info["level"]);
 				if(!$level instanceof Level){
@@ -635,6 +642,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"not-your-land" => "Land number %1 is not your land",
 			"no-land-found" => "There's no land numbered %1",
 			"land-corrupted" => "Land number %1 is corrupted",
+			"no-permission-move" => "You have no permission to move to land %1. Owner : %2",
 			"fail-moving" => "Failed moving to land %1",
 			"success-moving" => "Has been moved to land %1",
 			"land-list-top" => "Showing land list page %1 of %2\\n",
