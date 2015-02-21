@@ -6,9 +6,10 @@ use onebone\economyland\event\LandAddedEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
-use pocketmine\event\block\BlockEvent;
+use pocketmine\event\Event;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\scheduler\CallbackTask;
 use pocketmine\utils\Config;
 use pocketmine\command\Command;
@@ -35,6 +36,8 @@ class EconomyLand extends PluginBase implements Listener{
 	private $config, $lang;
 	private $start, $end;
 	private $expire;
+	
+	private $placeQueue;
 
 	private static $instance;
 	
@@ -51,7 +54,9 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
 
 		$this->createConfig();
-
+		
+		$this->placeQueue = [];
+		
 		$now = time();
 		foreach($this->expire as $landId => &$time){
 			$time[1] = $now;
@@ -76,6 +81,7 @@ class EconomyLand extends PluginBase implements Listener{
 
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlaceEvent"), $this);
 		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onBreakEvent"), $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\player\\PlayerInteractEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlayerInteract"), $this);
 	}
 
 	public function expireLand($landId){
@@ -509,15 +515,23 @@ class EconomyLand extends PluginBase implements Listener{
 		return false;
 	}
 	
-	public function onPlaceEvent(BlockPlaceEvent $event){
+	public function onPlayerInteract(PlayerInteractEvent $event){
 		$this->permissionCheck($event);
+	}
+	
+	public function onPlaceEvent(BlockPlaceEvent $event){
+		$name = $event->getPlayer()->getName();
+		if(isset($this->placeQueue[$name])){
+			$event->setCancelled();
+			unset($this->placeQueue[$name]);
+		}
 	}
 	
 	public function onBreakEvent(BlockBreakEvent $event){
 		$this->permissionCheck($event);
 	}
 	
-	public function permissionCheck(BlockEvent $event){
+	public function permissionCheck(Event $event){
 		/** @var $player Player */
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
@@ -538,16 +552,23 @@ class EconomyLand extends PluginBase implements Listener{
 			if($this->config->get("white-world-protection")){
 				if(in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
 					$player->sendMessage($this->getMessage("not-owned"));
-					$event->setCancelled(true);
+					$event->setCancelled();
+					if($event->getItem()->isPlaceable()){
+						$this->placeQueue[$player->getName()] = true;
+					}
 					return false;
 				}
 			}
 		}elseif($info !== true){
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
-			$event->setCancelled(true);
+			$event->setCancelled();
+			if($event instanceof PlayerInteractEvent){
+				if($event->getItem()->isPlaceable()){
+					$this->placeQueue[$player->getName()] = true;
+				}
+			}
 			return false;
 		}
-
 	}
 
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
