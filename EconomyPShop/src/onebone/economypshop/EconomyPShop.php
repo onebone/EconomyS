@@ -167,10 +167,13 @@ class EconomyPShop extends PluginBase implements Listener{
 					if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
 						$player->sendMessage($this->getMessage("no-space"));
 					}else{
-						if(EconomyAPI::getInstance()->myMoney($player) > $shop["price"]){
+						$api = EconomyAPI::getInstance();
+						if($api->myMoney($player) > $shop["price"]){
 							$player->getInventory()->addItem($item);
-							EconomyAPI::getInstance()->reduceMoney($player, $shop["price"]);
+							$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
 							$player->sendMessage($this->getMessage("bought-item", [$shop["item"].":".$shop["meta"], $shop["price"], $shop["amount"]]));
+							$cloud->removeItem($shop["item"], $shop["meta"], $shop["amount"]);
+							$api->addMoney($shop["owner"], $shop["price"], true, "EconomyPShop");
 						}else{
 							$player->sendMessage($this->getMessage("no-money"));
 						}
@@ -179,6 +182,7 @@ class EconomyPShop extends PluginBase implements Listener{
 			}else{
 				$player->sendMessage($this->getMessage("shop-owner-no-account"));
 			}
+			$event->setCancelled();
 			if($event->getItem()->isPlaceable()){
 				$this->placeQueue[$player->getName()] = true;
 			}

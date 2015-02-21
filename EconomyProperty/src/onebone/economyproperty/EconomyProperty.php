@@ -130,6 +130,7 @@ class EconomyProperty extends PluginBase implements Listener{
 						$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 					}else{
 						$player->sendMessage("[EconomyProperty] Failed to buy land. Please contact server operator.");
+						return;
 					}
 				}
 				$level->removeTile($tile);
