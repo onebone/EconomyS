@@ -41,6 +41,10 @@ class EconomyLand extends PluginBase implements Listener{
 
 	private static $instance;
 	
+	const RET_LAND_OVERLAP = 0;
+	const RET_LAND_LIMIT = 1;
+	const RET_SUCCESS = 2;
+	
 	public function onEnable(){
 
 		if(!static::$instance instanceof EconomyLand){
@@ -585,6 +589,14 @@ class EconomyLand extends PluginBase implements Listener{
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
+		
+		if(is_numeric($this->config->get("player-land-limit"))){
+			$cnt = count($this->db->getLandsByOwner($player));
+			if($cnt >= $this->config->get("player-land-limit")){
+				return self::RET_LAND_LIMIT;
+			}
+		}
+		
 		if($startX > $endX){
 			$tmp = $startX;
 			$startX = $endX;
@@ -602,7 +614,7 @@ class EconomyLand extends PluginBase implements Listener{
 	//	$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
 		if($result){
-			return false;
+			return self::RET_LAND_OVERLAP;
 		}
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
 	//	$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, ','".($expires === null ? "":", $expires").")");

@@ -124,12 +124,17 @@ class EconomyProperty extends PluginBase implements Listener{
 					return;
 				}else{
 					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"], $info["rentTime"]);
-					if($result){
+					switch($result){
+						case EconomyLand::RET_SUCCESS:
 						EconomyAPI::getInstance()->reduceMoney($player, $info["price"], true , "EconomyProperty");
 						$player->sendMessage("Successfully bought land.");
 						$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
-					}else{
-						$player->sendMessage("[EconomyProperty] Failed to buy land. Please contact server operator.");
+						break;
+						case EconomyLand::RET_LAND_OVERLAP:
+						$player->sendMessage("[EconomyProperty] Failed to buy the land because the land is trying to overlap.");
+						return;
+						case EconomyLand::RET_LAND_LIMIT:
+						$player->sendMessage("[EconomyProperty] Failed to buy the land due to land limitation.");
 						return;
 					}
 				}
