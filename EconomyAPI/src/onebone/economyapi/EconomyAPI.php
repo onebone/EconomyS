@@ -88,7 +88,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"it" => "Italiano",
 		"ch" => "中文",
 		"id" => "Bahasa Indonesia",
-		"user-define" => "User Define"
+		"user-define" => "User Defined"
 	);
 
 	public static function getInstance(){
