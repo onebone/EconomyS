@@ -212,7 +212,7 @@ class EconomyCasino extends PluginBase implements Listener{
 						}
 						$money = (int)$money;
 						if($this->api->myMoney($sender) < $money){
-							$sender->sendMessage("You don't have money to gamble ".$this->api->monetaryUnit()."$money");
+							$sender->sendMessage("You don't have money to gamble ".$this->api->getMonetaryUnit()."$money");
 							break;
 						}
 						if(isset($this->casino[$sender->getName()])){
@@ -222,15 +222,15 @@ class EconomyCasino extends PluginBase implements Listener{
 								$this->api->reduceMoney($player, $tmp);
 								$all += $tmp;
 							}
-							$got = array_rand($this->casino[$sender->getName()]);
+							$got = array_rand($this->casino[$sender->getName()]["players"]);
 							
 							$this->api->addMoney($got, $all, true, "EconomyCasino");
 							
 							foreach($this->casino[$sender->getName()]["players"] as $p => $v){
 								if($got === $p){
-									$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->monetaryUnit()."$all!");
+									$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->getMonetaryUnit()."$all!");
 								}else{
-									$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->monetaryUnit()."$money");
+									$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->getMonetaryUnit()."$money");
 								}
 							}
 						}else{
@@ -246,9 +246,9 @@ class EconomyCasino extends PluginBase implements Listener{
 									$this->api->addMoney($got, $all, true, "EconomyCasino");
 									foreach($this->casino[$player]["players"] as $p => $v){
 										if($got === $p){
-											$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->monetaryUnit()."$all!");
+											$this->getServer()->getPlayerExact($p)->sendMessage("You've win ".$this->api->getMonetaryUnit()."$all!");
 										}else{
-											$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->monetaryUnit()."$money");
+											$this->getServer()->getPlayerExact($p)->sendMessage("You've lost ".$this->api->getMonetaryUnit()."$money");
 										}
 									}
 								}
@@ -260,18 +260,28 @@ class EconomyCasino extends PluginBase implements Listener{
 				}
 				break;
 			case "jackpot":
+				if(!$sender instanceof Player){
+					$sender->sendMessage("Please run this command in-game.");
+					break;
+				}
 				$money = array_shift($params);
 				if(!is_numeric($money)){
 					$sender->sendMessage("Usage: ".$command->getUsage());
 					break;
 				}
-				$this->api->reduceMoney($sender, $money);
+				$money = (int)$money;
+				if($this->api->myMoney($sender) < $money){
+					$sender->sendMessage("You don't have money to jackpot ".$this->api->getMonetaryUnit()."$money");
+					break;
+				}
+				
 				$rand = rand(0, $this->config->get("jackpot-winning"));
 				if($rand === 0){
 					$this->api->addMoney($sender, $money);
-					$sender->sendMessage("You've wined jackpot! You've got ".$this->api->monetaryUnit()."$money");
+					$sender->sendMessage("You've wined jackpot! You've got ".$this->api->getMonetaryUnit()."$money");
 				}else{
-					$sender->sendMessage("You've failed your jackpot! You've lost ".$this->api->monetaryUnit()."$money");
+					$this->api->reduceMoney($sender, $money);
+					$sender->sendMessage("You've failed your jackpot! You've lost ".$this->api->getMonetaryUnit()."$money");
 				}
 				break;
 		}
