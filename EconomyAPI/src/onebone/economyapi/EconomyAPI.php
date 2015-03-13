@@ -12,6 +12,7 @@ use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
 use pocketmine\scheduler\CallbackTask;
+use pocketmine\utils\Utils;
 
 use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
@@ -191,34 +192,29 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		
 		if($this->config->get("check-update")){
-			$this->getLogger()->info("Checking for updates... It may be take some while.");
-			$lastest = $this->getLastestDescription();
-			$desc = \yaml_parse($lastest);
-			
-			$description = $this->getDescription();
-			if(version_compare($description->getVersion(), $desc["version"]) < 0){
-				$this->getLogger()->warning("New version of EconomyAPI (v".$desc["version"].") has been found. Current version : v".$description->getVersion().". Please update the plugin.");
-			}else{
-				$this->getLogger()->notice("EconomyAPI is currently up-to-date.");
-			}
-			
-			if($desc["author"] !== $description->getAuthors()[0]){
-				$this->getLogger()->warning("You are using the modified version of the plugin. This version could not be supported.");
+			try{
+				$this->getLogger()->info("Checking for updates... It may be take some while.");
+				//$lastest = $this->getLastestDescription();
+				$lastest = Utils::getURL("https://raw.githubusercontent.com/onebone/EconomyS/master/EconomyAPI/plugin.yml");
+				
+				$desc = \yaml_parse($lastest);
+				
+				$description = $this->getDescription();
+				if(version_compare($description->getVersion(), $desc["version"]) < 0){
+					$this->getLogger()->warning("New version of EconomyAPI (v".$desc["version"].") has been found. Current version : v".$description->getVersion().". Please update the plugin.");
+				}else{
+					$this->getLogger()->notice("EconomyAPI is currently up-to-date.");
+				}
+				
+				if($desc["author"] !== $description->getAuthors()[0]){
+					$this->getLogger()->warning("You are using the modified version of the plugin. This version could not be supported.");
+				}
+			}catch(\Exception $e){
+				$this->getLogger()->warning("An exception during check-update has been detected.");
 			}
 		}
 		
 		$this->registerList("EconomyAPI");
-	}
-	
-	private function getLastestDescription(){
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, 'https://raw.githubusercontent.com/onebone/EconomyS/master/EconomyAPI/plugin.yml');
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		$content = curl_exec($ch);
-		curl_close($ch);
-		
-		return $content;
 	}
 	
 	private function convertData(){
