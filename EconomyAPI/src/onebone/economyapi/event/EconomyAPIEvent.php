@@ -9,7 +9,14 @@ use pocketmine\event\Cancellable;
 use onebone\economyapi\EconomyAPI;
 
 class EconomyAPIEvent extends PluginEvent implements Cancellable{
-	public function __construct(EconomyAPI $plugin){
+	private $issuer;
+	
+	public function __construct(EconomyAPI $plugin, $issuer){
 		parent::__construct($plugin);
+		$this->issuer = $issuer;
+	}
+	
+	public function getIssuer(){
+		return $this->issuer;
 	}
 }

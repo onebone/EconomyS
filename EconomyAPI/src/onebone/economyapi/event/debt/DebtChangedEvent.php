@@ -7,14 +7,13 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 
 class DebtChangedEvent extends EconomyAPIEvent{
-	private $plugin, $username, $debt;
+	private $username, $debt;
 	public static $handlerList;
 
 	public function __construct(EconomyAPI $api, $username, $debt, $issuer){
-		$this->plugin = $api;
+		parent::__construct($plugin, $issuer);
 		$this->username = $username;
 		$this->debt = $debt;
-		$this->issuer = $issuer;
 	}
 
 	/**

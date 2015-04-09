@@ -10,11 +10,10 @@ class CreateAccountEvent extends EconomyAPIEvent{
 	public static $handlerList;
 	
 	public function __construct(EconomyAPI $plugin, $username, $defaultMoney, $defaultDebt, $defaultBankMoney, $issuer){
-		$this->plugin = $plugin;
+		parent::__construct($plugin, $issuer);
 		$this->username = $username;
 		$this->defaultMoney = $defaultMoney;
 		$this->defaultBankMoney = $defaultBankMoney;
-		$this->issuer = $issuer;
 	}
 	
 	public function getUsername(){
