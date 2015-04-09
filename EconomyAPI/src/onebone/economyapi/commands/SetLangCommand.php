@@ -7,25 +7,18 @@ use pocketmine\command\CommandSender;
 use onebone\economyapi\EconomyAPI;
 
 class SetLangCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
 	public function __construct(EconomyAPI $plugin, $cmd = "setlang"){
-		parent::__construct($cmd, $plugin);
-		$this->cmd = $cmd;
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <lang>");
 		$this->setPermission("economyapi.command.setlang");
 		$this->setDescription("Sets language resource");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
-		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $params){
 		$lang = implode(" ", $params);
 		
 		if(trim($lang) === ""){
-			$sender->sendMessage("Usage : /".$this->cmd." <lang>");
+			$sender->sendMessage("Usage : /".$this->getName()." <lang>");
 			return true;
 		}
 		

@@ -3,34 +3,25 @@
 namespace onebone\economyapi\commands;
 
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\Server;
 
 use onebone\economyapi\EconomyAPI;
 
 class SetMoneyCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
-	public function __construct(EconomyAPI $api, $cmd = "setmoney"){
-		parent::__construct($cmd, $api);
-		$this->cmd = $cmd;
+	public function __construct(EconomyAPI $plugin, $cmd = "setmoney"){
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <player> <money>");
 		$this->setDescription("Sets player's money");
 		$this->setPermission("economyapi.command.setmoney");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $args){
-		if(!$this->getPlugin()->isEnabled()){
-			return false;
-		}
-		if(!$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $args){
 		$player = array_shift($args);
 		$money = array_shift($args);
 		
 		if(trim($player) === "" or trim($money) === ""){
-			$sender->sendMessage("Usage: /".$this->cmd." <player> <money>");
+			$sender->sendMessage("Usage: /".$this->getName()." <player> <money>");
 			return true;
 		}
 		
