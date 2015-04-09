@@ -8,21 +8,14 @@ use pocketmine\Server;
 use onebone\economyapi\EconomyAPI;
 
 class TopMoneyCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
 	public function __construct(EconomyAPI $plugin, $cmd = "topmoney"){
-		parent::__construct($cmd, $plugin);
-		$this->plugin = $plugin;
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <page>");
 		$this->setDescription("Shows top money list");
 		$this->setPermission("economyapi.command.topmoney");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
-		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $params){
 		$page = array_shift($params);
 		
 		$moneyData = $this->getPlugin()->getAllMoney();

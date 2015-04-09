@@ -2,38 +2,24 @@
 
 namespace onebone\economyapi\commands;
 
-use pocketmine\Player;
 use pocketmine\command\CommandSender;
 
 use onebone\economyapi\EconomyAPI;
 
-class TakeDebtCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
+class TakeDebtCommand extends EconomyAPICommand implements InGameCommand{
 	public function __construct(EconomyAPI $plugin, $cmd = "takedebt"){
-		parent::__construct($cmd, $plugin);
-		$this->cmd = $cmd;
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <amount>");
 		$this->setPermission("economyapi.command.takedebt");
 		$this->setDescription("Takes debt from plugin");
+
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
-		if(!$this->getPlugin()->isEnabled()){
-			return false;
-		}
-		if(!$this->testPermission($sender)){
-			return false;
-		}
-		
-		if(!$sender instanceof Player){
-			$sender->sendMessage("Please run this command in-game.");
-			return true;
-		}
-		
+	public function exec(CommandSender $sender, array $params){
 		$amount = array_shift($params);
 		
 		if(trim($amount) === "" or !is_numeric($amount)){
+            $cmd = $this->getName();
 			$sender->sendMessage("Usage: /$cmd <amount>");
 			return true;
 		}

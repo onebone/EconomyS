@@ -8,29 +8,15 @@ use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-class PayCommand extends EconomyAPICommand{
-	private $plugin;
-	
+class PayCommand extends EconomyAPICommand implements InGameCommand{
 	public function __construct(EconomyAPI $plugin, $cmd = "pay"){
-		parent::__construct($cmd, $plugin);
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <player> <amount>");
 		$this->setPermission("economyapi.command.pay");
 		$this->setDescription("Pay or give the money to the others");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
-		$plugin = $this->getPlugin();
-		if(!$plugin->isEnabled()){
-			return false;
-		}
-		if(!$this->testPermission($sender)){
-			return false;
-		}
-		if(!$sender instanceof Player){
-			$sender->sendMessage("Please run this command in-game");
-			return true;
-		}
-		
+	public function exec(CommandSender $sender, array $params){
 		$player = array_shift($params);
 		$amount = array_shift($params);
 		
@@ -47,17 +33,18 @@ class PayCommand extends EconomyAPICommand{
 		}
 		// END //
 		
-		$result = $plugin->reduceMoney($sender, $amount);
+		$result = $this->getPlugin()->reduceMoney($sender, $amount);
 		if($result !== EconomyAPI::RET_SUCCESS){
-			$sender->sendMessage($plugin->getMessage("pay-failed", $sender));
+			$sender->sendMessage($this->getPlugin()->getMessage("pay-failed", $sender));
 			return true;
 		}
-		$result = $plugin->addMoney($player, $amount);
+		$result = $this->getPlugin()->addMoney($player, $amount);
 		if($result !== EconomyAPI::RET_SUCCESS){
-			$sender->sendMessage($plugin->getMessage("request-cancelled", $sender));
-			$plugin->addMoney($sender, $amount, true);
+			$sender->sendMessage($this->getPlugin()->getMessage("request-cancelled", $sender));
+            $this->getPlugin()->addMoney($sender, $amount, true);
 			return true;
 		}
-		$sender->sendMessage($plugin->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
+		$sender->sendMessage($this->getPlugin()->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
+        return true;
 	}
 }

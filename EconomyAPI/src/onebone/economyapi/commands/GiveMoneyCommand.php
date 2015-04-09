@@ -9,35 +9,24 @@ use pocketmine\Server;
 use onebone\economyapi\EconomyAPI;
 
 class GiveMoneyCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
-	public function __construct(EconomyAPI $api, $cmd = "givemoney"){
-		parent::__construct($cmd, $api);
-		$this->cmd = $cmd;
+	public function __construct(EconomyAPI $plugin, $cmd = "givemoney"){
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <player> <amount>");
 		$this->setDescription("Gives money to player");
 		$this->setPermission("economyapi.command.givemoney");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $args){
-		$plugin = $this->getPlugin();
-		if(!$plugin->isEnabled()){
-			return false;
-		}
-		if(!$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $args){
 		$player = array_shift($args);
 		$amount = array_shift($args);
 		
 		if(trim($player) === "" or trim($amount) === "" or !is_numeric($amount)){
-			$sender->sendMessage("Usage: /".$this->cmd." <player> <amount>");
+			$sender->sendMessage("Usage: /".$this->getName()." <player> <amount>");
 			return true;
 		}
 		
 		if($amount <= 0){
-			$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", $sender->getName()));
+			$sender->sendMessage($this->getPlugin()->getMessage("givemoney-invalid-number", $sender->getName()));
 			return true;
 		}
 		
@@ -49,20 +38,20 @@ class GiveMoneyCommand extends EconomyAPICommand{
 		}
 		// END //
 		
-		$result = $plugin->addMoney($player, $amount);
+		$result = $this->getPlugin()->addMoney($player, $amount);
 		$output = "";
 		switch($result){
 			case -2: // CANCELLED
 			$output .= "Your request have been cancelled";
 			break;
 			case -1: // NOT_FOUND
-			$output .= $plugin->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4"));
+			$output .= $this->getPlugin()->getMessage("player-never-connected", $sender->getName(), array($player, "%2", "%3", "%4"));
 			break;
 			// INVALID is already checked
 			case 1: // SUCCESS
-			$output .= $plugin->getMessage("givemoney-gave-money", $sender->getName(), array($amount, $player, "%3", "%4"));
+			$output .= $this->getPlugin()->getMessage("givemoney-gave-money", $sender->getName(), array($amount, $player, "%3", "%4"));
 			if($p instanceof Player){
-				$p->sendMessage($plugin->getMessage("givemoney-money-given", $sender->getName(), array($amount, "%2", "%3", "%4")));
+				$p->sendMessage($this->getPlugin()->getMessage("givemoney-money-given", $sender->getName(), array($amount, "%2", "%3", "%4")));
 			}
 			break;
 		}

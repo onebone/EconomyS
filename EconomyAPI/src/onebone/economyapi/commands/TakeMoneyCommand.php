@@ -9,26 +9,19 @@ use pocketmine\Server;
 use onebone\economyapi\EconomyAPI;
 
 class TakeMoneyCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
 	public function __construct(EconomyAPI $plugin, $cmd = "takemoney"){
-		parent::__construct($cmd, $plugin);
-		$this->cmd = $cmd;
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <player> <amount>");
 		$this->setPermission("economyapi.command.takemoney");
 		$this->setDescription("Take others' money");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
-		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $params){
 		$player = array_shift($params);
 		$amount = array_shift($params);
 		
 		if(trim($player) === "" or trim($amount) === "" or !is_numeric($amount)){
-			$sender->sendMessage("Usage: /".$this->cmd." <player> <amount>");
+			$sender->sendMessage("Usage: /".$this->getName()." <player> <amount>");
 			return true;
 		}
 		
@@ -47,6 +40,7 @@ class TakeMoneyCommand extends EconomyAPICommand{
 				return true;
 			}
 		}*/
+
 		//  Player finder  //
 		$server = Server::getInstance();
 		$p = $server->getPlayer($player);
@@ -68,5 +62,6 @@ class TakeMoneyCommand extends EconomyAPICommand{
 			$output .= $this->getPlugin()->getMessage("takemoney-failed", $sender->getName());
 		}
 		$sender->sendMessage($output);
+        return true;
 	}
 }

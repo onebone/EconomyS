@@ -9,27 +9,17 @@ use pocketmine\Player;
 use onebone\economyapi\EconomyAPI;
 
 class SeeMoneyCommand extends EconomyAPICommand{
-	private $plugin, $cmd;
-	
 	public function __construct(EconomyAPI $plugin, $cmd = "seemoney"){
-		parent::__construct($cmd, $plugin);
-		$this->cmd = $cmd;
+		parent::__construct($plugin, $cmd);
 		$this->setUsage("/$cmd <player>");
 		$this->setDescription("See player's money");
 		$this->setPermission("economyapi.command.seemoney");
 	}
 	
-	public function execute(CommandSender $sender, $label, array $args){
-		if(!$this->getPlugin()->isEnabled()){
-			return false;
-		}
-		if(!$this->testPermission($sender)){
-			return false;
-		}
-		
+	public function exec(CommandSender $sender, array $args){
 		$player = array_shift($args);
 		if(trim($player) === ""){
-			$sender->sendMessage("Usage: /".$this->cmd." <player>");
+			$sender->sendMessage("Usage: /".$this->getName()." <player>");
 			return true;
 		}
 		
