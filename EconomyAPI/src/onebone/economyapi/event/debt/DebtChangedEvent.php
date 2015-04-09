@@ -10,7 +10,7 @@ class DebtChangedEvent extends EconomyAPIEvent{
 	private $username, $debt;
 	public static $handlerList;
 
-	public function __construct(EconomyAPI $api, $username, $debt, $issuer){
+	public function __construct(EconomyAPI $plugin, $username, $debt, $issuer){
 		parent::__construct($plugin, $issuer);
 		$this->username = $username;
 		$this->debt = $debt;
