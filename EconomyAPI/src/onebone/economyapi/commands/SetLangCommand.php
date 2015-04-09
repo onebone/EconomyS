@@ -15,10 +15,6 @@ class SetLangCommand extends EconomyAPICommand{
 	}
 	
 	public function exec(CommandSender $sender, array $params){
-		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
-			return false;
-		}
-		
 		$lang = implode(" ", $params);
 		
 		if(trim($lang) === ""){
