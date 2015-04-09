@@ -62,6 +62,6 @@ class TakeMoneyCommand extends EconomyAPICommand{
 			$output .= $this->getPlugin()->getMessage("takemoney-failed", $sender->getName());
 		}
 		$sender->sendMessage($output);
-        return true;
+		return true;
 	}
 }

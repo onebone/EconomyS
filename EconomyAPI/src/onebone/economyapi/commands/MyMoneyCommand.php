@@ -18,6 +18,6 @@ class MyMoneyCommand extends EconomyAPICommand implements InGameCommand{
 		$username = $sender->getName();
 		$result = $this->getPlugin()->myMoney($username);
 		$sender->sendMessage($this->getPlugin()->getMessage("mymoney-mymoney", $sender->getName(), array($result, "%2", "%3", "%4")));
-        return true;
+		return true;
 	}
 }

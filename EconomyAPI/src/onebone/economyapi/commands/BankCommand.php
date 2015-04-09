@@ -88,6 +88,6 @@ class BankCommand extends EconomyAPICommand implements InGameCommand{
 			default:
 			$sender->sendMessage("Usage: /".$this->getName()." <deposit|withdraw|seemoney|mymoney>");
 		}
-        return true;
+		return true;
 	}
 }

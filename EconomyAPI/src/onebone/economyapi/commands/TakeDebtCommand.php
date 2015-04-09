@@ -19,7 +19,7 @@ class TakeDebtCommand extends EconomyAPICommand implements InGameCommand{
 		$amount = array_shift($params);
 		
 		if(trim($amount) === "" or !is_numeric($amount)){
-            $cmd = $this->getName();
+			$cmd = $this->getName();
 			$sender->sendMessage("Usage: /$cmd <amount>");
 			return true;
 		}

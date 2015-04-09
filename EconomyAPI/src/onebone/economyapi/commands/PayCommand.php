@@ -41,10 +41,10 @@ class PayCommand extends EconomyAPICommand implements InGameCommand{
 		$result = $this->getPlugin()->addMoney($player, $amount);
 		if($result !== EconomyAPI::RET_SUCCESS){
 			$sender->sendMessage($this->getPlugin()->getMessage("request-cancelled", $sender));
-            $this->getPlugin()->addMoney($sender, $amount, true);
+			$this->getPlugin()->addMoney($sender, $amount, true);
 			return true;
 		}
 		$sender->sendMessage($this->getPlugin()->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
-        return true;
+		return true;
 	}
 }
