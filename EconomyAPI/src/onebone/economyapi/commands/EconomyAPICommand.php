@@ -10,9 +10,6 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 
 abstract class EconomyAPICommand extends PluginCommand implements PluginIdentifiableCommand{
-	/** @var EconomyAPI */
-	private $owningPlugin;
-	
 	public function __construct(EconomyAPI $plugin, $name){
 		parent::__construct($name, $plugin);
 	}
