@@ -10,8 +10,6 @@ givemoney:
 - givemoney
 takedebt:
 - takedebt
-economys:
-- economys
 topmoney:
 - topmoney
 setlang:

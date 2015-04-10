@@ -105,7 +105,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->lastActivity = array();
 		$this->schedules = array();
 
-		$this->list = array();
 		$this->money = array();
 		$this->bank = array();
 
@@ -143,7 +142,6 @@ class EconomyAPI extends PluginBase implements Listener{
 			"pay" => "onebone\\economyapi\\commands\\PayCommand",
 			"givemoney" => "onebone\\economyapi\\commands\\GiveMoneyCommand",
 			"takedebt" => "onebone\\economyapi\\commands\\TakeDebtCommand",
-			"economys" => "onebone\\economyapi\\commands\\EconomySCommand",
 			"topmoney" => "onebone\\economyapi\\commands\\TopMoneyCommand",
 			"setlang" => "onebone\\economyapi\\commands\\SetLangCommand",
 			"takemoney" => "onebone\\economyapi\\commands\\TakeMoneyCommand",
@@ -213,8 +211,6 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->getLogger()->warning("An exception during check-update has been detected.");
 			}
 		}
-		
-		$this->registerList("EconomyAPI");
 	}
 	
 	private function convertData(){
@@ -263,45 +259,6 @@ class EconomyAPI extends PluginBase implements Listener{
 			}
 		}
 		$this->langRes["user-define"] = (new Config($this->path."language.properties", Config::PROPERTIES, $this->langRes["def"]))->getAll();
-	}
-
-	/**
-	 * @param string $name
-	 *
-	 * @return bool
-	 */
-	public function registerList($name){
-		if(trim($name) === ""){
-			return false;
-		}
-		if(in_array($name, $this->list)){
-			return false;
-		}else{
-			$this->list[] = $name;
-			return true;
-		}
-	}
-
-	/**
-	 * @param string $name
-	 *
-	 * @return bool
-	 */
-	public function unregisterList($name){
-		foreach($this->list as $key => $n){
-			if($n === $name){
-				unset($this->list[$key]);
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	/**
-	 * @return string[]
-	*/
-	public function getList(){
-		return $this->list;
 	}
 
 	/**

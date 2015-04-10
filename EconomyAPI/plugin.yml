@@ -27,9 +27,6 @@ permissions:
      economyapi.command.mymoney:
       description: Allows player to see his/her money
       default: true
-     economyapi.command.economys:
-      description: Allows player to see list of registered plugin compatiable with EconomyAPI
-      default: true
      economyapi.command.givemoney:
       description: Allows player to give money to others
       default: op
