@@ -168,7 +168,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		));
 		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
 		
-		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){ // TODO: This code is too slow. Do optimization.
+		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){
 			$converter = new DataConverter($this->path."Money.yml", $this->path."Bank.yml");
 			$result = $converter->convertData(self::CURRENT_DATABASE_VERSION);
 			if($result !== false){
