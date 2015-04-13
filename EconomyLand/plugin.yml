@@ -81,6 +81,11 @@ permissions:
        economyland.command.land.invite:
         description: Allows player to invite players
         default: true
+        children:
+         economyland.command.land.invite.remove:
+         description: Allows player to remove invitee from the list
+         default: true
+         
      economyland.command.landsell:
       description: Allows player to sell lands
       default: op

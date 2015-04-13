@@ -404,7 +404,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$landnum = array_shift($param);
 					$player = array_shift($param);
 					if(trim($player) == "" or trim($landnum) == ""){
-						$sender->sendMessage("Usage : /land <invite> <land number> <(r:)player>");
+						$sender->sendMessage("Usage : /land <invite> <land number> <[r:]player>");
 						return true;
 					}
 					if(!is_numeric($landnum)){
@@ -421,6 +421,10 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "", "")));
 						return true;
 					}elseif(substr($player, 0, 2) === "r:"){
+						if(!$sender->hasPermission("economyland.command.land.invite.remove")){
+							$sender->sendMessage("You don't have permissions to use this command.");
+							return true;
+						}
 						$player = substr($player, 2);
 
 						//$this->land->exec("UPDATE land SET invitee = '".str_replace($player.",", "", $info["invitee"])."' WHERE ID = {$info["ID"]};");
