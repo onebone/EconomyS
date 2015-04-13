@@ -78,6 +78,9 @@ permissions:
        economyland.command.land.here:
         description: Allows player to see what land player is standing on
         default: true
+       economyland.command.land.invite:
+        description: Allows player to invite players
+        default: true
      economyland.command.landsell:
       description: Allows player to sell lands
       default: op

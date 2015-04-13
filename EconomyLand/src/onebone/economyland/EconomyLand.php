@@ -397,6 +397,10 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				return true;
 				case "invite":
+					if(!$sender->hasPermission("economyland.command.invite")){
+						$sender->sendMessage("You don't have permissions to use this command.");
+						return true;
+					}
 					$landnum = array_shift($param);
 					$player = array_shift($param);
 					if(trim($player) == "" or trim($landnum) == ""){
