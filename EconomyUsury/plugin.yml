@@ -1,0 +1,6 @@
+name: EconomyUsury
+version: "1.0.0"
+author: onebone
+api: [1.12.0] # Pretty higher than I expected!
+main: onebone\economyusury\EconomyUsury
+depend: [EconomyAPI]
