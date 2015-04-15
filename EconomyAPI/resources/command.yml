@@ -16,13 +16,9 @@ setlang:
 - setlang
 takemoney:
 - takemoney
-bank:
-- bank
 mydebt:
 - mydebt
 returndebt:
 - returndebt
-bankadmin:
-- bankadmin
 mystatus:
 - mystatus

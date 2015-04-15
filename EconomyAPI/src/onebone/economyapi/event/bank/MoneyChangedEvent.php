@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * @deprecated
+ */
+
 namespace onebone\economyapi\event\bank;
 
 use onebone\economyapi\EconomyAPI;

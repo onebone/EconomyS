@@ -145,10 +145,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			"topmoney" => "onebone\\economyapi\\commands\\TopMoneyCommand",
 			"setlang" => "onebone\\economyapi\\commands\\SetLangCommand",
 			"takemoney" => "onebone\\economyapi\\commands\\TakeMoneyCommand",
-			"bank" => "onebone\\economyapi\\commands\\BankCommand",
 			"mydebt" => "onebone\\economyapi\\commands\\MyDebtCommand",
 			"returndebt" => "onebone\\economyapi\\commands\\ReturnDebtCommand",
-			"bankadmin" => "onebone\\economyapi\\commands\\BankAdminCommand",
 			"mystatus" => "onebone\\economyapi\\commands\\MyStatusCommand"
 		);
 		$commandMap = $this->getServer()->getCommandMap();
@@ -434,6 +432,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @param bool $force
@@ -472,6 +472,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @param bool $force
@@ -517,6 +519,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @return array
 	*/
 	public function getAllBankMoney(){
@@ -632,6 +636,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 *
 	 * @return boolean
@@ -680,6 +686,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 *
 	 * @return boolean|float
