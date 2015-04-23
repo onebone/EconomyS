@@ -210,6 +210,9 @@ class EconomyShop extends PluginBase implements Listener{
 	}
 
 	public function onPlayerTouch(PlayerInteractEvent $event){
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			return;
+		}
 		$block = $event->getBlock();
 		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName();
 		if(isset($this->shop[$loc])){

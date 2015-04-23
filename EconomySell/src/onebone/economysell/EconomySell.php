@@ -132,6 +132,9 @@ class EconomySell extends PluginBase implements Listener {
 	}
 	
 	public function onTouch(PlayerInteractEvent $event){
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			return;
+		}
 		$block = $event->getBlock();
 		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName();
 		if(isset($this->sell[$loc])){

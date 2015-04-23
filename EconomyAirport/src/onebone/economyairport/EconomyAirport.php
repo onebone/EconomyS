@@ -123,6 +123,9 @@ class EconomyAirport extends PluginBase  implements Listener{
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event){
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			return;
+		}
 		$block = $event->getBlock();
 		if(isset($this->airport[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()])){
 			$airport = $this->airport[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()];

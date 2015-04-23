@@ -3,9 +3,7 @@ version: "2.0.0"
 author: onebone
 main: onebone\economypshop\EconomyPShop
 
-api:
-- 1.6.0
-- 1.7.0
+api: [1.12.0]
 depend:
 - EconomyAPI
 - ItemCloud
