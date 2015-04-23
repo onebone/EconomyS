@@ -397,7 +397,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				return true;
 				case "invite":
-					if(!$sender->hasPermission("economyland.command.invite")){
+					if(!$sender->hasPermission("economyland.command.land.invite")){
 						$sender->sendMessage("You don't have permissions to use this command.");
 						return true;
 					}
@@ -440,6 +440,10 @@ class EconomyLand extends PluginBase implements Listener{
 							return true;
 						}
 						$this->land->exec("UPDATE land SET invitee = '".$info["invitee"].$player.",' WHERE ID = {$info["ID"]};");*/
+						if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0){
+							$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "", ""]));
+							return true;
+						}
 						$result = $this->db->addInviteeById($landnum, $player);
 						if($result === false){
 							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
@@ -672,6 +676,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"not-invitee" => "%1 is not invitee of your land",
 			"already-invitee" => "Player %1 is already invitee of your land",
 			"removed-invitee" => "Has been removed %1 from land %2",
+			"invalid-invitee" => "%1 is invalid name",
 			"success-invite" => "%1 is now invitee of your land",
 			"player-not-connected" => "Player %1 is not connected",
 			"cannot-give-land-myself" => "You can't give your land yourself",
