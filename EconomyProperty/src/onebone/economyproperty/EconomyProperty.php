@@ -83,9 +83,13 @@ class EconomyProperty extends PluginBase implements Listener{
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event){
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			return;
+		}
+		
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
-
+		
 		if(isset($this->touch[$player->getName()])){
 		//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
 			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getFolderName()]);
