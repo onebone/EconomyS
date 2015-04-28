@@ -71,12 +71,12 @@ class EconomyUsury extends PluginBase implements Listener{
 		
 		foreach($this->usuryHosts[$player]["players"] as $key => $username){ // TODO: Debug here
 			if(($player = $this->getServer()->getPlayerExact($username))){
-				$player->getInventory()->addItem(Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]]));
+				$player->getInventory()->addItem(Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]));
 				continue;
 			}
 			$data = $this->getServer()->getOfflinePlayerData($username);
 			$count = $this->usuryHosts[$player]["players"][$key][2];
-			foreach($data->Inventory as $item){
+			foreach($data->Inventory as $key => $item){
 				if($item["id"] == $this->usuryHosts[$player]["players"][$key][0] and $item["Damage"] == $this->usuryHosts[$player]["players"][$key][1]){
 					$i = Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]]);
 					$giveCnt = min($count, $i->getMaxStackSize());
