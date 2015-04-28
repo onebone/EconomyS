@@ -11,7 +11,6 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
-use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Utils;
 
 use onebone\economyapi\event\money\AddMoneyEvent;
@@ -24,6 +23,7 @@ use onebone\economyapi\event\bank\AddMoneyEvent as BankAddMoneyEvent;
 use onebone\economyapi\event\bank\ReduceMoneyEvent as BankReduceMoneyEvent;
 use onebone\economyapi\event\bank\MoneyChangedEvent as BankMoneyChangedEvent;
 use onebone\economyapi\database\DataConverter;
+use onebone\economyapi\task\SaveTask;
 
 class EconomyAPI extends PluginBase implements Listener{
 
