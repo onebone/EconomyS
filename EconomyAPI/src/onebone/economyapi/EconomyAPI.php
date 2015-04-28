@@ -31,15 +31,15 @@ class EconomyAPI extends PluginBase implements Listener{
 	 */
 	private static $instance = null;
 
-    /**
-     * @var array
-     */
+	/**
+	 * @var array
+	 */
 	private $money = [];
 
-    /**
-     * @var array
-     */
-    private $bank = [];
+	/**
+	 * @var array
+	 */
+	private $bank = [];
 
 	/**
 	 * @var Config
@@ -51,19 +51,19 @@ class EconomyAPI extends PluginBase implements Listener{
 	 */
 	private $command = null;
 
-    /**
-     * @var array
-     */
+	/**
+	 * @var array
+	 */
 	private $langRes = [];
 
-    /**
-     * @var array
-     */
-    private $playerLang = []; // language system related
+	/**
+	 * @var array
+	 */
+	private $playerLang = []; // language system related
 
-    /**
-     * @var string
-     */
+	/**
+	 * @var string
+	 */
 	private $monetaryUnit = "$";
 	
 	/**
@@ -96,14 +96,14 @@ class EconomyAPI extends PluginBase implements Listener{
 	*/
 	const RET_SUCCESS = 1;
 
-    /**
-     * @var int CURRENT_DATABASE_VERSION The version of current database
-     */
+	/**
+	 * @var int CURRENT_DATABASE_VERSION The version of current database
+	 */
 	const CURRENT_DATABASE_VERSION = 0x02;
 
-    /**
-     * @var array
-     */
+	/**
+	 * @var array
+	 */
 	private $langList = [
 		"def" => "Default",
 		"en" => "English",
@@ -114,9 +114,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		"user-define" => "User Defined"
 	];
 
-    /**
-     * @return EconomyAPI
-     */
+	/**
+	 * @return EconomyAPI
+	 */
 	public static function getInstance(){
 		return self::$instance;
 	}
@@ -141,7 +141,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		if(!isset($this->playerLang["console"])){
 			$this->getLangFile();
 		}
-		$command = [
+		$commands = [
 			"setmoney" => "onebone\\economyapi\\commands\\SetMoneyCommand",
 			"seemoney" => "onebone\\economyapi\\commands\\SeeMoneyCommand",
 			"mymoney" => "onebone\\economyapi\\commands\\MyMoneyCommand",
@@ -156,9 +156,9 @@ class EconomyAPI extends PluginBase implements Listener{
 			"mystatus" => "onebone\\economyapi\\commands\\MyStatusCommand"
 		];
 		$commandMap = $this->getServer()->getCommandMap();
-		foreach($command as $key => $cmd){
-			foreach($this->command->get($key) as $c){
-				$commandMap->register("economyapi", new $cmd($this, $c));
+		foreach($commands as $key => $command){
+			foreach($this->command->get($key) as $cmd){
+				$commandMap->register("economyapi", new $command($this, $cmd));
 			}
 		}
 
@@ -275,11 +275,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		return $default;
 	}
 
-    /**
-     * @param string $res
-     *
-     * @return bool|string
-     */
+	/**
+	 * @param string $res
+	 *
+	 * @return bool|string
+	 */
 	private function readResource($res){
 		$resource = $this->getResource($res);
 		if($resource !== null){
@@ -804,9 +804,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize($this->playerLang));
 	}
 
-    /**
-     * @param PlayerLoginEvent $event
-     */
+	/**
+	 * @param PlayerLoginEvent $event
+	 */
 	public function onLoginEvent(PlayerLoginEvent $event){
 		$username = strtolower($event->getPlayer()->getName());
 		if(!isset($this->money["money"][$username])){
