@@ -11,7 +11,7 @@ use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
-use pocketmine\scheduler\CallbackTask;
+use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Utils;
 
 use onebone\economyapi\event\money\AddMoneyEvent;
@@ -183,7 +183,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$time = $this->config->get("auto-save-interval");
 		if(is_numeric($time)){
 			$interval = $time * 1200;
-			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new CallbackTask([$this, "save"], []), $interval, $interval);
+			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
 			$this->getLogger()->notice("Auto save has been set to interval : ".$time." min(s)");
 		}
 		
@@ -347,6 +347,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @param bool $force
@@ -392,6 +394,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @deprecated
+	 *
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @param bool $force
@@ -653,7 +657,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	/**
 	 * @param Player|string $player
-	
+	 *
 	 * @return boolean|float
 	*/
 	public function myMoney($player){ // To identify the result, use '===' operator
@@ -669,8 +673,10 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
+	 * @ deprecated
+	 *
 	 * @param Player|string $player
-	
+	 *
 	 * @return boolean|float
 	*/
 	public function myDebt($player){ // To identify the result, use '===' operator
