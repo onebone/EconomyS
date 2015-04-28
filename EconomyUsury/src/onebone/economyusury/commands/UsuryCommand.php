@@ -15,5 +15,29 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand{
 		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
 			return false;
 		}
+		
+		switch(array_shift($params)){
+			case "host":
+			switch(array_shift($params)){
+				case "open":
+				
+				break;
+				case "close":
+				
+				break;
+			}
+			break;
+			case "request":
+			$requestTo = strtolower(array_shift($params));
+			if(trim($requestTo) == ""){
+				$sender->sendMessage("Usage: /usury request <host>");
+				break;
+			}
+			
+			break;
+			default:
+			$sender->sendMessage("Usage: ".$this->getUsage());
+		}
+		return true;
 	}
 }

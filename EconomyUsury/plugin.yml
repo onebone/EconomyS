@@ -15,4 +15,13 @@ permissions:
      economyusury.command.usury:
       description: Gives player permission to execute usury command
       default: true
-      children: [] # TODO: Add more children permissions
+      children:
+       economyusury.command.usury.host:
+        description: Gives player permission to execute usury host command
+        default: true
+        children:
+         economyusury.command.usury.host.open:
+          description: Gives player permission to open usury host by command
+          default: true
+         economyusury.command.usury.host.close:
+          description: Gives player permission to close usury host by command
