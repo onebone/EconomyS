@@ -102,10 +102,10 @@ class EconomyAuction extends PluginBase{
 				$cnt = 0;
 				foreach($sender->getInventory()->getContents() as $i){
 					if($i->getID() == $e[0] and $i->getDamage() == $e[1]){
-						++$cnt;
-					}
-					if($count <= $cnt){
-						break;
+						$cnt += $i->getCount();
+						if($count <= $cnt){
+							break;
+						}
 					}
 				}
 				if($count <= $cnt){
@@ -213,7 +213,7 @@ class EconomyAuction extends PluginBase{
 				foreach($this->auctions as $player => $data){
 					$price = $data[5] === null ? $data[3] : $data[5];
 					$p = $data[4] === null ? "No player":$data[4];
-					$output .= "##".$player." | ".EconomyAPI::getInstance()->getMonetaryUnit()."$price | $p\n";
+					$output .= "##".$player." | ".EconomyAPI::getInstance()->getMonetaryUnit()."$price | ".$data[2]." of ".$data[0].":".$data[1]." | $p\n";
 				}
 				$output = substr($output, 0, -1);
 				$sender->sendMessage($output);
