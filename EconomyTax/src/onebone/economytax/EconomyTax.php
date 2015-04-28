@@ -4,7 +4,8 @@ namespace onebone\economytax;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
-use pocketmine\scheduler\CallbackTask;
+
+use onebone\economytax\task\PayTask;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -28,10 +29,10 @@ class EconomyTax extends PluginBase{
 			"tax-as-percentage" => "",
 			"tax-as-money" => 100
 		));
-		$this->getServer()->getScheduler()->scheduleRepeatingTask(new CallbackTask(array($this, "onSchedule")), $this->config->get("time-for-tax")*1200);
+		$this->getServer()->getScheduler()->scheduleRepeatingTask(new PayTask($this), $this->config->get("time-for-tax")*1200);
 	}
 
-	public function onSchedule(){
+	public function payTax(){
 		if(($percent = $this->config->get("tax-as-percentage")) !== ""){
 			$players = $this->getServer()->getOnlinePlayers();
 			foreach($players as $player){

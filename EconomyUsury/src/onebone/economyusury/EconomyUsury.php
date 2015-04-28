@@ -78,7 +78,7 @@ class EconomyUsury extends PluginBase implements Listener{
 			$count = $this->usuryHosts[$player]["players"][$key][2];
 			foreach($data->Inventory as $key => $item){
 				if($item["id"] == $this->usuryHosts[$player]["players"][$key][0] and $item["Damage"] == $this->usuryHosts[$player]["players"][$key][1]){
-					$i = Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]]);
+					$i = Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]);
 					$giveCnt = min($count, $i->getMaxStackSize());
 					$count -= $giveCnt;
 					
