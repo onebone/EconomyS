@@ -8,7 +8,6 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
-use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
 use pocketmine\utils\Utils;
@@ -30,23 +29,42 @@ class EconomyAPI extends PluginBase implements Listener{
 	/**
 	 * @var EconomyAPI
 	 */
-	private static $obj = null;
-	private $path;
-	private $money, $bank;
+	private static $instance = null;
+
+    /**
+     * @var array
+     */
+	private $money = [];
+
+    /**
+     * @var array
+     */
+    private $bank = [];
+
 	/**
 	 * @var Config
 	 */
-	private $config;
+	private $config = null;
+
 	/**
 	 * @var Config
 	 */
-	private $command;
+	private $command = null;
 
-	private $list;
+    /**
+     * @var array
+     */
+	private $langRes = [];
 
-	private $langRes, $playerLang; // language system related
-	
-	private $monetaryUnit;
+    /**
+     * @var array
+     */
+    private $playerLang = []; // language system related
+
+    /**
+     * @var string
+     */
+	private $monetaryUnit = "$";
 	
 	/**
 	 * @var int RET_ERROR_1 Unknown error 1
@@ -77,10 +95,16 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @var int RET_SUCCESS The task was successful
 	*/
 	const RET_SUCCESS = 1;
-	
+
+    /**
+     * @var int CURRENT_DATABASE_VERSION The version of current database
+     */
 	const CURRENT_DATABASE_VERSION = 0x02;
-	
-	private $langList = array(
+
+    /**
+     * @var array
+     */
+	private $langList = [
 		"def" => "Default",
 		"en" => "English",
 		"ko" => "한국어",
@@ -88,41 +112,36 @@ class EconomyAPI extends PluginBase implements Listener{
 		"ch" => "中文",
 		"id" => "Bahasa Indonesia",
 		"user-define" => "User Defined"
-	);
+	];
 
+    /**
+     * @return EconomyAPI
+     */
 	public static function getInstance(){
-		return self::$obj;
+		return self::$instance;
 	}
 	
 	public function onLoad(){
-		self::$obj = $this;
-		
-		$this->path = $this->getDataFolder();
-
-		$this->money = array();
-		$this->bank = array();
-
-		$this->playerLang = array();
-		$this->langRes = array();
+		self::$instance = $this;
 	}
 	
 	public function onEnable(){
-		@mkdir($this->path);
+		@mkdir($this->getDataFolder());
 		
 		$this->createConfig();
 		$this->scanResources();
 		
-		file_put_contents($this->path."ReadMe.txt", $this->readResource("ReadMe.txt"));
-		if(!is_file($this->path."PlayerLang.dat")){
-			file_put_contents($this->path."PlayerLang.dat", serialize(array()));
+		file_put_contents($this->getDataFolder() . "ReadMe.txt", $this->readResource("ReadMe.txt"));
+		if(!is_file($this->getDataFolder() . "PlayerLang.dat")){
+			file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize([]));
 		}
 		
-		$this->playerLang = unserialize(file_get_contents($this->path."PlayerLang.dat"));
+		$this->playerLang = unserialize(file_get_contents($this->getDataFolder() . "PlayerLang.dat"));
 
 		if(!isset($this->playerLang["console"])){
 			$this->getLangFile();
 		}
-		$cmds = array(
+		$command = [
 			"setmoney" => "onebone\\economyapi\\commands\\SetMoneyCommand",
 			"seemoney" => "onebone\\economyapi\\commands\\SeeMoneyCommand",
 			"mymoney" => "onebone\\economyapi\\commands\\MyMoneyCommand",
@@ -135,32 +154,31 @@ class EconomyAPI extends PluginBase implements Listener{
 			"mydebt" => "onebone\\economyapi\\commands\\MyDebtCommand",
 			"returndebt" => "onebone\\economyapi\\commands\\ReturnDebtCommand",
 			"mystatus" => "onebone\\economyapi\\commands\\MyStatusCommand"
-		);
+		];
 		$commandMap = $this->getServer()->getCommandMap();
-		foreach($cmds as $key => $cmd){
+		foreach($command as $key => $cmd){
 			foreach($this->command->get($key) as $c){
 				$commandMap->register("economyapi", new $cmd($this, $c));
 			}
 		}
-		
-		// getServer().getPluginManager().registerEvents(this, this);
+
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->convertData();
-		$moneyConfig = new Config($this->path."Money.yml", Config::YAML, array(
+		$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML, [
 			"version" => 2,
 			"money" => [],
 			"debt" => []
-		));
-		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+		]);
+		$bankConfig = new Config($this->getDataFolder() . "Bank.yml", Config::YAML);
 		
 		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){
-			$converter = new DataConverter($this->path."Money.yml", $this->path."Bank.yml");
+			$converter = new DataConverter($this->getDataFolder() . "Money.yml", $this->getDataFolder() . "Bank.yml");
 			$result = $converter->convertData(self::CURRENT_DATABASE_VERSION);
 			if($result !== false){
 				$this->getLogger()->info("Converted data into new database. Database version : ".self::CURRENT_DATABASE_VERSION);
 			}
-			$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
-			$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+			$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML);
+			$bankConfig = new Config($this->getDataFolder() . "Bank.yml", Config::YAML);
 		}
 		$this->money = $moneyConfig->getAll();
 		$this->bank = $bankConfig->getAll();
@@ -177,10 +195,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($this->config->get("check-update")){
 			try{
 				$this->getLogger()->info("Checking for updates... It may be take some while.");
-				
-				$lastest = Utils::getURL("https://raw.githubusercontent.com/onebone/EconomyS/master/EconomyAPI/plugin.yml");
-				
-				$desc = \yaml_parse($lastest);
+
+				$desc = yaml_parse(Utils::getURL("https://raw.githubusercontent.com/onebone/EconomyS/master/EconomyAPI/plugin.yml"));
 				
 				$description = $this->getDescription();
 				if(version_compare($description->getVersion(), $desc["version"]) < 0){
@@ -200,28 +216,28 @@ class EconomyAPI extends PluginBase implements Listener{
 	
 	private function convertData(){
 		$cnt = 0;
-		if(is_file($this->path."MoneyData.yml")){
-			$data = (new Config($this->path."MoneyData.yml", Config::YAML))->getAll();
-			$saveData = array();
+		if(is_file($this->getDataFolder() . "MoneyData.yml")){
+			$data = (new Config($this->getDataFolder() . "MoneyData.yml", Config::YAML))->getAll();
+			$saveData = [];
 			foreach($data as $player => $money){
 				$saveData["money"][$player] = round($money["money"], 2);
 				$saveData["debt"][$player] = round($money["debt"], 2);
 				++$cnt;
 			}
-			@unlink($this->path."MoneyData.yml");
-			$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
+			@unlink($this->getDataFolder() . "MoneyData.yml");
+			$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML);
 			$moneyConfig->setAll($saveData);
 			$moneyConfig->save();
 		}
-		if(is_file($this->path."BankData.yml")){
-			$data = (new Config($this->path."BankData.yml", Config::YAML))->getAll();
-			$saveData = array();
+		if(is_file($this->getDataFolder() . "BankData.yml")){
+			$data = (new Config($this->getDataFolder() . "BankData.yml", Config::YAML))->getAll();
+			$saveData = [];
 			foreach($data as $player => $money){
 				$saveData["money"][$player] = round($money["money"], 2);
 				++$cnt;
 			}
-			@unlink($this->path."BankData.yml");
-			$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+			@unlink($this->getDataFolder() . "BankData.yml");
+			$bankConfig = new Config($this->getDataFolder() . "Bank.yml", Config::YAML);
 			$bankConfig->setAll($saveData);
 			$bankConfig->save();
 		}
@@ -231,8 +247,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	private function createConfig(){
-		$this->config = new Config($this->path."economy.properties", Config::PROPERTIES, yaml_parse($this->readResource("config.yml")));
-		$this->command = new Config($this->path."command.yml", Config::YAML, yaml_parse($this->readResource("command.yml")));
+		$this->config = new Config($this->getDataFolder() . "economy.properties", Config::PROPERTIES, yaml_parse($this->readResource("config.yml")));
+		$this->command = new Config($this->getDataFolder() . "command.yml", Config::YAML, yaml_parse($this->readResource("command.yml")));
 	}
 	
 	private function scanResources(){
@@ -243,7 +259,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->langRes[substr($res, 5, -5)] = get_object_vars(json_decode($this->readResource($res)));
 			}
 		}
-		$this->langRes["user-define"] = (new Config($this->path."language.properties", Config::PROPERTIES, $this->langRes["def"]))->getAll();
+		$this->langRes["user-define"] = (new Config($this->getDataFolder() . "language.properties", Config::PROPERTIES, $this->langRes["def"]))->getAll();
 	}
 
 	/**
@@ -258,7 +274,12 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		return $default;
 	}
-	
+
+    /**
+     * @param string $res
+     *
+     * @return bool|string
+     */
 	private function readResource($res){
 		$resource = $this->getResource($res);
 		if($resource !== null){
@@ -272,11 +293,11 @@ class EconomyAPI extends PluginBase implements Listener{
 		if(isset($this->langRes[$lang])){
 			$this->playerLang["console"] = $lang;
 			$this->playerLang["rcon"] = $lang;
-			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", array($this->langList[$lang], "%2", "%3", "%4")));
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", [$this->langList[$lang], "%2", "%3", "%4"]));
 		}else{
 			$this->playerLang["console"] = "def";
 			$this->playerLang["rcon"] = "def";
-			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", array($this->langList[$lang], "%2", "%3", "%4")));
+			$this->getLogger()->info(TextFormat::GREEN.$this->getMessage("language-set", "console", [$this->langList[$lang], "%2", "%3", "%4"]));
 		}
 	}
 
@@ -512,16 +533,16 @@ class EconomyAPI extends PluginBase implements Listener{
 	 *
 	 * @return string
 	*/
-	public function getMessage($key, $player = "console", array $value = array("%1", "%2", "%3", "%4")){
+	public function getMessage($key, $player = "console", array $value = ["%1", "%2", "%3", "%4"]){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 		
 		if(isset($this->playerLang[$player]) and isset($this->langRes[$this->playerLang[$player]][$key])){
-			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "%4"), array($this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]), $this->langRes[$this->playerLang[$player]][$key]);
+			return str_replace(["%MONETARY_UNIT%", "%1", "%2", "%3", "%4"], [$this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]], $this->langRes[$this->playerLang[$player]][$key]);
 		}elseif(isset($this->langRes["def"][$key])){
-			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "%4"), array($this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]), $this->langRes["def"][$key]);
+			return str_replace(["%MONETARY_UNIT%", "%1", "%2", "%3", "%4"], [$this->monetaryUnit, $value[0], $value[1], $value[2], $value[3]], $this->langRes["def"][$key]);
 		}else{
 			return "Couldn't find message resource";
 		}
@@ -628,7 +649,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	/**
-	 * @ deprecated
+	 * @deprecated
 	 *
 	 * @param Player|string $player
 	 *
@@ -774,15 +795,18 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 	
 	public function save(){
-		$moneyConfig = new Config($this->path."Money.yml", Config::YAML);
-		$bankConfig = new Config($this->path."Bank.yml", Config::YAML);
+		$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML);
+		$bankConfig = new Config($this->getDataFolder() . "Bank.yml", Config::YAML);
 		$moneyConfig->setAll($this->money);
 		$moneyConfig->save();
 		$bankConfig->setAll($this->bank);
 		$bankConfig->save();
-		file_put_contents($this->path."PlayerLang.dat", serialize($this->playerLang));
+		file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize($this->playerLang));
 	}
-	
+
+    /**
+     * @param PlayerLoginEvent $event
+     */
 	public function onLoginEvent(PlayerLoginEvent $event){
 		$username = strtolower($event->getPlayer()->getName());
 		if(!isset($this->money["money"][$username])){
@@ -803,6 +827,6 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return string
 	*/
 	public function __toString(){
-		return "EconomyAPI (accounts:".count($this->money).", bank: ".count($this->money).")";
+		return "EconomyAPI (total accounts: " . count($this->money) . ")";
 	}
 }
