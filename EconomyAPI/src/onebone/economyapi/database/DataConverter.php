@@ -23,20 +23,18 @@ namespace onebone\economyapi\database;
 use pocketmine\utils\Config;
 
 class DataConverter{
-	private $moneyData, $debtData, $bankData, $version, $moneyFile, $banFile;
+	private $moneyData, $version, $moneyFile;
 	
 	const VERSION_1 = 0x01;
 	const VERSION_2 = 0x02;
 	
-	public function __construct($moneyFile, $bankFile){
-		$this->parseData($moneyFile, $bankFile);
+	public function __construct($moneyFile){
+		$this->parseData($moneyFile);
 	}
 	
-	private function parseData($moneyFile, $bankFile){
+	private function parseData($moneyFile){
 		$moneyCfg = new Config($moneyFile, Config::YAML);
-		$bankCfg = new Config($bankFile, Config::YAML);
 		$this->moneyFile = $moneyCfg;
-		$this->bankFile = $bankCfg;
 		
 		if($moneyCfg->exists("version")){
 			$this->version = $moneyCfg->get("version");
@@ -46,8 +44,6 @@ class DataConverter{
 		
 		if($this->version === self::VERSION_1){
 			$this->moneyData = $moneyCfg->get("money");
-			$this->debtData = $moneyCfg->get("debt");
-			$this->bankData = $bankCfg->get("money");
 		}else{
 			switch($this->version){
 				case self::VERSION_2:
@@ -55,17 +51,7 @@ class DataConverter{
 				foreach($moneyCfg->get("money") as $player => $m){
 					$money[strtolower($player)] = $m;
 				}
-				$debt = [];
-				foreach($moneyCfg->get("debt") as $player => $d){
-					$debt[strtolower($player)] = $d;
-				}
-				$bank = [];
-				foreach($bankCfg->get("money") as $player => $b){
-					$bank[strtolower($player)] = $b;
-				}
 				$this->moneyData = $money;
-				$this->debtData = $debt;
-				$this->bankData = $bank;
 				break;
 			}
 		}
@@ -85,21 +71,10 @@ class DataConverter{
 				foreach($this->moneyData as $player => $m){
 					$money[strtolower($player)] = $m;
 				}
-				$debt = [];
-				foreach($this->debtData as $player => $d){
-					$debt[strtolower($player)] = $d;
-				}
-				$bank = [];
-				foreach($this->bankData as $player => $b){
-					$bank[strtolower($player)] = $b;
-				}
 				
 				$this->moneyFile->set("money", $money);
-				$this->moneyFile->set("debt", $debt);
-				$this->bankFile->set("money", $bank);
 				
 				$this->moneyFile->save();
-				$this->bankFile->save();
 				return true;
 			}
 			break;
@@ -112,14 +87,6 @@ class DataConverter{
 	
 	public function getMoneyData(){
 		return $this->moneyData;
-	}
-	
-	public function getDebtData(){
-		return $this->debtData;
-	}
-	
-	public function getBankData(){
-		return $this->bankData;
 	}
 	
 	public function getVersion(){

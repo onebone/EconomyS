@@ -24,6 +24,9 @@ namespace onebone\economyapi\event\debt;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 
+/**
+ * @deprecated
+ */
 class DebtChangedEvent extends EconomyAPIEvent{
 	private $username, $debt;
 	public static $handlerList;

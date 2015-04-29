@@ -8,17 +8,11 @@ pay:
 - pay
 givemoney:
 - givemoney
-takedebt:
-- takedebt
 topmoney:
 - topmoney
 setlang:
 - setlang
 takemoney:
 - takemoney
-mydebt:
-- mydebt
-returndebt:
-- returndebt
 mystatus:
 - mystatus

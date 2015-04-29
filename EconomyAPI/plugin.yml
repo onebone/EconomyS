@@ -39,27 +39,12 @@ permissions:
      economyapi.command.setlang:
       description: Allows player to set his/her language
       default: true
-     economyapi.command.takedebt:
-      description: Allows player to take debt from plugin
-      default: true
      economyapi.command.topmoney:
       description: Allows player to see top money list
       default: true
-     economyapi.command.bank:
-      description: Allows player to manage bank account
-      default: true
-     economyapi.command.bankadmin:
-      description: Allows player to manage others' bank account
-      default: op
      economyapi.command.mystatus:
       description: Allows player to see his/her financial status
       default: true
      economyapi.command.takemoney:
       description: Allows player to take money from others
       default: op
-     economyapi.command.returndebt:
-      description: Allows player to return debt
-      default: true
-     economyapi.command.mydebt:
-      description: Allows player to see his/her money
-      default: true
