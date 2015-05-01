@@ -241,6 +241,7 @@ class EconomyAuction extends PluginBase{
 			}
 			return true;
 		}
+		return true;
 	}
 	
 	public function quitAuction($auction){

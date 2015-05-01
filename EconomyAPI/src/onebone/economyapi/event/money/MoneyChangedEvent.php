@@ -24,7 +24,7 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 
 class MoneyChangedEvent extends EconomyAPIEvent{
-	private $plugin, $username, $money;
+	private $username, $money;
 	public static $handlerList;
 
 	public function __construct(EconomyAPI $plugin, $username, $money, $issuer){

@@ -94,7 +94,7 @@ class EconomyUsury extends PluginBase implements Listener{
 			}
 			$data = $this->getServer()->getOfflinePlayerData($username);
 			$count = $this->usuryHosts[$player]["players"][$key][2];
-			foreach($data->Inventory as $key => $item){
+			foreach($data->Inventory as $key => $item){ //FIXME: The $key is already used in outer foreach loop
 				if($item["id"] == $this->usuryHosts[$player]["players"][$key][0] and $item["Damage"] == $this->usuryHosts[$player]["players"][$key][1]){
 					$i = Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]);
 					$giveCnt = min($count, $i->getMaxStackSize());
@@ -111,5 +111,6 @@ class EconomyUsury extends PluginBase implements Listener{
 		}
 		
 		unset($this->usuryHosts[$player]);
+		return true;
 	}
 }

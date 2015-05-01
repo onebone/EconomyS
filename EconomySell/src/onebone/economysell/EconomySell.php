@@ -26,16 +26,9 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\tile\Sign;
-use pocketmine\math\Vector3;
 use pocketmine\utils\Config;
 use pocketmine\item\Item;
-use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\network\protocol\EntityDataPacket;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Int;
-use pocketmine\nbt\tag\String;
 use onebone\economyapi\EconomyAPI;
 
 #define TAG 1

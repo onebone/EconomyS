@@ -20,7 +20,6 @@
 
 namespace onebone\economyland;
 
-use onebone\economyland\event\LandAddedEvent;
 use pocketmine\math\Vector3;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -39,7 +38,6 @@ use pocketmine\event\EventPriority;
 use pocketmine\plugin\MethodEventExecutor;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyland\database\SQLiteDatabase;
 use onebone\economyland\database\YamlDatabase;
 use onebone\economyland\database\Database;
 
@@ -585,7 +583,7 @@ class EconomyLand extends PluginBase implements Listener{
 			return false;
 		}
 		
-		$exist = false;
+		//$exist = false;
 		//$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
 		//if(!is_array($info)) goto checkLand;
 		$info = $this->db->canTouch($x, $z, $level, $player);
@@ -610,6 +608,7 @@ class EconomyLand extends PluginBase implements Listener{
 			}
 			return false;
 		}
+		return true;
 	}
 
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
