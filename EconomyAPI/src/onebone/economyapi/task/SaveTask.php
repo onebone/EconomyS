@@ -24,9 +24,7 @@ use onebone\economyapi\EconomyAPI;
 
 use pocketmine\scheduler\PluginTask;
 
-class SaveTask extends PluginTask{
-	private $plugin;
-
+class SaveTask extends PluginTask {
 	public function __construct(EconomyAPI $plugin){
 		parent::__construct($plugin);
 	}

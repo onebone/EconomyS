@@ -24,7 +24,7 @@ use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\EconomyAPI;
 
 class CreateAccountEvent extends EconomyAPIEvent{
-	private $player, $username, $defaultMoney;
+	private $username, $defaultMoney;
 	public static $handlerList;
 	
 	public function __construct(EconomyAPI $plugin, $username, $defaultMoney, $issuer){

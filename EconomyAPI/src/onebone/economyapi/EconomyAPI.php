@@ -410,7 +410,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return array
 	*/
 	public function getAllBankMoney(){
-		return $this->getLogger()->warning("Bank system is now deprecated");
+		$this->getLogger()->warning("Bank system is now deprecated");
 	}
 	
 	/**

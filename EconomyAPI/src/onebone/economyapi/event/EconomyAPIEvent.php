@@ -20,7 +20,6 @@
 
 namespace onebone\economyapi\event;
 
-use pocketmine\plugin\Plugin;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\event\Cancellable;
 

@@ -18,14 +18,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * @deprecated
- */
 namespace onebone\economyapi\event\bank;
 
 use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\EconomyAPI;
 
+/**
+ * @deprecated
+ */
 class AddMoneyEvent extends EconomyAPIEvent{
 	private $username, $amount;
 	public static $handlerList;
