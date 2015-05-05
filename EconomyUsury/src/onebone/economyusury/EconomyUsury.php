@@ -112,4 +112,88 @@ class EconomyUsury extends PluginBase implements Listener{
 		
 		unset($this->usuryHosts[$player]);
 	}
+	
+	public function isPlayerJoinedHost($player, $host){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		
+		return isset($this->usuryHosts[$host]["players"][$player]) === true;
+	}
+	
+	public function joinHost($player, $host, $due, Item $guarantee){
+		if($guarantee === null){
+			throw new \Exception("Item cannot be null");
+		}
+		
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		
+		if(isset($this->usuryHosts[$host]["players"][$player])){
+			return false;
+		}
+		if(!$this->containsItem($player, $guarantee)){
+			return false;
+		}
+		$this->removeItem($player, $guarantee);
+		
+		$this->usuryHosts[$host]["players"][$player] = [
+			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), $due * 1200
+		];
+		
+		$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
+		$this->usuryHosts[$host]["players"][$player][4] = $tid;
+		return true;
+	}
+	
+	public function removePlayerFromHost($player, $host){
+		if(!isset($this->usuryHosts[$host]["players"][$player])){
+			return false;
+		}
+		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][4])){
+			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][4]);
+		}
+		unset($this->usuryHosts[$host]["players"][$player]);
+		return true;
+	}
+	
+	public function containsItem($player, Item $i){
+		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+			return $p->getInventory()->contains($i);
+		}
+		
+		$data = $this->getServer()->getOfflinePlayerData($player);
+		$count = 0;
+		foreach($data->Inventory as $key => $item){
+			if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
+				$count += $item["Count"];
+				if($count >= $i->getCount()) return true;
+			}
+		}
+		return false;
+	}
+	
+	public function removeItem($player, Item $i){ // FIXME: Not working on offline player
+		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+			return $p->getInventory()->removeItem($i);
+		}
+		$data = $this->getServer()->getOfflinePlayerData($player);
+		$count = $i->getCount();
+		foreach($data->Inventory as $key => $item){
+			if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
+				$removeCnt = min($count, $item["Count"]);
+				$count -= $removeCnt;
+				
+				$item["Count"] -= $removeCnt;
+				
+				if($count <= 0){
+					break;
+				}
+			}
+		}
+		$this->getServer()->saveOfflinePlayerData($player, $data);
+	}
 }
