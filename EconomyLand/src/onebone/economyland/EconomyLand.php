@@ -27,7 +27,6 @@ use pocketmine\event\Event;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\scheduler\CallbackTask;
 use pocketmine\utils\Config;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
@@ -80,7 +79,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$now = time();
 		foreach($this->expire as $landId => &$time){
 			$time[1] = $now;
-			$this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "expireLand"), array($landId)), ($time[0] * 20));
+			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
 		}
 
 		//$this->land = new \SQLite3($this->getDataFolder()."Land.sqlite3");
@@ -650,7 +649,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
 		if($expires !== null){
 			//$info = $this->land->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
-			$this->getServer()->getScheduler()->scheduleDelayedTask(new CallbackTask(array($this, "expireLand"), [$id]), $expires * 1200);
+			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
 			$this->expire[$id] = array(
 				$expires * 60,
 				time()

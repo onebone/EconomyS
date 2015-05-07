@@ -24,8 +24,8 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\command\CommandSender;
 use pocketmine\command\Command;
 use pocketmine\Player;
-use pocketmine\scheduler\CallbackTask;
 use pocketmine\item\Item;
+use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
 
@@ -61,7 +61,7 @@ class EconomyAuction extends PluginBase{
 		
 		foreach($this->auctions as $player => $data){
 			if(isset($this->auctions[$player][6])){
-				$id = $this->getServer()->getScheduler()->scheduleDelayedTask($this->auctions[$player][6], new CallbackTask(array($this, "quitAuction"), $player))->getTaskId();
+				$id = $this->getServer()->getScheduler()->scheduleDelayedTask($this->auctions[$player][6], new QuitAuctionTask($this, $player))->getTaskId();
 				$this->auctions[$player][7] = time();
 				$this->auctions[$player][8] = $id;
 			}
@@ -131,7 +131,7 @@ class EconomyAuction extends PluginBase{
 					$this->auctions[strtolower($sender->getName())] = array(
 						$e[0], $e[1], (int) $count, (int) $startPrice, null, (int) $startPrice, null, null
 					);
-					$this->getServer()->broadcastMessage($sender->getName()."'s auction has just started.");
+					$this->getServer()->broadcastMessage(TextFormat::GREEN.$sender->getName().TextFormat::RESET."'s auction has just started.");
 					EconomyAPI::getInstance()->reduceMoney($sender, $tax);
 				}else{
 					$sender->sendMessage("You don't have enough items");
@@ -194,7 +194,7 @@ class EconomyAuction extends PluginBase{
 				
 				if($count <= $cnt){
 					$sender->getInventory()->removeItem(new Item($e[0], $e[1], $count));
-					$id = $this->getServer()->getScheduler()->scheduleDelayedTask(($time * 20), new CallbackTask(array($this, "quitAuction"), $sender->getName()))->getTaskId();
+					$id = $this->getServer()->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $sender->getName()), ($time * 20))->getTaskId();
 					$this->auctions[strtolower($sender->getName())] = array(
 						$e[0], $e[1], (int) $count, (int) $startPrice, null, (int) $startPrice, $time, time(), $id
 					);
@@ -241,7 +241,6 @@ class EconomyAuction extends PluginBase{
 			}
 			return true;
 		}
-		return true;
 	}
 	
 	public function quitAuction($auction){
@@ -264,6 +263,7 @@ class EconomyAuction extends PluginBase{
 			$p = $this->getServer()->getPlayerExact($auction);
 			if($p instanceof Player){
 				$p->getInventory()->addItem(new Item($this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]));
+				$p->sendMessage("Your auction was finished without buyer.");
 			}else{
 				$this->queue[$auction] = array(
 					$this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]
