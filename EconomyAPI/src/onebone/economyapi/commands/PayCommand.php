@@ -25,6 +25,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\event\money\PayMoneyEvent;
 
 class PayCommand extends EconomyAPICommand implements InGameCommand{
 	public function __construct(EconomyAPI $plugin, $cmd = "pay"){
@@ -50,6 +51,10 @@ class PayCommand extends EconomyAPICommand implements InGameCommand{
 			$player = $p->getName();
 		}
 		// END //
+		if($player === $sender->getName()){
+			$sender->sendMessage($this->getPlugin()->getMessage("pay-failed"));
+			return true;
+		}
 		
 		$result = $this->getPlugin()->reduceMoney($sender, $amount, false, "payment");
 		if($result !== EconomyAPI::RET_SUCCESS){
@@ -62,6 +67,7 @@ class PayCommand extends EconomyAPICommand implements InGameCommand{
 			$this->getPlugin()->addMoney($sender, $amount, true, "payment-rollback");
 			return true;
 		}
+		$this->getPlugin()->getServer()->getPluginManager()->callEvent(new PayMoneyEvent($this->getPlugin(), $sender->getName(), $player, $amount));
 		$sender->sendMessage($this->getPlugin()->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
 		return true;
 	}
