@@ -25,8 +25,6 @@ use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
-use onebone\economyusury\EconomyUsury;
-
 class DueTask extends PluginTask{
 	private $guarantee, $playerName, $hostOwner;
 	
@@ -43,15 +41,18 @@ class DueTask extends PluginTask{
 	}
 	
 	public function removeItem(){
-		if(($player = $this->getOwner()->getServer()->getPlayerExact($this->playerName)) instanceof Player){
+		/** @var $owner EconomyUsury */
+		$owner = $this->getOwner();
+
+		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
 			$player->sendMessage("Your usury due was expired. Your guarantee item was paid to the host.");
 		}
 		
-		if(($player = $this->getOwner()->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
+		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
 			$player->getInventory()->addItem($this->guarantee);
 			$player->sendMessage("Usury of ".TextFormat::GREEN.$this->playerName.TextFormat::RESET." was expired. Guarantee item was paid to your inventory.");
 		}else{
-			$data = $this->getOwner()->getServer()->getOfflinePlayerData($this->hostOwner); // FIXME: Item not given to offline player
+			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner); // FIXME: Item not given to offline player
 			$c = $this->guarantee->getCount();
 			echo $this->guarantee->getId().", ".$this->guarantee->getDamage().", $c\n";
 			foreach($data->Inventory as $key => $item){
@@ -95,8 +96,8 @@ class DueTask extends PluginTask{
 					}
 				}
 			}
-			$this->getOwner()->getServer()->saveOfflinePlayerData($this->hostOwner, $data);
+			$owner->getServer()->saveOfflinePlayerData($this->hostOwner, $data);
 		}
-		$this->getOwner()->removePlayerFromHost($this->playerName, $this->hostOwner);
+		$owner->removePlayerFromHost($this->playerName, $this->hostOwner);
 	}
 }

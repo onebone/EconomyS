@@ -240,6 +240,9 @@ class EconomyAuction extends PluginBase{
 				$sender->sendMessage("Usage: ".$command->getUsage());
 			}
 			return true;
+
+			default:
+			return true;
 		}
 	}
 	

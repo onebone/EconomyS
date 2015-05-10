@@ -54,7 +54,6 @@ class ItemList{
 		"sandstone" => 24,
 		"sandstone2" => "24:1",
 		"sandstone3" => "24:2",
-		"bed" => 26,
 		"poweredrail" => 27,
 		"cobweb" => 30,
 		"bush" => 31,
@@ -113,7 +112,6 @@ class ItemList{
 		"ladder" => 65,
 		"cobblestair" => 67,
 		"wallsign" => 68,
-		"irondoor" => 71,
 		"redstoneore" => 73,
 		"glowredstone" => 74,
 		"snow" => 78,
@@ -121,13 +119,11 @@ class ItemList{
 		"snowblock" => 80,
 		"cactus" => 81,
 		"clayblock" => 82,
-		"sugarcane" => 83,
 		"fence" => 85,
 		"pumpkin" => 86,
 		"netherrack" => 87,
 		"glowingstone" => 89,
 		"jack-o-lanton" => 91,
-		"cake" => 92,
 		"invisiblebedrock" => 95,
 		"trapdoor" => 96,
 		"stonebrick" => 98,
@@ -144,7 +140,6 @@ class ItemList{
 		"stonestair" => 109,
 		"mycelium" => 110,
 		"lilypad" => 111,
-		"netherbrick" => 112,
 		"netherbrickstair" => 114,
 		"endportalframe" => 120,
 		"endstone" => 121,
@@ -179,7 +174,6 @@ class ItemList{
 		"carpet" => 171,
 		"coalblock" => 173,
 		"podzol" => 243,
-		"beetroot" => 244,
 		"stonecutter" => 245,
 		"glowingobsidian" => 246,
 		"nethercore" => 247,
@@ -316,5 +310,5 @@ class ItemList{
 		"beetroot" => 457,
 		"beetrootseed" => 458,
 		"beetrootsoup" => 459
-);
+	);
 }
