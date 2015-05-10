@@ -92,22 +92,7 @@ class EconomyUsury extends PluginBase implements Listener{
 				$player->getInventory()->addItem(Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]));
 				continue;
 			}
-			$data = $this->getServer()->getOfflinePlayerData($username);
-			$count = $this->usuryHosts[$player]["players"][$key][2];
-			foreach($data->Inventory as $key => $item){ //FIXME: The $key is already used in outer foreach loop
-				if($item["id"] == $this->usuryHosts[$player]["players"][$key][0] and $item["Damage"] == $this->usuryHosts[$player]["players"][$key][1]){
-					$i = Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]);
-					$giveCnt = min($count, $i->getMaxStackSize());
-					$count -= $giveCnt;
-					
-					$item["Count"] += $giveCnt;
-					
-					if($count <= 0){
-						break;
-					}
-				}
-			}
-			$this->getServer()->saveOfflinePlayerData($username, $data);
+			$this->addItem($username, Item::get($this->usuryHosts[$player]["players"][$key][0], $this->usuryHosts[$player]["players"][$key][1], $this->usuryHosts[$player]["players"][$key][2]));
 		}
 		
 		unset($this->usuryHosts[$player]);
@@ -169,29 +154,72 @@ class EconomyUsury extends PluginBase implements Listener{
 		$data = $this->getServer()->getOfflinePlayerData($player);
 		$count = 0;
 		foreach($data->Inventory as $key => $item){
-			if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
-				$count += $item["Count"];
-				if($count >= $i->getCount()) return true;
+			if($key > 8){
+				if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
+					$count += $item["Count"];
+					if($count >= $i->getCount()) return true;
+				}
 			}
 		}
 		return false;
 	}
 	
-	public function removeItem($player, Item $i){ // FIXME: Not working on offline player
+	public function addItem($player, Item $i){
 		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
-			return $p->getInventory()->removeItem($i);
+			$p->getInventory()->addItem($i);
+		}
+		
+		$data = $this->getServer()->getOfflinePlayerData($player);
+		$count = $i->getCount();
+		foreach($data->Inventory as $key => $item){
+			if($key > 8){
+				if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
+					$giveCnt = min($i->getMaxStackSize() - $item["Count"], $count);
+					$count -= $giveCnt;
+					
+					$item["Count"] += $giveCnt;
+					if($count <= 0) goto save;
+				}
+			}
+		}
+		foreach($data->Inventory as $key => $item){
+			if($key > 8){
+				if($item["id"] == 0){
+					$giveCnt = min($i->getMaxStackSize(), $count);
+					$count -= $giveCnt;
+					
+					$item["id"] = $i->getId();
+					$item["Damage"] = $i->getDamage();
+					$item["Count"] = $giveCnt;
+					if($count <= 0) break;
+				}
+			}
+		}
+		save:
+		$this->getServer()->saveOfflinePlayerData($player, $data);
+	}
+	
+	public function removeItem($player, Item $i){
+		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+			$p->getInventory()->removeItem($i);
+			return;
 		}
 		$data = $this->getServer()->getOfflinePlayerData($player);
 		$count = $i->getCount();
 		foreach($data->Inventory as $key => $item){
-			if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
-				$removeCnt = min($count, $item["Count"]);
-				$count -= $removeCnt;
-				
-				$item["Count"] -= $removeCnt;
-				
-				if($count <= 0){
-					break;
+			if($key > 8){
+				if($item["id"] == $i->getId() and $item["Damage"] == $i->getDamage()){
+					$removeCnt = min($count, $item["Count"]);
+					$count -= $removeCnt;
+					
+					$item["Count"] -= $removeCnt;
+					if($item["Count"] <= 0){
+						$item["id"] = 0;
+						$item["Damage"] = 0;
+					}
+					if($count <= 0){
+						break;
+					}
 				}
 			}
 		}
