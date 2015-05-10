@@ -155,6 +155,10 @@ class EconomyUsury extends PluginBase implements Listener{
 		return isset($this->usuryHosts[$host]["players"][$player]) === true;
 	}
 	
+	public function getAllHosts(){
+		return $this->usuryHosts;
+	}
+	
 	public function joinHost($player, $host, $due, Item $guarantee){
 		if($guarantee === null){
 			throw new \Exception("Item cannot be null");
@@ -180,6 +184,13 @@ class EconomyUsury extends PluginBase implements Listener{
 		$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
 		$this->usuryHosts[$host]["players"][$player][5] = $tid;
 		return true;
+	}
+	
+	public function getJoinedPlayers($host){
+		if(!isset($this->usuryHosts[$host])){
+			return false;
+		}
+		return $this->usuryHosts[$host]["players"];
 	}
 	
 	public function removePlayerFromHost($player, $host){

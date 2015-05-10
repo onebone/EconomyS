@@ -107,8 +107,19 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 					$sender->sendMessage("You don't have request from ".TextFormat::GREEN.$player);
 				}
 				break;
+				case "list":
+				if(!isset($this->requests[strtolower($sender->getName())])){
+					$sender->sendMessage("You don't have any request received.");
+					return true;
+				}
+				$msg = TextFormat::GREEN.count($this->requests[strtolower($sender->getName())]).TextFormat::RESET." players requested to your usury host: \n";
+				foreach($this->requests[strtolower($sender->getName())] as $player => $condition){
+					$msg .= TextFormat::GREEN.$player.TextFormat::RESET.": Item (".$condition[0]->getCount()." of ".$condition[0]->getName()."), due (".TextFormat::AQUA.$condition[1].TextFormat::RESET." min(s))\n";
+				}
+				$sender->sendMessage($msg);
+				break;
 				default:
-				$sender->sendMessage("Usage: /usury host <open|close|accept|decline>");
+				$sender->sendMessage("Usage: /usury host <open|close|accept|decline|list>");
 			}
 			break;
 			case "request":
@@ -160,6 +171,13 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			}else{
 				$sender->sendMessage("You have no request sent to ".TextFormat::GREEN.$host);
 			}
+			break;
+			case "list":
+			$msg = "There are ".TextFormat::GREEN.count($this->getPlugin()->getAllHosts()).TextFormat::RESET." hosts running: \n";
+			foreach($this->getPlugin()->getAllHosts() as $host => $data){
+				$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::AQUA.count($data["players"]).TextFormat::RESET." client(s)\n";
+			}
+			$sender->sendMessage($msg);
 			break;
 			default:
 			$sender->sendMessage("Usage: ".$this->getUsage());
