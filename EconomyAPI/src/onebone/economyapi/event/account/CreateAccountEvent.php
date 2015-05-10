@@ -40,4 +40,8 @@ class CreateAccountEvent extends EconomyAPIEvent{
 	public function setDefaultMoney($money){
 		$this->defaultMoney = $money;
 	}
+	
+	public function getDefaultMoney(){
+		return $this->defaultMoney;
+	}
 }
