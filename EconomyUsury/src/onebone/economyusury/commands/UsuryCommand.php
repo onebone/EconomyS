@@ -86,7 +86,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 					break;
 				}
 				if(isset($this->requests[strtolower($sender->getName())][$player])){
-					$this->getPlugin()->joinHost($player, $sender->getName(), 0.2, $this->requests[strtolower($sender->getName())][$player]);
+					$this->getPlugin()->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0]);
 					$sender->sendMessage("You have accepted player ".TextFormat::GREEN.$player.TextFormat::RESET." to your usury host.");
 					unset($this->requests[strtolower($sender->getName())][$player]);
 					return true;
@@ -115,8 +115,9 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			$requestTo = strtolower(array_shift($params));
 			$item = array_shift($params);
 			$count = array_shift($params);
-			if(trim($requestTo) == "" or trim($item) == "" or !is_numeric($count)){
-				$sender->sendMessage("Usage: /usury request <host> <guarantee item> <count>");
+			$due = array_shift($params);
+			if(trim($requestTo) == "" or trim($item) == "" or !is_numeric($count) or !is_numeric($due)){
+				$sender->sendMessage("Usage: /usury request <host> <guarantee item> <count> <due>");
 				break;
 			}
 			
@@ -138,7 +139,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			$item = Item::fromString($item);
 			$item->setCount($count);
 			if($sender->getInventory()->contains($item)){
-				$this->requests[$requestTo][strtolower($sender->getName())] = $item;
+				$this->requests[$requestTo][strtolower($sender->getName())] = [$item, $due];
 				$sender->sendMessage("You have sent request to host ".TextFormat::GREEN.$requestTo.TextFormat::RESET);
 				if(($player = $this->getPlugin()->getServer()->getPlayerExact($requestTo)) instanceof Player){
 					$player->sendMessage("You received a usury host client request by ".TextFormat::GREEN.$sender->getName().TextFormat::RESET);

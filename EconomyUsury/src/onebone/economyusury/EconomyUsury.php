@@ -50,15 +50,41 @@ class EconomyUsury extends PluginBase implements Listener{
 		$commandMap->register("usury", new UsuryCommand("usury", $this));
 		
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+		
+		foreach($this->usuryHosts as $host => $val){
+			foreach($val["players"] as $player => $data){
+				$this->usuryHosts[$host]["players"][$player][3] = time();
+				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
+				$this->usuryHosts[$host]["players"][$player][5] = $tid;
+			}
+		}
 	}
 	
 	public function onDisable(){
+		$this->validateDue();
+		
 		$saves = [
 			"usury.dat" => $this->usuryHosts,
 			"msg_queue.dat" => $this->msg_queue
 		];
 		foreach($saves as $fileName => $data){
 			file_put_contents($this->getDataFolder().$fileName, serialize($data));
+		}
+	}
+	
+	public function validateDue($cancelTask = true){
+		$now = time();
+		foreach($this->usuryHosts as $host => $val){
+			foreach($val["players"] as $player => $data){
+				$reduce = (($now - $data[3]) * 20);
+				$this->usuryHosts[$host]["players"][$player][3] = time();
+				$this->usuryHosts[$host]["players"][$player][4] -= $reduce;
+				if($cancelTask){
+					if($this->getServer()->getScheduler()->isQueued($data[5])){
+						$this->getServer()->getScheduler()->cancelTask($data[5]);
+					}
+				}
+			}
 		}
 	}
 	
@@ -148,11 +174,11 @@ class EconomyUsury extends PluginBase implements Listener{
 		$this->removeItem($player, $guarantee);
 		
 		$this->usuryHosts[$host]["players"][$player] = [
-			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), $due * 1200
+			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), time(), $due * 1200
 		];
 		
 		$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
-		$this->usuryHosts[$host]["players"][$player][4] = $tid;
+		$this->usuryHosts[$host]["players"][$player][5] = $tid;
 		return true;
 	}
 	
@@ -160,8 +186,8 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(!isset($this->usuryHosts[$host]["players"][$player])){
 			return false;
 		}
-		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][4])){
-			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][4]);
+		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][5])){
+			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][5]);
 		}
 		unset($this->usuryHosts[$host]["players"][$player]);
 		return true;
