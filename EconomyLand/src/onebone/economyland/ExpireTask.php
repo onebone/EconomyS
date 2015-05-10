@@ -22,6 +22,8 @@ namespace onebone\economyland;
 
 use pocketmine\scheduler\PluginTask;
 
+use onebone\economyland\EconomyLand;
+
 class ExpireTask extends PluginTask{
 	private $landId;
 	
@@ -32,8 +34,6 @@ class ExpireTask extends PluginTask{
 	}
 	
 	public function onRun($currentTick){
-		/** @var $owner EconomyLand */
-		$owner = $this->getOwner();
-		$owner->expireLand($this->landId);
+		$this->getOwner()->expireLand($this->landId);
 	}
 }

@@ -22,18 +22,18 @@
  
  use pocketmine\scheduler\PluginTask;
  
+ use onebone\economyauction\EconomyAuction;
+ 
  class QuitAuctionTask extends PluginTask{
 	 private $player;
 	 
-	 public function __construct($plugin, $player){
+	 public function __construct(EconomyAuction $plugin, $player){
 		 parent::__construct($plugin);
 		 
 		 $this->player = $player;
 	 }
 	 
 	 public function onRun($currentTick){
-		 /** @var $owner EconomyAuction */
-		 $owner = $this->getOwner();
-		 $owner->quitAuction($this->player);
+		 $this->getOwner()->quitAuction($this->player);
 	 }
  }
