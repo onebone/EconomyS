@@ -32,6 +32,8 @@ use pocketmine\math\Vector3;
 use pocketmine\block\SignPost;
 use pocketmine\block\Air;
 use pocketmine\tile\Sign;
+use pocketmine\block\Block;
+use pocketmine\item\Item;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\String;
 use pocketmine\nbt\tag\Int;
@@ -221,7 +223,7 @@ class EconomyProperty extends PluginBase implements Listener{
 				return false;
 			}
 		}
-
+		$expectedY = round($expectedY);
 		if($first[0] > $sec[0]){
 			$tmp = $first[0];
 			$first[0] = $sec[0];
@@ -254,7 +256,7 @@ class EconomyProperty extends PluginBase implements Listener{
 				$y = $tmpY;
 				break;
 			}else{
-				if($id === 0 and $lastBlock !== 0){
+				if($id === 0 and $lastBlock !== 0 or $b->canBeReplaced()){
 					$tmpY = $y;
 					$diff = $difference;
 				}
@@ -265,9 +267,7 @@ class EconomyProperty extends PluginBase implements Listener{
 			$y = $expectedY;
 		}
 
-		$sign = new SignPost(floor((($expectedYaw + 180) * 16 / 360) + 0.5) & 0x0F);
-		$sign->position(new Position($centerx, $y, $centerz, $level));
-		$level->setBlock($sign, $sign);
+		$level->setBlock(new Position($centerx, $y, $centerz, $level), Block::get(Item::SIGN_POST));
 
 		$info = $this->property->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
 		$tile = new Sign($level->getChunk($centerx >> 4, $centerz >> 4, false), new Compound(false, [
