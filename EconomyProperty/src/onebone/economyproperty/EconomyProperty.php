@@ -270,7 +270,7 @@ class EconomyProperty extends PluginBase implements Listener{
 		$level->setBlock($sign, $sign);
 
 		$info = $this->property->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
-		$tile = new Sign($level->getChunkAt($centerx >> 4, $centerz >> 4), new Compound(false, [
+		$tile = new Sign($level->getChunk($centerx >> 4, $centerz >> 4, false), new Compound(false, [
 			"id" => new String("id", Tile::SIGN),
 			"x" => new Int("x", $centerx),
 			"y" => new Int("y", $y),
