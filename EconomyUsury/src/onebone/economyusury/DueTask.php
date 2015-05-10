@@ -45,58 +45,18 @@ class DueTask extends PluginTask{
 		$owner = $this->getOwner();
 
 		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
-			$player->sendMessage("Your usury due was expired. Your guarantee item was paid to the host.");
+			$player->sendMessage("Your usury with ".TextFormat::GREEN.$this->hostOwner.TextFormat::RESET." due was expired. Your guarantee item was paid to the host.");
+		}else{
+			$owner->queueMessage($this->playerName, "Your usury with ".TextFormat::GREEN.$this->hostOwner.TextFormat::RESET." due was expired. Your guarantee item was paid to the host.");
 		}
 		
 		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
 			$player->getInventory()->addItem($this->guarantee);
 			$player->sendMessage("Usury of ".TextFormat::GREEN.$this->playerName.TextFormat::RESET." was expired. Guarantee item was paid to your inventory.");
 		}else{
-			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner); // FIXME: Item not given to offline player
+			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
 			$c = $this->guarantee->getCount();
-			echo $this->guarantee->getId().", ".$this->guarantee->getDamage().", $c\n";
-			foreach($data->Inventory as $key => $item){
-				if($item["id"] == $this->guarantee->getId() and $item["Damage"] == $this->guarantee->getDamage()){
-					/*$giveCnt = min($count, $this->guarantee->getMaxStackSize() - $item["Count"]);
-					$count -= $giveCnt;
-					echo $item["Count"].", $giveCnt\n";
-					$item["Count"] = 20;
-					if($count <= 0){
-						break;
-					}*/
-					$giveCnt = min($c, $this->guarantee->getMaxStackSize() - $item["Count"]);
-					$c -= $giveCnt;
-					$item["Count"] += $giveCnt;
-					//echo "$giveCnt, We got here\n";
-					if($c <= 0){
-						break;
-					}
-				}
-			}
-			if($c > 0){
-				foreach($data->Inventory as $key => $item){
-					if($item["id"] == 0){
-						/*$giveCnt = min($count, $this->guarantee->getMaxStackSize());
-						$count -= $giveCnt;
-						
-						$item["id"] = 1;// $this->guarantee->getId();
-						$item["Damage"] = 0;//$this->guarantee->getDamage();
-						$item["Count"] = 20;
-						echo "I have given $giveCnt\n";
-						if($count <= 0){
-							break;
-						}*/
-						$giveCnt = min($c, $this->guarantee->getMaxStackSize());
-						
-						$item["id"] = $this->guarantee->getId();
-						$item["Damage"] = $this->guarantee->getDamage();
-						$item["Count"] = $giveCnt;
-						
-						$c -= $giveCnt;
-					}
-				}
-			}
-			$owner->getServer()->saveOfflinePlayerData($this->hostOwner, $data);
+			$owner->addItem($this->hostOwner, $this->guarantee);
 		}
 		$owner->removePlayerFromHost($this->playerName, $this->hostOwner);
 	}

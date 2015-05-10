@@ -42,7 +42,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 	
 	public function onPlayerJoin(PlayerJoinEvent $event){
 		if(isset($this->requests[strtolower($event->getPlayer()->getName())])){
-			$event->getPlayer()->sendMessage("You have ".TextFormat::GREEN.count($this->requests[strtolower($event->getPlayer()->getName())]).TextFormat::RESET." received usury requests.");
+			$event->getPlayer()->sendMessage("You have received ".TextFormat::GREEN.count($this->requests[strtolower($event->getPlayer()->getName())]).TextFormat::RESET." usury request(s).");
 		}
 	}
 	
@@ -94,7 +94,18 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				$sender->sendMessage("You don't have player ".TextFormat::GREEN.$player.TextFormat::RESET." in your request list.");
 				break;
 				case "decline":
-				
+				$player = strtolower(array_shift($params));
+				if(trim($player) === ""){
+					$sender->sendMessage("Usage: /usury host decline <player>");
+					break;
+				}
+				if(isset($this->requests[strtolower($sender->getName())][$player])){
+					unset($this->requests[strtolower($sender->getName())][$player]);
+					$this->getPlugin()->queueMessage($player, "Your usury request was declined by ".TextFormat::GREEN.$sender->getName());
+					$sender->sendMessage("You have declined request from ".TextFormat::GREEN.$player);
+				}else{
+					$sender->sendMessage("You don't have request from ".TextFormat::GREEN.$player);
+				}
 				break;
 				default:
 				$sender->sendMessage("Usage: /usury host <open|close|accept|decline>");
@@ -113,6 +124,12 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				$sender->sendMessage("There's no usury host ".TextFormat::GREEN.$requestTo.TextFormat::RESET);
 				break;
 			}
+			
+			if($requestTo === strtolower($sender->getName())){
+				$sender->sendMessage("You cannot join your own host.");
+				break;
+			}
+			
 			if(isset($this->requests[$requestTo][strtolower($sender->getName())]) or $this->getPlugin()->isPlayerJoinedHost($sender->getName(), $requestTo)){
 				$sender->sendMessage("You are already related to the host ".TextFormat::GREEN.$requestTo.TextFormat::RESET);
 				break;
@@ -121,7 +138,6 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			$item = Item::fromString($item);
 			$item->setCount($count);
 			if($sender->getInventory()->contains($item)){
-			//	$sender->getInventory()->removeItem($item);
 				$this->requests[$requestTo][strtolower($sender->getName())] = $item;
 				$sender->sendMessage("You have sent request to host ".TextFormat::GREEN.$requestTo.TextFormat::RESET);
 				if(($player = $this->getPlugin()->getServer()->getPlayerExact($requestTo)) instanceof Player){
@@ -132,7 +148,17 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			}
 			break;
 			case "cancel":
-			
+			$host = strtolower(array_shift($params));
+			if(trim($host) === ""){
+				$sender->sendMessage("Usage: /usury cancel <host>");
+				break;
+			}
+			if(isset($this->requests[$host][strtolower($sender->getName())])){
+				unset($this->requests[$host][strtolower($sender->getName())]);
+				$sender->sendMessage("Usury request to ".TextFormat::GREEN.$host.TextFormat::RESET." was cancelled.");
+			}else{
+				$sender->sendMessage("You have no request sent to ".TextFormat::GREEN.$host);
+			}
 			break;
 			default:
 			$sender->sendMessage("Usage: ".$this->getUsage());

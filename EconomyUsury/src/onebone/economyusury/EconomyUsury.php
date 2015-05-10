@@ -22,14 +22,14 @@ namespace onebone\economyusury;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
-use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
 
 use onebone\economyusury\commands\UsuryCommand;
 
 class EconomyUsury extends PluginBase implements Listener{
-	private $usuryHosts;
+	private $usuryHosts, $msg_queue;
 	
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -39,6 +39,11 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(!is_file($this->getDataFolder()."usury.dat")){
 			file_put_contents($this->getDataFolder()."usury.dat", serialize([]));
 		}
+		if(!is_file($this->getDataFolder()."msg_queue.dat")){
+			file_put_contents($this->getDataFolder()."msg_queue.dat", serialize([]));
+		}
+		
+		$this->msg_queue = unserialize(file_get_contents($this->getDataFolder()."msg_queue.dat"));
 		$this->usuryHosts = unserialize(file_get_contents($this->getDataFolder()."usury.dat"));
 		
 		$commandMap = $this->getServer()->getCommandMap();
@@ -47,8 +52,24 @@ class EconomyUsury extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 	
-	public function onLoginEvent(PlayerLoginEvent $event){
-		
+	public function onDisable(){
+		$saves = [
+			"usury.dat" => $this->usuryHosts,
+			"msg_queue.dat" => $this->msg_queue
+		];
+		foreach($saves as $fileName => $data){
+			file_put_contents($this->getDataFolder().$fileName, serialize($data));
+		}
+	}
+	
+	public function onJoinEvent(PlayerJoinEvent $event){
+		$player = $event->getPlayer();
+		if(isset($this->msg_queue[$player->getName()])){
+			foreach($this->msg_queue[$player->getName()] as $msg){
+				$player->sendMessage($msg);
+			}
+			unset($this->msg_queue[$player->getName()]);
+		}
 	}
 	
 	public function usuryHostExists($player){
@@ -143,6 +164,15 @@ class EconomyUsury extends PluginBase implements Listener{
 			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][4]);
 		}
 		unset($this->usuryHosts[$host]["players"][$player]);
+		return true;
+	}
+	
+	public function queueMessage($player, $message){
+		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+			$p->sendMessage($message);
+			return false;
+		}
+		$this->msg_queue[$player][] = $message;
 		return true;
 	}
 	
