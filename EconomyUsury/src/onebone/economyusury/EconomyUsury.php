@@ -69,6 +69,9 @@ class EconomyUsury extends PluginBase implements Listener{
 				$this->usuryHosts[$host]["players"][$player][3] = time();
 				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
 				$this->usuryHosts[$host]["players"][$player][6] = $tid;
+				
+				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
+				$this->usuryHosts[$data[3]]["players"][$player->getName()] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid];
 			}
 		}
 	}
@@ -95,8 +98,8 @@ class EconomyUsury extends PluginBase implements Listener{
 				$this->usuryHosts[$host]["players"][$player][3] = time();
 				$this->usuryHosts[$host]["players"][$player][4] -= $reduce;
 				if($cancelTask){
-					if($this->getServer()->getScheduler()->isQueued($data[5])){
-						$this->getServer()->getScheduler()->cancelTask($data[5]);
+					if($this->getServer()->getScheduler()->isQueued($data[6])){
+						$this->getServer()->getScheduler()->cancelTask($data[6]);
 					}
 				}
 			}
@@ -116,8 +119,7 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(isset($this->schedule_req[$player->getName()])){
 			foreach($this->schedule_req[$player->getName()] as $data){
 				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
-				$this->usuryHosts[$data[3]]["players"][$player->getName()][4] = time();
-				$this->usuryHosts[$data[3]]["players"][$player->getName()][6] = $tid;
+				$this->usuryHosts[$data[3]]["players"][$player->getName()] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid];
 			}
 			unset($this->schedule_req[$player->getName()]);
 		}
@@ -228,21 +230,37 @@ class EconomyUsury extends PluginBase implements Listener{
 		}
 		$this->removeItem($player, $guarantee);
 		
-		$this->usuryHosts[$host]["players"][$player] = [
-			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), null, $due * 1200, $money
-		];
-		
 		if($this->getServer()->getPlayerExact($player) instanceof Player){
 			$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
-			$this->usuryHosts[$data[3]]["players"][$player->getName()][4] = time();
-			$this->usuryHosts[$data[3]]["players"][$player->getName()][6] = $tid;
+			$this->usuryHosts[$host]["players"][$player] = [
+				$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), time(), $due * 1200, $money, $tid
+			];
 			return true;
 		}
-		$this->schedule_req[$player][] = [$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), $host, $due * 1200];
+		$this->schedule_req[$player][] = [$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), $host, $due * 1200, $money];
 		return true;
 	}
 	
+	public function getHostsJoined($player){
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		
+		$ret = [];
+		foreach($this->usuryHosts as $host => $data){
+			foreach($data["players"] as $p => $dummy){
+				if($player === $p){
+					$ret[] = $host;
+					break;
+				}
+			}
+		}
+		return $ret;
+	}
+	
 	public function getJoinedPlayers($host){
+		$host = strtolower($host);
 		if(!isset($this->usuryHosts[$host])){
 			return false;
 		}
