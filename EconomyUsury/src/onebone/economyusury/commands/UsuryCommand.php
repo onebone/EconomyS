@@ -29,12 +29,14 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\item\Item;
 use pocketmine\Player;
 
+use onebone\economyapi\EconomyAPI;
+
 class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, Listener{
 	private $requests = [];
 	
 	public function __construct($cmd = "usury", $plugin){
 		parent::__construct($cmd, $plugin);
-		$this->setUsage("/$cmd <host|request>");
+		$this->setUsage("/$cmd <host|request|cancel>");
 		$this->setDescription("Usury master command");
 		
 		$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
@@ -86,8 +88,11 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 					break;
 				}
 				if(isset($this->requests[strtolower($sender->getName())][$player])){
-					$this->getPlugin()->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0]);
+					$this->getPlugin()->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0], $this->requests[strtolower($sender->getName())][$player][2]);
 					$sender->sendMessage("You have accepted player ".TextFormat::GREEN.$player.TextFormat::RESET." to your usury host.");
+					$this->getPlugin()->queueMessage($player, "You are accepted to the usury host by ".TextFormat::GREEN.$sender->getName());
+					EconomyAPI::getInstance()->addMoney($player, $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
+					EconomyAPI::getInstance()->reduceMoney($sender->getName(), $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
 					unset($this->requests[strtolower($sender->getName())][$player]);
 					return true;
 				}
@@ -108,13 +113,13 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				}
 				break;
 				case "list":
-				if(!isset($this->requests[strtolower($sender->getName())])){
+				if(!isset($this->requests[strtolower($sender->getName())]) or count($this->requests[strtolower($sender->getName())]) <= 0){
 					$sender->sendMessage("You don't have any request received.");
 					return true;
 				}
 				$msg = TextFormat::GREEN.count($this->requests[strtolower($sender->getName())]).TextFormat::RESET." players requested to your usury host: \n";
 				foreach($this->requests[strtolower($sender->getName())] as $player => $condition){
-					$msg .= TextFormat::GREEN.$player.TextFormat::RESET.": Item (".$condition[0]->getCount()." of ".$condition[0]->getName()."), due (".TextFormat::AQUA.$condition[1].TextFormat::RESET." min(s))\n";
+					$msg .= TextFormat::GREEN.$player.TextFormat::RESET.": Item (".$condition[0]->getCount()." of ".$condition[0]->getName()."), due (".TextFormat::AQUA.$condition[1].TextFormat::RESET." min(s), money (".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$condition[2].TextFormat::RESET."))\n";
 				}
 				$sender->sendMessage($msg);
 				break;
@@ -127,8 +132,9 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			$item = array_shift($params);
 			$count = array_shift($params);
 			$due = array_shift($params);
-			if(trim($requestTo) == "" or trim($item) == "" or !is_numeric($count) or !is_numeric($due)){
-				$sender->sendMessage("Usage: /usury request <host> <guarantee item> <count> <due>");
+			$money = array_shift($params);
+			if(trim($requestTo) == "" or trim($item) == "" or !is_numeric($count) or !is_numeric($due) or !is_numeric($money)){
+				$sender->sendMessage("Usage: /usury request <host> <guarantee item> <count> <due> <money>");
 				break;
 			}
 			
@@ -150,7 +156,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			$item = Item::fromString($item);
 			$item->setCount($count);
 			if($sender->getInventory()->contains($item)){
-				$this->requests[$requestTo][strtolower($sender->getName())] = [$item, $due];
+				$this->requests[$requestTo][strtolower($sender->getName())] = [$item, $due, $money];
 				$sender->sendMessage("You have sent request to host ".TextFormat::GREEN.$requestTo.TextFormat::RESET);
 				if(($player = $this->getPlugin()->getServer()->getPlayerExact($requestTo)) instanceof Player){
 					$player->sendMessage("You received a usury host client request by ".TextFormat::GREEN.$sender->getName().TextFormat::RESET);
@@ -175,7 +181,13 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 			case "list":
 			$msg = "There are ".TextFormat::GREEN.count($this->getPlugin()->getAllHosts()).TextFormat::RESET." hosts running: \n";
 			foreach($this->getPlugin()->getAllHosts() as $host => $data){
-				$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::AQUA.count($data["players"]).TextFormat::RESET." client(s)\n";
+				$ic = TextFormat::GREEN;
+				if($data[0] >= 50){
+					$ic = TextFormat::YELLOW;
+				}elseif($data[0] >= 100){
+					$ic = TextFormat::RED;
+				}
+				$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::AQUA.count($data["players"]).TextFormat::RESET." client(s), interest : ".$ic.$data[0]."%".TextFormat::RESET." per ".TextFormat::GOLD.$data[1].TextFormat::RESET."min(s)\n";
 			}
 			$sender->sendMessage($msg);
 			break;

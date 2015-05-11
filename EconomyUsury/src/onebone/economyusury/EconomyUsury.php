@@ -25,15 +25,23 @@ use pocketmine\Player;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
+use pocketmine\utils\TextFormat;
 
 use onebone\economyusury\commands\UsuryCommand;
 
+use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\event\money\PayMoneyEvent;
+
 class EconomyUsury extends PluginBase implements Listener{
-	private $usuryHosts, $msg_queue;
+	private $usuryHosts, $msg_queue, $schedule_req;
 	
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
 			mkdir($this->getDataFolder());
+		}
+		if(!defined("\\onebone\\economyapi\\EconomyAPI::API_VERSION") or EconomyAPI::API_VERSION < 1){
+			$this->getLogger()->warning("Your EconomyAPI version is not compatible with this plugin. Please update it.");
+			return;
 		}
 		
 		if(!is_file($this->getDataFolder()."usury.dat")){
@@ -42,7 +50,11 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(!is_file($this->getDataFolder()."msg_queue.dat")){
 			file_put_contents($this->getDataFolder()."msg_queue.dat", serialize([]));
 		}
+		if(!is_file($this->getDataFolder()."schedule_required.dat")){
+			file_put_contents($this->getDataFolder()."schedule_required.dat", serialize([]));
+		}
 		
+		$this->schedule_req = unserialize(file_get_contents($this->getDataFolder()."schedule_required.dat"));
 		$this->msg_queue = unserialize(file_get_contents($this->getDataFolder()."msg_queue.dat"));
 		$this->usuryHosts = unserialize(file_get_contents($this->getDataFolder()."usury.dat"));
 		
@@ -53,9 +65,10 @@ class EconomyUsury extends PluginBase implements Listener{
 		
 		foreach($this->usuryHosts as $host => $val){
 			foreach($val["players"] as $player => $data){
+				if($data[3] === null) continue;
 				$this->usuryHosts[$host]["players"][$player][3] = time();
 				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
-				$this->usuryHosts[$host]["players"][$player][5] = $tid;
+				$this->usuryHosts[$host]["players"][$player][6] = $tid;
 			}
 		}
 	}
@@ -65,7 +78,8 @@ class EconomyUsury extends PluginBase implements Listener{
 		
 		$saves = [
 			"usury.dat" => $this->usuryHosts,
-			"msg_queue.dat" => $this->msg_queue
+			"msg_queue.dat" => $this->msg_queue,
+			"schedule_required.dat" => $this->schedule_req
 		];
 		foreach($saves as $fileName => $data){
 			file_put_contents($this->getDataFolder().$fileName, serialize($data));
@@ -76,6 +90,7 @@ class EconomyUsury extends PluginBase implements Listener{
 		$now = time();
 		foreach($this->usuryHosts as $host => $val){
 			foreach($val["players"] as $player => $data){
+				if($data[3] === null) continue;
 				$reduce = (($now - $data[3]) * 20);
 				$this->usuryHosts[$host]["players"][$player][3] = time();
 				$this->usuryHosts[$host]["players"][$player][4] -= $reduce;
@@ -90,11 +105,47 @@ class EconomyUsury extends PluginBase implements Listener{
 	
 	public function onJoinEvent(PlayerJoinEvent $event){
 		$player = $event->getPlayer();
+		
 		if(isset($this->msg_queue[$player->getName()])){
 			foreach($this->msg_queue[$player->getName()] as $msg){
 				$player->sendMessage($msg);
 			}
 			unset($this->msg_queue[$player->getName()]);
+		}
+		
+		if(isset($this->schedule_req[$player->getName()])){
+			foreach($this->schedule_req[$player->getName()] as $data){
+				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
+				$this->usuryHosts[$data[3]]["players"][$player->getName()][4] = time();
+				$this->usuryHosts[$data[3]]["players"][$player->getName()][6] = $tid;
+			}
+			unset($this->schedule_req[$player->getName()]);
+		}
+	}
+	
+	public function onPayEvent(PayMoneyEvent $event){
+		$target = strtolower($event->getTarget());
+		$player = strtolower($event->getPayer());
+		
+		if(isset($this->usuryHosts[$target]["players"][$player])){
+			$condition = $this->usuryHosts[$target]["players"][$player];
+			
+			$mustPay = $condition[5];
+			$amount = $event->getAmount();
+			
+			if($mustPay <= $amount){
+				$this->queueMessage($player, "You have paid all money to pay to ".TextFormat::GREEN.$target.TextFormat::RESET." and contract was terminated.");
+				$this->queueMessage($target, "Your usury client ".TextFormat::GREEN.$player.TextFormat::RESET." returned all money and contract was terminated.");
+				
+				$this->addItem($player, Item::get($condition[0], $condition[2], $condition[3]));
+				
+				$this->getServer()->getScheduler()->cancelTask($condition[6]);
+				
+				unset($this->usuryHosts[$target]["players"][$player]);
+				return;
+			}
+			$this->usuryHosts[$target]["players"][$player][5] -= $amount;
+			$this->queueMessage($player, "You have to pay ".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$this->usuryHosts[$target]["players"][$player][5].TextFormat::RESET." more to ".TextFormat::GREEN.$target);
 		}
 	}
 	
@@ -159,7 +210,7 @@ class EconomyUsury extends PluginBase implements Listener{
 		return $this->usuryHosts;
 	}
 	
-	public function joinHost($player, $host, $due, Item $guarantee){
+	public function joinHost($player, $host, $due, Item $guarantee, $money){
 		if($guarantee === null){
 			throw new \Exception("Item cannot be null");
 		}
@@ -178,11 +229,16 @@ class EconomyUsury extends PluginBase implements Listener{
 		$this->removeItem($player, $guarantee);
 		
 		$this->usuryHosts[$host]["players"][$player] = [
-			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), time(), $due * 1200
+			$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), null, $due * 1200, $money
 		];
 		
-		$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
-		$this->usuryHosts[$host]["players"][$player][5] = $tid;
+		if($this->getServer()->getPlayerExact($player) instanceof Player){
+			$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
+			$this->usuryHosts[$data[3]]["players"][$player->getName()][4] = time();
+			$this->usuryHosts[$data[3]]["players"][$player->getName()][6] = $tid;
+			return true;
+		}
+		$this->schedule_req[$player][] = [$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), $host, $due * 1200];
 		return true;
 	}
 	
