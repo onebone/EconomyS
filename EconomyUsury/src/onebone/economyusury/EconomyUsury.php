@@ -70,7 +70,7 @@ class EconomyUsury extends PluginBase implements Listener{
 				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
 				$this->usuryHosts[$host]["players"][$player][6] = $tid;
 				
-				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
+				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $data[3]), $data[4])->getTaskId();
 				$this->usuryHosts[$data[3]]["players"][$player->getName()] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid];
 			}
 		}
