@@ -36,7 +36,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 	
 	public function __construct($cmd = "usury", $plugin){
 		parent::__construct($cmd, $plugin);
-		$this->setUsage("/$cmd <host|request|cancel>");
+		$this->setUsage("/$cmd <host|request|cancel|list|left>");
 		$this->setDescription("Usury master command");
 		
 		$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
@@ -224,6 +224,19 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				}
 				$sender->sendMessage($msg);
 			}
+			break;
+			case "left":
+			$hosts = $this->getPlugin()->getHostsJoined($sender->getName());
+			if(count($hosts) <= 0){
+				$sender->sendMessage("You have not joined any usury host.");
+				break;
+			}
+			$msg = "Threre are ".TextFormat::GREEN.count($hosts).TextFormat::RESET." hosts you have joined: \n";
+			$all = $this->getPlugin()->getAllHosts();
+			foreach($hosts as $host){
+				$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$all[$host]["players"][strtolower($sender->getName())][5].TextFormat::RESET."\n";
+			}
+			$sender->sendMessage($msg);
 			break;
 			default:
 			$sender->sendMessage("Usage: ".$this->getUsage());
