@@ -26,6 +26,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\Listener;
 use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
+use pocketmine\utils\Config;
 
 use onebone\economyusury\commands\UsuryCommand;
 
@@ -33,7 +34,7 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\money\PayMoneyEvent;
 
 class EconomyUsury extends PluginBase implements Listener{
-	private $usuryHosts, $msg_queue, $schedule_req;
+	private $usuryHosts, $msg_queue, $schedule_req, $lang;
 	
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -53,6 +54,8 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(!is_file($this->getDataFolder()."schedule_required.dat")){
 			file_put_contents($this->getDataFolder()."schedule_required.dat", serialize([]));
 		}
+		$this->saveResource("language.properties");
+		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES);
 		
 		$this->schedule_req = unserialize(file_get_contents($this->getDataFolder()."schedule_required.dat"));
 		$this->msg_queue = unserialize(file_get_contents($this->getDataFolder()."msg_queue.dat"));
@@ -71,6 +74,14 @@ class EconomyUsury extends PluginBase implements Listener{
 				$tid2 = $this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $host, $player), $data[8], $val[1] * 1200)->getTaskId();
 				$this->usuryHosts[$host]["players"][$player] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid, time(), $data[8], $tid2];
 			}
+		}
+	}
+	
+	public function getMessage($key, $val = ["%1", "%2"]){
+		if($this->lang->exists($key)){
+			return str_replace(["%1", "%2"], $val, $this->lang->get($key));
+		}else{
+			return $key;
 		}
 	}
 	
