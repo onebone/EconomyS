@@ -37,7 +37,11 @@ use onebone\economyapi\database\DataConverter;
 use onebone\economyapi\task\SaveTask;
 
 class EconomyAPI extends PluginBase implements Listener{
-
+	/**
+	 * @var int
+	 */
+	const API_VERSION = 1;
+	
 	/**
 	 * @var EconomyAPI
 	 */
@@ -107,7 +111,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @var int CURRENT_DATABASE_VERSION The version of current database
 	 */
 	const CURRENT_DATABASE_VERSION = 0x02;
-
+	
 	/**
 	 * @var array
 	 */
