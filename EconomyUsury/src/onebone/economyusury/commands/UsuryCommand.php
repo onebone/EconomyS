@@ -90,7 +90,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				if(isset($this->requests[strtolower($sender->getName())][$player])){
 					$this->getPlugin()->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0], $this->requests[strtolower($sender->getName())][$player][2]);
 					$sender->sendMessage($this->getPlugin()->getMessage("accepted-player", [$player, "%2"]));
-					$this->getPlugin()->queueMessage($player, $this->getPlugin()->getMessage("accepted-by-host", [$player, "%2"]));
+					$this->getPlugin()->queueMessage($player, $this->getPlugin()->getMessage("accepted-by-host", [$sender->getName(), "%2"]));
 					EconomyAPI::getInstance()->addMoney($player, $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
 					EconomyAPI::getInstance()->reduceMoney($sender->getName(), $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
 					unset($this->requests[strtolower($sender->getName())][$player]);
@@ -121,9 +121,9 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 						$sender->sendMessage($this->getPlugin()->getMessage("no-joined-host"));
 						break;
 					}
-					$msg = TextFormat::GREEN.count($players).TextFormat::RESET." players joined to your usury host: \n";
+					$msg = $this->getPlugin()->getMessage("list-clients-top", [count($players)]);
 					foreach($players as $player => $condition){
-						$msg .= TextFormat::GREEN.$player.TextFormat::RESET.": Item (".$condition[2]." of ".Item::get($condition[0], $condition[1], $condition[2])->getName()."), money (".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$condition[2].TextFormat::RESET."))\n";
+						$msg .= $this->getPlugin()->getMessage("list-clients", [$player, $condition[2], Item::get($condition[0], $condition[1], $condition[2])->getName(), $condition[2]]);
 					}
 					$sender->sendMessage($msg);
 					break;
@@ -132,9 +132,9 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 						$sender->sendMessage($this->getPlugin()->getMessage("no-request-received"));
 						return true;
 					}
-					$msg = TextFormat::GREEN.count($this->requests[strtolower($sender->getName())]).TextFormat::RESET." players requested to your usury host: \n";
+					$msg = $this->getPlugin()->getMessage("list-requesters-top", [count($this->requests[strtolower($sender->getName())])]);
 					foreach($this->requests[strtolower($sender->getName())] as $player => $condition){
-						$msg .= TextFormat::GREEN.$player.TextFormat::RESET.": Item (".$condition[0]->getCount()." of ".$condition[0]->getName()."), due (".TextFormat::AQUA.$condition[1].TextFormat::RESET." min(s), money (".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$condition[2].TextFormat::RESET."))\n";
+						$msg .= $this->getPlugin()->getMessage("list-requesters", [$player, $condition[0]->getCount(), $condition[0]->getName(), $condition[1], $condition[2]]);
 					}
 					$sender->sendMessage($msg);
 					break;
@@ -204,7 +204,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 					$sender->sendMessage($this->getPlugin()->getMessage("no-host-joined"));
 					break;
 				}
-				$msg = "There are ".TextFormat::GREEN.count($hosts).TextFormat::RESET." hosts you have joined: \n";
+				$msg = $this->getPlugin()->getMessage("list-joined-top", [count($hosts)]);
 				foreach($hosts as $host){
 					$msg .= $host.", ";
 				}
@@ -212,7 +212,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				$sender->sendMessage($msg);
 				break;
 				default:
-				$msg = "There are ".TextFormat::GREEN.count($this->getPlugin()->getAllHosts()).TextFormat::RESET." hosts running: \n";
+				$msg = $this->getPlugin()->getMessage("list-hosts-top", [count($this->getPlugin()->getAllHosts())]);
 				foreach($this->getPlugin()->getAllHosts() as $host => $data){
 					$ic = TextFormat::GREEN;
 					if($data[0] >= 50){
@@ -220,7 +220,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 					}elseif($data[0] >= 100){
 						$ic = TextFormat::RED;
 					}
-					$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::AQUA.count($data["players"]).TextFormat::RESET." client(s), interest : ".$ic.$data[0]."%".TextFormat::RESET." per ".TextFormat::GOLD.$data[1].TextFormat::RESET."min(s)\n";
+					$msg .= $this->getPlugin()->getMessage("list-hosts", [$host, count($data["players"]), $ic, $data[0], $data[1]]);
 				}
 				$sender->sendMessage($msg);
 			}
@@ -231,10 +231,10 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 				$sender->sendMessage($this->getPlugin()->getMessage("no-host-joined"));
 				break;
 			}
-			$msg = "Threre are ".TextFormat::GREEN.count($hosts).TextFormat::RESET." hosts you have joined: \n";
+			$msg = $this->getPlugin()->getMessage("list-left-top", [count($hosts)]);
 			$all = $this->getPlugin()->getAllHosts();
 			foreach($hosts as $host){
-				$msg .= TextFormat::GREEN.$host.TextFormat::RESET.": ".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$all[$host]["players"][strtolower($sender->getName())][5].TextFormat::RESET."\n";
+				$msg .= $this->getPlugin()->getMessage("list-left", [$host, $all[$host]["players"][strtolower($sender->getName())][5]]);
 			}
 			$sender->sendMessage($msg);
 			break;

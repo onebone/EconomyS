@@ -77,9 +77,18 @@ class EconomyUsury extends PluginBase implements Listener{
 		}
 	}
 	
-	public function getMessage($key, $val = ["%1", "%2"]){
+	public function getMessage($key, $val = ["%1", "%2", "%3", "%4"]){
 		if($this->lang->exists($key)){
-			return str_replace(["%1", "%2"], $val, $this->lang->get($key));
+			if(count($val) < 3){
+				$val[0] = isset($val[0]) ? $val[0]:"%1";
+				$val[1] = isset($val[1]) ? $val[1]:"%2";
+				$val[2] = isset($val[2]) ? $val[2]:"%3";
+				$val[3] = isset($val[3]) ? $val[3]:"%4";
+				$val[4] = isset($val[4]) ? $val[4]:"%5";
+			}
+			$val[5] = "\n";
+			$val[6] = EconomyAPI::getInstance()->getMonetaryUnit();
+			return str_replace(["%1", "%2", "%3", "%4", "%5", "\\n", "%MONETARY_UNIT%"], $val, $this->lang->get($key));
 		}else{
 			return $key;
 		}
@@ -146,8 +155,8 @@ class EconomyUsury extends PluginBase implements Listener{
 			$amount = $event->getAmount();
 			
 			if($mustPay <= $amount){
-				$this->queueMessage($player, "You have paid all money to pay to ".TextFormat::GREEN.$target.TextFormat::RESET." and contract was terminated.");
-				$this->queueMessage($target, "Your usury client ".TextFormat::GREEN.$player.TextFormat::RESET." returned all money and contract was terminated.");
+				$this->queueMessage($player, $this->getMessage("paid-all", [$target, "%2"]));
+				$this->queueMessage($target, $this->getMessage("client-paid-all", [$player, "%2"]));
 				
 				$this->addItem($player, Item::get($condition[0], $condition[2], $condition[3]));
 				
@@ -157,7 +166,7 @@ class EconomyUsury extends PluginBase implements Listener{
 				return;
 			}
 			$this->usuryHosts[$target]["players"][$player][5] -= $amount;
-			$this->queueMessage($player, "You have to pay ".TextFormat::GOLD.EconomyAPI::getInstance()->getMonetaryUnit().$this->usuryHosts[$target]["players"][$player][5].TextFormat::RESET." more to ".TextFormat::GREEN.$target);
+			$this->queueMessage($player, $this->getMessage("loan-left", [$this->usuryHosts[$target]["players"][$player][5], $target]));
 		}
 	}
 	
@@ -292,12 +301,15 @@ class EconomyUsury extends PluginBase implements Listener{
 		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][5])){
 			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][5]);
 		}
+		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][9])){
+			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][9]);
+		}
 		unset($this->usuryHosts[$host]["players"][$player]);
 		return true;
 	}
 	
-	public function queueMessage($player, $message){
-		if(($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
+	public function queueMessage($player, $message, $checkPlayer = true){
+		if($checkPlayer === true and ($p = $this->getServer()->getPlayerExact($player)) instanceof Player){
 			$p->sendMessage($message);
 			return false;
 		}

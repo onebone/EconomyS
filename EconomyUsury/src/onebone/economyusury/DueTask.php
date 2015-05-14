@@ -45,18 +45,19 @@ class DueTask extends PluginTask{
 		$owner = $this->getOwner();
 
 		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
-			$player->sendMessage("Your usury with ".TextFormat::GREEN.$this->hostOwner.TextFormat::RESET." due was expired. Your guarantee item was paid to the host.");
+			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}else{
-			$owner->queueMessage($this->playerName, "Your usury with ".TextFormat::GREEN.$this->hostOwner.TextFormat::RESET." due was expired. Your guarantee item was paid to the host.");
+			$owner->queueMessage($this->playerName, $owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}
 		
 		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
 			$player->getInventory()->addItem($this->guarantee);
-			$player->sendMessage("Usury of ".TextFormat::GREEN.$this->playerName.TextFormat::RESET." was expired. Guarantee item was paid to your inventory.");
+			$player->sendMessage($owner->getMessage("usury-expired", [$this->playerName]));
 		}else{
 			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
 			$c = $this->guarantee->getCount();
 			$owner->addItem($this->hostOwner, $this->guarantee);
+			$owner->queueMessage($this->hostOwner, $owner->getMessage("usury-expired", [$this->playerName], false));
 		}
 		$owner->removePlayerFromHost($this->playerName, $this->hostOwner);
 	}
