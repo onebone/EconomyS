@@ -241,10 +241,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$startZ = $endZ;
 					$endZ = $backup;
 				}
-				$startX--;
-				$endX++;
-				$startZ--;
-				$endZ++;
+				
 				/*$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '{$sender->getLevel()->getFolderName()}'")->fetchArray(SQLITE3_ASSOC);
 				if(!is_bool($result)){
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
@@ -255,7 +252,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
 					return true;
 				}
-				$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
+				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->config->get("price-per-y-axis");
 				if(EconomyAPI::getInstance()->reduceMoney($sender, $price, true, "EconomyLand") === EconomyAPI::RET_INVALID){
 					$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 					return true;
@@ -574,7 +571,11 @@ class EconomyLand extends PluginBase implements Listener{
 	public function permissionCheck(Event $event){
 		/** @var $player Player */
 		$player = $event->getPlayer();
-		$block = $event->getBlock();
+		if($event instanceof PlayerInteractEvent){
+			$block = $event->getBlock()->getSide($event->getFace());
+		}else{
+			$block = $event->getBlock();
+		}
 		
 		$x = $block->getX();
 		$z = $block->getZ();
