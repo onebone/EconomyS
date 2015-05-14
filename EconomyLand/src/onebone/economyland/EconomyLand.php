@@ -554,7 +554,9 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 	
 	public function onPlayerInteract(PlayerInteractEvent $event){
-		$this->permissionCheck($event);
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			$this->permissionCheck($event);
+		}
 	}
 	
 	public function onPlaceEvent(BlockPlaceEvent $event){
