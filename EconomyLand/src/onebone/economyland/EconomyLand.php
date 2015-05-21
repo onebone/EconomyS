@@ -201,6 +201,11 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage("Please run this command in-game.");
 					return true;
 				}
+				
+				if(in_array($sender->getLevel()->getFolderName(), $this->config->get("buying-disallowed-worlds"))){
+					$sender->sendMessage($this->getMessage("not-allowed-to-buy"));
+					return true;
+				}
 			//	$result = $this->land->query("SELECT * FROM land WHERE owner = '{$sender->getName()}'");
 				$cnt = count($this->db->getLandsByOwner($sender->getName()));
 
@@ -673,6 +678,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"handler-priority" => 10,
 			"white-world-protection" => array(),
 			"non-check-worlds" => array(),
+			"buying-disallowed-worlds" => array(),
 			"player-land-limit" => "NaN",
 			"price-per-y-axis" => 100,
 			"database-type" => "yaml"
@@ -704,6 +710,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"land-limit" => "You have %1 lands. The limit of land is %2",
 			"set-first-position" => "Please set first position",
 			"set-second-position" => "Please set second position",
+			"not-allowed-to-buy" => "This world is not allowed to buy land",
 			"land-around-here" => "There are %1's land around here",
 			"no-money-to-buy-land" => "You don't have money to buy this land",
 			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
