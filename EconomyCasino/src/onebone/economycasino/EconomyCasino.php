@@ -98,6 +98,7 @@ class EconomyCasino extends PluginBase implements Listener{
 						}
 						if(isset($this->casino[$sender->getName()])){
 							$sender->sendMessage("You already have joined casino.");
+							return true;
 						}else{
 							foreach($this->casino as $player => $casino){
 								if(isset($casino["players"][$sender->getName()])){
