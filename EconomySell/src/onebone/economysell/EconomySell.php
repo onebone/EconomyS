@@ -77,7 +77,7 @@ class EconomySell extends PluginBase implements Listener {
 				"sell" => array(
 						"§1[Sell]",
 						"§l$§r%1",
-						"§4%2",
+						"%2",
 						"Amount : §r§l%3" 
 				) 
 		));
