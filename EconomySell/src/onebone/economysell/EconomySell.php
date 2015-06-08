@@ -75,10 +75,10 @@ class EconomySell extends PluginBase implements Listener {
 		
 		$this->sellSign = new Config($this->getDataFolder()."SellSign.yml", Config::YAML, array(
 				"sell" => array(
-						"[SELL]",
-						"$%1",
-						"%2",
-						"Amount : %3" 
+						"§1[Sell]",
+						"§l$§r%1",
+						"§4%2",
+						"§fAmount : §r§l%3" 
 				) 
 		));
 	}
