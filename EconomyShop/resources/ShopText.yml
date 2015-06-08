@@ -3,5 +3,5 @@ shop:
 - '§1[Shop]'
 - §l$§r%1
 - '§4%2'
-- '§fAmount : §r§l%3'
+- 'Amount : §r§l%3'
 ...
