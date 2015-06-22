@@ -103,8 +103,10 @@ If there's no target airport to fly, it aborts riding a flight.
 
 You can access to EconomyAPI by using `EconomyAPI::getInstance()`
 
-example)
-EconomyAPI::getInstance()->addMoney($player_instance, $amount);
+Example:
+```php
+EconomyAPI::getInstance()->addMoney($player, $amount);
+```
 
 ## License
 ```
