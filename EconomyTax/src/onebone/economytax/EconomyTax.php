@@ -40,7 +40,10 @@ class EconomyTax extends PluginBase{
 	private $config;
 
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())){
+			mkdir($this->getDataFolder());
+		}
+		
 		$this->api = EconomyAPI::getInstance();
 		$this->config = new Config($this->getDataFolder()."tax.properties", Config::PROPERTIES, array(
 			"time-for-tax" => 10,
