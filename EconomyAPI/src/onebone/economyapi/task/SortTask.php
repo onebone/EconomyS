@@ -45,17 +45,18 @@ class SortTask extends AsyncTask{
 			$output = "- Showing top money list ($page of $max) -\n";
 			$message = ($plugin->getMessage("topmoney-format", $this->player, array("%1", "%2", "%3", "%4"))."\n");
 			
-			foreach($this->moneyData["money"] as $player => $money){
-				if($banList->isBanned($player)) continue;
-				if($server->isOp(strtolower($player)) and ($this->addOp === false)) continue;
+			foreach($this->moneyData["money"] as $p => $money){
+				if($banList->isBanned($p)) continue;
+				if($server->isOp(strtolower($p)) and ($this->addOp === false)) continue;
 				$current = (int)ceil($n / 5);
 				if($current === $page){
-					$output .= str_replace(array("%1", "%2", "%3"), array($n, $player, $money), $message);
+					$output .= str_replace(array("%1", "%2", "%3"), array($n, $p, $money), $message);
 				}elseif($current > $page){
 					break;
 				}
 				++$n;
 			}
+			
 			if($player instanceof Player){
 				$player->sendMessage($output);
 			}else{
