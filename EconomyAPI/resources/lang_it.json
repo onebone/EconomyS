@@ -20,5 +20,5 @@
     "setmoney-failed": "Hai fallito a settare i soldi a causa di un errore sconosciuto.",
     "setmoney-invalid-number": "%MONETARY_UNIT%%1 non e un ammontare valido",
     "mymoney-mymoney": "I tuoi soldi : %MONETARY_UNIT%%1",
-    "mystatus-show": "Lo stato dei miei soldi : %1%",
+    "mystatus-show": "Lo stato dei miei soldi : %1%"
 }
