@@ -12,6 +12,9 @@ permissions:
    economysell.sell.*:
     description: Includes all permission related to managing sell center
     children:
+     economysell.sell.buy:
+      description: Allows player to sell items
+      default: true
      economysell.sell.create:
       description: Allows player to create sell center
      economysell.sell.remove:

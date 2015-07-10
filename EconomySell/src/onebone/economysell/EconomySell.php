@@ -67,15 +67,16 @@ class EconomySell extends PluginBase implements Listener {
 				"sell-created" => "Sell center has been created (%1 = %MONETARY_UNIT%%2)",
 				"removed-sell" => "Sell center has been removed",
 				"creative-mode" => "You are in creative mode",
+				"no-permission-sell" => "You don't have permission to sell item",
 				"no-permission-break" => "You don't have permission to break sell center",
 				"tap-again" => "Are you sure to sell %1 (%MONETARY_UNIT%%2)? Tap again to confirm",
 				"no-item" => "You have no item to sell",
-				"sold-item" => "Has been sold %1 of %2 for %MONETARY_UNIT%%3"
+				"sold-item" => "You have sold %1 of %2 for %MONETARY_UNIT%%3"
 		));
 		
 		$this->sellSign = new Config($this->getDataFolder()."SellSign.yml", Config::YAML, array(
 				"sell" => array(
-						"§1[Sell]",
+						"§1[SELL]",
 						"%MONETARY_UNIT%%1",
 						"%2",
 						"Amount : §l%3" 
@@ -135,10 +136,11 @@ class EconomySell extends PluginBase implements Listener {
 			
 			$player->sendMessage($this->getMessage("sell-created", [$itemName, (int)$event->getLine(3), ""]));
 			
+			$mu = EconomyAPI::getInstance()->getMonetaryUnit();
 			$event->setLine(0, $val[0]);
-			$event->setLine(1, str_replace("%1", $event->getLine(1), $val[1]));
-			$event->setLine(2, str_replace("%2", $event->getLine(2), $itemName));
-			$event->setLine(3, str_replace("%3", $event->getLine(3), $val[3]));
+			$event->setLine(1, str_replace(["%MONETARY_UNIT%", "%1"], [$mu, $event->getLine(1)], $val[1]));
+			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $event->getLine(2)], $itemName));
+			$event->setLine(3, str_replace(["%MONETARY_UNIT%", "%3"], [$mu, $event->getLine(3)], $val[3]));
 		}
 	}
 	
@@ -152,6 +154,16 @@ class EconomySell extends PluginBase implements Listener {
 			$sell = $this->sell[$loc];
 			$player = $event->getPlayer();
 			
+			if($player->getGamemode() % 2 === 1){
+				$player->sendMessage($this->getMessage("creative-mode"));
+				$event->setCancelled();
+				return;
+			}
+			if(!$player->hasPermission("economysell.sell.buy")){
+				$player->sendMessage($this->getMessage("no-permission-sell"));
+				$event->setCancelled();
+				return;
+			}
 			$cnt = 0;
 			foreach($player->getInventory()->getContents() as $item){
 				if($item->getID() == $sell["item"] and $item->getDamage() == $sell["meta"]){
@@ -202,9 +214,9 @@ class EconomySell extends PluginBase implements Listener {
 	
 	public function onBreak(BlockBreakEvent $event){
 		$block = $event->getBlock();
-		if(isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] )){
+		if(isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
 			$player = $event->getPlayer();
-			if(!$player->hasPermission("economysell.sell.remove" )){
+			if(!$player->hasPermission("economysell.sell.remove")){
 				$player->sendMessage($this->getMessage("no-permission-break"));
 				$event->setCancelled(true);
 				return;
@@ -227,12 +239,12 @@ class EconomySell extends PluginBase implements Listener {
 		$item = strtolower($item);
 		$e = explode(":", $item);
 		$e[1] = isset($e[1])? $e[1] : 0;
-		if(isset(ItemList::$items [$item] )){
-			return array(ItemList::$items [$item], true); // Returns Item ID
+		if(isset(ItemList::$items [$item])){
+			return array(ItemList::$items[$item], true); // Returns Item ID
 		}else{
 			foreach(ItemList::$items as $name => $id){
 				$explode = explode(":", $id);
-				$explode[1] = isset($explode[1])? $explode[1] : 0;
+				$explode[1] = isset($explode[1]) ? $explode[1] : 0;
 				if($explode[0] == $e[0] and $explode[1] == $e[1]){
 					return array($name, false);
 				}
