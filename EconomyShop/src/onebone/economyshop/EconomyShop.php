@@ -236,6 +236,17 @@ class EconomyShop extends PluginBase implements Listener{
 		if(isset($this->shop[$loc])){
 			$shop = $this->shop[$loc];
 			$player = $event->getPlayer();
+			if($player->getGamemode() % 2 == 1){
+				$player->sendMessage($this->getMessage("invalid-gamemode"));
+				$event->setCancelled();
+				return;
+			}
+			if(!$player->hasPermission("economyshop.shop.buy")){
+				$player->sendMessage($this->getMessage("no-permission-buy"));
+				$event->setCancelled();
+				return;
+			}
+			
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
 				$player->sendMessage("[EconomyShop] You don't have enough money to buy ".($shop["item"].":".$shop["meta"])." ($$shop[price])");
