@@ -45,12 +45,12 @@ class PayCommand extends EconomyAPICommand implements InGameCommand{
 		}
 		
 		$server = Server::getInstance();
-		//  Player finder  //
+		
 		$p = $server->getPlayer($player);
 		if($p instanceof Player){
 			$player = $p->getName();
 		}
-		// END //
+		
 		if($player === $sender->getName()){
 			$sender->sendMessage($this->getPlugin()->getMessage("pay-failed"));
 			return true;
@@ -69,6 +69,9 @@ class PayCommand extends EconomyAPICommand implements InGameCommand{
 		}
 		$this->getPlugin()->getServer()->getPluginManager()->callEvent(new PayMoneyEvent($this->getPlugin(), $sender->getName(), $player, $amount));
 		$sender->sendMessage($this->getPlugin()->getMessage("pay-success", $sender, [$amount, $player, "%3", "%4"]));
+		if($p instanceof Player){
+			$p->sendMessage($this->getPlugin()->getMessage("money-paid", $p, [$sender->getName(), $amount, "%3", "%4"]));
+		}
 		return true;
 	}
 }
