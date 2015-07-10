@@ -25,9 +25,13 @@ use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
+use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Player;
 use pocketmine\utils\Utils;
+use pocketmine\command\CommandSender;
+use pocketmine\command\Command;
 
 use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
@@ -684,6 +688,36 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		if(!isset($this->playerLang[$username])){
 			$this->setLang($this->config->get("default-lang"), $username);
+		}
+	}
+	
+	/**
+	 * @param PlayerCommandPreprocessEvent $event
+	 */
+	public function onPlayerCommandPreprocess(PlayerCommandPreprocessEvent $event){
+		$command = strtolower(substr($event->getMessage(), 0, 9));
+		if($command === "/save-all"){
+			$this->onCommandProcess($event->getPlayer());
+		}
+	}
+	
+	/**
+	 * @param ServerCommandEvent $event
+	 */
+	public function onServerCommandProcess(ServerCommandEvent $event){
+		$command = strtolower(substr($event->getCommand(), 0, 8));
+		if($command === "save-all"){
+			$this->onCommandProcess($event->getSender());
+		}
+	}
+	
+	public function onCommandProcess(CommandSender $sender){
+		$command = $this->getServer()->getCommandMap()->getCommand("save-all");
+		if($command instanceof Command){
+			if($command->testPermissionSilent($sender)){
+				$this->save();
+				$sender->sendMessage("[EconomyAPI] Saved money data.");
+			}
 		}
 	}
 	
