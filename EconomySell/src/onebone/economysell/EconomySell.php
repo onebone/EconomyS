@@ -159,7 +159,7 @@ class EconomySell extends PluginBase implements Listener {
 				$event->setCancelled();
 				return;
 			}
-			if(!$player->hasPermission("economysell.sell.buy")){
+			if(!$player->hasPermission("economysell.sell.sell")){
 				$player->sendMessage($this->getMessage("no-permission-sell"));
 				$event->setCancelled();
 				return;
