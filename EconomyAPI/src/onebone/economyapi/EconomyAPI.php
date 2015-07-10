@@ -127,6 +127,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"ch" => "中文",
 		"id" => "Bahasa Indonesia",
 		"ru" => "русский",
+		"ja" => "日本語",
 		"user-define" => "User Defined"
 	];
 
