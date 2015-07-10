@@ -25,7 +25,7 @@
   "setmoney-invalid-number": "%MONETARY_UNIT%%1 adalah jumlah yang tak valid",
   "mymoney-mymoney": "Uang Anda: %MONETARY_UNIT%%1",
   "mydebt-mydebt": "Hutang Anda: %MONETARY_UNIT%%1",
-  "mystatus-show": "Status uang saya: %1% | Status hutang saya: %2%",
+  "mystatus-show": "Status uang saya: %1%",
   "takedebt-must-bigger-than-zero": "Anda tak dapat berhutang kurang dari %MONETARY_UNIT%0",
   "takedebt-over-range-once": "Anda tak bisa pinjam %MONETARY_UNIT%%1 sekaligus. Batas hutang: %MONETARY_UNIT%%2",
   "takedebt-over-range": "Anda tak bisa pinjam %MONETARY_UNIT%%1. Batas hutang: %MONETARY_UNIT%%2",

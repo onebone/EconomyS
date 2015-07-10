@@ -43,15 +43,8 @@ class MyStatusCommand extends EconomyAPICommand implements InGameCommand{
 		if($allMoney > 0){
 			$topMoney = round((($money["money"][$sender->getName()] / $allMoney) * 100), 2);
 		}
-		$allDebt = 0;
-		foreach($money["debt"] as $d){
-			$allDebt += $d;
-		}
-		$topDebt = 0;
-		if($allDebt > 0){
-			$topDebt = round((($money["debt"][$sender->getName()] / $allDebt) * 100), 2);
-		}
-		$sender->sendMessage($this->getPlugin()->getMessage("mystatus-show", $sender->getName(), array($topMoney, $topDebt, "%3", "%4")));
+		
+		$sender->sendMessage($this->getPlugin()->getMessage("mystatus-show", $sender->getName(), array($topMoney, "%2", "%3", "%4")));
 		return true;
 	}
 }
