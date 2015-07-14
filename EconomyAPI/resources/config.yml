@@ -1,16 +1,8 @@
 # EconomyS configuration resource
 monetary-unit: "$"
-once-debt-limit: 100
-debt-limit: 500
 add-op-at-rank: false
 default-money: 1000
-default-debt: 0
 max-money: 9999999999
-time-for-increase-debt: 10
-percent-of-increase-debt: 5
-default-bank-money: 0
-time-for-increase-money: 10
-bank-increase-money-rate: 5
 debug: true
 default-lang: user-define
 auto-save-interval: 10
