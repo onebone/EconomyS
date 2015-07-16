@@ -97,7 +97,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	const RET_ERROR_2 = -3;
 
 	/**
-	@var int RET_CANCELLED Task cancelled by event
+	 * @var int RET_CANCELLED Task cancelled by event
 	*/
 	const RET_CANCELLED = -2;
 
@@ -207,13 +207,14 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->getLogger()->notice("Auto save has been set to interval : ".$time." min(s)");
 		}
 
-		if($this->config->get("check-update")){
+		$update_check = new Config($this->getDataFolder()."update-check.yml", Config::YAML, yaml_parse($this->readResource("update-check.yml")));
+		if($update_check->get("check-update")){
 			try{
 				$this->getLogger()->info("Checking for updates... It may be take some while.");
-				$update_check = new Config($this->getDataFolder()."update-check.yml", Config::YAML, yaml_parse($this->readResource("update-check.yml")));
 
 				$host = $update_check->get("update-host");
-				$url = "http://".$host."/?package_version=".self::PACKAGE_VERSION."&version=".$this->getDescription()->getVersion()."&uuid=".$this->getServer()->getServerUniqueId();
+				$url = "http://".$host."/?package_version=".self::PACKAGE_VERSION."&version=".$this->getDescription()->getVersion()."&uuid=".$this->getServer()->getServerUniqueId()."&lang=".$this->getServer()->getLanguage()->getName();
+				
 				$desc = json_decode(Utils::getUrl($url), true);
 
 				if($desc["update-available"]){
