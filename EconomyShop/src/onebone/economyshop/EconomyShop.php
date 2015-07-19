@@ -252,7 +252,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
-				$player->sendMessage("[EconomyShop] You don't have enough money to buy ".($shop["item"].":".$shop["meta"])." ($$shop[price])");
+				$player->sendMessage($this->getMessage("no-money-buy", [$shop["item"].":".$shop["meta"], $shop["price"], "%3"]));
 				$event->setCancelled(true);
 				if($event->getItem()->isPlaceable()){
 					$this->placeQueue[$player->getName()] = true;
