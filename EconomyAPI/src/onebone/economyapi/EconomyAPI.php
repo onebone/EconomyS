@@ -213,7 +213,7 @@ class EconomyAPI extends PluginBase implements Listener{
 				$this->getLogger()->info("Checking for updates... It may be take some while.");
 
 				$host = $update_check->get("update-host");
-				$url = "http://".$host."/?package_version=".self::PACKAGE_VERSION."&version=".$this->getDescription()->getVersion()."&uuid=".$this->getServer()->getServerUniqueId()."&lang=".$this->getServer()->getLanguage()->getName();
+				$url = "http://".$host."/?package_version=".self::PACKAGE_VERSION."&version=".$this->getDescription()->getVersion()."&lang=".$this->getServer()->getLanguage()->getName();
 				
 				$desc = json_decode(Utils::getUrl($url), true);
 
