@@ -58,13 +58,16 @@ class EconomyShop extends PluginBase implements Listener{
 
 	public function onEnable(){
 		@mkdir($this->getDataFolder());
+
+		$this->saveDefaultConfig();
+
 		$this->shop = (new Config($this->getDataFolder()."Shops.yml", Config::YAML))->getAll();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->prepareLangPref();
 		$this->placeQueue = array();
-		
+
 		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
-		
+
 		self::$instance = $this;
 	}
 
@@ -132,7 +135,7 @@ class EconomyShop extends PluginBase implements Listener{
 		$this->shopSign = new Config($this->getDataFolder()."ShopText.yml", Config::YAML, yaml_parse(stream_get_contents($resource = $this->getResource("ShopText.yml"))));
 		@fclose($resource);
 	}
-	
+
 	public function onDisable(){
 		$config = (new Config($this->getDataFolder()."Shops.yml", Config::YAML));
 		$config->setAll($this->shop);
@@ -246,7 +249,7 @@ class EconomyShop extends PluginBase implements Listener{
 				$event->setCancelled();
 				return;
 			}
-			
+
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
 				$player->sendMessage("[EconomyShop] You don't have enough money to buy ".($shop["item"].":".$shop["meta"])." ($$shop[price])");
@@ -267,14 +270,16 @@ class EconomyShop extends PluginBase implements Listener{
 					$shop["itemName"] = $item;
 				}
 				$now = microtime(true);
-				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
-					$this->tap[$player->getName()] = [$loc, $now];
-					$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
-					return;
-				}else{
-					unset($this->tap[$player->getName()]);
+				if($this->getConfig()->get("enable-double-tap")){
+					if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
+						$this->tap[$player->getName()] = [$loc, $now];
+						$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
+						return;
+					}else{
+						unset($this->tap[$player->getName()]);
+					}
 				}
-				
+
 				$player->getInventory()->addItem(new Item($shop["item"], $shop["meta"], $shop["amount"]));
 				EconomyAPI::getInstance()->reduceMoney($player, $shop["price"], true, "EconomyShop");
 				$player->sendMessage($this->getMessage("bought-item", [$shop["amount"], $shop["itemName"], $shop["price"]]));
