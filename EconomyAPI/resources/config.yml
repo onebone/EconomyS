@@ -6,4 +6,3 @@ max-money: 9999999999
 debug: true
 default-lang: user-define
 auto-save-interval: 10
-check-update: true
