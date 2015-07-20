@@ -254,7 +254,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}*/
 				$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName());
 				if($result){
-					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
+					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "%2", "%3")));
 					return true;
 				}
 				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->config->get("price-per-y-axis");
@@ -265,7 +265,7 @@ class EconomyLand extends PluginBase implements Listener{
 			//	$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee) VALUES ($startX, $endX, $startZ, $endZ, '{$sender->getName()}', '{$this->start[$sender->getName()]["level"]}', $price, ',')");
 				$this->db->addLand($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName(), $price, $sender->getName());
 				unset($this->start[$sender->getName()], $this->end[$sender->getName()]);
-				$sender->sendMessage($this->getMessage("bought-land", array($price, "", "")));
+				$sender->sendMessage($this->getMessage("bought-land", array($price, "%2", "%3")));
 				break;
 				case "list":
 				if(!$sender->hasPermission("economyland.command.land.list")){
@@ -397,19 +397,19 @@ class EconomyLand extends PluginBase implements Listener{
 			//	$info = $this->land->query("SELECT * FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getLandById($landnum);
 				if($info === false){
-					$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+					$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 					return true;
 				}
 				if($sender->getName() !== $info["owner"] and !$sender->hasPermission("economyland.land.give.others")){
-					$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "", "")));
+					$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 				}else{
 					if($sender->getName() === $player->getName()){
 						$sender->sendMessage($this->getMessage("cannot-give-land-myself"));
 					}else{
 					//	$this->land->exec("UPDATE land SET owner = '{$player->getName()}' WHERE ID = {$info["ID"]}");
 						$this->db->setOwnerById($info["ID"], $player->getName());
-						$sender->sendMessage($this->getMessage("gave-land", array($landnum, $player->getName())));
-						$player->sendMessage($this->getMessage("got-land", array($sender->getName(), $landnum)));
+						$sender->sendMessage($this->getMessage("gave-land", array($landnum, $player->getName(), "%3")));
+						$player->sendMessage($this->getMessage("got-land", array($sender->getName(), $landnum, "%3")));
 					}
 				}
 				return true;
@@ -425,17 +425,17 @@ class EconomyLand extends PluginBase implements Listener{
 						return true;
 					}
 					if(!is_numeric($landnum)){
-						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "", "")));
+						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
 						return true;
 					}
 					//$result = $this->land->query("SELECT * FROM land WHERE ID = $landnum");
 					//$info = $result->fetchArray(SQLITE3_ASSOC);
 					$info = $this->db->getLandById($landnum);
 					if($info === false){
-						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 						return true;
 					}elseif($info["owner"] !== $sender->getName()){
-						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "", "")));
+						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 						return true;
 					}elseif(substr($player, 0, 2) === "r:"){
 						if(!$sender->hasPermission("economyland.command.land.invite.remove")){
@@ -447,10 +447,10 @@ class EconomyLand extends PluginBase implements Listener{
 						//$this->land->exec("UPDATE land SET invitee = '".str_replace($player.",", "", $info["invitee"])."' WHERE ID = {$info["ID"]};");
 						$result = $this->db->removeInviteeById($landnum, $player);
 						if($result === false){
-							$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "")));
+							$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "%3")));
 							return true;
 						}
-						$sender->sendMessage($this->getMessage("removed-invitee", array($player, $landnum, "")));
+						$sender->sendMessage($this->getMessage("removed-invitee", array($player, $landnum, "%3")));
 					}else{
 						/*if(strpos($info["invitee"], ",".$player.",") !== false){
 							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
@@ -458,15 +458,15 @@ class EconomyLand extends PluginBase implements Listener{
 						}
 						$this->land->exec("UPDATE land SET invitee = '".$info["invitee"].$player.",' WHERE ID = {$info["ID"]};");*/
 						if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0){
-							$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "", ""]));
+							$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "%2", "%3"]));
 							return true;
 						}
 						$result = $this->db->addInviteeById($landnum, $player);
 						if($result === false){
-							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
+							$sender->sendMessage($this->getMessage("already-invitee", array($player, "%2", "%3")));
 							return true;
 						}
-						$sender->sendMessage($this->getMessage("success-invite", array($player, $landnum, "")));
+						$sender->sendMessage($this->getMessage("success-invite", array($player, $landnum, "%3")));
 					}
 					return true;
 				case "invitee":
@@ -478,7 +478,7 @@ class EconomyLand extends PluginBase implements Listener{
 					
 					$info = $this->db->getInviteeById($landnum);
 					if($info === false){
-						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "", "")));
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 						return true;
 					}
 					$output = "Invitee of land #$landnum : \n";
@@ -524,7 +524,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("not-my-land"));
 				}else{
 					EconomyAPI::getInstance()->addMoney($sender, $info["price"] / 2);
-					$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
+					$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "%2", "%3")));
 					//$this->land->exec("DELETE FROM land WHERE ID = {$info["ID"]}");
 					$this->db->removeLandById($info["ID"]);
 				}
@@ -544,10 +544,10 @@ class EconomyLand extends PluginBase implements Listener{
 						//$this->land->exec("DELETE FROM land WHERE ID = $p");
 						$this->db->removeLandById($p);
 					}else{
-						$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "")));
+						$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "%3")));
 					}
 				}else{
-					$sender->sendMessage($this->getMessage("no-land-found", array($p, "", "")));
+					$sender->sendMessage($this->getMessage("no-land-found", array($p, "%2", "%3")));
 				}
 			}
 			return true;
