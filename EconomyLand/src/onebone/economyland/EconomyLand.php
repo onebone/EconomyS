@@ -505,14 +505,15 @@ class EconomyLand extends PluginBase implements Listener{
 			}
 			return true;
 			case "landsell":
-			switch ($param[0]){
+			$id = array_shift($param);
+			switch ($id){
 			case "here":
 				if(!$sender instanceof Player){
 					$sender->sendMessage("Please run this command in-game.");
 					return true;
 				}
-				$x = $sender->x;
-				$z = $sender->z;
+				$x = $sender->getX();
+				$z = $sender->getZ();
 				//$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getFolderName()}'");
 				//$info = $result->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
@@ -530,12 +531,12 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				return true;
 			default:
-				$p = $param[0];
+				$p = $id;
 				if(is_numeric($p)){
 					//$info = $this->land->query("SELECT * FROM land WHERE ID = $p")->fetchArray(SQLITE3_ASSOC);
 					$info = $this->db->getLandById($p);
 					if($info === false){
-						$sender->sendMessage("Usage: /landsell <here|land number>");
+						$sender->sendMessage($this->getMessage("no-land-found", array($p, "%2", "%3")));
 						return true;
 					}
 					if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")){
@@ -547,7 +548,7 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "%3")));
 					}
 				}else{
-					$sender->sendMessage($this->getMessage("no-land-found", array($p, "%2", "%3")));
+					$sender->sendMessage("Usage: /landsell <here|land number>");
 				}
 			}
 			return true;
