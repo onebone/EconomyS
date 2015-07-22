@@ -1,6 +1,6 @@
 {
     "language": "ru",
-    "language-set": "Язык сменен на %1 ; перевод Рвач Виктора",
+    "language-set": "Язык сменен на %1 ; перевод Рвач Виктора и Ивана Дмитриева",
     "request-cancelled": "Запрос отменен",
     "player-not-connected": "Игрок %1 оффлайн",
     "player-never-connected": "Игрок %1 никогда не был на сервере",
@@ -19,6 +19,7 @@
     "givemoney-gave-money": "Игроку %2 было выдано %MONETARY_UNIT%%1",
     "seemoney-seemoney": "Баланс игрока %1 : %2",
     "setmoney-setmoney": "Баланс игрока %1 был установлен на %MONETARY_UNIT%%2",
+    "setmoney-set": "Ваш баланс был изменен на %MONETARY_UNIT%%1",
     "setmoney-failed": "Не удалось установить баланс",
     "setmoney-invalid-number": "MONETARY_UNIT%%1 - неправильная сумма",
     "mymoney-mymoney": "Ваш баланс : %MONETARY_UNIT%%1",
