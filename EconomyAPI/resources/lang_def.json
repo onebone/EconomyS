@@ -20,6 +20,7 @@
     "givemoney-gave-money": "Gave %MONETARY_UNIT%%1 to %2",
     "seemoney-seemoney": "Player %1's money : %2",
     "setmoney-setmoney": "Player %1's money has been set to %MONETARY_UNIT%%2",
+    "setmoney-set": "Your money was set to %MONETARY_UNIT%%1",
     "setmoney-failed": "Failed to set money due to unknown error",
     "setmoney-invalid-number": "%MONETARY_UNIT%%1 must be a numeric value",
     "mymoney-mymoney": "Your money : %MONETARY_UNIT%%1",

@@ -20,6 +20,7 @@
     "givemoney-gave-money": "%2님에게 %MONETARY_UNIT%%1를 주셨습니다.",
     "seemoney-seemoney": "%1님의 돈 : %MONETARY_UNIT%%2",
     "setmoney-setmoney": "%1님의 돈이 %MONETARY_UNIT%%2으로 설정되었습니다.",
+    "setmoney-set": "돈이 %MONETARY_UNIT%%1 로 설정되었습니다.",
     "setmoney-failed": "알수 없는 이유로 돈을 설정하는데 실패하였습니다.",
     "setmoney-invalid-number": "%1는 무효한 숫자입니다.",
     "mymoney-mymoney": "내 돈 : %MONETARY_UNIT%%1",

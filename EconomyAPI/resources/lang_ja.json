@@ -20,6 +20,7 @@
     "givemoney-gave-money": "%2に%MONETARY_UNIT%%1を上げました。",
     "seemoney-seemoney": "%1のお金 : %2",
     "setmoney-setmoney": "%1のお金が%MONETARY_UNIT%%2に設定されました。",
+    "setmoney-set": "お金が%MONETARY_UNIT%%1に設定されました。",
     "setmoney-failed": "不明のエラーでお金を設定することが失敗しました。",
     "setmoney-invalid-number": "パラメーターは数字を入力してください。",
     "mymoney-mymoney": "お金 : %MONETARY_UNIT%%1",

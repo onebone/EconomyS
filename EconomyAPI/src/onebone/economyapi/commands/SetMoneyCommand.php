@@ -33,16 +33,16 @@ class SetMoneyCommand extends EconomyAPICommand{
 		$this->setDescription("Sets player's money");
 		$this->setPermission("economyapi.command.setmoney");
 	}
-	
+
 	public function exec(CommandSender $sender, array $args){
 		$player = array_shift($args);
 		$money = array_shift($args);
-		
+
 		if(trim($player) === "" or trim($money) === ""){
 			$sender->sendMessage("Usage: /".$this->getName()." <player> <money>");
 			return true;
 		}
-		
+
 		//  Player finder  //
 		$server = Server::getInstance();
 		$p = $server->getPlayer($player);
@@ -50,7 +50,7 @@ class SetMoneyCommand extends EconomyAPICommand{
 			$player = $p->getName();
 		}
 		// END //
-		
+
 		$result = $this->getPlugin()->setMoney($player, $money, "SetMoneyCommand");
 		$output = "";
 		switch($result){
@@ -68,6 +68,10 @@ class SetMoneyCommand extends EconomyAPICommand{
 			break;
 		}
 		$sender->sendMessage($output);
+
+		if($p instanceof Player){
+			$p->sendMessage($this->getPlugin()->getMessage("setmoney-set", $p->getName(), array($money, $sender->getName(), "%3", "%4")));
+		}
 		return true;
 	}
 }
