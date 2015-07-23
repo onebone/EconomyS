@@ -165,47 +165,51 @@ class EconomyPShop extends PluginBase implements Listener{
 		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName();
 		if(isset($this->shop[$loc])){
 			$player = $event->getPlayer();
-			$shop = $this->shop[$loc];
-			
-			if($shop["owner"] == $player->getName()){
-				$player->sendMessage($this->getMessage("same-player"));
-				return;
-			}
-			
-			$now = microtime(true);
-			if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
-				$this->tap[$player->getName()] = [$loc, $now];
-				$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
-				return;
-			}else{
-				unset($this->tap[$player->getName()]);
-			}
-			
-			if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof ItemCloud){
-				if($shop["amount"] > $cloud->getCount($shop["item"], $shop["meta"])){
-					$player->sendMessage($this->getMessage("no-stock"));
+			if($player->hasPermission("economypshop.shop.buy")){
+				$shop = $this->shop[$loc];
+				
+				if($shop["owner"] == $player->getName()){
+					$player->sendMessage($this->getMessage("same-player"));
+					return;
+				}
+				
+				$now = microtime(true);
+				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
+					$this->tap[$player->getName()] = [$loc, $now];
+					$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
+					return;
 				}else{
-					if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
-						$player->sendMessage($this->getMessage("no-space"));
+					unset($this->tap[$player->getName()]);
+				}
+				
+				if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof ItemCloud){
+					if($shop["amount"] > $cloud->getCount($shop["item"], $shop["meta"])){
+						$player->sendMessage($this->getMessage("no-stock"));
 					}else{
-						$api = EconomyAPI::getInstance();
-						if($api->myMoney($player) > $shop["price"]){
-							$player->getInventory()->addItem($item);
-							$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
-							$player->sendMessage($this->getMessage("bought-item", [$shop["item"].":".$shop["meta"], $shop["price"], $shop["amount"]]));
-							$cloud->removeItem($shop["item"], $shop["meta"], $shop["amount"]);
-							$api->addMoney($shop["owner"], $shop["price"], true, "EconomyPShop");
+						if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
+							$player->sendMessage($this->getMessage("no-space"));
 						}else{
-							$player->sendMessage($this->getMessage("no-money"));
+							$api = EconomyAPI::getInstance();
+							if($api->myMoney($player) > $shop["price"]){
+								$player->getInventory()->addItem($item);
+								$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
+								$player->sendMessage($this->getMessage("bought-item", [$shop["item"].":".$shop["meta"], $shop["price"], $shop["amount"]]));
+								$cloud->removeItem($shop["item"], $shop["meta"], $shop["amount"]);
+								$api->addMoney($shop["owner"], $shop["price"], true, "EconomyPShop");
+							}else{
+								$player->sendMessage($this->getMessage("no-money"));
+							}
 						}
 					}
+				}else{
+					$player->sendMessage($this->getMessage("shop-owner-no-account"));
+				}
+				$event->setCancelled();
+				if($event->getItem()->isPlaceable()){
+					$this->placeQueue[$player->getName()] = true;
 				}
 			}else{
-				$player->sendMessage($this->getMessage("shop-owner-no-account"));
-			}
-			$event->setCancelled();
-			if($event->getItem()->isPlaceable()){
-				$this->placeQueue[$player->getName()] = true;
+				$player->sendMessage($this->getMessage("no-permission-buy"));
 			}
 		}
 	}

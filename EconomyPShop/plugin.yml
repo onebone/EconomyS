@@ -18,5 +18,8 @@ permissions:
      economypshop.shop.create:
       description: Allows player to create shop
       default: true
+     economypshop.shop.buy:
+      description: Allows player to buy items from shop
+      default: true
      economypshop.shop.destroy.others:
       description: Allows player to destroy others' shop
