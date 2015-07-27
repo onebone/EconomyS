@@ -106,10 +106,10 @@ class EconomyProperty extends PluginBase implements Listener{
 		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 			return;
 		}
-		
+
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
-		
+
 		if(isset($this->touch[$player->getName()])){
 		//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
 			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getFolderName()]);
@@ -162,7 +162,7 @@ class EconomyProperty extends PluginBase implements Listener{
 						return;
 					}
 				}
-				$level->removeTile($tile);
+				$tile->close();
 				$level->setBlock($block, new Air());
 				unset($this->tap[$player->getName()]);
 			}else{
