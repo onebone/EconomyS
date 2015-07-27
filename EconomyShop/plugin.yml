@@ -1,5 +1,5 @@
 name: EconomyShop
-version: "2.0.5"
+version: "2.0.6"
 api: [1.12.0]
 main: onebone\economyshop\EconomyShop
 author: onebone

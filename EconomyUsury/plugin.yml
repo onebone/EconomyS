@@ -1,5 +1,5 @@
 name: EconomyUsury
-version: "1.0.0"
+version: "1.0.1"
 author: onebone
 api: [1.12.0] # Pretty higher than I expected!
 main: onebone\economyusury\EconomyUsury
