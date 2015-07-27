@@ -87,7 +87,12 @@ class EconomyJob extends PluginBase implements Listener{
 		$job = $this->jobs->get($this->player->get($player->getName()));
 		if($job !== false){
 			if(isset($job[$block->getID().":".$block->getDamage().":break"])){
-				$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage().":break"]);
+				$money = $job[$block->getID().":".$block->getDamage().":break"];
+				if($money > 0){
+					$this->api->addMoney($player, $money);
+				}else{
+					$this->api->reduceMoney($player, $money);
+				}
 			}
 		}
 	}
@@ -104,7 +109,12 @@ class EconomyJob extends PluginBase implements Listener{
 		$job = $this->jobs->get($this->player->get($player->getName()));
 		if($job !== false){
 			if(isset($job[$block->getID().":".$block->getDamage().":place"])){
-				$this->api->addMoney($player, $job[$block->getID().":".$block->getDamage().":place"]);
+				$money = $job[$block->getID().":".$block->getDamage().":place"];
+				if($money > 0){
+					$this->api->addMoney($player, $money);
+				}else{
+					$this->api->reduceMoney($player, $money);
+				}
 			}
 		}
 	}
@@ -122,7 +132,7 @@ class EconomyJob extends PluginBase implements Listener{
 	public function getJobs(){
 		return $this->jobs->getAll();
 	}
-	
+
 	/**
 	 * @return array
 	 *
@@ -130,7 +140,7 @@ class EconomyJob extends PluginBase implements Listener{
 	public function getPlayers(){
 		return $this->player->getAll();
 	}
-	 
+
 	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
 		switch(array_shift($params)){
 			case "join":
