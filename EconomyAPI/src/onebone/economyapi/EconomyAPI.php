@@ -47,9 +47,9 @@ class EconomyAPI extends PluginBase implements Listener{
 	const API_VERSION = 1;
 
 	/**
-	 * @var int
+	 * @var string
 	 */
-	const PACKAGE_VERSION = "5.5";
+	const PACKAGE_VERSION = "5.6";
 
 	/**
 	 * @var EconomyAPI
