@@ -619,6 +619,19 @@ class EconomyLand extends PluginBase implements Listener{
 		return true;
 	}
 
+	/**
+	 * Adds land to the EconomyLand database
+	 *
+	 * @var Player|string	$player
+	 * @var int						$startX
+	 * @var int						$startZ
+	 * @var int						$endX
+	 * @var int						$endZ
+	 * @var Level|string	$level
+	 * @var float					$expires
+	 *
+	 * @return int
+	 */
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
@@ -664,7 +677,19 @@ class EconomyLand extends PluginBase implements Listener{
 				time()
 			);
 		}
-		return true;
+		return $id;
+	}
+
+	public function addInvitee($landId, $player){
+		return $this->db->addInviteeById($landId, $player);
+	}
+
+	public function removeInvitee($landId, $player){
+		return $this->db->removeInviteeById($landId, $player);
+	}
+
+	public function getLandInfo($landId){
+		return $this->db->getLandById($landId);
 	}
 
 	public function getMessage($key, $value = array("%1", "%2", "%3")){
