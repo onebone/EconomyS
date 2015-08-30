@@ -65,13 +65,12 @@ class SetMoneyCommand extends EconomyAPICommand{
 			break;
 			case 1:
 			$output .= $this->getPlugin()->getMessage("setmoney-setmoney", $sender->getName(), array($player, $money, "%3", "%4"));
+			if($p instanceof Player){
+				$p->sendMessage($this->getPlugin()->getMessage("setmoney-set", $p->getName(), array($money, $sender->getName(), "%3", "%4")));
+			}
 			break;
 		}
 		$sender->sendMessage($output);
-
-		if($p instanceof Player){
-			$p->sendMessage($this->getPlugin()->getMessage("setmoney-set", $p->getName(), array($money, $sender->getName(), "%3", "%4")));
-		}
 		return true;
 	}
 }
