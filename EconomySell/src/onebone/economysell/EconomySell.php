@@ -28,7 +28,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\utils\Config;
 use pocketmine\item\Item;
-use pocketmine\network\protocol\EntityDataPacket;
+
 use onebone\economyapi\EconomyAPI;
 
 #define TAG 1
