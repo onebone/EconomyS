@@ -266,8 +266,8 @@ class EconomyProperty extends PluginBase implements Listener{
 		if($y >= 126){
 			$y = $expectedY;
 		}
-
-		$level->setBlock(new Position($centerx, $y, $centerz, $level), Block::get(Item::SIGN_POST));
+		$meta = floor((($expectedYaw + 180) * 16 / 360) + 0.5) & 0x0F;
+		$level->setBlock(new Position($centerx, $y, $centerz, $level), Block::get(Item::SIGN_POST, $meta));
 
 		$info = $this->property->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
 		$tile = new Sign($level->getChunk($centerx >> 4, $centerz >> 4, false), new Compound(false, [

@@ -125,7 +125,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 					$this->pos[$sender->getName()][1][0],
 					$this->pos[$sender->getName()][1][1]
 				);
-				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY(), isset($params[0]) ? $params[0] : null);
+				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY(), (isset($params[0]) ? $params[0] : null), $sender->getYaw());
 				if($result){
 					$sender->sendMessage("[EconomyProperty] Property has successfully created.");
 				}else{
