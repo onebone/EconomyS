@@ -250,6 +250,11 @@ class EconomyShop extends PluginBase implements Listener{
 				return;
 			}
 
+			if(!$player->getInventory()->canAddItem(Item::get($shop["item"], $shop["meta"]))){
+				$player->sendMessage($this->getMessage("full-inventory"));
+				return;
+			}
+
 			$money = EconomyAPI::getInstance()->myMoney($player);
 			if($shop["price"] > $money){
 				$player->sendMessage($this->getMessage("no-money-buy", [$shop["item"].":".$shop["meta"], $shop["price"], "%3"]));
