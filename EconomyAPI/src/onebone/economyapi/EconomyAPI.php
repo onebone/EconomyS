@@ -131,7 +131,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"it" => "Italiano",
 		"ch" => "中文",
 		"id" => "Bahasa Indonesia",
-		"ru" => "русский",
+		"ru" => "Русский",
 		"ja" => "日本語",
 		"user-define" => "User Defined"
 	];
@@ -153,7 +153,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->createConfig();
 		$this->scanResources();
 
-		file_put_contents($this->getDataFolder() . "ReadMe.txt", $this->readResource("ReadMe.txt"));
 		if(!is_file($this->getDataFolder() . "PlayerLang.dat")){
 			file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize([]));
 		}
