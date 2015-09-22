@@ -600,7 +600,7 @@ class EconomyLand extends PluginBase implements Listener{
 				if(in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
 					$player->sendMessage($this->getMessage("not-owned"));
 					$event->setCancelled();
-					if($event->getItem()->isPlaceable()){
+					if($event->getItem()->canBePlaced()){
 						$this->placeQueue[$player->getName()] = true;
 					}
 					return false;
@@ -610,7 +610,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
 			$event->setCancelled();
 			if($event instanceof PlayerInteractEvent){
-				if($event->getItem()->isPlaceable()){
+				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
