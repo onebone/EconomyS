@@ -115,7 +115,7 @@ class EconomyProperty extends PluginBase implements Listener{
 			$this->command->mergePosition($player->getName(), 0, [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getFolderName()]);
 			$player->sendMessage("[EconomyProperty] First position has been saved.");
 			$event->setCancelled(true);
-			if($event->getItem()->isPlaceable()){
+			if($event->getItem()->canBePlaced()){
 				$this->placeQueue[$player->getName()] = true;
 			}
 			return;
@@ -126,7 +126,7 @@ class EconomyProperty extends PluginBase implements Listener{
 			if(!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())){
 				if($player->hasPermission("economyproperty.property.modify") === false){
 					$event->setCancelled(true);
-					if($event->getItem()->isPlaceable()){
+					if($event->getItem()->canBePlaced()){
 						$this->placeQueue[$player->getName()] = true;
 					}
 					$player->sendMessage("You don't have permission to modify property area.");
@@ -169,7 +169,7 @@ class EconomyProperty extends PluginBase implements Listener{
 				$this->tap[$player->getName()] = array($block->x.":".$block->y.":".$block->z, $now);
 				$player->sendMessage("[EconomyProperty] Are you sure to buy here? Tap again to confirm.");
 				$event->setCancelled(true);
-				if($event->getItem()->isPlaceable()){
+				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
