@@ -259,7 +259,7 @@ class EconomyShop extends PluginBase implements Listener{
 			if($shop["price"] > $money){
 				$player->sendMessage($this->getMessage("no-money-buy", [$shop["item"].":".$shop["meta"], $shop["price"], "%3"]));
 				$event->setCancelled(true);
-				if($event->getItem()->isPlaceable()){
+				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
 				}
 				return;
@@ -289,7 +289,7 @@ class EconomyShop extends PluginBase implements Listener{
 				EconomyAPI::getInstance()->reduceMoney($player, $shop["price"], true, "EconomyShop");
 				$player->sendMessage($this->getMessage("bought-item", [$shop["amount"], $shop["itemName"], $shop["price"]]));
 				$event->setCancelled(true);
-				if($event->getItem()->isPlaceable()){
+				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
