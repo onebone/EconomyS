@@ -49,7 +49,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	/**
 	 * @var string
 	 */
-	const PACKAGE_VERSION = "5.6";
+	const PACKAGE_VERSION = "5.7";
 
 	/**
 	 * @var EconomyAPI
@@ -131,7 +131,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"it" => "Italiano",
 		"ch" => "中文",
 		"id" => "Bahasa Indonesia",
-		"ru" => "Русский",
+		"ru" => "русский",
 		"ja" => "日本語",
 		"user-define" => "User Defined"
 	];
@@ -153,6 +153,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->createConfig();
 		$this->scanResources();
 
+		file_put_contents($this->getDataFolder() . "ReadMe.txt", $this->readResource("ReadMe.txt"));
 		if(!is_file($this->getDataFolder() . "PlayerLang.dat")){
 			file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize([]));
 		}
@@ -213,7 +214,7 @@ class EconomyAPI extends PluginBase implements Listener{
 
 				$host = $update_check->get("update-host");
 				$url = "http://".$host."/?package_version=".self::PACKAGE_VERSION."&version=".$this->getDescription()->getVersion()."&lang=".$this->getServer()->getLanguage()->getName();
-				
+
 				$desc = json_decode(Utils::getUrl($url), true);
 
 				if($desc["update-available"]){
