@@ -66,8 +66,6 @@ class EconomyShop extends PluginBase implements Listener{
 		$this->prepareLangPref();
 		$this->placeQueue = array();
 
-		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
-
 		self::$instance = $this;
 	}
 
@@ -151,24 +149,6 @@ class EconomyShop extends PluginBase implements Listener{
 		return false;
 	}
 
-	public function getItem($item){ // gets ItemID and ItemName
-		$item = strtolower($item);
-		$e = explode(":", $item);
-		$e[1] = isset($e[1]) ? $e[1] : 0;
-		if(array_key_exists($item, ItemList::$items)){
-			return array(ItemList::$items[$item], true); // Returns Item ID
-		}else{
-			foreach(ItemList::$items as $name => $id){
-				$explode = explode(":", $id);
-				$explode[1] = isset($explode[1]) ? $explode[1]:0;
-				if($explode[0] == $e[0] and $explode[1] == $e[1]){
-					return array($name, false);
-				}
-			}
-		}
-		return false;
-	}
-
 	public function getMessage($key, $val = array("%1", "%2", "%3")){
 		if($this->lang->exists($key)){
 			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $val[0], $val[1], $val[2]), $this->lang->get($key));
@@ -189,24 +169,11 @@ class EconomyShop extends PluginBase implements Listener{
 				return;
 			}
 
-			// Item identify
-			$item = $this->getItem($event->getLine(2));
+			$item = Item::fromString($event->getLine(2));
 			if($item === false){
 				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine(2), "", "")));
 				return;
 			}
-			if($item[1] === false){ // Item name found
-				$id = explode(":", strtolower($event->getLine(2)));
-				$event->setLine(2, $item[0]);
-			}else{
-				$tmp = $this->getItem(strtolower($event->getLine(2)));
-				$id = explode(":", $tmp[0]);
-			}
-			$id[0] = (int)$id[0];
-			if(!isset($id[1])){
-				$id[1] = 0;
-			}
-			// Item identify end
 
 			$block = $event->getBlock();
 			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = array(
@@ -215,17 +182,17 @@ class EconomyShop extends PluginBase implements Listener{
 				"z" => $block->getZ(),
 				"level" => $block->getLevel()->getFolderName(),
 				"price" => (int) $event->getLine(1),
-				"item" => (int) $id[0],
-				"itemName" => $event->getLine(2),
-				"meta" => (int) $id[1],
+				"item" => (int) $item->getID(),
+				"itemName" => $item->getName(),
+				"meta" => (int) $item->getDamage(),
 				"amount" => (int) $event->getLine(3)
 			);
 
-			$player->sendMessage($this->getMessage("shop-created", array($id[0], $id[1], $event->getLine(1))));
+			$player->sendMessage($this->getMessage("shop-created", array($item->getID(), $item->getDamage(), $event->getLine(1))));
 
 			$event->setLine(0, $result[0]); // TAG
 			$event->setLine(1, str_replace("%1", $event->getLine(1), $result[1])); // PRICE
-			$event->setLine(2, str_replace("%2", $event->getLine(2), $result[2])); // ITEM NAME
+			$event->setLine(2, str_replace("%2", $item->getName(), $result[2])); // ITEM NAME
 			$event->setLine(3, str_replace("%3", $event->getLine(3), $result[3])); // AMOUNT
 		}
 	}

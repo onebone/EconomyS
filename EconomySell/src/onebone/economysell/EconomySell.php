@@ -51,9 +51,7 @@ class EconomySell extends PluginBase implements Listener {
 		$this->sell = (new Config($this->getDataFolder()."Sell.yml", Config::YAML))->getAll();
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 		$this->prepareLangPref();
-		$this->placeQueue = array();
-
-		ItemList::$items = (new Config($this->getDataFolder()."items.properties", Config::PROPERTIES, ItemList::$items))->getAll();
+		$this->placeQueue = [];
 	}
 
 	public function onDisable(){
@@ -106,24 +104,12 @@ class EconomySell extends PluginBase implements Listener {
 				$player->sendMessage($this->getMessage("wrong-format"));
 				return;
 			}
-			$item = $this->getItem($event->getLine(2));
+			$item = Item::fromString($event->getLine(2));
 			if($item === false){
 				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine (2),"", "" )));
 				return;
 			}
-			if($item[1] === false){ // Item name found
-				$id = explode(":", strtolower($event->getLine(2)));
-				$event->setLine(2, $item[0]);
-			}else{
-				//$tmp = $this->getItem(strtolower($event->getLine(2)));
-				$id = explode(":", $item[0]);
-			}
-			$id[0] = (int) $id[0];
-			if(!isset($id[1])){
-				$id[1] = 0;
-			}
-			$itemName = $item[1] === false ? $item[0]:$event->getLine(2);
-
+			
 			$block = $event->getBlock();
 			$this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$player->getLevel()->getName()] = array(
 					"x" => $block->getX(),
@@ -131,18 +117,18 @@ class EconomySell extends PluginBase implements Listener {
 					"z" => $block->getZ(),
 					"level" => $player->getLevel()->getName(),
 					"cost" => (int) $event->getLine(1),
-					"item" =>  (int) $id[0],
-					"itemName" => $event->getLine(2),
-					"meta" => (int) $id[1],
+					"item" =>  (int) $item->getID(),
+					"itemName" => $item->getName(),
+					"meta" => (int) $item->getDamage(),
 					"amount" => (int) $event->getLine(3)
 			);
 
-			$player->sendMessage($this->getMessage("sell-created", [$itemName, (int)$event->getLine(3), ""]));
+			$player->sendMessage($this->getMessage("sell-created", [$item->getName(), (int)$event->getLine(3), ""]));
 
 			$mu = EconomyAPI::getInstance()->getMonetaryUnit();
 			$event->setLine(0, $val[0]);
 			$event->setLine(1, str_replace(["%MONETARY_UNIT%", "%1"], [$mu, $event->getLine(1)], $val[1]));
-			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $event->getLine(2)], $itemName));
+			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $item->getName()], $val[2]));
 			$event->setLine(3, str_replace(["%MONETARY_UNIT%", "%3"], [$mu, $event->getLine(3)], $val[3]));
 		}
 	}
@@ -235,24 +221,6 @@ class EconomySell extends PluginBase implements Listener {
 		foreach($this->sellSign->getAll() as $tag => $val){
 			if($tag == $line1){
 				return $val;
-			}
-		}
-		return false;
-	}
-
-	public function getItem($item){ // gets ItemID and ItemName
-		$item = strtolower($item);
-		$e = explode(":", $item);
-		$e[1] = isset($e[1])? $e[1] : 0;
-		if(isset(ItemList::$items [$item])){
-			return array(ItemList::$items[$item], true); // Returns Item ID
-		}else{
-			foreach(ItemList::$items as $name => $id){
-				$explode = explode(":", $id);
-				$explode[1] = isset($explode[1]) ? $explode[1] : 0;
-				if($explode[0] == $e[0] and $explode[1] == $e[1]){
-					return array($name, false);
-				}
 			}
 		}
 		return false;
