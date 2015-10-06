@@ -29,16 +29,11 @@ use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
-use onebone\itemcloud\MainClass;
-use onebone\itemcloud\ItemCloud;
-
-use onebone\economyapi\EconomyAPI;
-
 class EconomyPShop extends PluginBase implements Listener{
 	private $placeQueue, $shop, $shopText, $lang, $tap;
 
 	/**
-	 * @var MainClass
+	 * @var \onebone\itemcloud\MainClass
 	 */
 	private $itemcloud;
 
@@ -46,6 +41,15 @@ class EconomyPShop extends PluginBase implements Listener{
 		if(!file_exists($this->getDataFolder())){
 			mkdir($this->getDataFolder());
 		}
+		if(!class_exists("\\onebone\\itemcloud\\MainClass", false)){
+			$this->getLogger()->critical("[DEPENDENCY] Please install ItemCloud plugin to use PShop plugin.");
+			return;
+		}
+		if(!class_exists("\\onebone\\economyapi\\EconomyAPI", false)){
+			$this->getLogger()->critical("[DEPENDENCY] Please install EconomyAPI plugin to use PShop plugin.");
+			return;
+		}
+
 		$this->saveResource("ShopText.yml");
 		$this->saveResource("language.properties");
 		$this->saveDefaultConfig();
@@ -55,7 +59,7 @@ class EconomyPShop extends PluginBase implements Listener{
 		$this->lang = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES));
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		$this->itemcloud = MainClass::getInstance();
+		$this->itemcloud = \onebone\itemcloud\MainClass::getInstance();
 
 		$this->tap = [];
 		$this->placeQueue = [];
@@ -76,12 +80,12 @@ class EconomyPShop extends PluginBase implements Listener{
 				return;
 			}
 
-			$money = EconomyAPI::getInstance()->myMoney($player->getName());
+			$money = \onebone\economyapi\EconomyAPI::getInstance()->myMoney($player->getName());
 			if($money < $this->getConfig()->get("shop-tax")){
 				$player->sendMessage($this->getMessage("no-shop-tax"));
 				return;
 			}
-			EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->getConfig()->get("shop-tax"), "EconomyPShop");
+			\onebone\economyapi\EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->getConfig()->get("shop-tax"), "EconomyPShop");
 
 			$cost = $line[1];
 			$item = $line[2];
@@ -113,7 +117,7 @@ class EconomyPShop extends PluginBase implements Listener{
 				"amount" => (int) $line[3]
 			];
 
-			$mu = EconomyAPI::getInstance()->getMonetaryUnit();
+			$mu = \onebone\economyapi\EconomyAPI::getInstance()->getMonetaryUnit();
 			$event->setLine(0, str_replace("%MONETARY_UNIT%", $mu, $val[0]));
 			$event->setLine(1, str_replace(["%MONETARY_UNIT%", "%1"], [$mu, $cost], $val[1]));
 			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $item->getName()], $val[2]));
@@ -170,14 +174,14 @@ class EconomyPShop extends PluginBase implements Listener{
 					unset($this->tap[$player->getName()]);
 				}
 
-				if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof ItemCloud){
+				if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof \onebone\itemcloud\ItemCloud){
 					if($shop["amount"] > $cloud->getCount($shop["item"], $shop["meta"])){
 						$player->sendMessage($this->getMessage("no-stock"));
 					}else{
 						if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
 							$player->sendMessage($this->getMessage("no-space"));
 						}else{
-							$api = EconomyAPI::getInstance();
+							$api = \onebone\economyapi\EconomyAPI::getInstance();
 							if($api->myMoney($player) > $shop["price"]){
 								$player->getInventory()->addItem($item);
 								$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
@@ -204,7 +208,7 @@ class EconomyPShop extends PluginBase implements Listener{
 
 	public function getMessage($key, $val = ["%1", "%2", "%3"]){
 		if($this->lang->exists($key)){
-			return str_replace(["%1", "%2", "%3", "%MONETARY_UNIT%"], [$val[0], $val[1], $val[2], EconomyAPI::getInstance()->getMonetaryUnit()], $this->lang->get($key));
+			return str_replace(["%1", "%2", "%3", "%MONETARY_UNIT%"], [$val[0], $val[1], $val[2], \onebone\economyapi\EconomyAPI::getInstance()->getMonetaryUnit()], $this->lang->get($key));
 		}
 		return "There's no message named \"$key\"";
 	}
