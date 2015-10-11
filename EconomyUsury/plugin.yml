@@ -1,7 +1,18 @@
 name: EconomyUsury
 version: "1.0.1"
 author: onebone
-api: [1.12.0] # Pretty higher than I expected!
+api:
+- 1.0.0
+- 1.1.0
+- 1.2.0
+- 1.2.1
+- 1.3.0
+- 1.3.1
+- 1.4.0
+- 1.4.1
+- 1.12.0
+- 1.13.0
+- 2.0.0
 main: onebone\economyusury\EconomyUsury
 depend: [EconomyAPI]
 

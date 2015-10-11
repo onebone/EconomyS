@@ -1,7 +1,7 @@
 name: EconomyJob
 main: onebone\economyjob\EconomyJob
 version: "2.0.4"
-api: 
+api:
 - 1.0.0
 - 1.1.0
 - 1.2.0
@@ -10,6 +10,9 @@ api:
 - 1.3.1
 - 1.4.0
 - 1.4.1
+- 1.12.0
+- 1.13.0
+- 2.0.0
 
 author: onebone
 
