@@ -11,6 +11,9 @@ api:
 - 1.3.1
 - 1.4.0
 - 1.4.1
+- 1.12.0
+- 1.13.0
+- 2.0.0
 depend: [EconomyAPI]
 permissions:
  economytax.tax.avoid:
