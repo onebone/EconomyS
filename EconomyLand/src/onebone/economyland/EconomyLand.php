@@ -438,7 +438,7 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 						return true;
 					}elseif(substr($player, 0, 2) === "r:"){
-						if(!$sender->hasPermission("economyland.command.land.invite.remove")){
+						if(!$sender->hasPermission("economyland.command.land.invite")){
 							$sender->sendMessage("You don't have permissions to use this command.");
 							return true;
 						}
