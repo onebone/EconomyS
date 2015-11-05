@@ -385,7 +385,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$player = array_shift($param);
 				$landnum = array_shift($param);
 				if(trim($player) == "" or trim($landnum) == "" or !is_numeric($landnum)){
-					$sender->sendMessage("Usage: /$cmd give <player> <land number>");
+					$sender->sendMessage("Usage: /$cmd give <land number> <player>");
 					return true;
 				}
 				$username = $player;
