@@ -13,7 +13,7 @@ class SortTask extends AsyncTask{
 
 	private $max = 0;
 
-	private $topList = [];
+	private $topList = null;
 
 	/**
 	 * @param string	$player
@@ -33,7 +33,7 @@ class SortTask extends AsyncTask{
 	}
 
 	public function onRun(){
-		$this->topList = $this->getTopList();
+		$this->topList = json_encode((array)$this->getTopList());
 	}
 
 	private function getTopList(){
@@ -72,6 +72,7 @@ class SortTask extends AsyncTask{
 			$output = "- Showing top money list ({$this->page} of {$this->max}) - \n";
 			$message = ($plugin->getMessage("topmoney-format", $this->player, ["%1", "%2", "%3", "%4"])."\n");
 
+			$parseList = (array)json_decode($this->topList, true);
 			foreach($this->topList as $n => $list){
 				$output .= str_replace(["%1", "%2", "%3"], [$n, $list[0], $list[1]], $message);
 			}
