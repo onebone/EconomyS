@@ -200,7 +200,7 @@ class YamlDatabase implements Database{
 		}
 		foreach($this->land as $land){
 			if((($land["startX"] <= $startX and $land["endX"] >= $startX) or ($land["startX"] <= $endX and $land["endX"] >= $endX)) and (($land["startZ"] <= $startZ and $land["endZ"] >= $startZ and $level === $land["level"]) or ($land["endZ"] <= $endZ and $land["endZ"] >= $endZ))){
-				return true;
+				return $land;
 			}
 		}
 		return false;
