@@ -142,7 +142,7 @@ class EconomyLand extends PluginBase implements Listener{
 		switch($cmd->getName()){
 			case "startp":
 			if(!$sender instanceof Player){
-				$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
 			$x = (int) $sender->x;
@@ -198,7 +198,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 				if(!$sender instanceof Player){
-					$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 
@@ -318,7 +318,7 @@ class EconomyLand extends PluginBase implements Listener{
 				break;
 				case "move":
 				if(!$sender instanceof Player){
-					$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.move")){
@@ -376,7 +376,7 @@ class EconomyLand extends PluginBase implements Listener{
 				return true;
 				case "give":
 				if(!$sender instanceof Player){
-					$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.give")){
@@ -487,7 +487,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				case "here":
 				if(!$sender instanceof Player){
-					$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				$x = $sender->x;
@@ -509,7 +509,7 @@ class EconomyLand extends PluginBase implements Listener{
 			switch ($id){
 			case "here":
 				if(!$sender instanceof Player){
-					$sender->sendMessage($this->getMessage("rum-cmd-in-game"));
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				$x = $sender->getX();
@@ -746,7 +746,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"not-owned" => "You must buy land to edit this block",
-			"rum-cmd-in-game" => "[EconomyLand]Please run this command in-game."
+			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
 		));
 	}
 }
