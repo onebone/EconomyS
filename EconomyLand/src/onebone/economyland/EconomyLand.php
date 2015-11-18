@@ -287,7 +287,7 @@ class EconomyLand extends PluginBase implements Listener{
 					if($pro == 6)
 						break;
 					if($page === $cur){
-						$output .= $this->getMessage("land-list-format", array($l["ID"], ($l["endX"] - $l["startX"]) * ($l["endZ"] - $l["startZ"]), $l["owner"]));
+						$output .= $this->getMessage("land-list-format", array($l["ID"], (($l["endX"] + 1) - ($l["startX"] - 1) - 1) * (($l["endZ"] + 1) - ($l["startZ"] - 1) - 1 ), $l["owner"]));
 						$pro++;
 					}
 					$current++;
@@ -313,7 +313,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$sender->sendMessage("Results from query : $player\n");
 			//	while(($info = $result->fetchArray(SQLITE3_ASSOC)) !== false){
 				foreach($lands as $info)
-					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], ($info["endX"] - $info["startX"]) * ($info["endZ"] - $info["startZ"]), $info["owner"])));
+					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], (($info["endX"] + 1) - ($info["startX"] - 1) - 1) * (($info["endZ"] + 1) - ($info["startZ"] - 1) - 1 ), $info["owner"])));
 				//}
 				break;
 				case "move":
