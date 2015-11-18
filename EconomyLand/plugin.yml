@@ -100,7 +100,7 @@ commands:
  land:
   description: Manage land
   usage: /land <buy|move|list|whose|give|here>
-  permission: economyland.command.land;economyland.command.land.list;economyland.command.land.buy;economyland.command.land.whose;economyland.command.land.move;economyland.land.give;economyland.command.land.whose;economyland.command.land.here
+  permission: economyland.command.land;economyland.command.land.list;economyland.command.land.buy;economyland.command.land.whose;economyland.command.land.move;economyland.land.give;economyland.command.land.invite;economyland.command.land.here
  landsell:
   description: Sell land
   usage: /landsell <here|land num>
