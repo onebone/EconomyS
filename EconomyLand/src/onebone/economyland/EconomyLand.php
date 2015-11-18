@@ -254,7 +254,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}*/
 				$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName());
 				if($result){
-					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "%2", "%3")));
+					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], $result["ID"], "%3")));
 					return true;
 				}
 				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->config->get("price-per-y-axis");
@@ -737,7 +737,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"set-first-position" => "Please set first position",
 			"set-second-position" => "Please set second position",
 			"not-allowed-to-buy" => "This world is not allowed to buy land",
-			"land-around-here" => "There are %1's land around here",
+			"land-around-here" => "[EconomyLand]There are ID:%2 land around here. Owner : %1",
 			"no-money-to-buy-land" => "You don't have money to buy this land",
 			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
