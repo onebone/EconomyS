@@ -29,16 +29,11 @@ use pocketmine\item\Item;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
-use onebone\itemcloud\MainClass;
-use onebone\itemcloud\ItemCloud;
-
-use onebone\economyapi\EconomyAPI;
-
 class EconomyPShop extends PluginBase implements Listener{
 	private $placeQueue, $shop, $shopText, $lang, $tap;
 
 	/**
-	 * @var MainClass
+	 * @var \onebone\itemcloud\MainClass
 	 */
 	private $itemcloud;
 
@@ -46,21 +41,30 @@ class EconomyPShop extends PluginBase implements Listener{
 		if(!file_exists($this->getDataFolder())){
 			mkdir($this->getDataFolder());
 		}
+		if(!class_exists("\\onebone\\itemcloud\\MainClass", false)){
+			$this->getLogger()->critical("[DEPENDENCY] Please install ItemCloud plugin to use PShop plugin.");
+			return;
+		}
+		if(!class_exists("\\onebone\\economyapi\\EconomyAPI", false)){
+			$this->getLogger()->critical("[DEPENDENCY] Please install EconomyAPI plugin to use PShop plugin.");
+			return;
+		}
+
 		$this->saveResource("ShopText.yml");
 		$this->saveResource("language.properties");
 		$this->saveDefaultConfig();
-		
+
 		$this->shop = (new Config($this->getDataFolder()."Shops.yml", Config::YAML))->getAll();
 		$this->shopText = (new Config($this->getDataFolder()."ShopText.yml", Config::YAML));
 		$this->lang = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES));
-		
+
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		$this->itemcloud = MainClass::getInstance();
-		
+		$this->itemcloud = \onebone\itemcloud\MainClass::getInstance();
+
 		$this->tap = [];
 		$this->placeQueue = [];
 	}
-	
+
 	public function onDisable(){
 		$file = new Config($this->getDataFolder()."Shops.yml", Config::YAML);
 		$file->setAll($this->shop);
@@ -75,42 +79,30 @@ class EconomyPShop extends PluginBase implements Listener{
 				$player->sendMessage($this->getMessage("no-permission-create-shop"));
 				return;
 			}
-			
-			$money = EconomyAPI::getInstance()->myMoney($player->getName());
+
+			$money = \onebone\economyapi\EconomyAPI::getInstance()->myMoney($player->getName());
 			if($money < $this->getConfig()->get("shop-tax")){
 				$player->sendMessage($this->getMessage("no-shop-tax"));
 				return;
 			}
-			EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->getConfig()->get("shop-tax"), "EconomyPShop");
-			
+			\onebone\economyapi\EconomyAPI::getInstance()->reduceMoney($player->getName(), $this->getConfig()->get("shop-tax"), "EconomyPShop");
+
 			$cost = $line[1];
 			$item = $line[2];
 			$amount = $line[3];
-			
+
 			if(!is_numeric($cost) or !is_numeric($amount)){
 				$player->sendMessage($this->getMessage("insert-right-format"));
 				return;
 			}
-			
-			// Item identify
-			$item = $this->getItem($line[2]);
-			if($item === false){
+
+			$item = Item::fromString($line[2]);
+			if(!$item instanceof Item){
 				$player->sendMessage($this->getMessage("item-not-support", array($line[2], "", "")));
 				return;
 			}
-			if($item[1] === false){ // Item name found
-				$id = explode(":", strtolower($line[2]));
-				$line[2] = $item[0];
-			}else{
-				$tmp = $this->getItem(strtolower($line[2]));
-				$id = explode(":", $tmp[0]);
-			}
-			$id[0] = (int)$id[0];
-			if(!isset($id[1])){
-				$id[1] = 0;
-			}
-			// Item identify end
-			
+
+
 			$block = $event->getBlock();
 			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = [
 				"x" => $block->getX(),
@@ -119,19 +111,19 @@ class EconomyPShop extends PluginBase implements Listener{
 				"level" => $block->getLevel()->getFolderName(),
 				"owner" => $player->getName(),
 				"price" => (int) $line[1],
-				"item" => (int) $id[0],
+				"item" => (int) $item->getID(),
 				"itemName" => $line[2],
-				"meta" => (int) $id[1],
+				"meta" => (int) $item->getDamage(),
 				"amount" => (int) $line[3]
 			];
-			
-			$mu = EconomyAPI::getInstance()->getMonetaryUnit();
+
+			$mu = \onebone\economyapi\EconomyAPI::getInstance()->getMonetaryUnit();
 			$event->setLine(0, str_replace("%MONETARY_UNIT%", $mu, $val[0]));
 			$event->setLine(1, str_replace(["%MONETARY_UNIT%", "%1"], [$mu, $cost], $val[1]));
-			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $line[2]], $val[2]));
+			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $item->getName()], $val[2]));
 			$event->setLine(3, str_replace(["%MONETARY_UNIT%", "%3"], [$mu, $amount], $val[3]));
-			
-			$player->sendMessage($this->getMessage("shop-created", [$line[2], $cost, $amount]));
+
+			$player->sendMessage($this->getMessage("shop-created", [$item->getName(), $cost, $amount]));
 		}
 	}
 
@@ -141,7 +133,7 @@ class EconomyPShop extends PluginBase implements Listener{
 		if(isset($this->shop[$loc])){
 			$player = $event->getPlayer();
 			$shop = $this->shop[$loc];
-			
+
 			if($shop["owner"] == $player->getName()){
 				unset($this->shop[$loc]);
 				$player->sendMessage($this->getMessage("shop-removed"));
@@ -167,12 +159,12 @@ class EconomyPShop extends PluginBase implements Listener{
 			$player = $event->getPlayer();
 			if($player->hasPermission("economypshop.shop.buy")){
 				$shop = $this->shop[$loc];
-				
+
 				if($shop["owner"] == $player->getName()){
 					$player->sendMessage($this->getMessage("same-player"));
 					return;
 				}
-				
+
 				$now = microtime(true);
 				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
 					$this->tap[$player->getName()] = [$loc, $now];
@@ -181,15 +173,15 @@ class EconomyPShop extends PluginBase implements Listener{
 				}else{
 					unset($this->tap[$player->getName()]);
 				}
-				
-				if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof ItemCloud){
+
+				if(($cloud = $this->itemcloud->getCloudForPlayer($shop["owner"])) instanceof \onebone\itemcloud\ItemCloud){
 					if($shop["amount"] > $cloud->getCount($shop["item"], $shop["meta"])){
 						$player->sendMessage($this->getMessage("no-stock"));
 					}else{
 						if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
 							$player->sendMessage($this->getMessage("no-space"));
 						}else{
-							$api = EconomyAPI::getInstance();
+							$api = \onebone\economyapi\EconomyAPI::getInstance();
 							if($api->myMoney($player) > $shop["price"]){
 								$player->getInventory()->addItem($item);
 								$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
@@ -205,7 +197,7 @@ class EconomyPShop extends PluginBase implements Listener{
 					$player->sendMessage($this->getMessage("shop-owner-no-account"));
 				}
 				$event->setCancelled();
-				if($event->getItem()->isPlaceable()){
+				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}else{
@@ -213,10 +205,10 @@ class EconomyPShop extends PluginBase implements Listener{
 			}
 		}
 	}
-	
+
 	public function getMessage($key, $val = ["%1", "%2", "%3"]){
 		if($this->lang->exists($key)){
-			return str_replace(["%1", "%2", "%3", "%MONETARY_UNIT%"], [$val[0], $val[1], $val[2], EconomyAPI::getInstance()->getMonetaryUnit()], $this->lang->get($key));
+			return str_replace(["%1", "%2", "%3", "%MONETARY_UNIT%"], [$val[0], $val[1], $val[2], \onebone\economyapi\EconomyAPI::getInstance()->getMonetaryUnit()], $this->lang->get($key));
 		}
 		return "There's no message named \"$key\"";
 	}
@@ -228,25 +220,7 @@ class EconomyPShop extends PluginBase implements Listener{
 			unset($this->placeQueue[$user]);
 		}
 	}
-	
-	public function getItem($item){ // gets ItemID and ItemName
-		$item = strtolower($item);
-		$e = explode(":", $item);
-		$e[1] = isset($e[1]) ? $e[1] : 0;
-		if(array_key_exists($item, ItemList::$items)){
-			return array(ItemList::$items[$item], true); // Returns Item ID
-		}else{
-			foreach(ItemList::$items as $name => $id){
-				$explode = explode(":", $id);
-				$explode[1] = isset($explode[1]) ? $explode[1]:0;
-				if($explode[0] == $e[0] and $explode[1] == $e[1]){
-					return array($name, false);
-				}
-			}
-		}
-		return false;
-	}
-	
+
 	public function getTag($firstLine){
 		foreach($this->shopText->getAll() as $key => $val){
 			if($key == $firstLine){
