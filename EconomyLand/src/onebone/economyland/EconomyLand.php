@@ -142,7 +142,7 @@ class EconomyLand extends PluginBase implements Listener{
 		switch($cmd->getName()){
 			case "startp":
 			if(!$sender instanceof Player){
-				$sender->sendMessage("Please run this command in-game.");
+				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
 			$x = (int) $sender->x;
@@ -198,7 +198,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 				if(!$sender instanceof Player){
-					$sender->sendMessage("Please run this command in-game.");
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 
@@ -254,7 +254,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}*/
 				$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName());
 				if($result){
-					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "%2", "%3")));
+					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], $result["ID"], "%3")));
 					return true;
 				}
 				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->config->get("price-per-y-axis");
@@ -287,7 +287,7 @@ class EconomyLand extends PluginBase implements Listener{
 					if($pro == 6)
 						break;
 					if($page === $cur){
-						$output .= $this->getMessage("land-list-format", array($l["ID"], ($l["endX"] - $l["startX"]) * ($l["endZ"] - $l["startZ"]), $l["owner"]));
+						$output .= $this->getMessage("land-list-format", array($l["ID"], (($l["endX"] + 1) - ($l["startX"] - 1) - 1) * (($l["endZ"] + 1) - ($l["startZ"] - 1) - 1 ), $l["owner"]));
 						$pro++;
 					}
 					$current++;
@@ -313,12 +313,12 @@ class EconomyLand extends PluginBase implements Listener{
 				$sender->sendMessage("Results from query : $player\n");
 			//	while(($info = $result->fetchArray(SQLITE3_ASSOC)) !== false){
 				foreach($lands as $info)
-					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], ($info["endX"] - $info["startX"]) * ($info["endZ"] - $info["startZ"]), $info["owner"])));
+					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], (($info["endX"] + 1) - ($info["startX"] - 1) - 1) * (($info["endZ"] + 1) - ($info["startZ"] - 1) - 1 ), $info["owner"])));
 				//}
 				break;
 				case "move":
 				if(!$sender instanceof Player){
-					$sender->sendMessage("Please run this command in-game.");
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.move")){
@@ -376,7 +376,7 @@ class EconomyLand extends PluginBase implements Listener{
 				return true;
 				case "give":
 				if(!$sender instanceof Player){
-					$sender->sendMessage("Please run this command in-game.");
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.give")){
@@ -487,7 +487,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				case "here":
 				if(!$sender instanceof Player){
-					$sender->sendMessage("Please run this command in-game.");
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				$x = $sender->x;
@@ -509,7 +509,7 @@ class EconomyLand extends PluginBase implements Listener{
 			switch ($id){
 			case "here":
 				if(!$sender instanceof Player){
-					$sender->sendMessage("Please run this command in-game.");
+					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
 				$x = $sender->getX();
@@ -737,7 +737,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"set-first-position" => "Please set first position",
 			"set-second-position" => "Please set second position",
 			"not-allowed-to-buy" => "This world is not allowed to buy land",
-			"land-around-here" => "There are %1's land around here",
+			"land-around-here" => "[EconomyLand]There are ID:%2 land around here. Owner : %1",
 			"no-money-to-buy-land" => "You don't have money to buy this land",
 			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
@@ -745,7 +745,8 @@ class EconomyLand extends PluginBase implements Listener{
 			"cant-set-position-in-different-world" => "You can't set position in different world",
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
-			"not-owned" => "You must buy land to edit this block"
+			"not-owned" => "You must buy land to edit this block",
+			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
 		));
 	}
 }
