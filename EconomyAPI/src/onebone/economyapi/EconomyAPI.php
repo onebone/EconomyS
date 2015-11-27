@@ -127,7 +127,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	private $langList = [
 		"def" => "Default",
 		"user-define" => "User Defined",
-		"ch" => "中文",
+		"ch" => "简体中文",
 		"cs" => "Čeština",
 		"en" => "English",
 		"fr" => "Français",
@@ -137,6 +137,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"ko" => "한국어",
 		"nl" => "Nederlands",
 		"ru" => "Русский",
+		"zh" => "繁體中文",
 	];
 
 	/**
