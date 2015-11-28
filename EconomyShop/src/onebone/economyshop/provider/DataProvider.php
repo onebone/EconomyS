@@ -54,7 +54,7 @@ interface DataProvider{
 	 * @param \pocketmine\level\Position|int $x
 	 * @param int $y
 	 * @param int $z
-	 * @param \pocketmine\level\Level $level
+	 * @param \pocketmine\level\Level|string $level
 	 *
 	 * @return bool
 	 */

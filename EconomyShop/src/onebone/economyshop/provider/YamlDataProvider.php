@@ -42,15 +42,17 @@ class YamlDataProvider implements DataProvider{
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
+
+			$data = $y;
 		}
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		if($this->config->exists($x.":".$y.":".$z)){
+		if($this->config->exists($x.":".$y.":".$z.":".$level)){
 			return false;
 		}
 
-		$this->config->set($x.":".$y.":".$z, $data);
+		$this->config->set($x.":".$y.":".$z.":".$level, $data);
 		if($this->save){
 			$this->save();
 		}
@@ -67,10 +69,10 @@ class YamlDataProvider implements DataProvider{
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		if(!$this->config->exists($x.":".$y.":".$z)){
+		if(!$this->config->exists($x.":".$y.":".$z.":".$level)){
 			return false;
 		}
-		return $this->config->get($x.":".$y.":".$z);
+		return $this->config->get($x.":".$y.":".$z.":".$level);
 	}
 
 	public function removeShop($x, $y = 0, $z = 0, $level = null){
@@ -84,8 +86,8 @@ class YamlDataProvider implements DataProvider{
 			$level = $level->getFolderName();
 		}
 
-		if($this->config->exists($x.":".$y.":".$z)){
-			$this->config->remove($x.":".$y.":".$z);
+		if($this->config->exists($x.":".$y.":".$z.":".$level)){
+			$this->config->remove($x.":".$y.":".$z.":".$level);
 			return true;
 		}
 		return false;

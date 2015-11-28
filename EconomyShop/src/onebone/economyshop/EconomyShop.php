@@ -25,6 +25,7 @@ use onebone\economyshop\provider\YamlDataProvider;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -96,12 +97,16 @@ class EconomyShop extends PluginBase implements Listener{
 								case "east": case Vector3::SIDE_EAST: $side = Vector3::SIDE_EAST;break;
 								case "north": case Vector3::SIDE_NORTH: $side = Vector3::SIDE_NORTH;break;
 								case "south": case Vector3::SIDE_SOUTH: $side = Vector3::SIDE_SOUTH;break;
-								case "shop":case -1: $side = -1;break;
+								case "shop": case -1: $side = -1;break;
+								case "none": case -2: $side = -2;break;
 								default:
 									$sender->sendMessage($this->getMessage("invalid-side"));
 									return true;
 							}
 						}
+						$this->queue[strtolower($sender->getName())] = [
+							$item, $amount, $price, $side
+						];
 						$sender->sendMessage($this->getMessage("added-queue"));
 						return true;
 					case "remove":
@@ -120,6 +125,23 @@ class EconomyShop extends PluginBase implements Listener{
 						return true;
 				}
 				return false;
+		}
+	}
+
+	public function onBlockTouch(PlayerInteractEvent $event){
+		$player = $event->getPlayer();
+		$iusername = strtolower($player->getName());
+
+		if(isset($this->queue[$iusername])){
+			$block = $event->getBlock();
+			$queue = $this->queue[$iusername];
+			$item = Item::fromString($queue[0]);
+			$this->provider->addShop($block, [
+				$block->getX(), $block->getY(), $block->getZ(), $block->getLevel()->getFolderName(),
+				$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
+			]);
+			$player->sendMessage($this->getMessage("shop-created"));
+			unset($this->queue[$iusername]);
 		}
 	}
 
