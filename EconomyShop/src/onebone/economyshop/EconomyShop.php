@@ -20,8 +20,6 @@
 
 namespace onebone\economyshop;
 
-use onebone\economyshop\provider\DataProvider;
-use onebone\economyshop\provider\YamlDataProvider;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
@@ -32,6 +30,10 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
+use onebone\economyapi\EconomyAPI;
+use onebone\economyshop\provider\DataProvider;
+use onebone\economyshop\provider\YamlDataProvider;
+
 class EconomyShop extends PluginBase implements Listener{
 	/**
 	 * @var DataProvider
@@ -40,7 +42,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private $lang;
 
-	private $queue = [];
+	private $queue = [], $tap = [];
 
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -130,10 +132,11 @@ class EconomyShop extends PluginBase implements Listener{
 
 	public function onBlockTouch(PlayerInteractEvent $event){
 		$player = $event->getPlayer();
+		$block = $event->getBlock();
+
 		$iusername = strtolower($player->getName());
 
 		if(isset($this->queue[$iusername])){
-			$block = $event->getBlock();
 			$queue = $this->queue[$iusername];
 			$item = Item::fromString($queue[0]);
 			$this->provider->addShop($block, [
@@ -142,6 +145,41 @@ class EconomyShop extends PluginBase implements Listener{
 			]);
 			$player->sendMessage($this->getMessage("shop-created"));
 			unset($this->queue[$iusername]);
+			return;
+		}
+
+		if(($shop = $this->provider->getShop($block)) !== false){
+			if ($this->getConfig()->get("enable-double-tap")){
+				$now = time();
+				if (isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1){
+					$this->buyItem($player, $shop);
+					unset($this->tap[$iusername]);
+				}else{
+					$this->tap[$iusername] = $now;
+					$player->sendMessage($this->getMessage("tap-again"));
+				}
+			}else{
+				$this->buyItem($player, $shop);
+			}
+		}
+	}
+
+	private function buyItem(Player $player, $shop){
+		if(!$player instanceof Player){
+			return false;
+		}
+
+		$money = EconomyAPI::getInstance()->myMoney($player);
+		if($money < $shop[8]){
+			$player->sendMessage($this->getMessage("no-money", [$shop[8], $shop[6]]));
+		}else{
+			$item = Item::get($shop[4], $shop[5], $shop[7]);
+			if($player->getInventory()->canAddItem($item)){
+				$player->getInventory()->addItem($item);
+				$player->sendMessage($this->getMessage("bought-item", [$shop[6], $shop[7], $shop[8]]));
+			}else{
+				$player->sendMessage($this->getMessage("full-inventory"));
+			}
 		}
 	}
 
@@ -151,9 +189,13 @@ class EconomyShop extends PluginBase implements Listener{
 			$search = [];
 			$replace = [];
 			$this->replaceColors($search, $replace);
-			for($i = 1; $i < count($replacement); $i++){
+
+			$search[] = "%MONETARY_UNIT%";
+			$replace[] = EconomyAPI::getInstance()->getMonetaryUnit();
+
+			for($i = 1; $i <= count($replacement); $i++){
 				$search[] = "%".$i;
-				$replace[] = $replacement[$i];
+				$replace[] = $replacement[$i - 1];
 			}
 			return str_replace($search, $replace, $this->lang[$key]);
 		}

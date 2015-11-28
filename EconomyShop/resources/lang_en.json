@@ -1,5 +1,9 @@
 {
   "invalid-side": "%%RED%%Invalid side option was given.",
   "added-queue": "%%GREEN%%Added to shop creation queue. Touch where you want to create.",
-  "shop-created": "%%GREEN%%Shop was created successfully."
+  "shop-created": "%%GREEN%%Shop was created successfully.",
+  "tap-again": "%%YELLOW%%Tap again to confirm buying.",
+  "no-money": "You do not have %%RED%%%MONETARY_UNIT%%1%%RESET%% to buy %%RED%%%2%%RESET.",
+  "full-inventory": "%%RED%%You do not have inventory slot to buy item.",
+  "bought-item": "You have bought item %2 of %%AQUA%%%1%%RESET%% for %%GOLD%%%MONETARY_UNIT%%3%%RESET%%."
 }
