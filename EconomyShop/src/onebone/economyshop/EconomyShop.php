@@ -26,6 +26,8 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -36,6 +38,7 @@ use pocketmine\utils\TextFormat;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyshop\provider\DataProvider;
 use onebone\economyshop\provider\YamlDataProvider;
+use onebone\economyshop\item\ItemDisplayer;
 
 class EconomyShop extends PluginBase implements Listener{
 	/**
@@ -46,6 +49,9 @@ class EconomyShop extends PluginBase implements Listener{
 	private $lang;
 
 	private $queue = [], $tap = [], $removeQueue = [];
+
+	/** @var ItemDisplayer[][] */
+	private $items = [];
 
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -64,6 +70,21 @@ class EconomyShop extends PluginBase implements Listener{
 				return;
 		}
 		$this->getLogger()->notice("Data provider was set to: ".$this->provider->getProviderName());
+
+		$levels = [];
+		foreach($this->provider->getAll() as $shop){
+			if($shop[9] !== -2){
+				if(!isset($levels[$shop[3]])){
+					$levels[$shop[3]] = $this->getServer()->getLevelByName($shop[3]);
+				}
+				$pos = new Position($shop[0], $shop[1], $shop[2], $levels[$shop[3]]);
+				$display = $pos;
+				if($shop[9] !== -1){
+					$display = $pos->getSide($shop[9]);
+				}
+				$this->items[$shop[3]][] = new ItemDisplayer($display, Item::get($shop[4], $shop[5]), $pos);
+			}
+		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 
@@ -145,6 +166,29 @@ class EconomyShop extends PluginBase implements Listener{
 		}
 	}
 
+	public function onPlayerJoin(PlayerJoinEvent $event){
+		$player = $event->getPlayer();
+		$level = $player->getLevel()->getFolderName();
+
+		if(isset($this->items[$level])){
+			foreach($this->items[$level] as $displayer){
+				$displayer->spawnTo($player);
+			}
+		}
+	}
+
+	public function onPlayerTeleport(PlayerMoveEvent $event){
+		if($event->getFrom()->getLevel() !== $event->getTo()->getLevel()){
+			$to = $event->getTo()->getLevel();
+			if(isset($this->items[$to->getFolderName()])){
+				$player = $event->getPlayer();
+				foreach($this->items[$to->getFolderName()] as $displayer){
+					$displayer->spawnTo($player);
+				}
+			}
+		}
+	}
+
 	public function onBlockTouch(PlayerInteractEvent $event){
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
@@ -168,6 +212,17 @@ class EconomyShop extends PluginBase implements Listener{
 				$block->getX(), $block->getY(), $block->getZ(), $block->getLevel()->getFolderName(),
 				$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
 			]);
+
+			if($queue[3] !== -2){
+				$pos = $block;
+				if($queue[3] !== -1){
+					$pos = $block->getSide($queue[3]);
+				}
+
+				$this->items[$pos->getLevel()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
+				$dis->spawnToAll($pos->getLevel());
+			}
+
 			if($result){
 				$player->sendMessage($this->getMessage("shop-created"));
 			}else{
@@ -176,6 +231,18 @@ class EconomyShop extends PluginBase implements Listener{
 			unset($this->queue[$iusername]);
 			return;
 		}elseif(isset($this->removeQueue[$iusername])){
+			$shop = $this->provider->getShop($block);
+			foreach($this->items as $level => $arr){
+				foreach($arr as $key => $displayer){
+					$link = $displayer->getLinked();
+					if($link->getX() === $shop[0] and $link->getY() === $shop[1] and $link->getZ() === $shop[2] and $link->getLevel()->getFolderName() === $shop[3]){
+						$displayer->despawnFromAll();
+						unset($this->items[$key]);
+						break 2;
+					}
+				}
+			}
+
 			$this->provider->removeShop($block);
 
 			unset($this->removeQueue[$iusername]);
@@ -276,7 +343,7 @@ class EconomyShop extends PluginBase implements Listener{
 	}
 
 	public function onDisable(){
-		if($this->provider instanceof DataProvider) {
+		if($this->provider instanceof DataProvider){
 			$this->provider->close();
 		}
 	}

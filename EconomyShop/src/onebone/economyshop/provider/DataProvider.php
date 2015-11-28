@@ -61,6 +61,11 @@ interface DataProvider{
 	public function removeShop($x, $y = 0, $z = 0, $level = null);
 
 	/**
+	 * @return array
+	 */
+	public function getAll();
+
+	/**
 	 * @return string
 	 */
 	public function getProviderName();

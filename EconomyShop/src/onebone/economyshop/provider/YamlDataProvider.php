@@ -75,6 +75,10 @@ class YamlDataProvider implements DataProvider{
 		return $this->config->get($x.":".$y.":".$z.":".$level);
 	}
 
+	public function getAll(){
+		return $this->config->getAll();
+	}
+
 	public function removeShop($x, $y = 0, $z = 0, $level = null){
 		if($x instanceof Position){
 			$y = $x->getFloorY();
