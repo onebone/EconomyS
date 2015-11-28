@@ -20,11 +20,14 @@
 
 namespace onebone\economyshop;
 
+use onebone\economyshop\event\ShopCreationEvent;
+use onebone\economyshop\event\ShopTransactionEvent;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -107,7 +110,7 @@ class EconomyShop extends PluginBase implements Listener{
 							}
 						}
 						$this->queue[strtolower($sender->getName())] = [
-							$item, (int)$amount, (int)$price, (int)$side
+							$item, (int)$amount, $price, (int)$side
 						];
 						$sender->sendMessage($this->getMessage("added-queue"));
 						return true;
@@ -139,19 +142,33 @@ class EconomyShop extends PluginBase implements Listener{
 		if(isset($this->queue[$iusername])){
 			$queue = $this->queue[$iusername];
 			$item = Item::fromString($queue[0]);
-			$this->provider->addShop($block, [
+			$item->setCount($queue[1]);
+
+			$ev = new ShopCreationEvent($block, $item, $queue[2], $queue[3]);
+			$this->getServer()->getPluginManager()->callEvent($ev);
+
+			if($ev->isCancelled()){
+				$player->sendMessage($this->getMessage("shop-create-failed"));
+				unset($this->queue[$iusername]);
+				return;
+			}
+			$result = $this->provider->addShop($block, [
 				$block->getX(), $block->getY(), $block->getZ(), $block->getLevel()->getFolderName(),
 				$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
 			]);
-			$player->sendMessage($this->getMessage("shop-created"));
+			if($result){
+				$player->sendMessage($this->getMessage("shop-created"));
+			}else{
+				$player->sendMessage($this->getMessage("shop-already-exist"));
+			}
 			unset($this->queue[$iusername]);
 			return;
 		}
 
 		if(($shop = $this->provider->getShop($block)) !== false){
-			if ($this->getConfig()->get("enable-double-tap")){
+			if($this->getConfig()->get("enable-double-tap")){
 				$now = time();
-				if (isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1){
+				if(isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1){
 					$this->buyItem($player, $shop);
 					unset($this->tap[$iusername]);
 				}else{
@@ -175,12 +192,19 @@ class EconomyShop extends PluginBase implements Listener{
 		}else{
 			$item = Item::get($shop[4], $shop[5], $shop[7]);
 			if($player->getInventory()->canAddItem($item)){
+				$ev = new ShopTransactionEvent($player, new Position($shop[0], $shop[1], $shop[2], $this->getServer()->getLevelByName($shop[3])), $item, $shop[8]);
+				$this->getServer()->getPluginManager()->callEvent($ev);
+				if($ev->isCancelled()){
+					$player->sendMessage($this->getMessage("failed-buy"));
+					return true;
+				}
 				$player->getInventory()->addItem($item);
 				$player->sendMessage($this->getMessage("bought-item", [$shop[6], $shop[7], $shop[8]]));
 			}else{
 				$player->sendMessage($this->getMessage("full-inventory"));
 			}
 		}
+		return true;
 	}
 
 	public function getMessage($key, $replacement = []){
