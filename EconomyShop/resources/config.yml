@@ -1,2 +1,8 @@
 # EconomyShop configuration file
+
+# Confirm buying by tapping twice
 enable-double-tap: true
+# Save for each changes in shop data
+auto-save: true
+# Shop data provider (yaml)
+data-provider: yaml
