@@ -4,6 +4,7 @@
     "request-cancelled": "요청이 거부되었습니다.",
     "player-not-connected": "%1님은 서버에 접속하지 않았습니다.",
     "player-never-connected": "%1님은 서버에 접속한 적이 없습니다.",
+    "topmoney-tag": "- 돈 순위를 표시합니다 (%1 / %2 페이지) -",
     "topmoney-format": "[%1] %2: %3",
     "pay-failed": "돈을 지불할 수 없습니다.",
     "pay-success": "%2님에게 %MONETARY_UNIT%%1을(를) 지불하였습니다.",

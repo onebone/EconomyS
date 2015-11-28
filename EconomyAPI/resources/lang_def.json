@@ -4,6 +4,7 @@
     "request-cancelled": "Your request was cancelled",
     "player-not-connected": "Player %1 is not in server",
     "player-never-connected": "Player %1 was never seen in this server",
+    "topmoney-tag": "- Showing top money list (%1 of %2) -",
     "topmoney-format": "[%1] %2: %3",
     "pay-failed": "Failed to pay.",
     "pay-success": "Paid %MONETARY_UNIT%%1 to %2.",

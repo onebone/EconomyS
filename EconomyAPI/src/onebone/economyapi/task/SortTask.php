@@ -69,7 +69,7 @@ class SortTask extends AsyncTask{
 		if((($player = $this->player) === "CONSOLE") or ($player = $server->getPlayerExact($this->player)) instanceof Player){
 			$plugin = EconomyAPI::getInstance();
 
-			$output = "- Showing top money list ({$this->page} of {$this->max}) - \n";
+			$output = ($plugin->getMessage("topmoney-tag", $this->player, [$this->page, $this->max, "%3", "%4"])."\n");
 			$message = ($plugin->getMessage("topmoney-format", $this->player, ["%1", "%2", "%3", "%4"])."\n");
 
 			foreach($this->topList as $n => $list){
