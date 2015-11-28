@@ -8,6 +8,7 @@
   "shop-already-exist": "%%RED%%Shop already exists.",
   "shop-created": "%%GREEN%%Shop was created successfully.",
   "shop-removed": "%%GREEN%%Shop was removed successfully.",
+  "no-permission-buy": "%%RED%%You don't have permission to buy item.",
   "tap-again": "%%YELLOW%%Tap again to confirm buying.",
   "no-money": "You do not have %%RED%%%MONETARY_UNIT%%1%%RESET%% to buy %%RED%%%2%%RESET.",
   "full-inventory": "%%RED%%You do not have inventory slot to buy item.",

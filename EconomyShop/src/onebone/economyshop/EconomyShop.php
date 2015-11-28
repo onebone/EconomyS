@@ -105,6 +105,10 @@ class EconomyShop extends PluginBase implements Listener{
 							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
 							return true;
 						}
+						if(!$sender->hasPermission("economyshop.command.shop.create")){
+							$sender->sendMessage(TextFormat::RED."You don't have permission to run this command.");
+							return true;
+						}
 						if(isset($this->queue[strtolower($sender->getName())])){
 							unset($this->queue[strtolower($sender->getName())]);
 							$sender->sendMessage($this->getMessage("removed-queue"));
@@ -150,6 +154,10 @@ class EconomyShop extends PluginBase implements Listener{
 					case "d":
 						if(!$sender instanceof Player){
 							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						if(!$sender->hasPermission("economyshop.command.shop.remove")){
+							$sender->sendMessage(TextFormat::RED."You don't have permission to run this command.");
 							return true;
 						}
 						if(isset($this->removeQueue[strtolower($sender->getName())])){
@@ -219,17 +227,17 @@ class EconomyShop extends PluginBase implements Listener{
 				$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
 			]);
 
-			if($queue[3] !== -2){
-				$pos = $block;
-				if($queue[3] !== -1){
-					$pos = $block->getSide($queue[3]);
+			if($result){
+				if($queue[3] !== -2){
+					$pos = $block;
+					if($queue[3] !== -1){
+						$pos = $block->getSide($queue[3]);
+					}
+
+					$this->items[$pos->getLevel()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
+					$dis->spawnToAll($pos->getLevel());
 				}
 
-				$this->items[$pos->getLevel()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
-				$dis->spawnToAll($pos->getLevel());
-			}
-
-			if($result){
 				$player->sendMessage($this->getMessage("shop-created"));
 			}else{
 				$player->sendMessage($this->getMessage("shop-already-exist"));
@@ -305,6 +313,10 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private function buyItem(Player $player, $shop){
 		if(!$player instanceof Player){
+			return false;
+		}
+		if(!$player->hasPermission("economyshop.shop.buy")){
+			$player->sendMessage($this->getMessage("no-permission-buy"));
 			return false;
 		}
 

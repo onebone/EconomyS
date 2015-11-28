@@ -35,9 +35,3 @@ permissions:
      economyshop.shop.buy:
       description: Allows player to buy from shop
       default: true
-     economyshop.shop.create:
-      description: Allows player to create shop
-      default: op
-     economyshop.shop.remove:
-      description: Allows player to remove shop
-      default: op
