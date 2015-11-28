@@ -1,16 +1,45 @@
 <?php
 
+/*
+ * EconomyS, the massive economy plugin with many features for PocketMine-MP
+ * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 namespace onebone\economyshop;
 
+use onebone\economyshop\provider\DataProvider;
 use onebone\economyshop\provider\YamlDataProvider;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
+use pocketmine\item\Item;
+use pocketmine\math\Vector3;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextFormat;
 
 class EconomyShop extends PluginBase implements Listener{
 	/**
-	 * @var \onebone\economyshop\provider\DataProvider
+	 * @var DataProvider
 	 */
 	private $provider;
+
+	private $lang;
+
+	private $queue = [];
 
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -29,5 +58,120 @@ class EconomyShop extends PluginBase implements Listener{
 				return;
 		}
 		$this->getLogger()->notice("Data provider was set to: ".$this->provider->getProviderName());
+
+		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+
+		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true);
+		@fclose($rsc);
+	}
+
+	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
+		switch($command->getName()){
+			case "shop":
+				switch(strtolower(array_shift($params))){
+					case "create":
+					case "cr":
+					case "c":
+						if(!$sender instanceof Player){
+							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						$item = array_shift($params);
+						$amount = array_shift($params);
+						$price = array_shift($params);
+						$side = array_shift($params);
+
+						if(trim($item) === "" or trim($amount) === "" or trim($price) === "" or !is_numeric($amount) or !is_numeric($price)){
+							$sender->sendMessage("Usage: /shop create <item[:damage]> <amount> <price> [side]");
+							return true;
+						}
+
+						if(trim($side) === ""){
+							$side = Vector3::SIDE_UP;
+						}else{
+							switch(strtolower($side)){
+								case "up": case Vector3::SIDE_UP: $side = Vector3::SIDE_UP;break;
+								case "down": case Vector3::SIDE_DOWN: $side = Vector3::SIDE_DOWN;break;
+								case "west": case Vector3::SIDE_WEST: $side = Vector3::SIDE_WEST;break;
+								case "east": case Vector3::SIDE_EAST: $side = Vector3::SIDE_EAST;break;
+								case "north": case Vector3::SIDE_NORTH: $side = Vector3::SIDE_NORTH;break;
+								case "south": case Vector3::SIDE_SOUTH: $side = Vector3::SIDE_SOUTH;break;
+								case "shop":case -1: $side = -1;break;
+								default:
+									$sender->sendMessage($this->getMessage("invalid-side"));
+									return true;
+							}
+						}
+						$sender->sendMessage($this->getMessage("added-queue"));
+						return true;
+					case "remove":
+					case "rm":
+					case "r":
+					case "delete":
+					case "del":
+					case "d":
+						if(!$sender instanceof Player){
+							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						return true;
+					case "list":
+
+						return true;
+				}
+				return false;
+		}
+	}
+
+	public function getMessage($key, $replacement = []){
+		$key = strtolower($key);
+		if(isset($this->lang[$key])){
+			$search = [];
+			$replace = [];
+			$this->replaceColors($search, $replace);
+			for($i = 1; $i < count($replacement); $i++){
+				$search[] = "%".$i;
+				$replace[] = $replacement[$i];
+			}
+			return str_replace($search, $replace, $this->lang[$key]);
+		}
+		return "Could not find \"$key\".";
+	}
+
+	private function replaceColors(&$search = [], &$replace = []){
+		$colors = [
+			"BLACK" => "0",
+			"DARK_BLUE" => "1",
+			"DARK_GREEN" => "2",
+			"DARK_AQUA" => "3",
+			"DARK_RED" => "4",
+			"DARK_PURPLE" => "5",
+			"GOLD" => "6",
+			"GRAY" => "7",
+			"DARK_GRAY" => "8",
+			"BLUE" => "9",
+			"GREEN" => "a",
+			"AQUA" => "b",
+			"RED" => "c",
+			"LIGHT_PURPLE" => "d",
+			"YELLOW" => "e",
+			"WHITE" => "f",
+			"OBFUSCATED" => "k",
+			"BOLD" => "l",
+			"STRIKETHROUGH" => "m",
+			"UNDERLINE" => "n",
+			"ITALIC" => "o",
+			"RESET" => "r"
+		];
+		foreach($colors as $color => $code){
+			$search[] = "%%".$color."%%";
+			$replace[] = TextFormat::ESCAPE.$code;
+		}
+	}
+
+	public function onDisable(){
+		if($this->provider instanceof DataProvider) {
+			$this->provider->close();
+		}
 	}
 }
