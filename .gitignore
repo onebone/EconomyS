@@ -1,2 +1,3 @@
 Economy*/*.yml
 !Economy*/plugin.yml
+.idea
