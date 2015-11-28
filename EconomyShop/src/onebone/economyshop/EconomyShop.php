@@ -24,6 +24,8 @@ use onebone\economyshop\event\ShopCreationEvent;
 use onebone\economyshop\event\ShopTransactionEvent;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\event\block\BlockBreakEvent;
+use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -48,7 +50,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private $lang;
 
-	private $queue = [], $tap = [], $removeQueue = [];
+	private $queue = [], $tap = [], $removeQueue = [], $placeQueue = [];
 
 	/** @var ItemDisplayer[][] */
 	private $items = [];
@@ -190,6 +192,10 @@ class EconomyShop extends PluginBase implements Listener{
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event){
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
+			return;
+		}
+
 		$player = $event->getPlayer();
 		$block = $event->getBlock();
 
@@ -228,6 +234,11 @@ class EconomyShop extends PluginBase implements Listener{
 			}else{
 				$player->sendMessage($this->getMessage("shop-already-exist"));
 			}
+
+			if($event->getItem()->canBePlaced()){
+				$this->placeQueue[$iusername] = true;
+			}
+
 			unset($this->queue[$iusername]);
 			return;
 		}elseif(isset($this->removeQueue[$iusername])){
@@ -247,6 +258,10 @@ class EconomyShop extends PluginBase implements Listener{
 
 			unset($this->removeQueue[$iusername]);
 			$player->sendMessage($this->getMessage("shop-removed"));
+
+			if($event->getItem()->canBePlaced()){
+				$this->placeQueue[$iusername] = true;
+			}
 			return;
 		}
 
@@ -263,6 +278,28 @@ class EconomyShop extends PluginBase implements Listener{
 			}else{
 				$this->buyItem($player, $shop);
 			}
+
+			if($event->getItem()->canBePlaced()){
+				$this->placeQueue[$iusername] = true;
+			}
+		}
+	}
+
+	public function onBlockPlace(BlockPlaceEvent $event){
+		$iusername = strtolower($event->getPlayer()->getName());
+		if(isset($this->placeQueue[$iusername])){
+			$event->setCancelled();
+			unset($this->placeQueue[$iusername]);
+		}
+	}
+
+	public function onBlockBreak(BlockBreakEvent $event){
+		$block = $event->getBlock();
+		if($this->provider->getShop($block) !== false){
+			$player = $event->getPlayer();
+
+			$event->setCancelled(true);
+			$player->sendMessage($this->getMessage("shop-breaking-forbidden"));
 		}
 	}
 
