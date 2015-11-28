@@ -1,5 +1,5 @@
 #EconomyS
-## For PocketMine-MP 1.4 Core-Rewrite
+## For PocketMine-MP 1.4(1.5,1.6) Core-Rewrite
 
 Feel free to make a pull request!
 
@@ -19,12 +19,12 @@ Feel free to make a pull request!
 | /givemoney | `<player>` `<money>` | Gives $`<money>` `<player>` | `OP` `Console` |
 | /takemoney | `<player>` `<money>` | Takes $`<money>` from `<player>` | `OP` `Console` |
 | /seemoney | `<player>` | Shows `<player>`'s money | `All` |
-| /bank deposit | `<money>` | Deposit $`<money>` to your account | `All` |
-| /bank withdraw | `<money>` | Withdraw $`<money>` from your account | `All` |
-| /bank mymoney | | Shows your money from your account | `All` |
+| /bank deposit(this commond has been removed) | `<money>` | Deposit $`<money>` to your account | `All` |
+| /bank withdraw(removed) | `<money>` | Withdraw $`<money>` from your account | `All` |
+| /bank mymoney(removed) | | Shows your money from your account | `All` |
 | /mystatus | | Shows your money status | `All` |
-| /bankadmin takemoney | `<player>` `<money>` | Takes $`<money>` from `<player>`'s account | `OP` `Console` |
-| /bankadmin givemoney | `<player>` `<money>` | Gives $`<money>` for `<player>`'s account | `OP` `Console` |
+| /bankadmin takemoney (removed) | `<player>` `<money>` | Takes $`<money>` from `<player>`'s account | `OP` `Console` |
+| /bankadmin givemoney (removed)| `<player>` `<money>` | Gives $`<money>` for `<player>`'s account | `OP` `Console` |
 
 
 ## EconomyAPI configuration
