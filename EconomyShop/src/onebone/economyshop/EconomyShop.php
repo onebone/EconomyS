@@ -45,7 +45,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private $lang;
 
-	private $queue = [], $tap = [];
+	private $queue = [], $tap = [], $removeQueue = [];
 
 	public function onEnable(){
 		if(!file_exists($this->getDataFolder())){
@@ -80,6 +80,11 @@ class EconomyShop extends PluginBase implements Listener{
 					case "c":
 						if(!$sender instanceof Player){
 							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						if(isset($this->queue[strtolower($sender->getName())])){
+							unset($this->queue[strtolower($sender->getName())]);
+							$sender->sendMessage($this->getMessage("removed-queue"));
 							return true;
 						}
 						$item = array_shift($params);
@@ -124,6 +129,13 @@ class EconomyShop extends PluginBase implements Listener{
 							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
 							return true;
 						}
+						if(isset($this->removeQueue[strtolower($sender->getName())])){
+							unset($this->removeQueue[strtolower($sender->getName())]);
+							$sender->sendMessage($this->getMessage("removed-rm-queue"));
+							return true;
+						}
+						$this->removeQueue[strtolower($sender->getName())] = true;
+						$sender->sendMessage($this->getMessage("added-rm-queue"));
 						return true;
 					case "list":
 
@@ -162,6 +174,12 @@ class EconomyShop extends PluginBase implements Listener{
 				$player->sendMessage($this->getMessage("shop-already-exist"));
 			}
 			unset($this->queue[$iusername]);
+			return;
+		}elseif(isset($this->removeQueue[$iusername])){
+			$this->provider->removeShop($block);
+
+			unset($this->removeQueue[$iusername]);
+			$player->sendMessage($this->getMessage("shop-removed"));
 			return;
 		}
 

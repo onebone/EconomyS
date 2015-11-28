@@ -1,9 +1,13 @@
 {
   "invalid-side": "%%RED%%Invalid side option was given.",
+  "removed-queue": "%%GREEN%%Removed from shop creation queue.",
   "added-queue": "%%GREEN%%Added to shop creation queue. Touch where you want to create.",
+  "removed-rm-queue": "%%GREEN%%Removed from shop removal queue.",
+  "added-rm-queue": "%%GREEN%%Added shop removal queue. Touch where you want to remove.",
   "shop-create-failed": "%%RED%%Failed to create shop due to unknown reason.",
   "shop-already-exist": "%%RED%%Shop already exists.",
   "shop-created": "%%GREEN%%Shop was created successfully.",
+  "shop-removed": "%%GREEN%%Shop was removed successfully.",
   "tap-again": "%%YELLOW%%Tap again to confirm buying.",
   "no-money": "You do not have %%RED%%%MONETARY_UNIT%%1%%RESET%% to buy %%RED%%%2%%RESET.",
   "full-inventory": "%%RED%%You do not have inventory slot to buy item.",
