@@ -105,7 +105,7 @@ class EconomyShop extends PluginBase implements Listener{
 							}
 						}
 						$this->queue[strtolower($sender->getName())] = [
-							$item, $amount, $price, $side
+							$item, (int)$amount, (int)$price, (int)$side
 						];
 						$sender->sendMessage($this->getMessage("added-queue"));
 						return true;

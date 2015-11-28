@@ -31,19 +31,19 @@ class YamlDataProvider implements DataProvider{
 	private $save;
 
 	public function __construct($file, $save){
-		$this->config = new Config($file);
+		$this->config = new Config($file, Config::YAML);
 
 		$this->save = $save;
 	}
 
 	public function addShop($x, $y = 0, $z = 0, $level = null, $data = []){
 		if($x instanceof Position){
+			$data = $y;
+
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
-
-			$data = $y;
 		}
 		if($level instanceof Level){
 			$level = $level->getFolderName();
