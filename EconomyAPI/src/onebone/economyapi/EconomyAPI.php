@@ -21,6 +21,7 @@
 namespace onebone\economyapi;
 
 use onebone\economyapi\event\money\MoneyChangedEvent;
+use onebone\economyapi\provider\YamlProvider;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
@@ -37,7 +38,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
 use onebone\economyapi\event\account\CreateAccountEvent;
-use onebone\economyapi\database\DataConverter;
+use onebone\economyapi\provider\Provider;
 use onebone\economyapi\task\SaveTask;
 
 class EconomyAPI extends PluginBase implements Listener{
@@ -57,11 +58,6 @@ class EconomyAPI extends PluginBase implements Listener{
 	private static $instance = null;
 
 	/**
-	 * @var array
-	 */
-	private $money = [];
-
-	/**
 	 * @var Config
 	 */
 	private $config = null;
@@ -70,6 +66,11 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @var Config
 	 */
 	private $command = null;
+
+	/**
+	 * @var Provider
+	 */
+	private $provider = null;
 
 	/**
 	 * @var array
@@ -117,11 +118,6 @@ class EconomyAPI extends PluginBase implements Listener{
 	const RET_SUCCESS = 1;
 
 	/**
-	 * @var int CURRENT_DATABASE_VERSION The version of current database
-	 */
-	const CURRENT_DATABASE_VERSION = 0x02;
-
-	/**
 	 * @var array
 	 */
 	private $langList = [
@@ -155,9 +151,20 @@ class EconomyAPI extends PluginBase implements Listener{
 		@mkdir($this->getDataFolder());
 
 		$this->createConfig();
+
+		$this->convertData();
+		switch(strtolower($this->config->get("provider"))){
+			case "yaml":
+				$this->provider = new YamlProvider($this->getDataFolder()."Money.yml");
+				break;
+			default:
+				$this->getLogger()->critical("Invalid provider was given. Aborting...");
+				return;
+		}
+		$this->getLogger()->notice("Provider was set to: ".$this->provider->getName());
+
 		$this->scanResources();
 
-		file_put_contents($this->getDataFolder() . "ReadMe.txt", $this->readResource("ReadMe.txt"));
 		if(!is_file($this->getDataFolder() . "PlayerLang.dat")){
 			file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize([]));
 		}
@@ -186,21 +193,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		$this->convertData();
-		$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML, [
-			"version" => 2,
-			"money" => [],
-		]);
-
-		if($moneyConfig->get("version")< self::CURRENT_DATABASE_VERSION){
-			$converter = new DataConverter($this->getDataFolder() . "Money.yml");
-			$result = $converter->convertData(self::CURRENT_DATABASE_VERSION);
-			if($result !== false){
-				$this->getLogger()->info("Converted data into new database. Database version : ".self::CURRENT_DATABASE_VERSION);
-			}
-			$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML);
-		}
-		$this->money = $moneyConfig->getAll();
 
 		$this->monetaryUnit = $this->config->get("monetary-unit");
 
@@ -247,6 +239,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$moneyConfig->setAll($saveData);
 			$moneyConfig->save();
 		}
+
 		if($cnt > 0){
 			$this->getLogger()->info(TextFormat::AQUA."Converted $cnt data(m) into new format");
 		}
@@ -361,75 +354,10 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 * @param float $amount
-	 * @param bool $force
-	 * @param string $issuer
-	 *
-	 * @return int
-	*/
-	public function addDebt($player, $amount, $force = false, $issuer = "external"){
-		$this->getLogger()->warning("Debt system is now deprecated");
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 * @param float $amount
-	 * @param bool $force
-	 * @param string $issuer
-	 *
-	 * @return int
-	*/
-	public function reduceDebt($player, $amount, $force = false, $issuer = "external"){
-		$this->getLogger()->warning("Debt system is now deprecated");
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 * @param float $amount
-	 * @param bool $force
-	 * @param string $issuer
-	 *
-	 * @return int
-	*/
-	public function addBankMoney($player, $amount, $force = false, $issuer = "external"){
-		$this->getLogger()->warning("Bank system is now deprecated.");
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 * @param float $amount
-	 * @param bool $force
-	 * @param string $issuer
-	 *
-	 * @return int
-	*/
-	public function reduceBankMoney($player, $amount, $force = false, $issuer = "external"){
-		$this->getLogger()->warning("Bank system is now deprecated");
-	}
-
-	/**
 	 * @return array
 	*/
 	public function getAllMoney(){
-		return $this->money;
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @return array
-	*/
-	public function getAllBankMoney(){
-		$this->getLogger()->warning("Bank system is now deprecated");
+		return $this->provider->getAll();
 	}
 
 	/**
@@ -464,15 +392,10 @@ class EconomyAPI extends PluginBase implements Listener{
 	/**
 	 * @param Player|string $player
 	 *
-	 * @return boolean
+	 * @return bool
 	*/
 	public function accountExists($player){
-		if($player instanceof Player){
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		return isset($this->money["money"][$player]) === true;
+		return $this->provider->accountExists($player);
 	}
 
 	/**
@@ -488,10 +411,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$player = strtolower($player);
 
-		if(!isset($this->money["money"][$player])){
-			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $player, $default_money, "EconomyAPI")));
+		if(!$this->provider->accountExists($player)){
+			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $player, $default_money === false ? $this->config->get("default-money") : $default_money, "EconomyAPI")));
 			if(!$ev->isCancelled() and $force === false){
-				$this->money["money"][$player] = ($default_money === false ? $this->config->get("default-money") : $default_money);
+				$this->provider->createAccount($player, $ev->getDefaultMoney());
 				return true;
 			}
 		}
@@ -509,28 +432,16 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
-			$this->money["money"][$player] = null;
-			unset($this->money["money"][$player]);
-
-			$p = $this->getServer()->getPlayerExact($player);
-			if($p instanceof Player){
-				$p->kick("Your account have been removed.");
+		if($this->provider->accountExists($player)){
+			if($this->provider->removeAccount($player)){
+				$p = $this->getServer()->getPlayerExact($player);
+				if($p instanceof Player){
+					$p->kick("Your account have been removed.");
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 *
-	 * @return boolean
-	*/
-	public function bankAccountExists($player){
-		$this->getLogger()->warning("Bank system is now deprecated");
 	}
 
 	/**
@@ -539,37 +450,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return boolean|float
 	*/
 	public function myMoney($player){ // To identify the result, use '===' operator
-		if($player instanceof Player){
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		if(!isset($this->money["money"][$player])){
-			return false;
-		}
-		return $this->money["money"][$player];
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 *
-	 * @return boolean|float
-	*/
-	public function myDebt($player){ // To identify the result, use '===' operator
-		$this->getLogger()->warning("Debt system is now deprecated");
-	}
-
-	/**
-	 * @deprecated
-	 *
-	 * @param Player|string $player
-	 *
-	 * @return boolean|float
-	*/
-	public function myBankMoney($player){
-		$this->getLogger()->warning("Bank system is now deprecated");
+		return $this->provider->getMoney($player);
 	}
 
 	/**
@@ -585,21 +466,15 @@ class EconomyAPI extends PluginBase implements Listener{
 			return self::RET_INVALID;
 		}
 
-		if($player instanceof Player){
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		$amount = round($amount, 2);
-		if(isset($this->money["money"][$player])){
+		if(($money = $this->provider->getMoney($player)) !== false){
 			$amount = min($this->config->get("max-money"), $amount);
 			$event = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($event);
 			if($force === false and $event->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money["money"][$player] += $amount;
-			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
+			$this->provider->addMoney($player, $amount);
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $money + $amount, $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -618,15 +493,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($amount <= 0 or !is_numeric($amount)){
 			return self::RET_INVALID;
 		}
-
-		if($player instanceof Player){
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		$amount = round($amount, 2);
-		if(isset($this->money["money"][$player])){
-			if($this->money["money"][$player] - $amount < 0){
+		if(($money = $this->provider->getMoney($player)) !== false){
+			if($money - $amount < 0){
 				return self::RET_INVALID;
 			}
 			$event = new ReduceMoneyEvent($this, $player, $amount, $issuer);
@@ -634,8 +502,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			if($force === false and $event->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money["money"][$player] -= $amount;
-			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
+			$this->provider->reduceMoney($player, $amount);
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $money - $amount, $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -650,26 +518,20 @@ class EconomyAPI extends PluginBase implements Listener{
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, $money, $force = false, $issuer = "external"){
-		if($money < 0 or !is_numeric($money)){
+	public function setMoney($player, $amount, $force = false, $issuer = "external"){
+		if($amount < 0 or !is_numeric($amount)){
 			return self::RET_INVALID;
 		}
 
-		if($player instanceof Player){
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		$money = round($money, 2);
-		if(isset($this->money["money"][$player])){
-			$money = min($this->config->get("max-money"), $money);
+		if(($money = $this->provider->getMoney($player)) !== false){
+			$money = min($this->config->get("max-money"), $amount);
 			$ev = new SetMoneyEvent($this, $player, $money, $issuer);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($force === false and $ev->isCancelled()){
 				return self::RET_CANCELLED;
 			}
-			$this->money["money"][$player] = $money;
-			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $this->money["money"][$player], $issuer));
+			$this->provider->setMoney($player, $amount);
+			$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $amount, $issuer));
 			return self::RET_SUCCESS;
 		}else{
 			return self::RET_NOT_FOUND;
@@ -678,12 +540,15 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	public function onDisable(){
 		$this->save();
+		if($this->provider instanceof Provider){
+			$this->provider->close();
+		}
 	}
 
 	public function save(){
-		$moneyConfig = new Config($this->getDataFolder() . "Money.yml", Config::YAML);
-		$moneyConfig->setAll($this->money);
-		$moneyConfig->save();
+		if($this->provider instanceof Provider){
+			$this->provider->save();
+		}
 		file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize($this->playerLang));
 	}
 
@@ -692,9 +557,8 @@ class EconomyAPI extends PluginBase implements Listener{
 	 */
 	public function onLoginEvent(PlayerLoginEvent $event){
 		$username = strtolower($event->getPlayer()->getName());
-		if(!isset($this->money["money"][$username])){
-			$this->getServer()->getPluginManager()->callEvent(($ev = new CreateAccountEvent($this, $username, $this->config->get("default-money"), $this->config->get("default-debt"), null, "EconomyAPI")));
-			$this->money["money"][$username] = round($ev->getDefaultMoney(), 2);
+		if(!$this->provider->accountExists($username)){
+			$this->createAccount($username);
 		}
 		if(!isset($this->playerLang[$username])){
 			$this->setLang($this->config->get("default-lang"), $username);
@@ -735,6 +599,6 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @return string
 	*/
 	public function __toString(){
-		return "EconomyAPI (total accounts: " . count($this->money) . ")";
+		return "EconomyAPI";
 	}
 }
