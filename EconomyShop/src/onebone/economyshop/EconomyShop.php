@@ -334,6 +334,7 @@ class EconomyShop extends PluginBase implements Listener{
 				}
 				$player->getInventory()->addItem($item);
 				$player->sendMessage($this->getMessage("bought-item", [$shop[6], $shop[7], $shop[8]]));
+				EconomyAPI::getInstance()->reduceMoney($player, $shop[8]);
 			}else{
 				$player->sendMessage($this->getMessage("full-inventory"));
 			}
