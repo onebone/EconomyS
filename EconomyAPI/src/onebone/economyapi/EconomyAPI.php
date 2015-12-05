@@ -20,8 +20,7 @@
 
 namespace onebone\economyapi;
 
-use onebone\economyapi\event\money\MoneyChangedEvent;
-use onebone\economyapi\provider\YamlProvider;
+use onebone\economyapi\provider\MySQLProvider;
 use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 use pocketmine\event\Listener;
@@ -38,14 +37,17 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
 use onebone\economyapi\event\account\CreateAccountEvent;
+use onebone\economyapi\event\money\MoneyChangedEvent;
+use onebone\economyapi\provider\YamlProvider;
 use onebone\economyapi\provider\Provider;
 use onebone\economyapi\task\SaveTask;
+
 
 class EconomyAPI extends PluginBase implements Listener{
 	/**
 	 * @var int
 	 */
-	const API_VERSION = 1;
+	const API_VERSION = 2;
 
 	/**
 	 * @var string
@@ -60,12 +62,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	/**
 	 * @var Config
 	 */
-	private $config = null;
-
-	/**
-	 * @var Config
-	 */
-	private $command = null;
+	private $config = null, $command = null, $mysql = null;
 
 	/**
 	 * @var Provider
@@ -156,6 +153,9 @@ class EconomyAPI extends PluginBase implements Listener{
 		switch(strtolower($this->config->get("provider"))){
 			case "yaml":
 				$this->provider = new YamlProvider($this->getDataFolder()."Money.yml");
+				break;
+			case "mysql":
+				$this->provider = new MySQLProvider($this->mysql->getAll());
 				break;
 			default:
 				$this->getLogger()->critical("Invalid provider was given. Aborting...");
@@ -248,6 +248,13 @@ class EconomyAPI extends PluginBase implements Listener{
 	private function createConfig(){
 		$this->config = new Config($this->getDataFolder() . "economy.properties", Config::PROPERTIES, yaml_parse($this->readResource("config.yml")));
 		$this->command = new Config($this->getDataFolder() . "command.yml", Config::YAML, yaml_parse($this->readResource("command.yml")));
+		$this->mysql = new Config($this->getDataFolder()."mysql_host.yml", Config::YAML, [
+			"host" => "127.0.0.1",
+			"port" => 3306,
+			"user" => "onebone",
+			"password" => "secret",
+			"db" => "economys"
+		]);
 	}
 
 	private function scanResources(){
