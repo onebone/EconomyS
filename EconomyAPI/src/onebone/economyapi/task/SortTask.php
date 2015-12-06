@@ -13,7 +13,7 @@ class SortTask extends AsyncTask{
 
 	private $max = 0;
 
-	private $topList = [];
+	private $topList;
 
 	/**
 	 * @param string	$player
@@ -33,12 +33,12 @@ class SortTask extends AsyncTask{
 	}
 
 	public function onRun(){
-		$this->topList = $this->getTopList();
+		$this->topList = serialize((array)$this->getTopList());
 	}
 
 	private function getTopList(){
-		$money = $this->moneyData["money"];
-
+		$money = (array)$this->moneyData;
+		
 		arsort($money);
 
 		$ret = [];
@@ -47,16 +47,15 @@ class SortTask extends AsyncTask{
 		$this->max = ceil((count($money) - count($this->banList) - ($this->addOp ? 0 : count($this->ops))) / 5);
 		$this->page = (int)min($this->max, max(1, $this->page));
 
-		foreach($money as $p => $money){
+		foreach($money as $p => $m){
 			$p = strtolower($p);
 
 			if(isset($this->banList[$p])) continue;
 			if(isset($this->ops[$p]) and $this->addOp === false) continue;
-
 			$current = (int) ceil($n / 5);
 
 			if($current === $this->page){
-				$ret[$n] = [$p, $money];
+				$ret[$n] = [$p, $m];
 			}elseif($current > $this->page){
 				break;
 			}
@@ -72,7 +71,7 @@ class SortTask extends AsyncTask{
 			$output = ($plugin->getMessage("topmoney-tag", $this->player, [$this->page, $this->max, "%3", "%4"])."\n");
 			$message = ($plugin->getMessage("topmoney-format", $this->player, ["%1", "%2", "%3", "%4"])."\n");
 
-			foreach($this->topList as $n => $list){
+			foreach(unserialize($this->topList) as $n => $list){
 				$output .= str_replace(["%1", "%2", "%3"], [$n, $list[0], $list[1]], $message);
 			}
 
