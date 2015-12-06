@@ -358,7 +358,11 @@ class EconomyLand extends PluginBase implements Listener{
 				$cnt = 0;
 				for($y = 1;; $y++){
 					if($level->getBlock(new Vector3($x, $y, $z))->getID() === 0){
+						if($level->getBlock(new Vector3($x, $y + 1, $z))->getID() === 0){
 						break;
+						}else{
+							$y++;
+						}
 					}
 					if($cnt === 5){
 						break;
@@ -371,7 +375,7 @@ class EconomyLand extends PluginBase implements Listener{
 						continue;
 					}
 				}
-				$sender->teleport(new Position($x, $y, $z, $level));
+				$sender->teleport(new Position($x + 0.5, $y + 0.1, $z + 0.5, $level));
 				$sender->sendMessage($this->getMessage("success-moving", array($num, "", "")));
 				return true;
 				case "give":
