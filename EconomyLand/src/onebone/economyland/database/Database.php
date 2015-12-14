@@ -38,4 +38,5 @@ interface Database{
 	public function canTouch($x, $z, $level, Player $player);
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level);
 	public function close();
+	public function save();
 }
