@@ -213,12 +213,12 @@ class YamlDatabase implements Database{
 	}
 	
 	public function save(){
+		$config = new Config($this->path, Config::YAML);
 		$config->setAll($this->land);
 		$config->save();
 	}
 
 	public function close(){
-		$config = new Config($this->path, Config::YAML);
 		$this->save();
 	}
 }
