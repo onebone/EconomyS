@@ -211,10 +211,14 @@ class YamlDatabase implements Database{
 		}
 		return false;
 	}
+	
+	public function save(){
+		$config->setAll($this->land);
+		$config->save();
+	}
 
 	public function close(){
 		$config = new Config($this->path, Config::YAML);
-		$config->setAll($this->land);
-		$config->save();
+		$this->save();
 	}
 }
