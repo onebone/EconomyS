@@ -76,7 +76,11 @@ class EconomyLand extends PluginBase implements Listener{
 		
 		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
 			$interval = $interval * 1200;
-			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
+			if($interval > 0){
+				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
+			}else{
+				//doing nothing
+			}
 		}
 
 		$this->placeQueue = [];
@@ -763,6 +767,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"not-owned" => "You must buy land to edit this block",
+			"data-auto-saved" => "The data is saved automatically.",
 			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
 		));
 	}
