@@ -75,7 +75,8 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->createConfig();
 		
 		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
-			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval * 1200, $interval * 1200);
+			$interval = $interval * 1200;
+			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
 		}
 
 		$this->placeQueue = [];
@@ -125,13 +126,20 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	public function onDisable(){
+		$this->save();
+		if($this->db instanceof Database){
+			$this->db->close();
+		}
+	}
+	
+	public function save(){
 		$now = time();
 		foreach($this->expire as $landId => $time){
 			$this->expire[$landId][0] -= ($now - $time[1]);
 		}
 		file_put_contents($this->getDataFolder()."Expire.dat", serialize($this->expire));
 		if($this->db instanceof Database){
-			$this->db->close();
+			$this->db->save();
 		}
 	}
 
