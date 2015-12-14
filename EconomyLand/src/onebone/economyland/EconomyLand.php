@@ -73,6 +73,10 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
 
 		$this->createConfig();
+		
+		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
+			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval * 1200, $interval * 1200);
+		}
 
 		$this->placeQueue = [];
 
@@ -711,6 +715,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"buying-disallowed-worlds" => array(),
 			"player-land-limit" => "NaN",
 			"price-per-y-axis" => 100,
+			"auto-save-interval" => 10,
 			"database-type" => "yaml"
 		));
 
