@@ -31,5 +31,6 @@ class SaveTask extends PluginTask{
 	
 	public function onRun($currentTick){
 		$this->getOwner()->save();
+		$this->getOwner()->getLogger()->notice($this->getOwner()->getMessage("data-auto-saved"));
 	}
 }
