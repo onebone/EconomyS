@@ -153,7 +153,7 @@ class EconomyLand extends PluginBase implements Listener{
 			return true;
 			case "endp":
 			if(!$sender instanceof Player){
-				$sender->sendMessage("Please run this command in-game.");
+				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
 			if(!isset($this->start[$sender->getName()])){
