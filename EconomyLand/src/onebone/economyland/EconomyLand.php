@@ -73,6 +73,15 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
 
 		$this->createConfig();
+		
+		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
+			$interval = $interval * 1200;
+			if($interval > 0){
+				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
+			}else{
+				//doing nothing
+			}
+		}
 
 		$this->placeQueue = [];
 
@@ -121,13 +130,20 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	public function onDisable(){
+		$this->save();
+		if($this->db instanceof Database){
+			$this->db->close();
+		}
+	}
+	
+	public function save(){
 		$now = time();
 		foreach($this->expire as $landId => $time){
 			$this->expire[$landId][0] -= ($now - $time[1]);
 		}
 		file_put_contents($this->getDataFolder()."Expire.dat", serialize($this->expire));
 		if($this->db instanceof Database){
-			$this->db->close();
+			$this->db->save();
 		}
 	}
 
@@ -711,6 +727,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"buying-disallowed-worlds" => array(),
 			"player-land-limit" => "NaN",
 			"price-per-y-axis" => 100,
+			"auto-save-interval" => 10,
 			"database-type" => "yaml"
 		));
 
@@ -750,6 +767,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"not-owned" => "You must buy land to edit this block",
+			"data-auto-saved" => "The data is saved automatically.",
 			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
 		));
 	}
