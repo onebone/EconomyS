@@ -199,8 +199,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		$time = $this->config->get("auto-save-interval");
 		if(is_numeric($time)){
 			$interval = $time * 1200;
-			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
-			$this->getLogger()->notice("Auto save has been set to interval : ".$time." min(s)");
+			if($interval>0){
+				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
+				$this->getLogger()->notice("Auto save has been set to interval : ".$time." min(s)");
+			}
 		}
 
 		$update_check = new Config($this->getDataFolder()."update-check.yml", Config::YAML, yaml_parse($this->readResource("update-check.yml")));
