@@ -1,32 +1,37 @@
 name: EconomySell
-main: onebone\economysell\EconomySell
 version: "2.0.7"
 api:
-- 1.0.0
-- 1.1.0
-- 1.2.0
-- 1.2.1
-- 1.3.0
-- 1.3.1
-- 1.4.0
-- 1.4.1
-- 1.12.0
 - 1.13.0
 - 2.0.0
+main: onebone\economysell\EconomySell
 author: onebone
 depend: [EconomyAPI]
 
+commands:
+ sell:
+  description: Management command for creating/removing sell
+  usage: /sell <create|remove|list> [item[:damage]] [amount] [price] [side]
+  permission: economysell.command.sell;economysell.command.sell.create;economysell.command.sell.remove;economysell.command.sell.list;
+
 permissions:
  economysell.*:
-  description: Includes all permission for EconomySell
+  description: Allows all functions in EconomySell
+  default: op
   children:
+   economysell.command.sell:
+    description: Allows player to use /sell
+    children:
+     economysell.command.sell.create:
+      description: Allows player to use /sell create
+     economysell.command.sell.remove:
+      description: Allows player to use /sell remove
+     economysell.command.sell.list:
+      description: Allows player to use /sell list
+      default: true
    economysell.sell.*:
-    description: Includes all permission related to managing sell center
+    description: Allows all functions about sells
+    default: op
     children:
      economysell.sell.sell:
-      description: Allows player to sell items
+      description: Allows player to sell to sell center
       default: true
-     economysell.sell.create:
-      description: Allows player to create sell center
-     economysell.sell.remove:
-      description: Allows player to remove sell center

@@ -14,6 +14,7 @@ api:
 - 1.13.0
 - 2.0.0
 
+depend: [EconomyAPI]
 author: onebone
 
 commands:

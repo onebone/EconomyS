@@ -1,2 +1,8 @@
 # EconomySell configuration file
+
+# Confirm selling by tapping twice
 enable-double-tap: true
+# Save for each changes in sell center data
+auto-save: true
+# Sell center data provider (yaml)
+data-provider: yaml
