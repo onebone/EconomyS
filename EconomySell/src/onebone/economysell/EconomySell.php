@@ -320,7 +320,7 @@ class EconomySell extends PluginBase implements Listener{
 			return false;
 		}
 		$item = Item::get($sell[4], $sell[5], $sell[7]);
-		if($player->getInventory()->hasItem($item)){
+		if($player->getInventory()->contains($item)){
 			$ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
 			$this->getServer()->getPluginManager()->callEvent($ev);
 			if($ev->isCancelled()){
