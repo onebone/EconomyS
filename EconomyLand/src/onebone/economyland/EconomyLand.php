@@ -169,7 +169,7 @@ class EconomyLand extends PluginBase implements Listener{
 			return true;
 			case "endp":
 			if(!$sender instanceof Player){
-				$sender->sendMessage("Please run this command in-game.");
+				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
 			if(!isset($this->start[$sender->getName()])){
@@ -211,6 +211,7 @@ class EconomyLand extends PluginBase implements Listener{
 			switch($sub){
 				case "buy":
 				if(!$sender->hasPermission("economyland.command.land.buy")){
+					$sender->sendMessage($this->getMessage("no-permission-command"));
 					return true;
 				}
 				if(!$sender instanceof Player){
@@ -285,6 +286,7 @@ class EconomyLand extends PluginBase implements Listener{
 				break;
 				case "list":
 				if(!$sender->hasPermission("economyland.command.land.list")){
+					$sender->sendMessage($this->getMessage("no-permission-command"));
 					return true;
 				}
 				$page = isset($param[0]) ? (int) $param[0] : 1;
@@ -312,6 +314,7 @@ class EconomyLand extends PluginBase implements Listener{
 				break;
 				case "whose":
 				if(!$sender->hasPermission("economyland.command.land.whose")){
+					$sender->sendMessage($this->getMessage("no-permission-command"));
 					return true;
 				}
 				$player = array_shift($param);
@@ -338,6 +341,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.move")){
+					$sender->sendMessage($this->getMessage("no-permission-command"));
 					return true;
 				}
 				$num = array_shift($param);
@@ -400,6 +404,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 				if(!$sender->hasPermission("economyland.command.land.give")){
+					$sender->sendMessage($this->getMessage("no-permission-command"));
 					return true;
 				}
 				$player = array_shift($param);
@@ -435,7 +440,7 @@ class EconomyLand extends PluginBase implements Listener{
 				return true;
 				case "invite":
 					if(!$sender->hasPermission("economyland.command.land.invite")){
-						$sender->sendMessage("You don't have permissions to use this command.");
+						$sender->sendMessage($this->getMessage("no-permission-command"));
 						return true;
 					}
 					$landnum = array_shift($param);
@@ -459,7 +464,7 @@ class EconomyLand extends PluginBase implements Listener{
 						return true;
 					}elseif(substr($player, 0, 2) === "r:"){
 						if(!$sender->hasPermission("economyland.command.land.invite.remove")){
-							$sender->sendMessage("You don't have permissions to use this command.");
+							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$player = substr($player, 2);
@@ -766,7 +771,8 @@ class EconomyLand extends PluginBase implements Listener{
 			"cant-set-position-in-different-world" => "You can't set position in different world",
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
-			"not-owned" => "You must buy land to edit this block",
+			"no-permission-command" => "[EconomyLand]You don't have permissions to use this command.",
+ +			"not-owned" => "[EconomyLand]You must buy land to edit this block",
 			"data-auto-saved" => "The data is saved automatically.",
 			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
 		));
