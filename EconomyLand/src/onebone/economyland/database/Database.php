@@ -32,7 +32,7 @@ interface Database{
 	public function getInviteeById($id);
 	public function addInviteeById($id, $name);
 	public function removeInviteeById($id, $name);
-	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null,  $invitee = []);
+	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = [], $canTP = true ,$canPVP = true);
 	public function setOwnerById($id, $owner);
 	public function removeLandById($id);
 	public function canTouch($x, $z, $level, Player $player);
