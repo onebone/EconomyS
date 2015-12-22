@@ -25,9 +25,9 @@ use pocketmine\event\Event;
 class LandAddedEvent extends  Event{
 	public static $handlerList = null;
 
-	private $id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires;
+	private $id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires, $canTP, $canPVP;
 
-	public function __construct($id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires){
+	public function __construct($id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires, $canTP, $canPVP){
 		$this->startX = $startX;
 		$this->startZ = $startZ;
 		$this->endX = $endX;
@@ -37,6 +37,8 @@ class LandAddedEvent extends  Event{
 		$this->id = $id;
 		$this->player = $player;
 		$this->expires = $expires;
+		$this->canTP = $canTP;
+		$this->canPVP = $canPVP;
 	}
 
 	public function getId(){
@@ -73,5 +75,13 @@ class LandAddedEvent extends  Event{
 
 	public function getPlayer(){
 		return $this->player;
+	}
+	
+	public function getcanTP(){
+		return $this->canTP;
+	}
+	
+	public function getcanPVP(){
+		return $this->canPVP;
 	}
 }
