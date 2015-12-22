@@ -1,0 +1,17 @@
+{
+  "invalid-side": "%%RED%%Invalid side option was given.",
+  "removed-queue": "%%GREEN%%Removed from sell center creation queue.",
+  "added-queue": "%%GREEN%%Added to sell center creation queue. Touch where you want to create.",
+  "removed-rm-queue": "%%GREEN%%Removed from sell center removal queue.",
+  "added-rm-queue": "%%GREEN%%Added sell center removal queue. Touch where you want to remove.",
+  "sell-create-failed": "%%RED%%Failed to create sell center due to unknown reason.",
+  "sell-already-exist": "%%RED%%Sell center already exists.",
+  "sell-created": "%%GREEN%%Sell center was created successfully.",
+  "sell-removed": "%%GREEN%%Sell center was removed successfully.",
+  "no-permission-sell": "%%RED%%You don't have permission to sell item.",
+  "tap-again": "%%YELLOW%%Tap again to confirm selling.",
+  "no-item": "You do not have enough item to sell %%RED%%%1%%RESET%%.",
+  "failed-sell": "%%RED%%Failed to sell item due to unknown reason.",
+  "sold-item": "You have bought item %2 of %%AQUA%%%1%%RESET%% for %%GOLD%%%MONETARY_UNIT%%3%%RESET%%.",
+  "sell-breaking-forbidden": "%%RED%%You cannot break sell centers."
+}

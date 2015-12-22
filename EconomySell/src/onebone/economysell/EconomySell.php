@@ -20,227 +20,375 @@
 
 namespace onebone\economysell;
 
+use onebone\economysell\event\SellCreationEvent;
+use onebone\economysell\event\SellTransactionEvent;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\SignChangeEvent;
-use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\plugin\PluginBase;
-use pocketmine\event\Listener;
 use pocketmine\event\block\BlockPlaceEvent;
-use pocketmine\utils\Config;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
+use pocketmine\level\Position;
+use pocketmine\math\Vector3;
+use pocketmine\Player;
+use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economysell\provider\DataProvider;
+use onebone\economysell\provider\YamlDataProvider;
+use onebone\economysell\item\ItemDisplayer;
 
-#define TAG 1
-
-class EconomySell extends PluginBase implements Listener {
-	private $sell;
-	private $placeQueue;
-
+class EconomySell extends PluginBase implements Listener{
 	/**
-	 *
-	 * @var Config
+	 * @var DataProvider
 	 */
-	private $sellSign, $lang;
+	private $provider;
+
+	private $lang;
+
+	private $queue = [], $tap = [], $removeQueue = [], $placeQueue = [];
+
+	/** @var ItemDisplayer[][] */
+	private $items = [];
 
 	public function onEnable(){
-		@mkdir($this->getDataFolder());
+		if(!file_exists($this->getDataFolder())){
+			mkdir($this->getDataFolder());
+		}
 
 		$this->saveDefaultConfig();
 
-		$this->sell = (new Config($this->getDataFolder()."Sell.yml", Config::YAML))->getAll();
+		$provider = $this->getConfig()->get("data-provider");
+		switch(strtolower($provider)){
+			case "yaml":
+				$this->provider = new YamlDataProvider($this->getDataFolder()."Sells.yml", $this->getConfig()->get("auto-save"));
+				break;
+			default:
+				$this->getLogger()->critical("Invalid data provider was given. EconomySell will be terminated.");
+				return;
+		}
+		$this->getLogger()->notice("Data provider was set to: ".$this->provider->getProviderName());
+
+		$levels = [];
+		foreach($this->provider->getAll() as $sell){
+			if($sell[9] !== -2){
+				if(!isset($levels[$sell[3]])){
+					$levels[$sell[3]] = $this->getServer()->getLevelByName($sell[3]);
+				}
+				$pos = new Position($sell[0], $sell[1], $sell[2], $levels[$sell[3]]);
+				$display = $pos;
+				if($sell[9] !== -1){
+					$display = $pos->getSide($sell[9]);
+				}
+				$this->items[$sell[3]][] = new ItemDisplayer($display, Item::get($sell[4], $sell[5]), $pos);
+			}
+		}
+
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-		$this->prepareLangPref();
-		$this->placeQueue = [];
+
+		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true);
+		@fclose($rsc);
 	}
 
-	public function onDisable(){
-		$cfg = new Config($this->getDataFolder()."Sell.yml", Config::YAML);
-		$cfg->setAll($this->sell);
-		$cfg->save();
-	}
+	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
+		switch($command->getName()){
+			case "sell":
+				switch(strtolower(array_shift($params))){
+					case "create":
+					case "cr":
+					case "c":
+						if(!$sender instanceof Player){
+							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						if(!$sender->hasPermission("economysell.command.sell.create")){
+							$sender->sendMessage(TextFormat::RED."You don't have permission to run this command.");
+							return true;
+						}
+						if(isset($this->queue[strtolower($sender->getName())])){
+							unset($this->queue[strtolower($sender->getName())]);
+							$sender->sendMessage($this->getMessage("removed-queue"));
+							return true;
+						}
+						$item = array_shift($params);
+						$amount = array_shift($params);
+						$price = array_shift($params);
+						$side = array_shift($params);
 
-	private function prepareLangPref(){
-		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
-				"wrong-format" => "Please write your sign with right format",
-				"item-not-support" => "Item %1 is not supported on EconomySell",
-				"no-permission-create" => "You don't have permission to create sell center",
-				"sell-created" => "Sell center has been created (%1 = %MONETARY_UNIT%%2)",
-				"removed-sell" => "Sell center has been removed",
-				"creative-mode" => "You are in creative mode",
-				"no-permission-sell" => "You don't have permission to sell item",
-				"no-permission-break" => "You don't have permission to break sell center",
-				"tap-again" => "Are you sure to sell %1 (%MONETARY_UNIT%%2)? Tap again to confirm",
-				"no-item" => "You have no item to sell",
-				"sold-item" => "You have sold %1 of %2 for %MONETARY_UNIT%%3"
-		));
+						if(trim($item) === "" or trim($amount) === "" or trim($price) === "" or !is_numeric($amount) or !is_numeric($price)){
+							$sender->sendMessage("Usage: /sell create <item[:damage]> <amount> <price> [side]");
+							return true;
+						}
 
-		$this->sellSign = new Config($this->getDataFolder()."SellSign.yml", Config::YAML, array(
-				"sell" => array(
-						"§1[SELL]",
-						"%MONETARY_UNIT%%1",
-						"%2",
-						"Amount : §l%3"
-				)
-		));
-	}
+						if(trim($side) === ""){
+							$side = Vector3::SIDE_UP;
+						}else{
+							switch(strtolower($side)){
+								case "up": case Vector3::SIDE_UP: $side = Vector3::SIDE_UP;break;
+								case "down": case Vector3::SIDE_DOWN: $side = Vector3::SIDE_DOWN;break;
+								case "west": case Vector3::SIDE_WEST: $side = Vector3::SIDE_WEST;break;
+								case "east": case Vector3::SIDE_EAST: $side = Vector3::SIDE_EAST;break;
+								case "north": case Vector3::SIDE_NORTH: $side = Vector3::SIDE_NORTH;break;
+								case "south": case Vector3::SIDE_SOUTH: $side = Vector3::SIDE_SOUTH;break;
+								case "sell": case -1: $side = -1;break;
+								case "none": case -2: $side = -2;break;
+								default:
+									$sender->sendMessage($this->getMessage("invalid-side"));
+									return true;
+							}
+						}
+						$this->queue[strtolower($sender->getName())] = [
+							$item, (int)$amount, $price, (int)$side
+						];
+						$sender->sendMessage($this->getMessage("added-queue"));
+						return true;
+					case "remove":
+					case "rm":
+					case "r":
+					case "delete":
+					case "del":
+					case "d":
+						if(!$sender instanceof Player){
+							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							return true;
+						}
+						if(!$sender->hasPermission("economysell.command.sell.remove")){
+							$sender->sendMessage(TextFormat::RED."You don't have permission to run this command.");
+							return true;
+						}
+						if(isset($this->removeQueue[strtolower($sender->getName())])){
+							unset($this->removeQueue[strtolower($sender->getName())]);
+							$sender->sendMessage($this->getMessage("removed-rm-queue"));
+							return true;
+						}
+						$this->removeQueue[strtolower($sender->getName())] = true;
+						$sender->sendMessage($this->getMessage("added-rm-queue"));
+						return true;
+					case "list":
 
-	public function getMessage($key, $val = array("%1", "%2", "%3")){
-		if($this->lang->exists($key)){
-			return str_replace(array("%MONETARY_UNIT%", "%1","%2", "%3"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $val[0], $val[1], $val[2]),$this->lang->get($key));
+						return true;
+				}
+				return false;
 		}
-		return "There's no message named \"$key\"";
 	}
 
-	public function onSignChange(SignChangeEvent $event){
-		$tag = $event->getLine(0);
-		if(($val = $this->checkTag($tag)) !== false){
-			$player = $event->getPlayer();
-			if(!$player->hasPermission ("economysell.sell.create")){
-				$player->sendMessage($this->getMessage("no-permission-create"));
-				return;
-			}
-			if(!is_numeric($event->getLine(1)) or !is_numeric($event->getLine(3))){
-				$player->sendMessage($this->getMessage("wrong-format"));
-				return;
-			}
-			$item = Item::fromString($event->getLine(2));
-			if($item === false){
-				$player->sendMessage($this->getMessage("item-not-support", array($event->getLine (2),"", "" )));
-				return;
-			}
-			
-			$block = $event->getBlock();
-			$this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$player->getLevel()->getName()] = array(
-					"x" => $block->getX(),
-					"y" => $block->getY(),
-					"z" => $block->getZ(),
-					"level" => $player->getLevel()->getName(),
-					"cost" => (int) $event->getLine(1),
-					"item" =>  (int) $item->getID(),
-					"itemName" => $item->getName(),
-					"meta" => (int) $item->getDamage(),
-					"amount" => (int) $event->getLine(3)
-			);
+	public function onPlayerJoin(PlayerJoinEvent $event){
+		$player = $event->getPlayer();
+		$level = $player->getLevel()->getFolderName();
 
-			$player->sendMessage($this->getMessage("sell-created", [$item->getName(), (int)$event->getLine(3), ""]));
-
-			$mu = EconomyAPI::getInstance()->getMonetaryUnit();
-			$event->setLine(0, $val[0]);
-			$event->setLine(1, str_replace(["%MONETARY_UNIT%", "%1"], [$mu, $event->getLine(1)], $val[1]));
-			$event->setLine(2, str_replace(["%MONETARY_UNIT%", "%2"], [$mu, $item->getName()], $val[2]));
-			$event->setLine(3, str_replace(["%MONETARY_UNIT%", "%3"], [$mu, $event->getLine(3)], $val[3]));
+		if(isset($this->items[$level])){
+			foreach($this->items[$level] as $displayer){
+				$displayer->spawnTo($player);
+			}
 		}
 	}
 
-	public function onTouch(PlayerInteractEvent $event){
+	public function onPlayerTeleport(PlayerMoveEvent $event){
+		if($event->getFrom()->getLevel() !== $event->getTo()->getLevel()){
+			$to = $event->getTo()->getLevel();
+			if(isset($this->items[$to->getFolderName()])){
+				$player = $event->getPlayer();
+				foreach($this->items[$to->getFolderName()] as $displayer){
+					$displayer->spawnTo($player);
+				}
+			}
+		}
+	}
+
+	public function onBlockTouch(PlayerInteractEvent $event){
 		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK){
 			return;
 		}
+
+		$player = $event->getPlayer();
 		$block = $event->getBlock();
-		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName();
-		if(isset($this->sell[$loc])){
-			$sell = $this->sell[$loc];
-			$player = $event->getPlayer();
 
-			if($player->getGamemode() % 2 === 1){
-				$player->sendMessage($this->getMessage("creative-mode"));
-				$event->setCancelled();
+		$iusername = strtolower($player->getName());
+
+		if(isset($this->queue[$iusername])){
+			$queue = $this->queue[$iusername];
+			$item = Item::fromString($queue[0]);
+			$item->setCount($queue[1]);
+
+			$ev = new SellCreationEvent($block, $item, $queue[2], $queue[3]);
+			$this->getServer()->getPluginManager()->callEvent($ev);
+
+			if($ev->isCancelled()){
+				$player->sendMessage($this->getMessage("sell-create-failed"));
+				unset($this->queue[$iusername]);
 				return;
 			}
-			if(!$player->hasPermission("economysell.sell.sell")){
-				$player->sendMessage($this->getMessage("no-permission-sell"));
-				$event->setCancelled();
-				return;
-			}
-			$cnt = 0;
-			foreach($player->getInventory()->getContents() as $item){
-				if($item->getID() == $sell["item"] and $item->getDamage() == $sell["meta"]){
-					$cnt += $item->getCount();
-				}
-			}
+			$result = $this->provider->addSell($block, [
+				$block->getX(), $block->getY(), $block->getZ(), $block->getLevel()->getFolderName(),
+				$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
+			]);
 
-			if(!isset($sell["itemName"])){
-				$item = $this->getItem($sell["item"], $sell["meta"], $sell["amount"]);
-				if($item === false){
-					$item = $sell["item"].":".$sell["meta"];
-				}else{
-					$item = $item[0];
-				}
-				$this->sell[$loc]["itemName"] = $item;
-				$sell["itemName"] = $item;
-			}
-			$now = microtime(true);
-			if($this->getConfig()->get("enable-double-tap")){
-				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
-					$this->tap[$player->getName()] = [$loc, $now];
-					$player->sendMessage($this->getMessage("tap-again", [$sell["itemName"], $sell["cost"], $sell["amount"]]));
-					return;
-				}else{
-					unset($this->tap[$player->getName()]);
-				}
-			}
+			if($result){
+				if($queue[3] !== -2){
+					$pos = $block;
+					if($queue[3] !== -1){
+						$pos = $block->getSide($queue[3]);
+					}
 
-			if($cnt >= $sell ["amount"]){
-				$this->removeItem($player, new Item($sell["item"], $sell["meta"], $sell["amount"]));
-				EconomyAPI::getInstance()->addMoney($player, $sell ["cost"], true, "EconomySell");
-				$player->sendMessage($this->getMessage("sold-item", array($sell ["amount"], $sell ["item"].":".$sell ["meta"], $sell ["cost"] )));
+					$this->items[$pos->getLevel()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
+					$dis->spawnToAll($pos->getLevel());
+				}
+
+				$player->sendMessage($this->getMessage("sell-created"));
 			}else{
-				$player->sendMessage($this->getMessage("no-item"));
+				$player->sendMessage($this->getMessage("sell-already-exist"));
 			}
-			$event->setCancelled(true);
+
 			if($event->getItem()->canBePlaced()){
-				$this->placeQueue [$player->getName()] = true;
+				$this->placeQueue[$iusername] = true;
 			}
-		}
-	}
 
-	public function onPlace(BlockPlaceEvent $event){
-		$username = $event->getPlayer()->getName();
-		if(isset($this->placeQueue [$username])){
-			$event->setCancelled(true);
-			unset($this->placeQueue [$username]);
-		}
-	}
-
-	public function onBreak(BlockBreakEvent $event){
-		$block = $event->getBlock();
-		if(isset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()])){
-			$player = $event->getPlayer();
-			if(!$player->hasPermission("economysell.sell.remove")){
-				$player->sendMessage($this->getMessage("no-permission-break"));
-				$event->setCancelled(true);
-				return;
-			}
-			$this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()] = null;
-			unset($this->sell[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getName()]);
-			$player->sendMessage($this->getMessage("removed-sell"));
-		}
-	}
-	public function checkTag($line1){
-		foreach($this->sellSign->getAll() as $tag => $val){
-			if($tag == $line1){
-				return $val;
-			}
-		}
-		return false;
-	}
-
-	public function removeItem($sender, $getitem){
-		$getcount = $getitem->getCount();
-		if($getcount <= 0)
+			unset($this->queue[$iusername]);
 			return;
-		for($index = 0; $index < $sender->getInventory()->getSize(); $index ++){
-			$setitem = $sender->getInventory()->getItem($index);
-			if($getitem->getID() == $setitem->getID() and $getitem->getDamage() == $setitem->getDamage()){
-				if($getcount >= $setitem->getCount()){
-					$getcount -= $setitem->getCount();
-					$sender->getInventory()->setItem($index, Item::get(Item::AIR, 0, 1));
-				}else if($getcount < $setitem->getCount()){
-					$sender->getInventory()->setItem($index, Item::get($getitem->getID(), 0, $setitem->getCount() - $getcount));
-					break;
+		}elseif(isset($this->removeQueue[$iusername])){
+			$sell = $this->provider->getSell($block);
+			foreach($this->items as $level => $arr){
+				foreach($arr as $key => $displayer){
+					$link = $displayer->getLinked();
+					if($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getLevel()->getFolderName() === $sell[3]){
+						$displayer->despawnFromAll();
+						unset($this->items[$key]);
+						break 2;
+					}
 				}
 			}
+
+			$this->provider->removeSell($block);
+
+			unset($this->removeQueue[$iusername]);
+			$player->sendMessage($this->getMessage("sell-removed"));
+
+			if($event->getItem()->canBePlaced()){
+				$this->placeQueue[$iusername] = true;
+			}
+			return;
+		}
+
+		if(($sell = $this->provider->getSell($block)) !== false){
+			if($this->getConfig()->get("enable-double-tap")){
+				$now = time();
+				if(isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1){
+					$this->sellItem($player, $sell);
+					unset($this->tap[$iusername]);
+				}else{
+					$this->tap[$iusername] = $now;
+					$player->sendMessage($this->getMessage("tap-again"));
+				}
+			}else{
+				$this->sellItem($player, $sell);
+			}
+
+			if($event->getItem()->canBePlaced()){
+				$this->placeQueue[$iusername] = true;
+			}
+		}
+	}
+
+	public function onBlockPlace(BlockPlaceEvent $event){
+		$iusername = strtolower($event->getPlayer()->getName());
+		if(isset($this->placeQueue[$iusername])){
+			$event->setCancelled();
+			unset($this->placeQueue[$iusername]);
+		}
+	}
+
+	public function onBlockBreak(BlockBreakEvent $event){
+		$block = $event->getBlock();
+		if($this->provider->getSell($block) !== false){
+			$player = $event->getPlayer();
+
+			$event->setCancelled(true);
+			$player->sendMessage($this->getMessage("sell-breaking-forbidden"));
+		}
+	}
+
+	private function sellItem(Player $player, $sell){
+		if(!$player instanceof Player){
+			return false;
+		}
+		if(!$player->hasPermission("economysell.sell.sell")){
+			$player->sendMessage($this->getMessage("no-permission-sell"));
+			return false;
+		}
+		$item = Item::get($sell[4], $sell[5], $sell[7]);
+		if($player->getInventory()->contains($item)){
+			$ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
+			$this->getServer()->getPluginManager()->callEvent($ev);
+			if($ev->isCancelled()){
+				$player->sendMessage($this->getMessage("failed-sell"));
+				return true;
+			}
+			$player->getInventory()->removeItem($item);
+			$player->sendMessage($this->getMessage("sold-item", [$sell[6], $sell[7], $sell[8]]));
+			EconomyAPI::getInstance()->reduceMoney($player, $sell[8]);
+		}else{
+			$player->sendMessage($this->getMessage("no-item", [$sell[6]]));
+		}
+		return true;
+	}
+
+	public function getMessage($key, $replacement = []){
+		$key = strtolower($key);
+		if(isset($this->lang[$key])){
+			$search = [];
+			$replace = [];
+			$this->replaceColors($search, $replace);
+
+			$search[] = "%MONETARY_UNIT%";
+			$replace[] = EconomyAPI::getInstance()->getMonetaryUnit();
+
+			for($i = 1; $i <= count($replacement); $i++){
+				$search[] = "%".$i;
+				$replace[] = $replacement[$i - 1];
+			}
+			return str_replace($search, $replace, $this->lang[$key]);
+		}
+		return "Could not find \"$key\".";
+	}
+
+	private function replaceColors(&$search = [], &$replace = []){
+		$colors = [
+			"BLACK" => "0",
+			"DARK_BLUE" => "1",
+			"DARK_GREEN" => "2",
+			"DARK_AQUA" => "3",
+			"DARK_RED" => "4",
+			"DARK_PURPLE" => "5",
+			"GOLD" => "6",
+			"GRAY" => "7",
+			"DARK_GRAY" => "8",
+			"BLUE" => "9",
+			"GREEN" => "a",
+			"AQUA" => "b",
+			"RED" => "c",
+			"LIGHT_PURPLE" => "d",
+			"YELLOW" => "e",
+			"WHITE" => "f",
+			"OBFUSCATED" => "k",
+			"BOLD" => "l",
+			"STRIKETHROUGH" => "m",
+			"UNDERLINE" => "n",
+			"ITALIC" => "o",
+			"RESET" => "r"
+		];
+		foreach($colors as $color => $code){
+			$search[] = "%%".$color."%%";
+			$replace[] = TextFormat::ESCAPE.$code;
+		}
+	}
+
+	public function onDisable(){
+		if($this->provider instanceof DataProvider){
+			$this->provider->close();
 		}
 	}
 }
