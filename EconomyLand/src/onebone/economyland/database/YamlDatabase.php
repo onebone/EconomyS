@@ -42,7 +42,7 @@ class YamlDatabase implements Database{
 		if(count($this->land) > 0){
 			$land = $this->land;
 			$this->landNum = end($land)["ID"] + 1;
-		}/* Disable database Converted temporarily. Wait onebone make it support SQL.
+		}
 		if(is_file($otherName)){
 			$sq = new \SQLite3($otherName);
 			$cnt = 0;
@@ -64,16 +64,14 @@ class YamlDatabase implements Database{
 					"invitee" => $invitee,
 					"price" => $d["price"],
 					"expires" => $d["expires"]
-					"noTP" => $d["noTP"]
-					"noPVP" => $d["noPVP"]
-				];*//*
+				];*/
 				$this->addLand($d["startX"], $d["endX"], $d["startZ"], $d["endZ"], $d["level"], $d["price"], $d["owner"], $d["expires"], $invitee);
 				++$cnt;
 			}
 			$sq->close();
 			Server::getInstance()->getLogger()->notice("[EconomyProperty] Converted $cnt data into new database");
 			@unlink($otherName);
-		}*/
+		}
 		$this->config = $config;
 	}
 
@@ -142,7 +140,7 @@ class YamlDatabase implements Database{
 		return false;
 	}
 
-	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = [],$noTP = false ,$noPVP = false){
+	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
@@ -159,11 +157,9 @@ class YamlDatabase implements Database{
 			"owner" => $owner,
 			"level" => $level,
 			"invitee" => [],
-			"expires" => $expires,
-			"noTP" => $noTP,
-			"noPVP" => $noPVP
+			"expires" => $expires
 		];
-		Server::getInstance()->getPluginManager()->callEvent(new LandAddedEvent($this->landNum, $startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires, $noTP, $noPVP));
+		Server::getInstance()->getPluginManager()->callEvent(new LandAddedEvent($this->landNum, $startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires));
 		return $this->landNum++;
 	}
 
