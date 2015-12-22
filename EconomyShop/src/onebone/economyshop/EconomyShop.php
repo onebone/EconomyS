@@ -281,7 +281,7 @@ class EconomyShop extends PluginBase implements Listener{
 					unset($this->tap[$iusername]);
 				}else{
 					$this->tap[$iusername] = $now;
-					$player->sendMessage($this->getMessage("tap-again"));
+					$player->sendMessage($this->getMessage("tap-again", [$shop[7], $shop[6], $shop[8]]));
 				}
 			}else{
 				$this->buyItem($player, $shop);
