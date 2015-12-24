@@ -71,7 +71,7 @@ class YamlDatabase implements Database{
 				++$cnt;
 			}
 			$sq->close();
-			Server::getInstance()->getLogger()->notice("[EconomyProperty] Converted $cnt data into new database");
+			Server::getInstance()->getLogger()->notice("[EconomyLand] Converted $cnt data into new database");
 			@unlink($otherName);
 		}*/
 		$this->config = $config;
@@ -215,7 +215,7 @@ class YamlDatabase implements Database{
 		}
 		return false;
 	}
-	
+
 	public function save(){
 		$config = new Config($this->path, Config::YAML);
 		$config->setAll($this->land);

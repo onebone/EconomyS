@@ -73,7 +73,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
 
 		$this->createConfig();
-		
+
 		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
 			$interval = $interval * 1200;
 			if($interval > 0){
@@ -135,7 +135,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->db->close();
 		}
 	}
-	
+
 	public function save(){
 		$now = time();
 		foreach($this->expire as $landId => $time){
@@ -373,25 +373,23 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("land-corrupted", array($num, "", "")));
 					return true;
 				}
-				$x = (int) $info["startX"] + (($info["endX"] - $info["startX"]) / 2);
-				$z = (int) $info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2);
+				$x = (int) ($info["startX"] + (($info["endX"] - $info["startX"]) / 2));
+				$z = (int) ($info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2));
 				$cnt = 0;
-				for($y = 1;; $y++){
-					if($level->getBlock(new Vector3($x, $y, $z))->getID() === 0){
-						if($level->getBlock(new Vector3($x, $y + 1, $z))->getID() === 0){
+				for($y = 255;; $y--){
+					$vec = new Vector3($x, $y, $z);
+					if($level->getBlock($vec)->isSolid()){
+						$y++;
 						break;
-						}else{
-							$y++;
-						}
 					}
 					if($cnt === 5){
 						break;
 					}
-					if($y > 255){
+					if($y <= 0){
 						++$cnt;
 						++$x;
 						--$z;
-						$y = 1;
+						$y = 255;
 						continue;
 					}
 				}
@@ -657,7 +655,7 @@ class EconomyLand extends PluginBase implements Listener{
 	 *
 	 * @return int
 	 */
-	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
+	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null, &$id = null){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
@@ -688,7 +686,8 @@ class EconomyLand extends PluginBase implements Listener{
 		$endZ++;
 	//	$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
-		if($result){
+
+		if($result !== false){
 			return self::RET_LAND_OVERLAP;
 		}
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
@@ -702,7 +701,7 @@ class EconomyLand extends PluginBase implements Listener{
 				time()
 			);
 		}
-		return $id;
+		return self::RET_SUCCESS;
 	}
 
 	public function addInvitee($landId, $player){
@@ -763,7 +762,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"set-first-position" => "Please set first position",
 			"set-second-position" => "Please set second position",
 			"not-allowed-to-buy" => "This world is not allowed to buy land",
-			"land-around-here" => "[EconomyLand]There are ID:%2 land around here. Owner : %1",
+			"land-around-here" => "[EconomyLand] There are ID:%2 land around here. Owner : %1",
 			"no-money-to-buy-land" => "You don't have money to buy this land",
 			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
@@ -771,10 +770,9 @@ class EconomyLand extends PluginBase implements Listener{
 			"cant-set-position-in-different-world" => "You can't set position in different world",
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
-			"no-permission-command" => "[EconomyLand]You don't have permissions to use this command.",
- +			"not-owned" => "[EconomyLand]You must buy land to edit this block",
-			"data-auto-saved" => "The data is saved automatically.",
-			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
+			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
+ +			"not-owned" => "[EconomyLand] You must buy land to edit this block",
+			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game."
 		));
 	}
 }
