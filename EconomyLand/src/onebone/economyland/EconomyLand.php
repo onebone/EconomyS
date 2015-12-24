@@ -772,8 +772,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
  +			"not-owned" => "[EconomyLand] You must buy land to edit this block",
-			"data-auto-saved" => "The data is saved automatically.",
-			"run-cmd-in-game" => "[EconomyLand]Please run this command in-game."
+			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game."
 		));
 	}
 }

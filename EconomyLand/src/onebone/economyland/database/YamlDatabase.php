@@ -69,7 +69,7 @@ class YamlDatabase implements Database{
 				++$cnt;
 			}
 			$sq->close();
-			Server::getInstance()->getLogger()->notice("[EconomyProperty] Converted $cnt data into new database");
+			Server::getInstance()->getLogger()->notice("[EconomyLand] Converted $cnt data into new database");
 			@unlink($otherName);
 		}
 		$this->config = $config;

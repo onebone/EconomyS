@@ -28,9 +28,8 @@ class SaveTask extends PluginTask{
 	public function __construct(EconomyLand $plugin){
 		parent::__construct($plugin);
 	}
-	
+
 	public function onRun($currentTick){
 		$this->getOwner()->save();
-		$this->getOwner()->getLogger()->notice($this->getOwner()->getMessage("data-auto-saved"));
 	}
 }
