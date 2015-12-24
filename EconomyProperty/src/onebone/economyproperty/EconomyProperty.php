@@ -240,8 +240,8 @@ class EconomyProperty extends PluginBase implements Listener{
 		}
 		$price = round($price, 2);
 
-		$centerx = (int) $first[0] + round(((($sec[0]) - $first[0])) / 2);
-		$centerz = (int) $first[1] + round(((($sec[1]) - $first[1])) / 2);
+		$centerx = (int) ($first[0] + round(((($sec[0]) - $first[0])) / 2));
+		$centerz = (int) ($first[1] + round(((($sec[1]) - $first[1])) / 2));
 		$x = (int) round(($sec[0] - $first[0]));
 		$z = (int) round(($sec[1] - $first[1]));
 		$y = 0;

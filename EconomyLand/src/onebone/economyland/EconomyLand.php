@@ -73,7 +73,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->expire = unserialize(file_get_contents($this->getDataFolder()."Expire.dat"));
 
 		$this->createConfig();
-		
+
 		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
 			$interval = $interval * 1200;
 			if($interval > 0){
@@ -135,7 +135,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->db->close();
 		}
 	}
-	
+
 	public function save(){
 		$now = time();
 		foreach($this->expire as $landId => $time){
@@ -657,7 +657,7 @@ class EconomyLand extends PluginBase implements Listener{
 	 *
 	 * @return int
 	 */
-	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null){
+	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null, &$id = null){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
@@ -688,7 +688,8 @@ class EconomyLand extends PluginBase implements Listener{
 		$endZ++;
 	//	$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
-		if($result){
+		
+		if($result !== false){
 			return self::RET_LAND_OVERLAP;
 		}
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
@@ -702,7 +703,7 @@ class EconomyLand extends PluginBase implements Listener{
 				time()
 			);
 		}
-		return $id;
+		return self::RET_SUCCESS;
 	}
 
 	public function addInvitee($landId, $player){

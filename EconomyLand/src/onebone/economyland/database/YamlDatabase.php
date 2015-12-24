@@ -211,7 +211,7 @@ class YamlDatabase implements Database{
 		}
 		return false;
 	}
-	
+
 	public function save(){
 		$config = new Config($this->path, Config::YAML);
 		$config->setAll($this->land);
