@@ -376,7 +376,7 @@ class EconomyLand extends PluginBase implements Listener{
 				$x = (int) ($info["startX"] + (($info["endX"] - $info["startX"]) / 2));
 				$z = (int) ($info["startZ"] + (($info["endZ"] - $info["startZ"]) / 2));
 				$cnt = 0;
-				for($y = 255;; $y--){
+				for($y = 128;; $y--){
 					$vec = new Vector3($x, $y, $z);
 					if($level->getBlock($vec)->isSolid()){
 						$y++;
@@ -389,7 +389,7 @@ class EconomyLand extends PluginBase implements Listener{
 						++$cnt;
 						++$x;
 						--$z;
-						$y = 255;
+						$y = 128;
 						continue;
 					}
 				}
