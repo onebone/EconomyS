@@ -36,7 +36,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make", $touchPos = "touchpos"){
 		parent::__construct($command, $plugin);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
-		$this->setPermission("economyproperty.command.property");
+		$this->setPermission("economyproperty.command.property;economyproperty.command.property.pos1;economyproperty.command.property.pos2;");
 		$this->setDescription("Property manage command");
 		$this->plugin = $plugin;
 		$this->command = $command;
@@ -64,6 +64,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 		switch(array_shift($params)){
 			case $this->pos1:
 				if(!$sender->hasPermission("economyproperty.command.property.pos1")){
+					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
 				if(!$sender instanceof Player){
@@ -79,6 +80,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				break;
 			case $this->pos2:
 				if(!$sender->hasPermission("economyproperty.command.property.pos2")){
+					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
 				if(!$sender instanceof Player){
@@ -97,6 +99,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				break;
 			case $this->make:
 				if(!$sender->hasPermission("economyproperty.command.property.make")){
+					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
 				if(!$sender instanceof Player){
