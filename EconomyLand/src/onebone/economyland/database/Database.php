@@ -32,9 +32,11 @@ interface Database{
 	public function getInviteeById($id);
 	public function addInviteeById($id, $name);
 	public function removeInviteeById($id, $name);
-	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = [], $canTP = true ,$canPVP = true);
+	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = [], $cantp = true ,$canpvp = true);
 	public function setOwnerById($id, $owner);
+	public function setsettingById($id, $keyword, $value);
 	public function removeLandById($id);
+	public function isinvitee($id, Player $player);
 	public function canTouch($x, $z, $level, Player $player);
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level);
 	public function close();
