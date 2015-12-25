@@ -45,7 +45,7 @@ class TopMoneyCommand extends EconomyAPICommand{
 			$banList[$entry->getName()] = true;
 		}
 		
-		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new SortTask($sender->getName(), $this->getPlugin()->getAllMoney(), $this->getPlugin()->getConfigurationValue("add-op-at-rank"), $page, $ops, $banList));
+		$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new SortTask($sender->getName(), $this->getPlugin()->getAllMoney()["money"], $this->getPlugin()->getConfigurationValue("add-op-at-rank"), $page, $ops, $banList));
 		return true;
 	}
 }
