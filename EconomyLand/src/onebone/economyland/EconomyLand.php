@@ -366,6 +366,11 @@ class EconomyLand extends PluginBase implements Listener{
 					if(!$sender->hasPermission("economyland.land.move.others")){
 						$sender->sendMessage($this->getMessage("no-permission-move", [$info["ID"], $info["owner"], "%3"]));
 						return true;
+					}elseif(!$this->db->isinvitee($num, $sender)){//If is not an invitee, check permission.
+						if(!(isset($info["cantp"]) ? $info["cantp"] : true)){//default is allow.
+							$sender->sendMessage($this->getMessage("no-allow-TP", array($num, "", "")));
+							return true;
+						}
 					}
 				}
 				$level = $this->getServer()->getLevelByName($info["level"]);
@@ -523,6 +528,48 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$sender->sendMessage($this->getMessage("here-land", array($info["ID"], $info["owner"], "%3")));
 				return true;
+				case "set":
+					if(!$sender->hasPermission("economyland.command.land.set")){
+						$sender->sendMessage($this->getMessage("no-permission-command"));
+						return true;
+					}
+					$landnum = array_shift($param);
+					$keyword = array_shift($param);
+					$value = array_shift($param);
+					if($landnum == "help"){
+						$output = "Usage : /land set <land number> <setting> <true/false>\n";
+						$output .= "setting:\n";
+						$output .= "cantp : set other can use /land move to your land.";
+						//$output .= "canpvp : set players can PVP in your land.";
+						$sender->sendMessage($output);
+						return true;
+					}
+					if(trim($landnum) == "" or trim($keyword) == "" or trim($value) == ""){
+						$sender->sendMessage("Usage : /land set help");
+						return true;
+					}
+					if(!is_numeric($landnum)){
+						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
+						return true;
+					}
+					$info = $this->db->getLandById($landnum);
+					if($info === false){
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
+						return true;
+					}elseif($info["owner"] !== $sender->getName()){
+						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
+						return true;
+					}elseif($value === "true" or $value === "false"){
+						if($this->db->setsettingById($landnum, $keyword, $value)){
+							$sender->sendMessage($this->getMessage("land-set", array($landnum, $keyword, $value)));
+						}else{
+							$sender->sendMessage($this->getMessage("land-set-fail", array($landnum, $keyword, $value)));
+						}
+						return true;
+					}else{
+						$sender->sendMessage($this->getMessage("land-set-wrong", array($value, "", "")));
+					}
+					return true;
 				default:
 				$sender->sendMessage("Usage: ".$cmd->getUsage());
 			}
@@ -772,7 +819,11 @@ class EconomyLand extends PluginBase implements Listener{
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
  +			"not-owned" => "[EconomyLand] You must buy land to edit this block",
-			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game."
+			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game.",
+			"no-allow-TP" => "[EconomyLand] The owner of land %1 set no allow '/land move'.",
+			"land-set" => "[EconomyLand] Has set %2 in land %1 as %3.",
+			"land-set-fail" => "[EconomyLand] Fail to set %2 in land %1 as %3. Ensure inputting in a right way.",
+			"land-set-wrong" => "[EconomyLand] %1 is a wrong value. (true/false)"
 		));
 	}
 }
