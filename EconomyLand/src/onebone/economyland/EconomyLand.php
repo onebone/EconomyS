@@ -375,7 +375,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$level = $this->getServer()->getLevelByName($info["level"]);
 				if(!$level instanceof Level){
-					$sender->sendMessage($this->getMessage("land-corrupted", array($num, "", "")));
+					$sender->sendMessage($this->getMessage("land-corrupted", array($num, $info["level"], "")));
 					return true;
 				}
 				$x = (int) ($info["startX"] + (($info["endX"] - $info["startX"]) / 2));
@@ -788,7 +788,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"no-one-owned" => "Anyone doesn't have this land",
 			"not-your-land" => "Land number %1 is not your land",
 			"no-land-found" => "There's no land numbered %1",
-			"land-corrupted" => "Land number %1 is corrupted",
+			"land-corrupted" => "[EconomyLand] The World %2 of Land number %1 is corrupted.",
 			"no-permission-move" => "You have no permission to move to land %1. Owner : %2",
 			"fail-moving" => "Failed moving to land %1",
 			"success-moving" => "Has been moved to land %1",
