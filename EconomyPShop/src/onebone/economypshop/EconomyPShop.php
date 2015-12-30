@@ -95,6 +95,11 @@ class EconomyPShop extends PluginBase implements Listener{
 				$player->sendMessage($this->getMessage("insert-right-format"));
 				return;
 			}
+			
+			if($cost < 0 or $amount < 1 or (int)$amount != $amount){
+				$player->sendMessage($this->getMessage("wrong-num"));
+				return;
+			}
 
 			$item = Item::fromString($line[2]);
 			if(!$item instanceof Item){
