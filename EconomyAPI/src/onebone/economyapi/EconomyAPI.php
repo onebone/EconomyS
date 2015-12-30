@@ -68,7 +68,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	];
 	private $lang = [], $playerLang = [];
 
-	public function getCommandMessage($command, $lang = false){
+	public function getCommandMessage(string $command, $lang = false){
 		if($lang === false){
 			$lang = $this->getConfig()->get("default-lang");
 		}
@@ -80,7 +80,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 
-	public function getMessage($key, $params = [], $player = "console"){
+	public function getMessage(string $key, array $params = [], string $player = "console"){
 		$player = strtolower($player);
 		if(isset($this->lang[$this->playerLang[$player]][$key])){
 			return $this->replaceParameters($this->lang[$this->playerLang[$player]][$key], $params);
