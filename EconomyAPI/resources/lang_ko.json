@@ -1,5 +1,11 @@
 {
     "language": "ko",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "자신의 돈을 보여줍니다"
+		}
+	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
     "request-cancelled": "요청이 거부되었습니다.",
     "player-not-connected": "%1님은 서버에 접속하지 않았습니다.",

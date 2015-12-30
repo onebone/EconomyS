@@ -1,5 +1,11 @@
 {
     "language": "jp",
+	"commands": {
+		"mymoney": {
+			"uasge": "/mymoney",
+			"description": "自分の持っているお金を表示します"
+		}
+	},
     "language-set": "言語を%1に変更しました。",
     "request-cancelled": "リクエストはキャンセルされました。",
     "player-not-connected": "%1はオフラインです。",

@@ -1,5 +1,11 @@
 {
     "language": "en",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Shows your money"
+		}
+	},
     "language-set": "Language set to %1 by onebone",
     "request-cancelled": "Your request was cancelled",
     "player-not-connected": "Player %1 is not in server",

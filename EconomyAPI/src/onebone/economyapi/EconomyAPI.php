@@ -24,7 +24,9 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\utils\Config;
 use pocketmine\utils\Utils;
+use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\provider\Provider;
 use onebone\economyapi\provider\YamlProvider;
@@ -44,10 +46,53 @@ class EconomyAPI extends PluginBase implements Listener{
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
+	private static $instance = null;
+
 	/** @var Provider */
 	private $provider;
 
-	private static $instance = null;
+	private $langList = [
+		"def" => "Default",
+		"user-define" => "User Defined",
+		"ch" => "简体中文",
+		"cs" => "Čeština",
+		"en" => "English",
+		"fr" => "Français",
+		"id" => "Bahasa Indonesia",
+		"it" => "Italiano",
+		"jp" => "日本語",
+		"ko" => "한국어",
+		"nl" => "Nederlands",
+		"ru" => "Русский",
+		"zh" => "繁體中文",
+	];
+	private $lang = [], $playerLang = [];
+
+	public function getCommandMessage($command, $lang = false){
+		if($lang === false){
+			$lang = $this->getConfig()->get("default-lang");
+		}
+		$command = strtolower($command);
+		if(isset($this->lang[$lang]["commands"][$command])){
+			return $this->lang[$lang]["commands"][$command];
+		}else{
+			return $this->lang["def"]["commands"][$command];
+		}
+	}
+
+	public function getMessage($key, $params = [], $player = "console"){
+		$player = strtolower($player);
+		if(isset($this->lang[$this->playerLang[$player]][$key])){
+			return $this->replaceParameters($this->lang[$this->playerLang[$player]][$key], $params);
+		}elseif(isset($this->lang["def"][$key])){
+			return $this->replaceParameters($this->lang["def"][$key], $params);
+		}
+		return "Language matching key \"$key\" does not exist.";
+	}
+
+	public function getMonetaryUnit() : string{
+		return $this->getConfig()->get("monetary-unit");
+	}
 
 	/**
 	 * @return array
@@ -202,6 +247,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		if(!$this->getDataFolder()){
 			mkdir($this->getDataFolder());
 		}
+		if(!is_file($this->getDataFolder()."PlayerLang.dat")){
+			file_put_contents($this->getDataFolder()."PlayerLang.dat", serialize([]));
+		}
+		$this->playerLang = unserialize(file_get_contents($this->getDataFolder()."PlayerLang.dat"));
 
 		$this->saveDefaultConfig();
 		$this->initialize();
@@ -209,10 +258,12 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	public function onJoin(PlayerJoinEvent $event){
 		$player = $event->getPlayer();
-		$iusername = strtolower($player->getName());
 
+		if(!isset($this->playerLang[strtolower($player->getName())])){
+			$this->playerLang[strtolower($player->getName())] = $this->getConfig()->get("default-lang");
+		}
 		if(!$this->provider->accountExists($player)){
-			$this->getLogger()->debug("Account of '".$player."' is not found. Creating account...");
+			$this->getLogger()->debug("Account of '".$player->getName()."' is not found. Creating account...");
 			$this->createAccount($player);
 		}
 	}
@@ -221,6 +272,46 @@ class EconomyAPI extends PluginBase implements Listener{
 		if($this->provider instanceof Provider){
 			$this->provider->close();
 		}
+	}
+
+	private function replaceParameters($message, $params = []){
+		$search = ["%MONETARY_UNIT%"];
+		$replace = [$this->getMonetaryUnit()];
+		for($i = 0; $i < count($params); $i++){
+			$search[] = "%".($i + 1);
+			$replace[] = $params[$i];
+		}
+
+		$colors = [
+			"BLACK" => "0",
+			"DARK_BLUE" => "1",
+			"DARK_GREEN" => "2",
+			"DARK_AQUA" => "3",
+			"DARK_RED" => "4",
+			"DARK_PURPLE" => "5",
+			"GOLD" => "6",
+			"GRAY" => "7",
+			"DARK_GRAY" => "8",
+			"BLUE" => "9",
+			"GREEN" => "a",
+			"AQUA" => "b",
+			"RED" => "c",
+			"LIGHT_PURPLE" => "d",
+			"YELLOW" => "e",
+			"WHITE" => "f",
+			"OBFUSCATED" => "k",
+			"BOLD" => "l",
+			"STRIKETHROUGH" => "m",
+			"UNDERLINE" => "n",
+			"ITALIC" => "o",
+			"RESET" => "r"
+		];
+		foreach($colors as $color => $code){
+			$search[] = "&".$color;
+			$replace[] = TextFormat::ESCAPE.$code;
+		}
+
+		return str_replace($search, $replace, $message);
 	}
 
 	private function initialize(){
@@ -238,6 +329,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->getLogger()->critical("Invalid database was given.");
 			return false;
 		}
+		$this->initializeLanguage();
 		$this->getLogger()->notice("Database provider was set to: ".$this->provider->getName());
 		$this->registerCommands();
 	}
@@ -264,10 +356,19 @@ class EconomyAPI extends PluginBase implements Listener{
 		$map = $this->getServer()->getCommandMap();
 
 		$commands = [
-			// TODO: Implement commands
+			"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand"
 		];
 		foreach($commands as $cmd => $class){
-			$map->register("economyapi", new $class($cmd));
+			$map->register("economyapi", new $class($this));
 		}
+	}
+
+	private function initializeLanguage(){
+		foreach($this->getResources() as $resource){
+			if($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_"){
+				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
+			}
+		}
+		$this->lang["user-define"] = (new Config($this->getDataFolder()."messages.yml", Config::YAML, $this->lang["def"]))->getAll();
 	}
 }
