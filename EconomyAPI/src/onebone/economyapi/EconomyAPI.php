@@ -20,21 +20,182 @@
 
 namespace onebone\economyapi;
 
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\utils\Utils;
 
+use onebone\economyapi\provider\Provider;
+use onebone\economyapi\provider\YamlProvider;
+use onebone\economyapi\provider\MySQLProvider;
+use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\event\money\ReduceMoneyEvent;
+use onebone\economyapi\event\money\AddMoneyEvent;
+use onebone\economyapi\event\account\CreateAccountEvent;
+
 class EconomyAPI extends PluginBase implements Listener{
+	const API_VERSION = 3;
 	const PACKAGE_VERSION = "5.7";
+
+	const RET_NO_ACCOUNT = -3;
+	const RET_CANCELLED = -2;
+	const RET_NOT_FOUND = -1;
+	const RET_INVALID = 0;
+	const RET_SUCCESS = 1;
+
+	/** @var Provider */
+	private $provider;
 
 	private static $instance = null;
 
-	public function onLoad(){
-		self::$instance = $this;
+	/**
+	 * @return array
+	 */
+	public function getAllMoney() : array{
+		return $this->provider->getAll();
 	}
 
+	/**
+	 * @param string|Player		$player
+	 * @param float				$defaultMoney
+	 * @param bool				$force
+	 *
+	 * @return bool
+	 */
+	public function createAccount($player, $defaultMoney = false, bool $force = false) : bool{
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		if(!$this->provider->accountExists($player)){
+			$this->getServer()->getPluginManager()->callEvent($ev = new CreateAccountEvent($this, $player, $defaultMoney, "none"));
+			if(!$ev->isCancelled() or $force === true){
+				$this->provider->createAccount($player, $ev->getDefaultMoney());
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * @param Player|string		$player
+	 *
+	 * @return float|bool
+	 */
+	public function myMoney($player){
+		return $this->provider->getMoney($player);
+	}
+
+	/**
+	 * @param string|Player 	$player
+	 * @param float 			$amount
+	 * @param bool				$force
+	 * @param string			$issuer
+	 *
+	 * @return int
+	 */
+	public function setMoney($player, $amount, bool $force = false, string $issuer = "none") : int{
+		if($amount < 0){
+			return self::RET_INVALID;
+		}
+
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		if($this->provider->accountExists($player)){
+			$amount = round($amount, 2);
+			if($amount > $this->getConfig()->get("max-money")){
+				return self::RET_INVALID;
+			}
+
+			$this->getServer()->getPluginManager()->callEvent($ev = new SetMoneyEvent($this, $player, $amount, $issuer));
+			if(!$ev->isCancelled() or $force === true){
+				$this->provider->setMoney($player, $amount);
+				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $amount, $issuer));
+				return self::RET_SUCCESS;
+			}
+			return self::RET_CANCELLED;
+		}
+		return self::RET_NO_ACCOUNT;
+	}
+
+	/**
+	 * @param string|Player 	$player
+	 * @param float 			$amount
+	 * @param bool				$force
+	 * @param string			$issuer
+	 *
+	 * @return int
+	 */
+	public function addMoney($player, $amount, bool $force = false, $issuer = "none") : int{
+		if($amount < 0){
+			return self::RET_INVALID;
+		}
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		if(($money = $this->provider->getMoney($player)) !== false){
+			$amount = round($amount, 2);
+			if($money + $amount > $this->getConfig()->get("max-money")){
+				return self::RET_INVALID;
+			}
+
+			$this->getServer()->getPluginManager()->callEvent($ev = new AddMoneyEvent($this, $player, $amount, $issuer));
+			if(!$ev->isCancelled() or $force === true){
+				$this->provider->addMoney($player, $amount);
+				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $amount + $money, $issuer));
+				return self::RET_SUCCESS;
+			}
+			return self::RET_CANCELLED;
+		}
+		return self::RET_NO_ACCOUNT;
+	}
+
+	/**
+	 * @param string|Player 	$player
+	 * @param float 			$amount
+	 * @param bool				$force
+	 * @param string			$issuer
+	 *
+	 * @return int
+	 */
+	public function reduceMoney($player, $amount, bool $force = false, $issuer = "none") : int{
+		if($amount < 0){
+			return self::RET_INVALID;
+		}
+		if($player instanceof Player){
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+		if(($money = $this->provider->getMoney($player)) !== false){
+			$amount = round($amount, 2);
+			if($money - $amount < 0){
+				return self::RET_INVALID;
+			}
+
+			$this->getServer()->getPluginManager()->callEvent($ev = new ReduceMoneyEvent($this, $player, $amount, $issuer));
+			if(!$ev->isCancelled() or $force === true){
+				$this->provider->reduceMoney($player, $amount);
+				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $money - $amount, $issuer));
+				return self::RET_SUCCESS;
+			}
+			return self::RET_CANCELLED;
+		}
+		return self::RET_NO_ACCOUNT;
+	}
+
+	/**
+	 * @return EconomyAPI
+	 */
 	public static function getInstance(){
 		return self::$instance;
+	}
+
+	public function onLoad(){
+		self::$instance = $this;
 	}
 
 	public function onEnable(){
@@ -46,10 +207,38 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->initialize();
 	}
 
+	public function onJoin(PlayerJoinEvent $event){
+		$player = $event->getPlayer();
+		$iusername = strtolower($player->getName());
+
+		if(!$this->provider->accountExists($player)){
+			$this->getLogger()->debug("Account of '".$player."' is not found. Creating account...");
+			$this->createAccount($player);
+		}
+	}
+
+	public function onDisable(){
+		if($this->provider instanceof Provider){
+			$this->provider->close();
+		}
+	}
+
 	private function initialize(){
 		if($this->getConfig()->get("check-update")){
 			$this->checkUpdate();
 		}
+		switch(strtolower($this->getConfig()->get("provider"))){
+			case "yaml":
+			$this->provider = new YamlProvider($this->getDataFolder()."Money.yml");
+			break;
+			case "mysql":
+			$this->provider = new MySQLProvider($this->getConfig()->get("provider-settings"));
+			break;
+			default:
+			$this->getLogger()->critical("Invalid database was given.");
+			return false;
+		}
+		$this->getLogger()->notice("Database provider was set to: ".$this->provider->getName());
 		$this->registerCommands();
 	}
 

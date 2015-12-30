@@ -127,7 +127,7 @@ class YamlProvider implements Provider{
 	}
 
 	public function getAll(){
-		return $this->money;
+		return $this->money["money"];
 	}
 
 	public function save(){
