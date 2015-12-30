@@ -32,8 +32,7 @@ class SQLiteDatabase implements Database{
 	private $land;
 	private $config;
 
-	const INVITEE_SEPERATOR = "\x01";
-	public function __construct($fileName, $config, $otherName){
+	public function __construct($fileName, $config){
 		$this->land = new \SQLite3($fileName);
 		$this->land->exec("CREATE TABLE IF NOT EXISTS land(
 			ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -47,17 +46,7 @@ class SQLiteDatabase implements Database{
 			price INTEGER NOT NULL,
 			expires INTEGER
 		)");
-		if(is_file($otherName)){
-			$cnt = 0;
-			$c = (new Config($otherName, Config::YAML))->getAll();
-			foreach($c as $d){
-			//	$this->land->exec("INSERT INTO land (startX, startZ, endX, endZ, level, owner, invitee, price, expires) VALUES ({$data[startX]}, {$data[startZ]}, {$data[endX]}, {$data[endZ]}, '{$data[level]}', '{$data[owner]}', ".implode(self::INVITEE_SEPERATOR, array_keys($data["invitee"])).", {$data[price]}, {$data[expires]})");
-				$this->addLand($d["startX"], $d["endX"], $d["startZ"], $d["endZ"], $d["level"], $d["price"], $d["owner"], $d["expires"], implode(self::INVITEE_SEPERATOR, array_keys($data["invitee"])));
-				++$cnt;
-			}
-			@unlink($otherName);
-			Server::getInstance()->getLogger()->notice("[EconomyProperty] Converted $cnt data into new database");
-		}
+
 		$this->config = $config;
 	}
 
@@ -94,23 +83,46 @@ class SQLiteDatabase implements Database{
 	}
 
 	public function getInviteeById($id){
-		return explode(self::INVITEE_SEPERATOR, $this->land->query("SELECT invitee FROM land WHERE ID = $id")->fetchArray(SQLITE3_ASSOC)["invitee"]);
+		$invitee = $this->land->exec("SELECT invitee FROM land WHERE ID = $id")->fetchArray(SQLITE3_ASSOC)["invitee"];
+		return unserialize($invitee);
 	}
 
 	public function addInviteeById($id, $name){
-
+		$invitee = $this->getInviteeById($id);
+		if(!in_array($name, $invitee)){
+			$invitee[] = strtolower(str_replace("'", "", $name));
+			$this->land->exec("UPDATE land SET invitee = '".serialize($invitee)."' WHERE ID = $id");
+			return true;
+		}
+		return false;
 	}
 
-	public function removeInviteeByid($id, $name){
+	public function isInvitee($id, $name){
+		$name = strtolower($name);
+		$invitee = $this->getInviteeById($id);
+		return in_array($name, $invitee)) === true;
+	}
 
+	public function removeInviteeById($id, $name){
+		$name = strtolower($name);
+
+		$invitee = $this->getInviteeById($id);
+		foreach($invitee as $key => $i){
+			if($i === $name){
+				unset($invitee[$key]);
+				$this->land->exec("UPDATE land SET invitee = '".serialize($invitee)."' WHERE ID = $id");
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		//$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee) VALUES ($startX, $endX, $startZ, $endZ, '$owner', '$level', $price, '')");
-		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, ','".($expires === null ? "":", $expires").")");
+		
+		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, '{}'".($expires === null ? "":", $expires").")");
 		return $this->land->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC)["seq"] - 1;
 	}
 
