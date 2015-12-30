@@ -95,7 +95,7 @@ class EconomyPShop extends PluginBase implements Listener{
 				$player->sendMessage($this->getMessage("insert-right-format"));
 				return;
 			}
-			
+
 			if($cost < 0 or $amount < 1 or (int)$amount != $amount){
 				$player->sendMessage($this->getMessage("wrong-num"));
 				return;
@@ -167,6 +167,10 @@ class EconomyPShop extends PluginBase implements Listener{
 
 				if($shop["owner"] == $player->getName()){
 					$player->sendMessage($this->getMessage("same-player"));
+					return;
+				}
+				if($shop["price"] < 0 or $shop["amount"] < 1){
+					$player->sendMessage($this->getMessage("wrong-num"));
 					return;
 				}
 

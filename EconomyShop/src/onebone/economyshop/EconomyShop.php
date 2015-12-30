@@ -90,7 +90,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 
-		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true);
+		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true); // TODO: Language preferences
 		@fclose($rsc);
 	}
 
