@@ -4,6 +4,10 @@
 		"mymoney": {
 			"usage": "/mymoney",
 			"description": "Shows your money"
+		},
+		"topmoney": {
+			"usage": "/topmoney [page]",
+			"description": "Shows top money of this server"
 		}
 	},
     "language-set": "Language set to %1 by onebone",

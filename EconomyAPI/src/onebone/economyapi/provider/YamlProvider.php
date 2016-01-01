@@ -33,7 +33,7 @@ class YamlProvider implements Provider{
 	private $money;
 
 	public function __construct($file){
-		$this->config = new Config($file, Config::YAML);
+		$this->config = new Config($file, Config::YAML, ["version" => 2, "money" => []]);
 		$this->money = $this->config->getAll();
 	}
 
@@ -127,7 +127,7 @@ class YamlProvider implements Provider{
 	}
 
 	public function getAll(){
-		return $this->money["money"];
+		return isset($this->money["money"]) ? $this->money["money"] : [];
 	}
 
 	public function save(){

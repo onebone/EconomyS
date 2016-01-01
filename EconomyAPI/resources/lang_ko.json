@@ -4,6 +4,10 @@
 		"mymoney": {
 			"usage": "/mymoney",
 			"description": "자신의 돈을 보여줍니다"
+		},
+		"topmoney": {
+			"usage": "/topmoney [페이지]",
+			"description": "이 서버의 돈 순위를 보여줍니다"
 		}
 	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",

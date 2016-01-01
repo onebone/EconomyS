@@ -4,6 +4,10 @@
 		"mymoney": {
 			"uasge": "/mymoney",
 			"description": "自分の持っているお金を表示します"
+		},
+		"topmoney": {
+			"uasge": "/topmoney [ページ]",
+			"description": "このサーバーのプレーヤーお金ランキングを表示します"
 		}
 	},
     "language-set": "言語を%1に変更しました。",

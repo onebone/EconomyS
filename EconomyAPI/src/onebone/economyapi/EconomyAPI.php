@@ -68,7 +68,13 @@ class EconomyAPI extends PluginBase implements Listener{
 	];
 	private $lang = [], $playerLang = [];
 
-	public function getCommandMessage(string $command, $lang = false){
+	/**
+	 * @param string			$command
+	 * @param string|bool		$lang
+	 *
+	 * @return array
+	 */
+	public function getCommandMessage(string $command, $lang = false) : array{
 		if($lang === false){
 			$lang = $this->getConfig()->get("default-lang");
 		}
@@ -80,7 +86,14 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 	}
 
-	public function getMessage(string $key, array $params = [], string $player = "console"){
+	/**
+	 * @param string		$key
+	 * @param array 		$params
+	 * @param string		$player
+	 *
+	 * @return string
+	 */
+	public function getMessage(string $key, array $params = [], string $player = "console") : string{
 		$player = strtolower($player);
 		if(isset($this->lang[$this->playerLang[$player]][$key])){
 			return $this->replaceParameters($this->lang[$this->playerLang[$player]][$key], $params);
@@ -115,12 +128,23 @@ class EconomyAPI extends PluginBase implements Listener{
 		$player = strtolower($player);
 
 		if(!$this->provider->accountExists($player)){
+			$defaultMoney = ($defaultMoney === false) ? $this->getConfig()->get("default-money") : $defaultMoney;
+
 			$this->getServer()->getPluginManager()->callEvent($ev = new CreateAccountEvent($this, $player, $defaultMoney, "none"));
 			if(!$ev->isCancelled() or $force === true){
 				$this->provider->createAccount($player, $ev->getDefaultMoney());
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * @param string|Player			$player
+	 *
+	 * @return bool
+	 */
+	public function accountExists($player) : bool{
+		return $this->provider->accountExists($player);
 	}
 
 	/**
@@ -252,8 +276,17 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		$this->playerLang = unserialize(file_get_contents($this->getDataFolder()."PlayerLang.dat"));
 
+		if(!isset($this->playerLang["console"])){
+			$this->playerLang["console"] = $this->getConfig()->get("default-lang");
+		}
+		if(!isset($this->playerLang["rcon"])){
+			$this->playerLang["rcon"] = $this->getConfig()->get("default-lang");
+		}
+
 		$this->saveDefaultConfig();
 		$this->initialize();
+
+		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
 	public function onJoin(PlayerJoinEvent $event){
@@ -264,50 +297,35 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		if(!$this->provider->accountExists($player)){
 			$this->getLogger()->debug("Account of '".$player->getName()."' is not found. Creating account...");
-			$this->createAccount($player);
+			$this->createAccount($player, false, true);
 		}
 	}
 
 	public function onDisable(){
+		$this->saveAll();
+	}
+
+	public function saveAll(){
 		if($this->provider instanceof Provider){
 			$this->provider->close();
 		}
+		file_put_contents($this->getDataFolder()."PlayerLang.dat", serialize($this->playerLang));
 	}
 
 	private function replaceParameters($message, $params = []){
 		$search = ["%MONETARY_UNIT%"];
 		$replace = [$this->getMonetaryUnit()];
+
 		for($i = 0; $i < count($params); $i++){
 			$search[] = "%".($i + 1);
 			$replace[] = $params[$i];
 		}
 
 		$colors = [
-			"BLACK" => "0",
-			"DARK_BLUE" => "1",
-			"DARK_GREEN" => "2",
-			"DARK_AQUA" => "3",
-			"DARK_RED" => "4",
-			"DARK_PURPLE" => "5",
-			"GOLD" => "6",
-			"GRAY" => "7",
-			"DARK_GRAY" => "8",
-			"BLUE" => "9",
-			"GREEN" => "a",
-			"AQUA" => "b",
-			"RED" => "c",
-			"LIGHT_PURPLE" => "d",
-			"YELLOW" => "e",
-			"WHITE" => "f",
-			"OBFUSCATED" => "k",
-			"BOLD" => "l",
-			"STRIKETHROUGH" => "m",
-			"UNDERLINE" => "n",
-			"ITALIC" => "o",
-			"RESET" => "r"
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "k", "l", "m", "n", "o", "r"
 		];
-		foreach($colors as $color => $code){
-			$search[] = "&".$color;
+		foreach($colors as $code){
+			$search[] = "&".$code;
 			$replace[] = TextFormat::ESCAPE.$code;
 		}
 
@@ -356,7 +374,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		$map = $this->getServer()->getCommandMap();
 
 		$commands = [
-			"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand"
+			"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand",
+			"topmoney" => "\\onebone\\economyapi\\command\\TopMoneyCommand"
 		];
 		foreach($commands as $cmd => $class){
 			$map->register("economyapi", new $class($this));
