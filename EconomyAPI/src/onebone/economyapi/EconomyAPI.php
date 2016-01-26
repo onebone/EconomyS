@@ -34,6 +34,7 @@ use onebone\economyapi\provider\MySQLProvider;
 use onebone\economyapi\event\money\SetMoneyEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\AddMoneyEvent;
+use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\account\CreateAccountEvent;
 
 class EconomyAPI extends PluginBase implements Listener{
@@ -375,7 +376,8 @@ class EconomyAPI extends PluginBase implements Listener{
 
 		$commands = [
 			"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand",
-			"topmoney" => "\\onebone\\economyapi\\command\\TopMoneyCommand"
+			"topmoney" => "\\onebone\\economyapi\\command\\TopMoneyCommand",
+			"setmoney" => "\\onebone\\economyapi\\command\\SetMoneyCommand"
 		];
 		foreach($commands as $cmd => $class){
 			$map->register("economyapi", new $class($this));

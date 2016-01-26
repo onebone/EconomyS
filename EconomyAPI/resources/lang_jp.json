@@ -3,11 +3,15 @@
 	"commands": {
 		"mymoney": {
 			"uasge": "/mymoney",
-			"description": "自分の持っているお金を表示します"
+			"description": "自分の持っている所持金を表示します"
 		},
 		"topmoney": {
 			"uasge": "/topmoney [ページ]",
-			"description": "このサーバーのプレーヤーお金ランキングを表示します"
+			"description": "このサーバーのプレーヤー所持金ランキングを表示します"
+		},
+		"setmoney": {
+			"usage": "/setmoney [数値]",
+			"description": "プレーヤーの所持金を設定します"
 		}
 	},
     "language-set": "言語を%1に変更しました。",

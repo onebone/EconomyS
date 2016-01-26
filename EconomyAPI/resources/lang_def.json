@@ -8,6 +8,10 @@
 		"topmoney": {
 			"usage": "/topmoney [page]",
 			"description": "Shows top money of this server"
+		},
+		"setmoney": {
+			"usage": "/setmoney <player> <amount>",
+			"description": "Set money of player"
 		}
 	},
     "language-set": "Language set to %1 by onebone",

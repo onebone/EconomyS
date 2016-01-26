@@ -17,6 +17,8 @@ class MyMoneyCommand extends Command{
 		$desc = $plugin->getCommandMessage("mymoney");
 		parent::__construct("mymoney", $desc["description"], $desc["usage"]);
 
+		$this->setPermission("economyapi.command.mymoney");
+
 		$this->plugin = $plugin;
 	}
 

@@ -8,6 +8,10 @@
 		"topmoney": {
 			"usage": "/topmoney [페이지]",
 			"description": "이 서버의 돈 순위를 보여줍니다"
+		},
+		"setmoney": {
+			"usage": "/setmoney <플레이어> <값>",
+			"description": "플레이어의 돈을 설정합니다"
 		}
 	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
