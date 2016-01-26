@@ -24,6 +24,10 @@
 		"takemoney": {
 			"usage": "/takemoney <プレーヤー> <数値>",
 			"description": "プレーヤーからお金を奪います"
+		},
+		"pay": {
+			"usage": "/pay <プレーヤー> <数値>",
+			"description": "プレーヤーに支払いします"
 		}
 	},
     "language-set": "言語を%1に変更しました。",

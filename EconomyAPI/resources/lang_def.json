@@ -24,6 +24,10 @@
 		"takemoney": {
 			"usage": "/takemoney <player> <amount>",
 			"description": "Takes money from player"
+		},
+		"pay": {
+			"usage": "/pay <player> <amount>",
+			"description": "Pays money to player"
 		}
 	},
     "language-set": "Language set to %1 by onebone",

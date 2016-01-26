@@ -24,6 +24,10 @@
 		"takemoney": {
 			"usage": "/takemoney <플레이어> <값>",
 			"description": "플레이어에게서 돈을 빼앗습니다"
+		},
+		"pay": {
+			"usage": "/pay <플레이어> <값>",
+			"description": "플레이어에게 돈을 지불합니다"
 		}
 	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
