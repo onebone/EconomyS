@@ -32,6 +32,10 @@
 		"setlang": {
 			"usage": "/setlang <ccTLD>",
 			"description": "Set your language"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Shows your status of money"
 		}
 	},
     "language-set": "Language set to %1 by onebone",
