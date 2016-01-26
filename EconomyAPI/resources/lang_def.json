@@ -28,6 +28,10 @@
 		"pay": {
 			"usage": "/pay <player> <amount>",
 			"description": "Pays money to player"
+		},
+		"setlang": {
+			"usage": "/setlang <ccTLD>",
+			"description": "Set your language"
 		}
 	},
     "language-set": "Language set to %1 by onebone",

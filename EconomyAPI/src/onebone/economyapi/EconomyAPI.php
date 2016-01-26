@@ -63,7 +63,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"id" => "Bahasa Indonesia",
 		"it" => "Italiano",
 		"jp" => "日本語",
-		"ko" => "한국어",
+		"kr" => "한국어",
 		"nl" => "Nederlands",
 		"ru" => "Русский",
 		"zh" => "繁體中文",
@@ -103,6 +103,16 @@ class EconomyAPI extends PluginBase implements Listener{
 			return $this->replaceParameters($this->lang["def"][$key], $params);
 		}
 		return "Language matching key \"$key\" does not exist.";
+	}
+
+	public function setPlayerLanguage(string $player, string $language) : bool{
+		$player = strtolower($player);
+		$language = strtolower($language);
+		if(isset($this->lang[$language])){
+			$this->playerLang[$player] = $language;
+			return true;
+		}
+		return false;
 	}
 
 	public function getMonetaryUnit() : string{
@@ -386,7 +396,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			"seemoney" => "\\onebone\\economyapi\\command\\SeeMoneyCommand",
 			"givemoney" => "\\onebone\\economyapi\\command\\GiveMoneyCommand",
 			"takemoney" => "\\onebone\\economyapi\\command\\TakeMoneyCommand",
-			"pay" => "\\onebone\\economyapi\\command\\PayCommand"
+			"pay" => "\\onebone\\economyapi\\command\\PayCommand",
+			"setlang" => "\\onebone\\economyapi\\command\\SetLangCommand"
 		];
 		foreach($commands as $cmd => $class){
 			$map->register("economyapi", new $class($this));
