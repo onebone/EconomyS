@@ -36,6 +36,7 @@ use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\account\CreateAccountEvent;
+use onebone\economyapi\task\SaveTask;
 
 class EconomyAPI extends PluginBase implements Listener{
 	const API_VERSION = 3;
@@ -286,6 +287,10 @@ class EconomyAPI extends PluginBase implements Listener{
 
 		$this->saveDefaultConfig();
 		$this->initialize();
+
+		if($this->getConfig()->get("auto-save-interval") > 0){
+			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->getConfig()->get("auto-save-interval") * 1200, $this->getConfig()->get("auto-save-interval") * 1200);
+		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
