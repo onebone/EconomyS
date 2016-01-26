@@ -16,12 +16,20 @@
 		"seemoney": {
 			"usage": "/seemoney <player>",
 			"description": "Shows money of player"
+		},
+		"givemoney": {
+			"usage": "/givemoney <player> <amount>",
+			"description": "Gives money to player"
+		},
+		"takemoney": {
+			"usage": "/takemoney <player> <amount>",
+			"description": "Takes money from player"
 		}
 	},
     "language-set": "Language set to %1 by onebone",
     "request-cancelled": "Your request was cancelled",
-    "player-not-connected": "Player %1 is not in server",
-    "player-never-connected": "Player %1 was never seen in this server",
+    "player-not-connected": "Player %1 is not online.",
+    "player-never-connected": "Player %1 was never connected.",
     "topmoney-tag": "- Showing top money list (%1 of %2) -",
     "topmoney-format": "[%1] %2: %3",
     "pay-failed": "Failed to pay.",
@@ -31,11 +39,11 @@
     "takemoney-invalid-number": "Invalid number",
     "takemoney-player-lack-of-money": "%1 does not have enough %MONETARY_UNIT%%2. %1's money : %MONETARY_UNIT%%3",
     "takemoney-money-taken": "Your %MONETARY_UNIT%%1 have been taken",
-    "takemoney-took-money": "Has been took %1's money %MONETARY_UNIT%%2",
+    "takemoney-took-money": "Taken %MONETARY_UNIT%%2 from %1",
     "takemoney-failed": "You have failed to take money",
     "givemoney-must-be-number": "Amount must be numeric",
     "givemoney-invalid-number": "Invalid number",
-    "givemoney-money-given": "You have been earned %MONETARY_UNIT%%1",
+    "givemoney-money-given": "You have earned %MONETARY_UNIT%%1",
     "givemoney-gave-money": "Gave %MONETARY_UNIT%%1 to %2",
     "seemoney-seemoney": "Player %1's money : %2",
     "setmoney-setmoney": "Player %1's money has been set to %MONETARY_UNIT%%2",

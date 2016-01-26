@@ -16,6 +16,14 @@
 		"seemoney": {
 			"usage": "/seemoney <プレーヤー>",
 			"description": "プレーヤーの所持金を表示します"
+		},
+		"givemoney": {
+			"usage": "/givemoney <プレーヤー> <数値>",
+			"description": "プレーヤーにお金を支給します"
+		},
+		"takemoney": {
+			"usage": "/takemoney <プレーヤー> <数値>",
+			"description": "プレーヤーからお金を奪います"
 		}
 	},
     "language-set": "言語を%1に変更しました。",
