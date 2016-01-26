@@ -1,5 +1,43 @@
 {
     "language": "jp",
+	"commands": {
+		"mymoney": {
+			"uasge": "/mymoney",
+			"description": "自分の持っている所持金を表示します"
+		},
+		"topmoney": {
+			"uasge": "/topmoney [ページ]",
+			"description": "このサーバーのプレーヤー所持金ランキングを表示します"
+		},
+		"setmoney": {
+			"usage": "/setmoney <プレーヤー> <数値>",
+			"description": "プレーヤーの所持金を設定します"
+		},
+		"seemoney": {
+			"usage": "/seemoney <プレーヤー>",
+			"description": "プレーヤーの所持金を表示します"
+		},
+		"givemoney": {
+			"usage": "/givemoney <プレーヤー> <数値>",
+			"description": "プレーヤーにお金を支給します"
+		},
+		"takemoney": {
+			"usage": "/takemoney <プレーヤー> <数値>",
+			"description": "プレーヤーからお金を奪います"
+		},
+		"pay": {
+			"usage": "/pay <プレーヤー> <数値>",
+			"description": "プレーヤーに支払いします"
+		},
+		"setlang": {
+			"usage": "/setlang <ccTLD>",
+			"description": "自分の言語を選びます"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "自分の所持金の状況を表示します"
+		}
+	},
     "language-set": "言語を%1に変更しました。",
     "request-cancelled": "リクエストはキャンセルされました。",
     "player-not-connected": "%1はオフラインです。",

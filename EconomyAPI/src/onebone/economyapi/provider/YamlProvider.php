@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class YamlProvider implements Provider{
 	private $money;
 
 	public function __construct($file){
-		$this->config = new Config($file, Config::YAML);
+		$this->config = new Config($file, Config::YAML, ["version" => 2, "money" => []]);
 		$this->money = $this->config->getAll();
 	}
 
@@ -127,7 +127,7 @@ class YamlProvider implements Provider{
 	}
 
 	public function getAll(){
-		return $this->money;
+		return isset($this->money["money"]) ? $this->money["money"] : [];
 	}
 
 	public function save(){

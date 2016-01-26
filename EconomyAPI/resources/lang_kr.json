@@ -1,5 +1,43 @@
 {
     "language": "ko",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "자신의 돈을 보여줍니다"
+		},
+		"topmoney": {
+			"usage": "/topmoney [페이지]",
+			"description": "이 서버의 돈 순위를 보여줍니다"
+		},
+		"setmoney": {
+			"usage": "/setmoney <플레이어> <값>",
+			"description": "플레이어의 돈을 설정합니다"
+		},
+		"seemoney": {
+			"usage": "/seemoney <플레이어>",
+			"description": "플레이어의 돈을 보여줍니다"
+		},
+		"givemoney": {
+			"usage": "/givemoney <플레이어> <값>",
+			"description": "플레이어에게 돈을 지급합니다"
+		},
+		"takemoney": {
+			"usage": "/takemoney <플레이어> <값>",
+			"description": "플레이어에게서 돈을 빼앗습니다"
+		},
+		"pay": {
+			"usage": "/pay <플레이어> <값>",
+			"description": "플레이어에게 돈을 지불합니다"
+		},
+		"setlang": {
+			"usage": "/setlang <ccTLD>",
+			"description": "언어를 선택합니다"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "자신의 돈의 상태를 봅니다"
+		}
+	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
     "request-cancelled": "요청이 거부되었습니다.",
     "player-not-connected": "%1님은 서버에 접속하지 않았습니다.",
