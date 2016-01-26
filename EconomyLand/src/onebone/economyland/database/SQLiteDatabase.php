@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@ namespace onebone\economyland\database;
 
 use pocketmine\level\Level;
 use pocketmine\Player;
+use pocketmine\Server;
+use pocketmine\utils\Config;
 
 class SQLiteDatabase implements Database{
 	/**
@@ -98,7 +100,7 @@ class SQLiteDatabase implements Database{
 	public function isInvitee($id, $name){
 		$name = strtolower($name);
 		$invitee = $this->getInviteeById($id);
-		return in_array($name, $invitee) === true;
+		return in_array($name, $invitee)) === true;
 	}
 
 	public function removeInviteeById($id, $name){

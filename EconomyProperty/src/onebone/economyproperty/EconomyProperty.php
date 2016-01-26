@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -129,7 +129,7 @@ class EconomyProperty extends PluginBase implements Listener{
 					if($event->getItem()->canBePlaced()){
 						$this->placeQueue[$player->getName()] = true;
 					}
-					$player->sendMessage("You don't have permission to modify property area.");
+					$player->sendMessage("#".$info["landNum"]." You don't have permission to modify property area.");
 					return;
 				}else{
 					return;
@@ -167,7 +167,7 @@ class EconomyProperty extends PluginBase implements Listener{
 				unset($this->tap[$player->getName()]);
 			}else{
 				$this->tap[$player->getName()] = array($block->x.":".$block->y.":".$block->z, $now);
-				$player->sendMessage("[EconomyProperty] Are you sure to buy here? Tap again to confirm.");
+				$player->sendMessage("#".$info["landNum"]." [EconomyProperty] Are you sure to buy here? Tap again to confirm.");
 				$event->setCancelled(true);
 				if($event->getItem()->canBePlaced()){
 					$this->placeQueue[$player->getName()] = true;
@@ -205,7 +205,7 @@ class EconomyProperty extends PluginBase implements Listener{
 					$player->sendMessage("[EconomyProperty] You have removed property area #".$info["landNum"]);
 				}else{
 					$event->setCancelled(true);
-					$player->sendMessage("You don't have permission to modify property area.");
+					$player->sendMessage("#".$info["landNum"]." You don't have permission to modify property area.");
 				}
 			}else{
 				if($player->hasPermission("economyproperty.property.modify") === false){
@@ -238,6 +238,10 @@ class EconomyProperty extends PluginBase implements Listener{
 		if($this->checkOverlapping($first, $sec, $level)){
 			return false;
 		}
+		if(EconomyLand::getInstance()->checkOverlap($first[0], $sec[0], $first[1], $sec[1], $level)){
+			return false;
+		}
+
 		$price = round($price, 2);
 
 		$centerx = (int) ($first[0] + round(((($sec[0]) - $first[0])) / 2));
@@ -315,5 +319,13 @@ class EconomyProperty extends PluginBase implements Listener{
 			$player = $player->getName();
 		}
 		return isset($this->touch[$player]) === true;
+	}
+
+	public function removeProperty($id){
+		$this->property->exec("DELETE FROM Property WHERE landNum = $id");
+	}
+
+	public function propertyExists($id){
+		return !is_bool($this->property->query("SELECT * FROM Property WHERE landNum = $id"));
 	}
 }

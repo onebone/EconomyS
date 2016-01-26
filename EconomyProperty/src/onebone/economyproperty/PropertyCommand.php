@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -143,6 +143,21 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 				$result = $this->plugin->switchTouchQueue($sender->getName());
 				$sender->sendMessage($result ? "[EconomyProperty] Your touch queue has been turned on.":"[EconomyProperty] Your touch queue has been turned off.");
 				break;
+			case "rm":
+				$id = array_shift($params);
+
+				if(!is_numeric($id)){
+					$sender->sendMessage(TextFormat::RED . "Usage: " . $command->getUsage());
+					return true;
+				}
+
+				if($this->plugin->propertyExists($id)){
+					$this->plugin->removeProperty($id);
+					$sender->sendMessage("[EconomyProperty] Removed property #".$id);
+				}else{
+					$sender->sendMessage("[EconomyProperty] There is no property with id #".$id);
+				}
+				return true;
 			default:
 				$sender->sendMessage("Usage: ".$this->usageMessage);
 		}

@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2015  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -714,6 +714,10 @@ class EconomyLand extends PluginBase implements Listener{
 
 	public function getLandInfo($landId){
 		return $this->db->getLandById($landId);
+	}
+
+	public function checkOverlap($startX, $endX, $startZ, $endZ, $level){
+		return $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
 	}
 
 	public function getMessage($key, $value = array("%1", "%2", "%3")){
