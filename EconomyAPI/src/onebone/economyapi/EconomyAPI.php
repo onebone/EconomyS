@@ -377,7 +377,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		$commands = [
 			"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand",
 			"topmoney" => "\\onebone\\economyapi\\command\\TopMoneyCommand",
-			"setmoney" => "\\onebone\\economyapi\\command\\SetMoneyCommand"
+			"setmoney" => "\\onebone\\economyapi\\command\\SetMoneyCommand",
+			"seemoney" => "\\onebone\\economyapi\\command\\SeeMoneyCommand"
 		];
 		foreach($commands as $cmd => $class){
 			$map->register("economyapi", new $class($this));

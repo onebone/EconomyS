@@ -10,8 +10,12 @@
 			"description": "このサーバーのプレーヤー所持金ランキングを表示します"
 		},
 		"setmoney": {
-			"usage": "/setmoney [数値]",
+			"usage": "/setmoney <プレーヤー> <数値>",
 			"description": "プレーヤーの所持金を設定します"
+		},
+		"seemoney": {
+			"usage": "/seemoney <プレーヤー>",
+			"description": "プレーヤーの所持金を表示します"
 		}
 	},
     "language-set": "言語を%1に変更しました。",

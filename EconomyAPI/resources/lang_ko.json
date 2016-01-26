@@ -12,6 +12,10 @@
 		"setmoney": {
 			"usage": "/setmoney <플레이어> <값>",
 			"description": "플레이어의 돈을 설정합니다"
+		},
+		"seemoney": {
+			"usage": "/seemoney <플레이어>",
+			"description": "플레이어의 돈을 보여줍니다"
 		}
 	},
     "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
