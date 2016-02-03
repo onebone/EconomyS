@@ -429,6 +429,14 @@ class EconomyLand extends PluginBase implements Listener{
 					if($sender->getName() === $player->getName()){
 						$sender->sendMessage($this->getMessage("cannot-give-land-myself"));
 					}else{
+						if(is_numeric($this->config->get("player-land-limit"))){
+							$cnt = count($this->db->getLandsByOwner($player->getName()));
+							if($cnt >= $this->config->get("player-land-limit")){
+								$sender->sendMessage($this->getMessage("give-land-limit", array($player->getName(), $cnt, $this->config->get("player-land-limit"), "%4")));
+								return true;
+							}
+						}
+
 					//	$this->land->exec("UPDATE land SET owner = '{$player->getName()}' WHERE ID = {$info["ID"]}");
 						$this->db->setOwnerById($info["ID"], $player->getName());
 						$sender->sendMessage($this->getMessage("gave-land", array($landnum, $player->getName(), "%3")));
@@ -763,6 +771,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"gave-land" => "Has been gave land %1 for %2",
 			"got-land" => "[EconomyLand] %1 gave you land %2",
 			"land-limit" => "You have %1 lands. The limit of land is %2",
+			"give-land-limit" => "%1 has %2 lands. The limit of land is %3",
 			"set-first-position" => "Please set first position",
 			"set-second-position" => "Please set second position",
 			"not-allowed-to-buy" => "This world is not allowed to buy land",
