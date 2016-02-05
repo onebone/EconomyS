@@ -11,7 +11,7 @@
 		},
 		"setmoney": {
 			"usage": "/setmoney <玩家名称> <数值>",
-			"description": "设定玩家的金钱"
+			"description": "设置玩家的金钱"
 		},
 		"seemoney": {
 			"usage": "/seemoney <玩家名称>",
