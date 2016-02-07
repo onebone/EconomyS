@@ -280,9 +280,17 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 
 	public function onEnable(){
-		if(!$this->getDataFolder()){
-			mkdir($this->getDataFolder());
-		}
+		/*
+		 * 디폴트 설정 파일을 먼저 생성하게 되면 데이터 폴더 파일이 자동 생성되므로
+		 * 'Failed to open stream: No such file or directory' 경고 메시지를 없앨 수 있습니다
+		 * - @64FF00
+		 *
+		 * [추가 옵션]
+		 * if(!file_exists($this->dataFolder))
+		 *     mkdir($this->dataFolder, 0755, true);
+		 */
+		$this->saveDefaultConfig();
+		
 		if(!is_file($this->getDataFolder()."PlayerLang.dat")){
 			file_put_contents($this->getDataFolder()."PlayerLang.dat", serialize([]));
 		}
@@ -294,8 +302,6 @@ class EconomyAPI extends PluginBase implements Listener{
 		if(!isset($this->playerLang["rcon"])){
 			$this->playerLang["rcon"] = $this->getConfig()->get("default-lang");
 		}
-
-		$this->saveDefaultConfig();
 		$this->initialize();
 
 		if($this->getConfig()->get("auto-save-interval") > 0){
