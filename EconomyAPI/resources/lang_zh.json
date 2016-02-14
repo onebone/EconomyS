@@ -1,9 +1,48 @@
 {
     "language": "zh",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "查看您的金錢"
+		},
+		"topmoney": {
+			"usage": "/topmoney [頁數]",
+			"description": "查看此伺服器的金錢排行"
+		},
+		"setmoney": {
+			"usage": "/setmoney <玩家名稱> <數值>",
+			"description": "設定玩家的金錢"
+		},
+		"seemoney": {
+			"usage": "/seemoney <玩家名稱>",
+			"description": "查看玩家的金錢"
+		},
+		"givemoney": {
+			"usage": "/givemoney <玩家名稱> <數值>",
+			"description": "給玩家金錢"
+		},
+		"takemoney": {
+			"usage": "/takemoney <玩家名稱> <數值>",
+			"description": "拿走玩家的金錢"
+		},
+		"pay": {
+			"usage": "/pay <玩家名稱> <數值>",
+			"description": "付款給玩家"
+		},
+		"setlang": {
+			"usage": "/setlang <ccTLD>",
+			"description": "設定您的語言"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "查看您的金錢狀態"
+		}
+	},
     "language-set": "語言被設定為 %1",
     "request-cancelled": "您的請求已被取消",
     "player-not-connected": "玩家 %1 目前不在伺服器上",
     "player-never-connected": "伺服器中不存在玩家 %1",
+    "topmoney-tag": "- 查看伺服器金錢排行 (%1 of %2) -",
     "topmoney-format": "[%1] %2: %3",
     "pay-failed": "付款失敗",
     "pay-success": "付款 %1 %MONETARY_UNIT% 給 %2",
