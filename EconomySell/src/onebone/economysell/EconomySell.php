@@ -57,11 +57,11 @@ class EconomySell extends PluginBase implements Listener{
 	private $items = [];
 
 	public function onEnable(){
-		if(!file_exists($this->getDataFolder())){
-			mkdir($this->getDataFolder());
-		}
-
 		$this->saveDefaultConfig();
+
+		if(!$this->selectLang()){
+			$this->getLogger()->warning("Invalid language option was given.");
+		}
 
 		$provider = $this->getConfig()->get("data-provider");
 		switch(strtolower($provider)){
@@ -90,9 +90,6 @@ class EconomySell extends PluginBase implements Listener{
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-
-		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true);
-		@fclose($rsc);
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
@@ -360,6 +357,20 @@ class EconomySell extends PluginBase implements Listener{
 			return str_replace($search, $replace, $this->lang[$key]);
 		}
 		return "Could not find \"$key\".";
+	}
+
+	private function selectLang(){
+		foreach(preg_grep("/.*lang_.{2}\\.json$/", $this->getResources()) as $resource){
+			$lang = substr($resource, -7, -5);
+			if($this->getConfig()->get("lang", "en") === $lang){
+				$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_".$lang.".json"))), true);
+				@fclose($rsc);
+				return true;
+			}
+		}
+		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true);
+		@fclose($rsc);
+		return false;
 	}
 
 	private function replaceColors(&$search = [], &$replace = []){
