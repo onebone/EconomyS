@@ -20,7 +20,6 @@
 
 namespace onebone\economyapi\task;
 
-use pocketmine\command\CommandSender;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\Player;
@@ -35,14 +34,14 @@ class SortTask extends AsyncTask{
 	private $topList;
 
 	/**
-	 * @param CommandSender		$player
+	 * @param string			$player
 	 * @param array				$moneyData
 	 * @param bool				$addOp
 	 * @param int				$page
 	 * @param array				$ops
 	 * @param array				$banList
 	 */
-	public function __construct(CommandSender $sender, array $moneyData, bool $addOp, int $page, array $ops, array $banList){
+	public function __construct(string $sender, array $moneyData, bool $addOp, int $page, array $ops, array $banList){
 		$this->sender = $sender;
 		$this->moneyData = $moneyData;
 		$this->addOp = $addOp;
@@ -83,18 +82,22 @@ class SortTask extends AsyncTask{
 	}
 
 	public function onCompletion(Server $server){
-		if($this->sender !== null){
+		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player){ // TODO: Rcon
 			$plugin = EconomyAPI::getInstance();
 
-			$output = ($plugin->getMessage("topmoney-tag", [$this->page, $this->max], $this->sender->getName())."\n");
-			$message = ($plugin->getMessage("topmoney-format", [], $this->sender->getName())."\n");
+			$output = ($plugin->getMessage("topmoney-tag", [$this->page, $this->max], $this->sender)."\n");
+			$message = ($plugin->getMessage("topmoney-format", [], $this->sender)."\n");
 
 			foreach(unserialize($this->topList) as $n => $list){
 				$output .= str_replace(["%1", "%2", "%3"], [$n, $list[0], $list[1]], $message);
 			}
 			$output = substr($output, 0, -1);
 
-			$this->sender->sendMessage($output);
+			if($this->sender === "CONSOLE"){
+				$plugin->getLogger()->info($output);
+			}else{
+				$player->sendMessage($output);
+			}
 		}
 	}
 }
