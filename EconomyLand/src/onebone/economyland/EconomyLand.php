@@ -75,11 +75,9 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->createConfig();
 
 		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
-			$interval = $interval * 1200;
 			if($interval > 0){
+				$interval = $interval * 1200;
 				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
-			}else{
-				//doing nothing
 			}
 		}
 
@@ -91,8 +89,6 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
 		}
 
-		//$this->land = new \SQLite3($this->getDataFolder()."Land.sqlite3");
-		//$this->land->exec(stream_get_contents($this->getResource("sqlite3.sql")));
 		switch(strtolower($this->config->get("database-type"))){
 			case "yaml":
 			case "yml":
@@ -115,15 +111,13 @@ class EconomyLand extends PluginBase implements Listener{
 	public function expireLand($landId){
 		if(!isset($this->expire[$landId])) return;
 		$landId = (int)$landId;
-		//$info = $this->land->query("SELECT * FROM land WHERE ID = $landId")->fetchArray(SQLITE3_ASSOC);
-		//if(is_bool($info)) return;
+
 		$info = $this->db->getLandById($landId);
 		if($info === false) return;
 		$player = $info["owner"];
 		if(($player = $this->getServer()->getPlayerExact($player)) instanceof Player){
 			$player->sendMessage("[EconomyLand] Your land #$landId has expired.");
 		}
-		//$this->land->exec("DELETE FROM land WHERE ID = $landId");
 		$this->db->removeLandById($landId);
 		unset($this->expire[$landId]);
 		return;
@@ -223,7 +217,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("not-allowed-to-buy"));
 					return true;
 				}
-			//	$result = $this->land->query("SELECT * FROM land WHERE owner = '{$sender->getName()}'");
+
 				$cnt = count($this->db->getLandsByOwner($sender->getName()));
 
 				if(is_numeric($this->config->get("player-land-limit"))){
@@ -231,14 +225,6 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"), "%3", "%4")));
 						return true;
 					}
-				/*	while($result->fetchArray(SQLITE3_ASSOC) !== false){
-						++$cnt;
-						if($cnt >= $this->config->get("player-land-limit")){
-							$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"))));
-							return true;
-						}
-					}*/
-
 				}
 				if(!isset($this->start[$sender->getName()])){
 					$sender->sendMessage($this->getMessage("set-first-position"));
@@ -264,11 +250,6 @@ class EconomyLand extends PluginBase implements Listener{
 					$endZ = $backup;
 				}
 
-				/*$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '{$sender->getLevel()->getFolderName()}'")->fetchArray(SQLITE3_ASSOC);
-				if(!is_bool($result)){
-					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], "", "")));
-					return true;
-				}*/
 				$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName());
 				if($result){
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], $result["ID"], "%3")));
@@ -279,7 +260,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 					return true;
 				}
-			//	$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee) VALUES ($startX, $endX, $startZ, $endZ, '{$sender->getName()}', '{$this->start[$sender->getName()]["level"]}', $price, ',')");
+
 				$this->db->addLand($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName(), $price, $sender->getName());
 				unset($this->start[$sender->getName()], $this->end[$sender->getName()]);
 				$sender->sendMessage($this->getMessage("bought-land", array($price, "%2", "%3")));
@@ -323,17 +304,14 @@ class EconomyLand extends PluginBase implements Listener{
 					$player = $sender->getName();
 					$alike = false;
 				}
-			///	$result = $this->land->query("SELECT * FROM land WHERE owner ".($alike ? "LIKE '%".$player."%'" : "= '".$player."'"));
 				if($alike){
 					$lands = $this->db->getLandsByKeyword($player);
 				}else{
 					$lands = $this->db->getLandsByOwner($player);
 				}
 				$sender->sendMessage("Results from query : $player\n");
-			//	while(($info = $result->fetchArray(SQLITE3_ASSOC)) !== false){
 				foreach($lands as $info)
 					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], (($info["endX"] + 1) - ($info["startX"] - 1) - 1) * (($info["endZ"] + 1) - ($info["startZ"] - 1) - 1 ), $info["owner"])));
-				//}
 				break;
 				case "move":
 				if(!$sender instanceof Player){
@@ -353,9 +331,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage("Usage: /land move <land num>");
 					return true;
 				}
-				//$result = $this->land->query("SELECT * FROM land WHERE ID = $num");
 
-			//	$info = $result->fetchArray(SQLITE3_ASSOC);
 				$info = $this->db->getLandById($num);
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-land-found", array($num, "", "")));
@@ -417,7 +393,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("player-not-connected", [$username, "%2", "%3"]));
 					return true;
 				}
-			//	$info = $this->land->query("SELECT * FROM land WHERE ID = $landnum")->fetchArray(SQLITE3_ASSOC);
+
 				$info = $this->db->getLandById($landnum);
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
@@ -437,7 +413,6 @@ class EconomyLand extends PluginBase implements Listener{
 							}
 						}
 
-					//	$this->land->exec("UPDATE land SET owner = '{$player->getName()}' WHERE ID = {$info["ID"]}");
 						$this->db->setOwnerById($info["ID"], $player->getName());
 						$sender->sendMessage($this->getMessage("gave-land", array($landnum, $player->getName(), "%3")));
 						$player->sendMessage($this->getMessage("got-land", array($sender->getName(), $landnum, "%3")));
@@ -459,8 +434,6 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
 						return true;
 					}
-					//$result = $this->land->query("SELECT * FROM land WHERE ID = $landnum");
-					//$info = $result->fetchArray(SQLITE3_ASSOC);
 					$info = $this->db->getLandById($landnum);
 					if($info === false){
 						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
@@ -469,11 +442,6 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 						return true;
 					}else{
-						/*if(strpos($info["invitee"], ",".$player.",") !== false){
-							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
-							return true;
-						}
-						$this->land->exec("UPDATE land SET invitee = '".$info["invitee"].$player.",' WHERE ID = {$info["ID"]};");*/
 						if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0){
 							$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "%2", "%3"]));
 							return true;
@@ -564,8 +532,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$x = $sender->getX();
 				$z = $sender->getZ();
-				//$result = $this->land->query("SELECT * FROM land WHERE (startX < $x AND endX > $x) AND (startZ < $z AND endZ > $z) AND level = '{$sender->getLevel()->getFolderName()}'");
-				//$info = $result->fetchArray(SQLITE3_ASSOC);
+
 				$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-one-owned"));
@@ -583,7 +550,6 @@ class EconomyLand extends PluginBase implements Listener{
 			default:
 				$p = $id;
 				if(is_numeric($p)){
-					//$info = $this->land->query("SELECT * FROM land WHERE ID = $p")->fetchArray(SQLITE3_ASSOC);
 					$info = $this->db->getLandById($p);
 					if($info === false){
 						$sender->sendMessage($this->getMessage("no-land-found", array($p, "%2", "%3")));
@@ -592,7 +558,7 @@ class EconomyLand extends PluginBase implements Listener{
 					if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")){
 						EconomyAPI::getInstance()->addMoney($sender, ($info["price"] / 2), true, "EconomyLand");
 						$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
-						//$this->land->exec("DELETE FROM land WHERE ID = $p");
+
 						$this->db->removeLandById($p);
 					}else{
 						$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "%3")));
@@ -641,9 +607,6 @@ class EconomyLand extends PluginBase implements Listener{
 			return false;
 		}
 
-		//$exist = false;
-		//$result = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX > $x AND endZ > $z AND startX < $x AND startZ < $z");
-		//if(!is_array($info)) goto checkLand;
 		$info = $this->db->canTouch($x, $z, $level, $player);
 		if($info === -1){
 			if($this->config->get("white-world-protection")){
@@ -711,17 +674,15 @@ class EconomyLand extends PluginBase implements Listener{
 		$endX++;
 		$startZ--;
 		$endZ++;
-	//	$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
+
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
 
 		if($result !== false){
 			return self::RET_LAND_OVERLAP;
 		}
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
-	//	$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, ','".($expires === null ? "":", $expires").")");
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
 		if($expires !== null){
-			//$info = $this->land->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC);
 			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
 			$this->expire[$id] = array(
 				$expires * 60,
@@ -803,7 +764,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
- +			"not-owned" => "[EconomyLand] You must buy land to edit this block",
+			"not-owned" => "[EconomyLand] You must buy land to edit this block",
 			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game."
 		));
 	}
