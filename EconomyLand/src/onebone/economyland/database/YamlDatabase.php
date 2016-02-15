@@ -42,7 +42,7 @@ class YamlDatabase implements Database{
 		if(count($this->land) > 0){
 			$land = $this->land;
 			$this->landNum = end($land)["ID"] + 1;
-		}
+		}/* Disable database Converted temporarily. Wait onebone make it support SQL.
 		if(is_file($otherName)){
 			$sq = new \SQLite3($otherName);
 			$cnt = 0;
@@ -64,14 +64,16 @@ class YamlDatabase implements Database{
 					"invitee" => $invitee,
 					"price" => $d["price"],
 					"expires" => $d["expires"]
-				];*/
+					"cantp" => $d["cantp"]
+					"canpvp" => $d["canpvp"]
+				];*//*
 				$this->addLand($d["startX"], $d["endX"], $d["startZ"], $d["endZ"], $d["level"], $d["price"], $d["owner"], $d["expires"], $invitee);
 				++$cnt;
 			}
 			$sq->close();
 			Server::getInstance()->getLogger()->notice("[EconomyLand] Converted $cnt data into new database");
 			@unlink($otherName);
-		}
+		}*/
 		$this->config = $config;
 	}
 
@@ -140,7 +142,7 @@ class YamlDatabase implements Database{
 		return false;
 	}
 
-	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []){
+	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = [],$cantp = true ,$canpvp = true){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
@@ -157,9 +159,11 @@ class YamlDatabase implements Database{
 			"owner" => $owner,
 			"level" => $level,
 			"invitee" => [],
-			"expires" => $expires
+			"expires" => $expires,
+			"cantp" => $cantp,
+			"canpvp" => $canpvp
 		];
-		Server::getInstance()->getPluginManager()->callEvent(new LandAddedEvent($this->landNum, $startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires));
+		Server::getInstance()->getPluginManager()->callEvent(new LandAddedEvent($this->landNum, $startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires, $cantp, $canpvp));
 		return $this->landNum++;
 	}
 
@@ -171,11 +175,39 @@ class YamlDatabase implements Database{
 		return false;
 	}
 
+	public function setsettingById($id, $keyword, $value){
+		if(isset($this->land[$id])){
+			$keyword = strtolower($keyword);
+			if($value === "false"){
+				$value = false;
+			}elseif($value === "true"){
+				$value = true;
+			}else{
+				return false;
+			}
+			if($keyword == "cantp" or $keyword == "canpvp"){
+				$this->land[$id][$keyword] = $value;
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public function removeLandById($id){
 		if(isset($this->land[$id])){
 			Server::getInstance()->getPluginManager()->callEvent(($ev = new LandRemoveEvent($id)));
 			if(!$ev->isCancelled()){
 				unset($this->land[$id]);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public function isinvitee($id, Player $player){
+		if(isset($this->land[$id])){
+			$land = $this->land[$id];
+			if($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()]) or $player->hasPermission("economyland.land.modify.others")){
 				return true;
 			}
 		}

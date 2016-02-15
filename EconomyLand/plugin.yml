@@ -90,6 +90,9 @@ permissions:
        economyland.command.land.invitee:
         description: Allows player to see invitee
         default: true
+       economyland.command.land.set:
+        description: Allows player to change setting of their land
+        default: true
          
      economyland.command.landsell:
       description: Allows player to sell lands
@@ -112,8 +115,8 @@ commands:
   permission: economyland.command.endp
  land:
   description: Manage land
-  usage: /land <buy|move|list|whose|give|here|[r:]invite|invitee>
-  permission: economyland.command.land;economyland.command.land.buy;economyland.command.land.move;economyland.command.land.list;economyland.command.land.whose;economyland.command.land.give;economyland.command.land.here;economyland.command.land.invite;economyland.command.land.invite.remove;economyland.command.land.invitee
+  usage: /land <buy|move|list|whose|give|here|[r:]invite|invitee|set>
+  permission: economyland.command.land;economyland.command.land.buy;economyland.command.land.move;economyland.command.land.list;economyland.command.land.whose;economyland.command.land.give;economyland.command.land.here;economyland.command.land.invite;economyland.command.land.invite.remove;economyland.command.land.invitee;economyland.command.land.set
  landsell:
   description: Sell land
   usage: /landsell <here|land num>
