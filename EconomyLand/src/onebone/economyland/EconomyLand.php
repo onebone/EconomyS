@@ -468,20 +468,6 @@ class EconomyLand extends PluginBase implements Listener{
 					}elseif($info["owner"] !== $sender->getName()){
 						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 						return true;
-					}elseif(substr($player, 0, 2) === "r:"){
-						if(!$sender->hasPermission("economyland.command.land.invite.remove")){
-							$sender->sendMessage($this->getMessage("no-permission-command"));
-							return true;
-						}
-						$player = substr($player, 2);
-
-						//$this->land->exec("UPDATE land SET invitee = '".str_replace($player.",", "", $info["invitee"])."' WHERE ID = {$info["ID"]};");
-						$result = $this->db->removeInviteeById($landnum, $player);
-						if($result === false){
-							$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "%3")));
-							return true;
-						}
-						$sender->sendMessage($this->getMessage("removed-invitee", array($player, $landnum, "%3")));
 					}else{
 						/*if(strpos($info["invitee"], ",".$player.",") !== false){
 							$sender->sendMessage($this->getMessage("already-invitee", array($player, "", "")));
@@ -498,6 +484,39 @@ class EconomyLand extends PluginBase implements Listener{
 							return true;
 						}
 						$sender->sendMessage($this->getMessage("success-invite", array($player, $landnum, "%3")));
+					}
+					return true;
+				case "kick":
+					if(!$sender->hasPermission("economyland.command.land.invite.remove")){
+						$sender->sendMessage($this->getMessage("no-permission-command"));
+						return true;
+					}
+					$landnum = array_shift($param);
+					$player = array_shift($param);
+
+					if(trim($player) === ""){
+						$sender->sendMessage(TextFormat::RED . "Usage: " . $command->getUsage());
+						return true;
+					}
+					if(!is_numeric($landnum)){
+						$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
+						return true;
+					}
+
+					$info = $this->db->getLandById($landnum);
+					if($info === false){
+						$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
+						return true;
+					}
+
+					if($sender->hasPermission("economyland.command.land.invite.remove.others") and $info["owner"] !== $sender->getName()
+						or $info["owner"] === $sender->getName()){
+							$result = $this->db->removeInviteeById($landnum, $player);
+							if($result === false){
+								$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "%3")));
+								return true;
+							}
+							$sender->sendMessage($this->getMessage("removed-invitee", array($player, $landnum, "%3")));
 					}
 					return true;
 				case "invitee":
