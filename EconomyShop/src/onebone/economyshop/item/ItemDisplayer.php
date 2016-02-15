@@ -48,17 +48,15 @@ class ItemDisplayer{
 	}
 
 	public function spawnTo(Player $player){
-		if($player->getLevel() === $this->pos->getLevel()){
-			$pk = new AddItemEntityPacket;
-			$pk->eid = $this->eid;
-			$pk->item = $this->item;
-			$pk->x = $this->pos->x + 0.5;
-			$pk->y = $this->pos->y;
-			$pk->z = $this->pos->z + 0.5;
-			$pk->speedX = $pk->speedY = $pk->speedZ = 0;
+		$pk = new AddItemEntityPacket;
+		$pk->eid = $this->eid;
+		$pk->item = $this->item;
+		$pk->x = $this->pos->x + 0.5;
+		$pk->y = $this->pos->y;
+		$pk->z = $this->pos->z + 0.5;
+		$pk->speedX = $pk->speedY = $pk->speedZ = 0;
 
-			$player->dataPacket($pk);
-		}
+		$player->dataPacket($pk);
 	}
 
 	public function spawnToAll(Level $level = null){

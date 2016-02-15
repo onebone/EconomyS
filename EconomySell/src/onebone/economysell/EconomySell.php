@@ -20,8 +20,6 @@
 
 namespace onebone\economysell;
 
-use onebone\economysell\event\SellCreationEvent;
-use onebone\economysell\event\SellTransactionEvent;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\block\BlockBreakEvent;
@@ -29,7 +27,7 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerMoveEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
@@ -38,9 +36,12 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
+
 use onebone\economysell\provider\DataProvider;
 use onebone\economysell\provider\YamlDataProvider;
 use onebone\economysell\item\ItemDisplayer;
+use onebone\economysell\event\SellCreationEvent;
+use onebone\economysell\event\SellTransactionEvent;
 
 class EconomySell extends PluginBase implements Listener{
 	/**
@@ -187,13 +188,19 @@ class EconomySell extends PluginBase implements Listener{
 		}
 	}
 
-	public function onPlayerTeleport(PlayerMoveEvent $event){
-		if($event->getFrom()->getLevel() !== $event->getTo()->getLevel()){
-			$to = $event->getTo()->getLevel();
-			if(isset($this->items[$to->getFolderName()])){
-				$player = $event->getPlayer();
-				foreach($this->items[$to->getFolderName()] as $displayer){
-					$displayer->spawnTo($player);
+	public function onPlayerTeleport(EntityTeleportEvent $event){
+		$player = $event->getEntity();
+		if($player instanceof Player){
+			if(($from = $event->getFrom()->getLevel()) !== ($to = $event->getTo()->getLevel())){
+				if(isset($this->items[$from->getFolderName()])){
+					foreach($this->items[$from->getFolderName()] as $displayer){
+						$displayer->despawnFrom($player);
+					}
+				}
+				if(isset($this->items[$to->getFolderName()])){
+					foreach($this->items[$to->getFolderName()] as $displayer){
+						$displayer->spawnTo($player);
+					}
 				}
 			}
 		}
