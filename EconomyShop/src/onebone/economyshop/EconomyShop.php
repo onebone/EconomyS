@@ -90,9 +90,6 @@ class EconomyShop extends PluginBase implements Listener{
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
-
-		$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_en.json"))), true); // TODO: Language preferences
-		@fclose($rsc);
 	}
 
 	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
@@ -288,7 +285,7 @@ class EconomyShop extends PluginBase implements Listener{
 					unset($this->tap[$iusername]);
 				}else{
 					$this->tap[$iusername] = $now;
-					$player->sendMessage($this->getMessage("tap-again", [$shop[7], $shop[6], $shop[8]]));
+					$player->sendMessage($this->getMessage("tap-again", [$shop[6], $shop[7], $shop[8]]));
 				}
 			}else{
 				$this->buyItem($player, $shop);

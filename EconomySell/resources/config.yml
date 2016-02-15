@@ -6,5 +6,5 @@ enable-double-tap: true
 auto-save: true
 # Sell center data provider (yaml)
 data-provider: yaml
-# Language of EconomySell will use (en)
+# Language of EconomySell will use (en, ko, jp)
 lang: en

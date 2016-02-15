@@ -6,5 +6,5 @@ enable-double-tap: true
 auto-save: true
 # Shop data provider (yaml)
 data-provider: yaml
-# Language of EconomyShop will use (en)
+# Language of EconomyShop will use (en, ko, jp)
 lang: en
