@@ -1,0 +1,17 @@
+{
+	"invalid-side": "&4无法识别的面.",
+	"removed-queue": "&2移除回收中心创建队列.",
+	"added-queue": "&2添加回收中心创建队列. 点击你想创建的地方.",
+	"removed-rm-queue": "&2移除回收中心移除队列.",
+	"added-rm-queue": "&2添加回收中心移除队列. 点击你想移除的商店.",
+	"sell-create-failed": "&4未知原因,无法创建回收中心.",
+	"sell-already-exist": "&4该方块已经存在回收中心.",
+	"sell-created": "&2回收中心创建成功.",
+	"sell-removed": "&2回收中心移除成功.",
+	"no-permission-sell": "&4你没有权限出售物品.",
+	"tap-again": "&e再次点击以出售 &2%2&e 个 &b%1&e 获得 &6%MONETARY_UNIT%%3&e.",
+	"no-item": "你没有足够的物品出售 &4%1&r.",
+	"failed-sell": "&4未知原因出售失败.",
+	"sold-item": "你成功出售 %2 个 &b%1&r 获得 &6%MONETARY_UNIT%%3&r.",
+	"sell-breaking-forbidden": "&4你不能破坏回收中心."
+}
