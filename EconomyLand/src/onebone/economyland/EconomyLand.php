@@ -155,8 +155,8 @@ class EconomyLand extends PluginBase implements Listener{
 				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
-			$x = (int) $sender->x;
-			$z = (int) $sender->z;
+			$x = floor($sender->x);
+			$z = floor($sender->z);
 			$level = $sender->getLevel()->getFolderName();
 			$this->start[$sender->getName()] = array("x" => $x, "z" => $z, "level" => $level);
 			$sender->sendMessage($this->getMessage("first-position-saved"));
@@ -177,8 +177,8 @@ class EconomyLand extends PluginBase implements Listener{
 
 			$startX = $this->start[$sender->getName()]["x"];
 			$startZ = $this->start[$sender->getName()]["z"];
-			$endX = (int) $sender->x;
-			$endZ = (int) $sender->z;
+			$endX = floor($sender->x);
+			$endZ = floor($sender->z);
 			$this->end[$sender->getName()] = array(
 				"x" => $endX,
 				"z" => $endZ
@@ -235,10 +235,10 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$l = $this->start[$sender->getName()];
 				$endp = $this->end[$sender->getName()];
-				$startX = (int) $l["x"];
-				$endX = (int) $endp["x"];
-				$startZ = (int) $l["z"];
-				$endZ = (int) $endp["z"];
+				$startX = floor($l["x"]);
+				$endX = floor($endp["x"]);
+				$startZ = floor($l["z"]);
+				$endZ = floor($endp["z"]);
 				if($startX > $endX){
 					$backup = $startX;
 					$startX = $endX;
