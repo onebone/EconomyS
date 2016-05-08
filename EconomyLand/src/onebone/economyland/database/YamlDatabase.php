@@ -79,8 +79,8 @@ class YamlDatabase implements Database{
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		$x=(int)$x;
-		$z=(int)$z;
+		$x=floor($x);
+		$z=floor($z);
 		foreach($this->land as $land){
 			if($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z){
 				return $land;
