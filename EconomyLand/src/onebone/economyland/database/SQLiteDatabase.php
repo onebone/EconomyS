@@ -100,7 +100,7 @@ class SQLiteDatabase implements Database{
 	public function isInvitee($id, $name){
 		$name = strtolower($name);
 		$invitee = $this->getInviteeById($id);
-		return in_array($name, $invitee)) === true;
+		return in_array($name, $invitee) === true;
 	}
 
 	public function removeInviteeById($id, $name){
