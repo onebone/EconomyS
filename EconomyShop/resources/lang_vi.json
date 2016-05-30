@@ -1,0 +1,18 @@
+{
+  "invalid-side": "&4Tùy chọn không hợp lệ đã được đưa ra.",
+  "removed-queue": "&2Đã ra khỏi hàng đợi tạo cửa hàng.",
+  "added-queue": "&2Thêm để mua sắm hàng đợi sáng tạo. Chạm vào nơi bạn muốn tạo.",
+  "removed-rm-queue": "&2Đã ra khỏi hàng đợi loại bỏ cửa hàng.",
+  "added-rm-queue": "&2Thêm vào hàng đợi loại bỏ cửa hàng. Chạm vào nơi bạn muốn loại bỏ.",
+  "shop-create-failed": "&4Không tạo cửa hàng vì lý do không rõ.",
+  "shop-already-exist": "&4Cửa hàng đã tồn tại.",
+  "shop-created": "&2Shop đã được tạo thành công.",
+  "shop-removed": "&2Shop đã được gỡ bỏ thành công.",
+  "no-permission-buy": "&4Bạn không có quyền mua.",
+  "tap-again": "&eChạm một lần nữa để mua &2%2&e &b%1&e cho &6%MONETARY_UNIT%%3&e.",
+  "no-money": "Bạn không có &4%MONETARY_UNIT%%1&r để mua &4%2%&r.",
+  "full-inventory": "&4Bạn không có rãnh hàng tồn kho để mua hàng.",
+  "failed-buy": "&4Không thể mua hàng vì lý do không rõ.",
+  "bought-item": "Bạn đã mua hàng %2 &b%1&r cho &6%MONETARY_UNIT%%3%&r.",
+  "shop-breaking-forbidden": "&4Bạn không thể phá shop."
+}
