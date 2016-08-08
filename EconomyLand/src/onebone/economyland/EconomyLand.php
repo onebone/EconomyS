@@ -202,7 +202,7 @@ class EconomyLand extends PluginBase implements Listener{
 			$sender->sendMessage($this->getMessage("confirm-buy-land", array($price, "%2", "%3")));
 
 			if(($land = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel())) !== false){
-				$sender->sendMessage($this->getMessage("confirm-warning", [$land->getID()]));
+				$sender->sendMessage($this->getMessage("confirm-warning", [$land["ID"], "%2", "%3"]));
 			}
 			return true;
 			case "land":
