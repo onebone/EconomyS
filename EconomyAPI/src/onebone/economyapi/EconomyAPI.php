@@ -290,7 +290,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		 *     mkdir($this->dataFolder, 0755, true);
 		 */
 		$this->saveDefaultConfig();
-		
+
 		if(!is_file($this->getDataFolder()."PlayerLang.dat")){
 			file_put_contents($this->getDataFolder()."PlayerLang.dat", serialize([]));
 		}
