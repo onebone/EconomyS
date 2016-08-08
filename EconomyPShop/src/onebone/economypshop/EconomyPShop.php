@@ -80,6 +80,11 @@ class EconomyPShop extends PluginBase implements Listener{
 				return;
 			}
 
+			if(in_array(strtolower($event->getBlock()->getLevel()->getFolderName()), $this->getConfig()->get("disallow-worlds", []))){
+				$player->sendMessage($this->getMessage("disallowed-world"));
+				return;
+			}
+
 			$money = \onebone\economyapi\EconomyAPI::getInstance()->myMoney($player->getName());
 			if($money < $this->getConfig()->get("shop-tax")){
 				$player->sendMessage($this->getMessage("no-shop-tax"));
@@ -106,7 +111,6 @@ class EconomyPShop extends PluginBase implements Listener{
 				$player->sendMessage($this->getMessage("item-not-support", array($line[2], "", "")));
 				return;
 			}
-
 
 			$block = $event->getBlock();
 			$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = [
