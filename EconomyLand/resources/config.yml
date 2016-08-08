@@ -1,0 +1,17 @@
+# Whether to allow players to overlap their lands if it is owned by same player
+allow-overlap: false
+# Worlds to protect by default. Players will have to buy land in order to modify the terrain.
+white-world-protection: []
+# Worlds not to be checked by EconomyLand. This option is for performance improvements.
+# DO NOT TOUCH this option if you don't know what it is.
+non-check-worlds: []
+# Worlds to disallow players to buy
+buying-disallowed-worlds: []
+# Limit of lands
+player-land-limit: NaN
+# Price of land per one vertical area
+price-per-y-axis: 100
+# Interval of auto saving
+auto-save-interval: 10
+# Type of database provider (Available: yaml)
+database-type: yaml

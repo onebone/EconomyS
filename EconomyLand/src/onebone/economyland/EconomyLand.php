@@ -48,7 +48,7 @@ class EconomyLand extends PluginBase implements Listener{
 	/**
 	 * @var Config
 	 */
-	private $config, $lang;
+	private $lang;
 	private $start, $end;
 	private $expire;
 
@@ -66,7 +66,8 @@ class EconomyLand extends PluginBase implements Listener{
 			static::$instance = $this;
 		}
 
-		@mkdir($this->getDataFolder());
+		$this->saveDefaultConfig();
+
 		if(!is_file($this->getDataFolder()."Expire.dat")){
 			file_put_contents($this->getDataFolder()."Expire.dat", serialize(array()));
 		}
@@ -74,7 +75,7 @@ class EconomyLand extends PluginBase implements Listener{
 
 		$this->createConfig();
 
-		if(is_numeric($interval = $this->config->get("auto-save-interval"))){
+		if(is_numeric($interval = $this->getConfig()->get("auto-save-interval", 10))){
 			if($interval > 0){
 				$interval = $interval * 1200;
 				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
@@ -89,17 +90,17 @@ class EconomyLand extends PluginBase implements Listener{
 			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
 		}
 
-		switch(strtolower($this->config->get("database-type"))){
+		switch(strtolower($this->getConfig()->get("database-type", "yaml"))){
 			case "yaml":
 			case "yml":
-				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->config, $this->getDataFolder()."Land.sqlite3");
+				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->getConfig(), $this->getDataFolder()."Land.sqlite3");
 				break;
 		/*	case "sqlite3":
 			case "sqlite":
-				$this->db = new SQLiteDatabase($this->getDataFolder()."Land.sqlite3", $this->config, $this->getDataFolder()."Land.yml");
+				$this->db = new SQLiteDatabase($this->getDataFolder()."Land.sqlite3", $this->getConfig(), $this->getDataFolder()."Land.yml");
 				break;*/
 			default:
-				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->config, $this->getDataFolder()."Land.sqlite3");
+				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->getConfig(), $this->getDataFolder()."Land.sqlite3");
 				$this->getLogger()->alert("Specified database type is unavailable. Database type is YAML.");
 		}
 
@@ -197,8 +198,12 @@ class EconomyLand extends PluginBase implements Listener{
 			$endX++;
 			$startZ--;
 			$endZ++;
-			$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
+			$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 			$sender->sendMessage($this->getMessage("confirm-buy-land", array($price, "%2", "%3")));
+
+			if(($land = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel())) !== false){
+				$sender->sendMessage($this->getMessage("confirm-warning", [$land->getID()]));
+			}
 			return true;
 			case "land":
 			$sub = array_shift($param);
@@ -213,16 +218,16 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 
-				if(in_array($sender->getLevel()->getFolderName(), $this->config->get("buying-disallowed-worlds"))){
+				if(in_array($sender->getLevel()->getFolderName(), $this->getConfig()->get("buying-disallowed-worlds", []))){
 					$sender->sendMessage($this->getMessage("not-allowed-to-buy"));
 					return true;
 				}
 
 				$cnt = count($this->db->getLandsByOwner($sender->getName()));
 
-				if(is_numeric($this->config->get("player-land-limit"))){
-					if($cnt >= $this->config->get("player-land-limit")){
-						$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->config->get("player-land-limit"), "%3", "%4")));
+				if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))){
+					if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")){
+						$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->getConfig()->get("player-land-limit", "NaN"), "%3", "%4")));
 						return true;
 					}
 				}
@@ -255,7 +260,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], $result["ID"], "%3")));
 					return true;
 				}
-				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->config->get("price-per-y-axis");
+				$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 				if(EconomyAPI::getInstance()->reduceMoney($sender, $price, true, "EconomyLand") === EconomyAPI::RET_INVALID){
 					$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 					return true;
@@ -405,10 +410,10 @@ class EconomyLand extends PluginBase implements Listener{
 					if($sender->getName() === $player->getName()){
 						$sender->sendMessage($this->getMessage("cannot-give-land-myself"));
 					}else{
-						if(is_numeric($this->config->get("player-land-limit"))){
+						if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))){
 							$cnt = count($this->db->getLandsByOwner($player->getName()));
-							if($cnt >= $this->config->get("player-land-limit")){
-								$sender->sendMessage($this->getMessage("give-land-limit", array($player->getName(), $cnt, $this->config->get("player-land-limit"), "%4")));
+							if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")){
+								$sender->sendMessage($this->getMessage("give-land-limit", array($player->getName(), $cnt, $this->getConfig()->get("player-land-limit", "NaN"), "%4")));
 								return true;
 							}
 						}
@@ -603,14 +608,14 @@ class EconomyLand extends PluginBase implements Listener{
 		$z = $block->getZ();
 		$level = $block->getLevel()->getFolderName();
 
-		if(in_array($level, $this->config->get("non-check-worlds"))){
+		if(in_array($level, $this->getConfig()->get("non-check-worlds", []))){
 			return false;
 		}
 
 		$info = $this->db->canTouch($x, $z, $level, $player);
 		if($info === -1){
-			if($this->config->get("white-world-protection")){
-				if(in_array($level, $this->config->get("white-world-protection")) and !$player->hasPermission("economyland.land.modify.whiteland")){
+			if($this->getConfig()->get("white-world-protection", [])){
+				if(in_array($level, $this->getConfig()->get("white-world-protection", [])) and !$player->hasPermission("economyland.land.modify.whiteland")){
 					$player->sendMessage($this->getMessage("not-owned"));
 					$event->setCancelled();
 					if($event->getItem()->canBePlaced()){
@@ -653,9 +658,9 @@ class EconomyLand extends PluginBase implements Listener{
 			$player = $player->getName();
 		}
 
-		if(is_numeric($this->config->get("player-land-limit"))){
+		if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))){
 			$cnt = count($this->db->getLandsByOwner($player));
-			if($cnt >= $this->config->get("player-land-limit")){
+			if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")){
 				return self::RET_LAND_LIMIT;
 			}
 		}
@@ -677,10 +682,10 @@ class EconomyLand extends PluginBase implements Listener{
 
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
 
-		if($result !== false){
+		if($result !== false and $this->getConfig()->get("allow-overlap", false) === false){
 			return self::RET_LAND_OVERLAP;
 		}
-		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->config->get("price-per-y-axis");
+		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
 		if($expires !== null){
 			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
@@ -716,17 +721,6 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	private function createConfig(){
-		$this->config = new Config($this->getDataFolder()."config.yml", Config::YAML, array(
-			"handler-priority" => 10,
-			"white-world-protection" => array(),
-			"non-check-worlds" => array(),
-			"buying-disallowed-worlds" => array(),
-			"player-land-limit" => "NaN",
-			"price-per-y-axis" => 100,
-			"auto-save-interval" => 10,
-			"database-type" => "yaml"
-		));
-
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
 			"sold-land" => "Has been sold the land for %MONETARY_UNIT%%1",
 			"not-my-land" => "Here is not your land",
@@ -762,6 +756,7 @@ class EconomyLand extends PluginBase implements Listener{
 			"second-position-saved" => "Second position saved",
 			"cant-set-position-in-different-world" => "You can't set position in different world",
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
+			"confirm-warning" => "WARNING: Your land seems overlapping with #%1.",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
 			"not-owned" => "[EconomyLand] You must buy land to edit this block",
