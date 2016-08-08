@@ -468,7 +468,7 @@ class EconomyLand extends PluginBase implements Listener{
 					$player = array_shift($param);
 
 					if(trim($player) === ""){
-						$sender->sendMessage(TextFormat::RED . "Usage: " . $cmd->getUsage());
+						$sender->sendMessage("Usage: /land kick <land number> <player>");
 						return true;
 					}
 					if(!is_numeric($landnum)){
