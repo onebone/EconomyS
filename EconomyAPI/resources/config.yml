@@ -6,12 +6,17 @@ add-op-at-rank: false
 default-money: 1000
 # max-money: Set max money that player can have
 max-money: 9999999999
+# Whether to allow player to pay when taret player is offline
+allow-pay-offline: true
+
 # default-lang: Set default language
 default-lang: def
 # auto-save-interval: Set interval of auto-save
 auto-save-interval: 10
+
 # provider: Set provider of database (Available: yaml)
 provider: yaml
+
 # check-update: Set whether to check update from server
 check-update: true
 # update-host: Set host where to check update
