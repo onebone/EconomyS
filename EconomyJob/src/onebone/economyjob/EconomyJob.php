@@ -81,17 +81,19 @@ class EconomyJob extends PluginBase implements Listener{
 	 * @param BlockBreakEvent $event
 	 */
 	public function onBlockBreak(BlockBreakEvent $event){
-		$player = $event->getPlayer();
-		$block = $event->getBlock();
+		if(!$event->isCancelled()){
+			$player = $event->getPlayer();
+			$block = $event->getBlock();
 
-		$job = $this->jobs->get($this->player->get($player->getName()));
-		if($job !== false){
-			if(isset($job[$block->getID().":".$block->getDamage().":break"])){
-				$money = $job[$block->getID().":".$block->getDamage().":break"];
-				if($money > 0){
-					$this->api->addMoney($player, $money);
-				}else{
-					$this->api->reduceMoney($player, $money);
+			$job = $this->jobs->get($this->player->get($player->getName()));
+			if($job !== false){
+				if(isset($job[$block->getID().":".$block->getDamage().":break"])){
+					$money = $job[$block->getID().":".$block->getDamage().":break"];
+					if($money > 0){
+						$this->api->addMoney($player, $money);
+					}else{
+						$this->api->reduceMoney($player, $money);
+					}
 				}
 			}
 		}
@@ -103,17 +105,19 @@ class EconomyJob extends PluginBase implements Listener{
 	 * @param BlockPlaceEvent $event
 	 */
 	public function onBlockPlace(BlockPlaceEvent $event){
-		$player = $event->getPlayer();
-		$block = $event->getBlock();
+		if(!$event->isCancelled()){
+			$player = $event->getPlayer();
+			$block = $event->getBlock();
 
-		$job = $this->jobs->get($this->player->get($player->getName()));
-		if($job !== false){
-			if(isset($job[$block->getID().":".$block->getDamage().":place"])){
-				$money = $job[$block->getID().":".$block->getDamage().":place"];
-				if($money > 0){
-					$this->api->addMoney($player, $money);
-				}else{
-					$this->api->reduceMoney($player, $money);
+			$job = $this->jobs->get($this->player->get($player->getName()));
+			if($job !== false){
+				if(isset($job[$block->getID().":".$block->getDamage().":place"])){
+					$money = $job[$block->getID().":".$block->getDamage().":place"];
+					if($money > 0){
+						$this->api->addMoney($player, $money);
+					}else{
+						$this->api->reduceMoney($player, $money);
+					}
 				}
 			}
 		}
