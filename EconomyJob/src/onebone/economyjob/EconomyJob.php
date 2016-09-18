@@ -76,7 +76,7 @@ class EconomyJob extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @priority LOWEST
+	 * @priority MONITOR
 	 * @ignoreCancelled true
 	 * @param BlockBreakEvent $event
 	 */
@@ -98,7 +98,7 @@ class EconomyJob extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @priority LOWEST
+	 * @priority MONITOR
 	 * @ignoreCancelled true
 	 * @param BlockPlaceEvent $event
 	 */
