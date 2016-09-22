@@ -18,6 +18,8 @@ class MyMoneyCommand extends Command{
 		parent::__construct("mymoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.mymoney");
+                // People prefer bal and balance
+    $this->setAliases(array("bal","balance"));
 
 		$this->plugin = $plugin;
 	}
