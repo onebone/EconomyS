@@ -189,12 +189,12 @@ class EconomySell extends PluginBase implements Listener{
 		$player = $event->getEntity();
 		if($player instanceof Player){
 			if(($from = $event->getFrom()->getLevel()) !== ($to = $event->getTo()->getLevel())){
-				if(isset($this->items[$from->getFolderName()])){
+				if($from !== null and isset($this->items[$from->getFolderName()])){
 					foreach($this->items[$from->getFolderName()] as $displayer){
 						$displayer->despawnFrom($player);
 					}
 				}
-				if(isset($this->items[$to->getFolderName()])){
+				if($to !== null and isset($this->items[$to->getFolderName()])){
 					foreach($this->items[$to->getFolderName()] as $displayer){
 						$displayer->spawnTo($player);
 					}
