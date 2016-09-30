@@ -30,7 +30,7 @@
 	 public function __construct(EconomyAuction $plugin, $player){
 		 parent::__construct($plugin);
 		 
-		 $this->player = $player;
+		 $this->player = strtolower($player);
 	 }
 	 
 	 public function onRun($currentTick){

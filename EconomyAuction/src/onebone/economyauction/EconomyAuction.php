@@ -61,7 +61,7 @@ class EconomyAuction extends PluginBase{
 		
 		foreach($this->auctions as $player => $data){
 			if(isset($this->auctions[$player][6])){
-				$id = $this->getServer()->getScheduler()->scheduleDelayedTask($this->auctions[$player][6], new QuitAuctionTask($this, $player))->getTaskId();
+				$id = $this->getServer()->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $player), $this->auctions[$player][6])->getTaskId();
 				$this->auctions[$player][7] = time();
 				$this->auctions[$player][8] = $id;
 			}
@@ -100,26 +100,19 @@ class EconomyAuction extends PluginBase{
 				}
 				
 				$item = array_shift($params);
-				$count = (int)array_shift($params);
+				$count = array_shift($params);
 				$startPrice = array_shift($params);
-				if(trim($item) === "" or trim($count) === "" or trim($startPrice) === ""){
+				if(trim($item) === "" or !is_numeric($count) or !is_numeric($count)){
 					$sender->sendMessage("Usage: /auction start <item> <count> <start price>");
 					break;
 				}
-				$e = explode(":", $item);
-				if(!is_numeric($e[0])){
-					$e[0] = 1;
-				}
-				if(!isset($e[1]) or !is_numeric($e[1])){
-					$e[1] = 0;
-				}
-				$e = array(
-					(int)$e[0],
-					(int)$e[1]
-				);
+
+				$count = (int) $count;
+				$item = Item::fromString($item);
+
 				$cnt = 0;
 				foreach($sender->getInventory()->getContents() as $i){
-					if($i->getID() == $e[0] and $i->getDamage() == $e[1]){
+					if($i->equals($item)){
 						$cnt += $i->getCount();
 						if($count <= $cnt){
 							break;
@@ -127,9 +120,11 @@ class EconomyAuction extends PluginBase{
 					}
 				}
 				if($count <= $cnt){
-					$sender->getInventory()->removeItem((new Item($e[0], $e[1], $count)));
+					$item->setCount($count);
+					$sender->getInventory()->removeItem($item);
+
 					$this->auctions[strtolower($sender->getName())] = array(
-						$e[0], $e[1], (int) $count, (int) $startPrice, null, (int) $startPrice, null, null
+						$item->getID(), $item->getDamage(), $count, (float) $startPrice, null, (float) $startPrice, null, null
 					);
 					$this->getServer()->broadcastMessage(TextFormat::GREEN.$sender->getName().TextFormat::RESET."'s auction has just started.");
 					EconomyAPI::getInstance()->reduceMoney($sender, $tax);
@@ -171,21 +166,13 @@ class EconomyAuction extends PluginBase{
 					$sender->sendMessage("Usage: /auction time <item> <count> <start price> <time>");
 					break;
 				}
-				$e = explode(":", $item);
-				if(!is_numeric($e[0])){
-					$e[0] = 1;
-				}
-				if(!isset($e[1]) or !is_numeric($e[1])){
-					$e[1] = 0;
-				}
-				$e = array(
-					(int)$e[0],
-					(int)$e[1]
-				);
+				$item = Item::fromString($item);
+				$count = (int) $count;
+
 				$cnt = 0;
 				foreach($sender->getInventory()->getContents() as $i){
-					if($i->getID() === $e[0] and $i->getDamage() === $e[1]){
-						++$cnt;
+					if($i->equals($item)){
+						$cnt += $i->getCount();
 					}
 					if($count <= $cnt){
 						break;
@@ -193,10 +180,11 @@ class EconomyAuction extends PluginBase{
 				}
 				
 				if($count <= $cnt){
-					$sender->getInventory()->removeItem(new Item($e[0], $e[1], $count));
+					$item->setCount($count);
+					$sender->getInventory()->removeItem($item);
 					$id = $this->getServer()->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $sender->getName()), ($time * 20))->getTaskId();
 					$this->auctions[strtolower($sender->getName())] = array(
-						$e[0], $e[1], (int) $count, (int) $startPrice, null, (int) $startPrice, $time, time(), $id
+						$item->getID(), $item->getDamage(), $count, (float) $startPrice, null, (float) $startPrice, $time, time(), $id
 					);
 					$this->getServer()->broadcastMessage($sender->getName()."'s auction has just started.");
 				}else{
@@ -210,7 +198,7 @@ class EconomyAuction extends PluginBase{
 				}
 				$player = array_shift($params);
 				$price = array_shift($params);
-				if(trim($player) === "" or trim($price) === ""){
+				if(trim($player) === "" or !is_numeric($price)){
 					$sender->sendMessage("Usage: /auction bid <player> <price>");
 					break;
 				}
