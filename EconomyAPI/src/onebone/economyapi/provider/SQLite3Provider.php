@@ -18,14 +18,12 @@
  */
 namespace onebone\economyapi\provider;
 
-use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\task\MySQLPingTask;
 use pocketmine\Player;
 
 class SQLite3Provider implements Provider{
   	private $db;
 	public function __construct($file){
-		$this->db = new SQLite3($file);
+		$this->db = new \SQLite3($file);
 		$this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, money FLOAT)");
 	}
   
@@ -38,22 +36,27 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$player."'");
-		return $result->num_rows > 0 ? true:false;
+		$result = $this->db->querySingle("SELECT * FROM user_money WHERE username='{$$player}'", true);
+        if($result != null) {
+            return true;
+        }
+        return false;
 	}
-  
-	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param float $defaultMoney
-	 * @return bool
-	 */
+
+    /**
+     * @param \pocketmine\Player|string $player
+     * @param int $defaultMoney
+     * @return bool
+     */
 	public function createAccount($player, $defaultMoney = 1000){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)){
-			$this->db->query("INSERT INTO user_money (username, money) VALUES ('".$player."', {$defaultMoney})");
+            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$$player}', {$defaultMoney})");
+            if(is_bool($result))
+                return $result;
 		}
 		return false;
 	}
@@ -68,8 +71,11 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$this->db->query("DELETE FROM user_money WHERE username='".$player."'");
+            $result = $this->db->query("DELETE FROM user_money WHERE username='{$$player}'");
+            if(is_bool($result))
+            return $result;
 		}
+		return false;
 	}
   
 	/**
@@ -82,8 +88,12 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$this->db->query("SELECT money FROM user_money WHERE username='".$player."'");
+            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$$player}'");
+            if(is_numeric($result)) {
+                return $result;
+            }
 		}
+		return false;
 	}
   
 	/**
@@ -97,8 +107,12 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."'");
+            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$$player}'");
+            if(is_bool($result)) {
+                return $result;
+            }
 		}
+		return false;
 	}
   
 	/**
@@ -107,16 +121,20 @@ class SQLite3Provider implements Provider{
 	 * @return bool
 	 */
 	public function addMoney($player, $amount){
-		$amount = absolute($amount);
+		$amount = abs($amount);
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$m = $this->db->getMoney($player);
+			$m = $this->getMoney($player);
 			$cash = $m+$amount;
-			$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$$player}'");
+            if(is_numeric($result)) {
+                return $result;
+            }
 		}
+		return false;
 	}
   
 	/**
@@ -125,23 +143,27 @@ class SQLite3Provider implements Provider{
 	 * @return bool
 	 */
 	public function reduceMoney($player, $amount){
-		$amount = absolute($amount);
+		$amount = abs($amount);
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$m = $this->db->getMoney($player);
-			$cash = $m-$ammount;
-			$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
+			$m = $this->getMoney($player);
+			$cash = $m-$amount;
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$$player}'");
+            if(is_numeric($result)) {
+                return $result;
+            }
 		}
+		return false;
 	}
   
 	/**
 	 * @return array
 	 */
 	public function getAll(){
-		$this->db->query("SELECT * FROM user_money");
+        return $this->db->query("SELECT * FROM user_money");
 	}
   
 	/**
