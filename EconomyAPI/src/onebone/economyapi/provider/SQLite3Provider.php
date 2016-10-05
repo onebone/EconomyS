@@ -97,7 +97,7 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."' ");
+			$this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."'");
 		}
 	}
   
@@ -115,7 +115,7 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->db->getMoney($player);
 			$cash = $m+$amount;
-			$this->db->query("UPDATE user_money SET money={$cash} where username='".$player."' ");
+			$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
 		}
 	}
   
@@ -133,7 +133,7 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->db->getMoney($player);
 			$cash = $m-$ammount;
-			$this->db->query("UPDATE user_money SET money={$cash} where username='".$player."'");
+			$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
 		}
 	}
   
