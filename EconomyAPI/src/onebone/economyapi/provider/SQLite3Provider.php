@@ -23,11 +23,11 @@ use onebone\economyapi\task\MySQLPingTask;
 use pocketmine\Player;
 
 class SQLite3Provider implements Provider{
-	private $db;
-  public function __construct($file){
-    $this->db = new SQLite3($file);
-    $this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, money FLOAT)");
-  }
+  	private $db;
+	public function __construct($file){
+		$this->db = new SQLite3($file);
+		$this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, money FLOAT)");
+	}
   
 	/**
 	 * @param \pocketmine\Player|string $player
@@ -35,8 +35,8 @@ class SQLite3Provider implements Provider{
 	 */
 	public function accountExists($player){
 		if($player instanceof Player){
-		  $player = $player->getName();
-    }
+			$player = $player->getName();
+		}
 		$player = strtolower($player);
 		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$player."'");
 		return $result->num_rows > 0 ? true:false;
@@ -67,9 +67,9 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-    if(!$this->accountExists($player)) {
-      $this->db->query("DELETE FROM user_money WHERE username='".$player."'");
-    }
+		if(!$this->accountExists($player)) {
+			$this->db->query("DELETE FROM user_money WHERE username='".$player."'");
+		}
 	}
   
 	/**
@@ -81,9 +81,9 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-    if(!$this->accountExists($player)) {
-      $this->db->query("SELECT money FROM user_money WHERE username='".$player."'");
-    }
+		if(!$this->accountExists($player)) {
+			$this->db->query("SELECT money FROM user_money WHERE username='".$player."'");
+		}
 	}
   
 	/**
@@ -96,9 +96,9 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-    if(!$this->accountExists($player)) {
-      $this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."' ");
-    }
+		if(!$this->accountExists($player)) {
+			$this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."' ");
+		}
 	}
   
 	/**
@@ -112,11 +112,11 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-    if(!$this->accountExists($player)) {
-	    $m = $this->db->getMoney($player);
+		if(!$this->accountExists($player)) {
+			$m = $this->db->getMoney($player);
 			$cash = $m+$amount;
 			$this->db->query("UPDATE user_money SET money={$cash} where username='".$player."' ");
-    }
+		}
 	}
   
 	/**
@@ -130,19 +130,19 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-    if(!$this->accountExists($player)) {
-      $m = $this->db->getMoney($player);
+		if(!$this->accountExists($player)) {
+			$m = $this->db->getMoney($player);
 			$cash = $m-$ammount;
 			$this->db->query("UPDATE user_money SET money={$cash} where username='".$player."'");
-    }
+		}
 	}
   
 	/**
 	 * @return array
 	 */
 	public function getAll(){
-    $this->db->query("SELECT * FROM user_money");
-  }
+		$this->db->query("SELECT * FROM user_money");
+	}
   
 	/**
 	 * @return string
@@ -156,6 +156,6 @@ class SQLite3Provider implements Provider{
 	}
   
 	public function close(){
-	  $this->db->close();
+		$this->db->close();
 	}
 }
