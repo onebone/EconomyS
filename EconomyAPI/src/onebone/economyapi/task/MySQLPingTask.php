@@ -29,11 +29,12 @@ class MySQLPingTask extends PluginTask{
 
 	public function __construct(EconomyAPI $plugin, \mysqli $mysql){
 		parent::__construct($plugin);
-
 		$this->mysql = $mysql;
 	}
 
 	public function onRun($currentTick){
-		$this->mysql->ping();
+		if(!$this->mysql->ping()) {
+			$this->getOwner()->getLogger()->error("Disconnected from MySQL Server!");
+		}
 	}
 }
