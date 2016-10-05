@@ -34,14 +34,14 @@ class MySQLProvider implements Provider{
 
 	public function __construct($file){
 		$this->db = new \mysqli($file["host"], $file["user"], $file["password"], $file["db"], $file["port"]);
-		if($this->db->connect_error){
-			EconomyAPI::getInstance()->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error);
+		if($this->db->connect_errno){
+			EconomyAPI::getInstance()->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error."\nError Number: ".$this->db->connect_errno);
 			return;
 		}
 		$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
-			username VARCHAR(20) PRIMARY KEY,
+			username TEXT PRIMARY KEY,
 			money FLOAT
-		);");
+		)");
 
 		EconomyAPI::getInstance()->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask(EconomyAPI::getInstance(), $this->db), 600);
 	}
@@ -56,7 +56,7 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
 
-		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$this->db->real_escape_string($player)."'");
+		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$player."'");
 		return $result->num_rows > 0 ? true:false;
 	}
 
@@ -72,7 +72,7 @@ class MySQLProvider implements Provider{
 		$player = strtolower($player);
 
 		if(!$this->accountExists($player)){
-			$this->db->query("INSERT INTO user_money (username, money) VALUES ('".$this->db->real_escape_string($player)."', $defaultMoney);");
+			$this->db->query("INSERT INTO user_money (username, money) VALUES ('".$player."', {$defaultMoney})");
 		}
 		return false;
 	}
@@ -86,6 +86,7 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+		$this->db->query("DELETE FROM user_money WHERE username='".$player."'");
 	}
 
 	/**
@@ -97,6 +98,7 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+		$this->db->query("SELECT money FROM user_money WHERE username='".$player."'");
 	}
 
 	/**
@@ -109,6 +111,7 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+		$this->db->query("UPDATE user_money SET money={$amount} WHERE username='".$player."'");
 	}
 
 	/**
@@ -117,10 +120,14 @@ class MySQLProvider implements Provider{
 	 * @return bool
 	 */
 	public function addMoney($player, $amount){
+		$amount = absolute($amount);
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+		$this->getMoney($player);
+		$cash = $m + $amount;
+		$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
 	}
 
 	/**
@@ -129,17 +136,20 @@ class MySQLProvider implements Provider{
 	 * @return bool
 	 */
 	public function reduceMoney($player, $amount){
+		$amount = absolute($amount);
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+		$cash = $m - $amount;
+		$this->db->query("UPDATE user_money SET money={$cash} WHERE username='".$player."'");
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getAll(){
-
+		$this->db->query("SELECT * FROM user_money");
 	}
 
 	/**
@@ -149,11 +159,11 @@ class MySQLProvider implements Provider{
 		return "MySQL";
 	}
 
-	public function save(){}
+	public function save(){
+		//
+	}
 
 	public function close(){
-		if($this->db instanceof \mysqli){
-			$this->db->close();
-		}
+		$this->db->close();
 	}
 }
