@@ -365,8 +365,8 @@ class EconomyAPI extends PluginBase implements Listener{
 			case "mysql":
 			$this->provider = new MySQLProvider($this->getConfig()->get("provider-settings"));
 			break;
-			case "sqlite":
-			$this->provider = new SQLiteProvider($this->getDataFolder()."Money.db");
+			case "sqlite3":
+			$this->provider = new SQLite3Provider($this->getDataFolder()."Money.db");
 			break;
 			default:
 			$this->getLogger()->critical("Invalid database was given.");
