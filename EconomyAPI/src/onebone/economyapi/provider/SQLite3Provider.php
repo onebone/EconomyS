@@ -24,7 +24,7 @@ class SQLite3Provider implements Provider{
   	private $db;
 	public function __construct($file){
 		$this->db = new \SQLite3($file);
-		$this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT, money FLOAT)");
+		$this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(username TEXT PRIMARY KEY, money FLOAT)");
 	}
   
 	/**
