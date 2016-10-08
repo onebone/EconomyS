@@ -36,7 +36,7 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		$result = $this->db->querySingle("SELECT * FROM user_money WHERE username='{$$player}'", true);
+		$result = $this->db->querySingle("SELECT * FROM user_money WHERE username='{$player}'", true);
         if($result != null) {
             return true;
         }
@@ -54,7 +54,7 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)){
-            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$$player}', {$defaultMoney})");
+            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$player}', {$defaultMoney})");
             if(is_bool($result))
                 return $result;
 		}
@@ -71,7 +71,7 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("DELETE FROM user_money WHERE username='{$$player}'");
+            $result = $this->db->query("DELETE FROM user_money WHERE username='{$player}'");
             if(is_bool($result))
             return $result;
 		}
@@ -88,7 +88,7 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$$player}'");
+            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$player}'");
             if(is_numeric($result)) {
                 return $result;
             }
@@ -107,7 +107,7 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$player}'");
             if(is_bool($result)) {
                 return $result;
             }
@@ -129,7 +129,7 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
 			$cash = $m+$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
             if(is_numeric($result)) {
                 return $result;
             }
@@ -151,7 +151,7 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
 			$cash = $m-$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
             if(is_numeric($result)) {
                 return $result;
             }

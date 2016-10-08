@@ -53,7 +53,7 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
 
-		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$player."'");
+		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$this->db->real_escape_string($player)."'");
 		return $result->num_rows > 0 ? true:false;
 	}
 
@@ -69,7 +69,7 @@ class MySQLProvider implements Provider{
 		$player = strtolower($player);
 
         if(!$this->accountExists($player)){
-            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$player}', {$defaultMoney})");
+            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$this->db->real_escape_string($player)}', {$defaultMoney})");
             if(is_bool($result))
                 return $result;
         }
@@ -86,7 +86,7 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
         if(!$this->accountExists($player)) {
-            $result = $this->db->query("DELETE FROM user_money WHERE username='{$player}'");
+            $result = $this->db->query("DELETE FROM user_money WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_bool($result))
                 return $result;
         }
@@ -103,7 +103,7 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
         if(!$this->accountExists($player)) {
-            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$player}'");
+            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_numeric($result)) {
                 return $result;
             }
@@ -122,7 +122,7 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
         if(!$this->accountExists($player)) {
-            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_bool($result)) {
                 return $result;
             }
@@ -144,7 +144,7 @@ class MySQLProvider implements Provider{
         if(!$this->accountExists($player)) {
             $m = $this->getMoney($player);
             $cash = $m+$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_bool($result)) {
                 return $result;
             }
@@ -166,7 +166,7 @@ class MySQLProvider implements Provider{
         if(!$this->accountExists($player)) {
             $m = $this->getMoney($player);
             $cash = $m+$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
+            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_bool($result)) {
                 return $result;
             }
