@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi;
 
+use onebone\economyapi\provider\SQLite3Provider;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
@@ -127,9 +128,9 @@ class EconomyAPI extends PluginBase implements Listener{
 	}
 
 	/**
-	 * @param string|Player		$player
-	 * @param float				$defaultMoney
-	 * @param bool				$force
+	 * @param string|Player $player
+	 * @param float|bool $defaultMoney
+	 * @param bool $force
 	 *
 	 * @return bool
 	 */
@@ -372,14 +373,15 @@ class EconomyAPI extends PluginBase implements Listener{
 			case "sqlite3":
 			$this->provider = new SQLite3Provider($this->getDataFolder()."Money.db");
 			break;
-			case:"json":
+			case "json":
 			default:
 			$this->getLogger()->critical("Invalid database was given.");
-			return false;
+			return;
 		}
 		$this->initializeLanguage();
 		$this->getLogger()->notice("Database provider was set to: ".$this->provider->getName());
 		$this->registerCommands();
+        return;
 	}
 
 	private function checkUpdate(){
@@ -421,9 +423,11 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	private function initializeLanguage(){
 		foreach($this->getResources() as $resource){
-			if($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_"){
-				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
-			}
+		    if($resource instanceof \RecursiveDirectoryIterator or $resource instanceof \RecursiveIteratorIterator) {
+                if($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_"){
+                    $this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
+                }
+            }
 		}
 		$this->lang["user-define"] = (new Config($this->getDataFolder()."messages.yml", Config::YAML, $this->lang["def"]))->getAll();
 	}

@@ -105,6 +105,7 @@ class MySQLProvider implements Provider{
         if(!$this->accountExists($player)) {
             $result = $this->db->query("SELECT money FROM user_money WHERE username='{$this->db->real_escape_string($player)}'");
             if(is_numeric($result)) {
+                floatval($result);
                 return $result;
             }
         }
@@ -178,7 +179,7 @@ class MySQLProvider implements Provider{
 	 * @return array
 	 */
 	public function getAll(){
-		return $this->db->query("SELECT * FROM user_money");
+		return $this->db->query("SELECT * FROM user_money")->fetch_array();
 	}
 
 	/**
@@ -189,7 +190,8 @@ class MySQLProvider implements Provider{
 	}
 
 	public function save(){
-		//
+	    $name = time()."_save";
+		$this->db->savepoint($name);
 	}
 
 	public function close(){

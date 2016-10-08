@@ -36,7 +36,7 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		$result = $this->db->querySingle("SELECT * FROM user_money WHERE username='{$player}'", true);
+		$result = $this->db->query("SELECT * FROM user_money WHERE username='{$player}'");
         if($result != null) {
             return true;
         }
@@ -90,6 +90,7 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
             $result = $this->db->query("SELECT money FROM user_money WHERE username='{$player}'");
             if(is_numeric($result)) {
+                floatval($result);
                 return $result;
             }
 		}
@@ -130,7 +131,7 @@ class SQLite3Provider implements Provider{
 			$m = $this->getMoney($player);
 			$cash = $m+$amount;
             $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
-            if(is_numeric($result)) {
+            if(is_bool($result)) {
                 return $result;
             }
 		}
@@ -140,7 +141,7 @@ class SQLite3Provider implements Provider{
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @param float $amount
-	 * @return bool
+	 * @return bool|float
 	 */
 	public function reduceMoney($player, $amount){
 		$amount = abs($amount);
@@ -152,7 +153,7 @@ class SQLite3Provider implements Provider{
 			$m = $this->getMoney($player);
 			$cash = $m-$amount;
             $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
-            if(is_numeric($result)) {
+            if(is_bool($result)) {
                 return $result;
             }
 		}
@@ -174,7 +175,7 @@ class SQLite3Provider implements Provider{
 	}
   
 	public function save(){
-		//$this->db->save();
+		return;
 	}
   
 	public function close(){
