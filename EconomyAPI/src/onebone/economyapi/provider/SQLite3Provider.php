@@ -37,10 +37,10 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		$result = $this->db->query("SELECT * FROM user_money WHERE username='{$player}'");
-        if($result != null) {
-            return true;
-        }
-        return false;
+		if($result != null) {
+			return true;
+		}
+		return false;
 	}
 
     /**
@@ -53,11 +53,10 @@ class SQLite3Provider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if(!$this->accountExists($player)){
-            $result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$player}', {$defaultMoney})");
-            if(is_bool($result))
-                return $result;
-		}
+		if(!$this->accountExists($player))
+			$result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$player}', {$defaultMoney})");
+		if(is_bool($result))
+			return $result;
 		return false;
 	}
   
@@ -71,9 +70,9 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("DELETE FROM user_money WHERE username='{$player}'");
-            if(is_bool($result))
-            return $result;
+			$result = $this->db->query("DELETE FROM user_money WHERE username='{$player}'");
+			if(is_bool($result))
+				return $result;
 		}
 		return false;
 	}
@@ -88,11 +87,11 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("SELECT money FROM user_money WHERE username='{$player}'");
-            if(is_numeric($result)) {
-                floatval($result);
-                return $result;
-            }
+			$result = $this->db->query("SELECT money FROM user_money WHERE username='{$player}'");
+			if(is_numeric($result)) {
+				floatval($result);
+				return $result;
+			}
 		}
 		return false;
 	}
@@ -108,10 +107,10 @@ class SQLite3Provider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-            $result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$player}'");
-            if(is_bool($result)) {
-                return $result;
-            }
+			$result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$player}'");
+			if(is_bool($result)) {
+				return $result;
+			}
 		}
 		return false;
 	}
@@ -130,10 +129,10 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
 			$cash = $m+$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
-            if(is_bool($result)) {
-                return $result;
-            }
+			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
+			if(is_bool($result)) {
+				return $result;
+			}
 		}
 		return false;
 	}
@@ -152,10 +151,10 @@ class SQLite3Provider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
 			$cash = $m-$amount;
-            $result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
-            if(is_bool($result)) {
-                return $result;
-            }
+			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$player}'");
+			if(is_bool($result)) {
+				return $result;
+			}
 		}
 		return false;
 	}
@@ -164,7 +163,7 @@ class SQLite3Provider implements Provider{
 	 * @return array
 	 */
 	public function getAll(){
-        return $this->db->query("SELECT * FROM user_money");
+		return $this->db->query("SELECT * FROM user_money");
 	}
   
 	/**
