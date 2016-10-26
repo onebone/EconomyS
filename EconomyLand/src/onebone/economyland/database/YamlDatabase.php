@@ -205,7 +205,8 @@ class YamlDatabase implements Database{
 				if(($land["startX"] <= $startX and $land["endX"] >= $startX and $land["startZ"] <= $startZ and $land["endZ"] >= $startZ)
 					or ($land["startX"] <= $startX and $land["endX"] >= $startX and $land["startZ"] <= $endZ and $land["endZ"] >= $endZ)
 					or ($land["startX"] <= $endX and $land["endX"] >= $endX and $land["startZ"] <= $startZ and $land["endZ"] >= $startZ)
-					or ($land["startX"] <= $endX and $land["endX"] >= $endX and $land["startZ"] <= $endZ and $land["endZ"] >= $endZ)){
+					or ($land["startX"] <= $endX and $land["endX"] >= $endX and $land["startZ"] <= $endZ and $land["endZ"] >= $endZ)
+				  	or ($startX <= $land["startX"] and $endX >= $land["endX"] and $startZ <= $land["startZ"] and $endZ >= $land["endZ"])){
 					return $land;
 				}
 			}
