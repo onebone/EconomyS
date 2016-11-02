@@ -1,5 +1,4 @@
 <?php
-
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
  * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
@@ -17,32 +16,17 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 namespace onebone\economyapi\provider;
-
-
-use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\task\MySQLPingTask;
 
 use pocketmine\Player;
 
-class MySQLProvider implements Provider{
-	/**
-	 * @var \mysqli
-	 */
-	private $db;
-
+class SQLite3Provider implements Provider{
+  	private $db;
 	public function __construct($file){
-		$this->db = new \mysqli($file["host"], $file["user"], $file["password"], $file["db"], $file["port"]);
-		if($this->db->connect_errno){
-			EconomyAPI::getInstance()->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error."\nError Number: ".$this->db->connect_errno);
-			return;
-		}
-		$this->db->query("CREATE TABLE IF NOT EXISTS user_money(username TEXT PRIMARY KEY,money FLOAT)");
-
-		EconomyAPI::getInstance()->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask(EconomyAPI::getInstance(), $this->db), 600);
+		$this->db = new \SQLite3($file);
+		$this->db->exec("CREATE TABLE IF NOT EXISTS User_Money(username TEXT PRIMARY KEY, money FLOAT)");
 	}
-
+  
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @return bool
@@ -52,29 +36,30 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-
-		$result = $this->db->query("SELECT * FROM user_money WHERE username='".$this->db->real_escape_string($player)."'");
-		return $result->num_rows > 0 ? true:false;
+		$result = $this->db->query("SELECT * FROM user_money WHERE username='{$this->db->escapeString($player)}'");
+		if($result != null) {
+			return true;
+		}
+		return false;
 	}
 
-	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param int $defaultMoney
-	 * @return bool
-	 */
+    /**
+     * @param \pocketmine\Player|string $player
+     * @param int $defaultMoney
+     * @return bool
+     */
 	public function createAccount($player, $defaultMoney = 1000){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if(!$this->accountExists($player)){
-			$result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$this->db->real_escape_string($player)}', {$defaultMoney})");
-			if(is_bool($result))
-				return $result;
-		}
+		if(!$this->accountExists($player))
+			$result = $this->db->query("INSERT INTO user_money (username, money) VALUES ('{$this->db->escapeString($player)}', {$defaultMoney})");
+		if(is_bool($result))
+			return $result;
 		return false;
 	}
-
+  
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @return bool
@@ -85,13 +70,13 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$result = $this->db->query("DELETE FROM user_money WHERE username='{$this->db->real_escape_string($player)}'");
+			$result = $this->db->query("DELETE FROM user_money WHERE username='{$this->db->escapeString($player)}'");
 			if(is_bool($result))
 				return $result;
 		}
 		return false;
 	}
-
+  
 	/**
 	 * @param string $player
 	 * @return float|bool
@@ -101,8 +86,8 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if(!$this->accountExists($player)){
-			$result = $this->db->query("SELECT money FROM user_money WHERE username='{$this->db->real_escape_string($player)}'");
+		if(!$this->accountExists($player)) {
+			$result = $this->db->query("SELECT money FROM user_money WHERE username='{$this->db->escapeString($player)}'");
 			if(is_numeric($result)) {
 				floatval($result);
 				return $result;
@@ -110,7 +95,7 @@ class MySQLProvider implements Provider{
 		}
 		return false;
 	}
-
+  
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @param float $amount
@@ -122,13 +107,14 @@ class MySQLProvider implements Provider{
 		}
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
-			$result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$this->db->real_escape_string($player)}'");
-			if(is_bool($result))
+			$result = $this->db->query("UPDATE user_money SET money={$amount} WHERE username='{$this->db->escapeString($player)}'");
+			if(is_bool($result)) {
 				return $result;
+			}
 		}
 		return false;
 	}
-
+  
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @param float $amount
@@ -143,17 +129,18 @@ class MySQLProvider implements Provider{
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
 			$cash = $m+$amount;
-			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->real_escape_string($player)}'");
-			if(is_bool($result))
+			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->escapeString($player)}'");
+			if(is_bool($result)) {
 				return $result;
+			}
 		}
 		return false;
 	}
-
+  
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @param float $amount
-	 * @return bool
+	 * @return bool|float
 	 */
 	public function reduceMoney($player, $amount){
 		$amount = abs($amount);
@@ -163,33 +150,33 @@ class MySQLProvider implements Provider{
 		$player = strtolower($player);
 		if(!$this->accountExists($player)) {
 			$m = $this->getMoney($player);
-			$cash = $m+$amount;
-			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->real_escape_string($player)}'");
-			if(is_bool($result))
+			$cash = $m-$amount;
+			$result = $this->db->query("UPDATE user_money SET money={$cash} WHERE username='{$this->db->escapeString($player)}'");
+			if(is_bool($result)) {
 				return $result;
+			}
 		}
 		return false;
 	}
-
+  
 	/**
 	 * @return array
 	 */
 	public function getAll(){
-		return $this->db->query("SELECT * FROM user_money")->fetch_array();
+		return $this->db->query("SELECT * FROM user_money");
 	}
-
+  
 	/**
 	 * @return string
 	 */
 	public function getName(){
-		return "MySQL";
+		return "SQLite3";
 	}
-
+  
 	public function save(){
-	    $name = time()."_save";
-		$this->db->savepoint($name);
+		return;
 	}
-
+  
 	public function close(){
 		$this->db->close();
 	}

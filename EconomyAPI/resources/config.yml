@@ -14,7 +14,7 @@ default-lang: def
 # auto-save-interval: Set interval of auto-save
 auto-save-interval: 10
 
-# provider: Set provider of database (Available: yaml)
+# provider: Set provider of database (Available: yaml, mysql, sqlite)
 provider: yaml
 
 # check-update: Set whether to check update from server
