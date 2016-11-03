@@ -21,6 +21,7 @@
 namespace onebone\economyapi\provider;
 
 
+use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -32,8 +33,8 @@ class YamlProvider implements Provider{
 
 	private $money;
 
-	public function __construct($file){
-		$this->config = new Config($file, Config::YAML, ["version" => 2, "money" => []]);
+	public function __construct(EconomyAPI $plugin){
+		$this->config = new Config($plugin->getDataFolder() . "Money.yml", Config::YAML, ["version" => 2, "money" => []]);
 		$this->money = $this->config->getAll();
 	}
 

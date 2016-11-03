@@ -32,18 +32,27 @@ class MySQLProvider implements Provider{
 	 */
 	private $db;
 
-	public function __construct($file){
-		$this->db = new \mysqli($file["host"], $file["user"], $file["password"], $file["db"], $file["port"]);
+	public function __construct(EconomyAPI $plugin){
+		$config = $plugin->getConfig()->get("provider-settings", []);
+
+		$this->db = new \mysqli(
+			$config["host"] ?? "127.0.0.1",
+			$config["user"] ?? "onebone",
+			$config["password"] ?? "hello_world",
+			$config["db"] ?? "economyapi",
+			$config["port"] ?? 3306);
 		if($this->db->connect_error){
-			EconomyAPI::getInstance()->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error);
+			$plugin->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error);
 			return;
 		}
-		$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
+		if(!$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
 			username VARCHAR(20) PRIMARY KEY,
 			money FLOAT
-		);");
+		);")){
+			$plugin->getLogger()->critical("Error creating table: " . $this->db->error);
+		}
 
-		EconomyAPI::getInstance()->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask(EconomyAPI::getInstance(), $this->db), 600);
+		$plugin->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask($plugin, $this->db), 600);
 	}
 
 	/**
@@ -86,6 +95,9 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+
+		if($this->db->query("DELETE FROM user_money WHERE username='".$this->db->real_escape_string($player)."'") === true) return true;
+		return false;
 	}
 
 	/**
@@ -97,6 +109,11 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+
+		$res = $this->db->query("SELECT money FROM user_money WHERE username='".$this->db->real_escape_string($player)."'");
+		$ret = $res->fetch_array()[0] ?? false;
+		$res->free();
+		return $ret;
 	}
 
 	/**
@@ -109,6 +126,10 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+
+		$amount = (float) $amount;
+
+		return $this->db->query("UPDATE user_money SET money = $amount WHERE username='".$this->db->real_escape_string($player)."'");
 	}
 
 	/**
@@ -121,6 +142,10 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+
+		$amount = (float) $amount;
+
+		return $this->db->query("UPDATE user_money SET money = money + $amount WHERE username='".$this->db->real_escape_string($player)."'");
 	}
 
 	/**
@@ -133,13 +158,26 @@ class MySQLProvider implements Provider{
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
+
+		$amount = (float) $amount;
+
+		return $this->db->query("UPDATE user_money SET money = money - $amount WHERE username='".$this->db->real_escape_string($player)."'");
 	}
 
 	/**
 	 * @return array
 	 */
 	public function getAll(){
+		$res = $this->db->query("SELECT * FROM user_money");
 
+		$ret = [];
+		foreach($res->fetch_all() as $val){
+			$ret[$val[0]] = $val[1];
+		}
+
+		$res->free();
+
+		return $ret;
 	}
 
 	/**

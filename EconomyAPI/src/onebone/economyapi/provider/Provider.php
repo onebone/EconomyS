@@ -20,8 +20,10 @@
 
 namespace onebone\economyapi\provider;
 
+use onebone\economyapi\EconomyAPI;
+
 interface Provider{
-	public function __construct($file);
+	public function __construct(EconomyAPI $plugin);
 
 	/**
 	 * @param \pocketmine\Player|string $player

@@ -360,10 +360,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		}
 		switch(strtolower($this->getConfig()->get("provider"))){
 			case "yaml":
-			$this->provider = new YamlProvider($this->getDataFolder()."Money.yml");
+			$this->provider = new YamlProvider($this);
 			break;
 			case "mysql":
-			$this->provider = new MySQLProvider($this->getConfig()->get("provider-settings"));
+			$this->provider = new MySQLProvider($this);
 			break;
 			default:
 			$this->getLogger()->critical("Invalid database was given.");
