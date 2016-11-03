@@ -82,6 +82,7 @@ class MySQLProvider implements Provider{
 
 		if(!$this->accountExists($player)){
 			$this->db->query("INSERT INTO user_money (username, money) VALUES ('".$this->db->real_escape_string($player)."', $defaultMoney);");
+			return true;
 		}
 		return false;
 	}
