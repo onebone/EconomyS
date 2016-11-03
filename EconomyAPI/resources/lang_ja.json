@@ -30,7 +30,7 @@
 			"description": "プレーヤーに支払いします"
 		},
 		"setlang": {
-			"usage": "/setlang <ccTLD>",
+			"usage": "/setlang <言語>",
 			"description": "自分の言語を選びます"
 		},
 		"mystatus": {

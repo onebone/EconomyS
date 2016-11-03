@@ -30,7 +30,7 @@
 			"description": "Pays money to player"
 		},
 		"setlang": {
-			"usage": "/setlang <ccTLD>",
+			"usage": "/setlang <language>",
 			"description": "Set your language"
 		},
 		"mystatus": {

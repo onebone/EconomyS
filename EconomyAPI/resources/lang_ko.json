@@ -30,7 +30,7 @@
 			"description": "플레이어에게 돈을 지불합니다"
 		},
 		"setlang": {
-			"usage": "/setlang <ccTLD>",
+			"usage": "/setlang <언어>",
 			"description": "언어를 선택합니다"
 		},
 		"mystatus": {

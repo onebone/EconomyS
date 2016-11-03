@@ -30,7 +30,7 @@
 			"description": "付款給玩家"
 		},
 		"setlang": {
-			"usage": "/setlang <ccTLD>",
+			"usage": "/setlang <語言>",
 			"description": "設定您的語言"
 		},
 		"mystatus": {
