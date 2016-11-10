@@ -25,6 +25,8 @@ use onebone\economyapi\EconomyAPI;
 interface Provider{
 	public function __construct(EconomyAPI $plugin);
 
+	public function open();
+
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @return bool

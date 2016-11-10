@@ -32,8 +32,15 @@ class MySQLProvider implements Provider{
 	 */
 	private $db;
 
+	/** @var EconomyAPI */
+	private $plugin;
+
 	public function __construct(EconomyAPI $plugin){
-		$config = $plugin->getConfig()->get("provider-settings", []);
+		$this->plugin = $plugin;
+	}
+
+	public function open(){
+		$config = $this->plugin->getConfig()->get("provider-settings", []);
 
 		$this->db = new \mysqli(
 			$config["host"] ?? "127.0.0.1",
@@ -42,17 +49,18 @@ class MySQLProvider implements Provider{
 			$config["db"] ?? "economyapi",
 			$config["port"] ?? 3306);
 		if($this->db->connect_error){
-			$plugin->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error);
+			$this->plugin->getLogger()->critical("Could not connect to MySQL server: ".$this->db->connect_error);
 			return;
 		}
 		if(!$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
 			username VARCHAR(20) PRIMARY KEY,
 			money FLOAT
 		);")){
-			$plugin->getLogger()->critical("Error creating table: " . $this->db->error);
+			$this->plugin->getLogger()->critical("Error creating table: " . $this->db->error);
+			return;
 		}
 
-		$plugin->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask($plugin, $this->db), 600);
+		$this->plugin->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask($this->plugin, $this->db), 600);
 	}
 
 	/**

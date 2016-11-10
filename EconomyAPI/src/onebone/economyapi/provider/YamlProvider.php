@@ -31,10 +31,17 @@ class YamlProvider implements Provider{
 	 */
 	private $config;
 
-	private $money;
+	/** @var EconomyAPI */
+	private $plugin;
+
+	private $money = [];
 
 	public function __construct(EconomyAPI $plugin){
-		$this->config = new Config($plugin->getDataFolder() . "Money.yml", Config::YAML, ["version" => 2, "money" => []]);
+		$this->plugin = $plugin;
+	}
+
+	public function open(){
+		$this->config = new Config($this->plugin->getDataFolder() . "Money.yml", Config::YAML, ["version" => 2, "money" => []]);
 		$this->money = $this->config->getAll();
 	}
 

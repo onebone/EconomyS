@@ -369,9 +369,16 @@ class EconomyAPI extends PluginBase implements Listener{
 			$this->getLogger()->critical("Invalid database was given.");
 			return false;
 		}
+		$this->provider->open();
+
 		$this->initializeLanguage();
 		$this->getLogger()->notice("Database provider was set to: ".$this->provider->getName());
 		$this->registerCommands();
+	}
+
+	public function openProvider(){
+		if($this->provider !== null)
+			$this->provider->open();
 	}
 
 	private function checkUpdate(){
