@@ -4,6 +4,7 @@ version: "2.0.9"
 author: onebone
 api:
 - 2.0.0
+- 2.1.0
 
 permissions:
  economyapi.*:
