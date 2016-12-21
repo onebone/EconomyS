@@ -1,7 +1,9 @@
 #EconomyS
-## For PocketMine-MP 1.4 Core-Rewrite
 
 Feel free to make a pull request!
+
+## Download
+[Jenkins](https://jenkins.onebone.me/job/EconomyS/)
 
 ## EconomyAPI commands
 
