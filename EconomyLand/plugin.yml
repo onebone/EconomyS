@@ -1,4 +1,4 @@
-0name: EconomyLand
+name: EconomyLand
 main: onebone\economyland\EconomyLand
 api:
 - 3.0.0
