@@ -2,6 +2,7 @@ name: EconomyAuction
 main: onebone\economyauction\EconomyAuction
 version: "2.0.2"
 api:
+- 3.0.0
 - 2.0.0
 - 2.1.0
 
