@@ -3,6 +3,7 @@ main: onebone\economyapi\EconomyAPI
 version: "2.0.9"
 author: onebone
 api:
+- 3.0.0
 - 2.0.0
 - 2.1.0
 
