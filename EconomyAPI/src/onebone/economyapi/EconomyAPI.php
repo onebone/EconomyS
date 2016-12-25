@@ -325,11 +325,15 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	public function onDisable(){
 		$this->saveAll();
+
+		if($this->provider instanceof Provider){
+			$this->provider->close();
+		}
 	}
 
 	public function saveAll(){
 		if($this->provider instanceof Provider){
-			$this->provider->close();
+			$this->provider->save();
 		}
 		file_put_contents($this->getDataFolder()."PlayerLang.dat", serialize($this->playerLang));
 	}

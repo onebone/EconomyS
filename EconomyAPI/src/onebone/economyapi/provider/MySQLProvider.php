@@ -82,7 +82,7 @@ class MySQLProvider implements Provider{
 	 * @param float $defaultMoney
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = 1000){
+	public function createAccount($player, $defaultMoney = 1000.0){
 		if($player instanceof Player){
 			$player = $player->getName();
 		}
