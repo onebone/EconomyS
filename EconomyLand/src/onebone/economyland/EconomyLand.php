@@ -724,7 +724,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
 			"sold-land" => "Has been sold the land for %MONETARY_UNIT%%1",
 			"not-my-land" => "Here is not your land",
-			"no-one-owned" => "Anyone doesn't have this land",
+			"no-one-owned" => "No one has this land",
 			"not-your-land" => "Land number %1 is not your land",
 			"no-land-found" => "There's no land numbered %1",
 			"land-corrupted" => "[EconomyLand] The World %2 of Land number %1 is corrupted.",
