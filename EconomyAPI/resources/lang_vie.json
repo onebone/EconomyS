@@ -1,0 +1,67 @@
+{
+    "language": "vie",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Shows your money"
+		},
+		"topmoney": {
+			"usage": "/topmoney [page]",
+			"description": "Shows top money of this server"
+		},
+		"setmoney": {
+			"usage": "/setmoney <player> <amount>",
+			"description": "Set money of player"
+		},
+		"seemoney": {
+			"usage": "/seemoney <player>",
+			"description": "Shows money of player"
+		},
+		"givemoney": {
+			"usage": "/givemoney <player> <amount>",
+			"description": "Gives money to player"
+		},
+		"takemoney": {
+			"usage": "/takemoney <player> <amount>",
+			"description": "Takes money from player"
+		},
+		"pay": {
+			"usage": "/pay <player> <amount>",
+			"description": "Pays money to player"
+		},
+		"setlang": {
+			"usage": "/setlang <language>",
+			"description": "Set your language"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Shows your status of money"
+		}
+	},
+    "language-set": "Language set to %1 by onebone",
+    "request-cancelled": "§l§cYêu cầu đã bị hủy bỏ :o",
+    "player-not-connected": "§c%1 không online",
+    "player-never-connected": "§c%1 chưa bao giờ online",
+    "topmoney-tag": "§l§b- §eBXH Tiền §b(%1 trên %2) -",
+    "topmoney-format": "§l§e[§a%1§e] §d%2§e: §b%3",
+    "pay-failed": "§cThất bại.",
+    "pay-success": "§aĐã trả §e%1 %MONETARY_UNIT% §acho §b%2.",
+    "money-paid": "§b%1 §ađã đưa cho bạn §e%2 %MONETARY_UNIT%.",
+    "takemoney-must-be-number": "§l§cPhải là một số",
+    "takemoney-invalid-number": "§l§cSố không phù hợp",
+    "takemoney-player-lack-of-money": "§b%1 §ckhông đủ §e%2 %MONETARY_UNIT%.§d Tiền của §b%1 §e%3 %MONETARY_UNIT%",
+    "takemoney-money-taken": "§l§aSố tiền %1 %MONETARY_UNIT% của bạn đã bị lấy",
+    "takemoney-took-money": "§l§aĐã lấy %2 %MONETARY_UNIT% từ %1",
+    "takemoney-failed": "§l§c Lấy tiền thất bại",
+    "givemoney-must-be-number": "§l§cPhải là một số",
+    "givemoney-invalid-number": "§l§cSố không phù hợp",
+    "givemoney-money-given": "§l§a Bạn đã nhận được %1 %MONETARY_UNIT%",
+    "givemoney-gave-money": "§l§aĐã đưa %1 %MONETARY_UNIT% cho %2",
+    "seemoney-seemoney": "§l§bTiền của người chơi %1: %2 %MONETARY_UNIT%",
+    "setmoney-setmoney": "§l§bTiền của người chơi %1 đã bị chỉnh thành %2 %MONETARY_UNIT%",
+    "setmoney-set": "§l§bTiền của bạn đã được chỉnh thành %1 %MONETARY_UNIT%",
+    "setmoney-failed": "§l§cLỗi",
+    "setmoney-invalid-number": "§l§b%1 %MONETARY_UNIT% phải là một số",
+    "mymoney-mymoney": "§l§bTiền của bạn: %1 %MONETARY_UNIT%",
+    "mystatus-show": "§l§bTrạng thái tiền của tôi: %1%"
+}
