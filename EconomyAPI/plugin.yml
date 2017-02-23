@@ -1,6 +1,6 @@
 name: EconomyAPI
 main: onebone\economyapi\EconomyAPI
-version: "2.0.9"
+api: [2.0.0, 3.0.0-ALPHA1, 3.0.0-ALPHA2, 3.0.0-ALPHA3]
 author: onebone
 api:
 - 3.0.0
