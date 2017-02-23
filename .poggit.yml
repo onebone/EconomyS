@@ -1,0 +1,41 @@
+--- # Poggit-CI Manifest. Open the CI at https://poggit.pmmp.io/ci/poggit-orphanage/EconomyS
+branches:
+- master
+projects:
+  EconomyAPI:
+    path: EconomyAPI/
+    logo: economy.png
+  EconomyAirport:
+    path: EconomyAirport/
+    logo: economy.png
+  EconomyAuction:
+    path: EconomyAuction/
+    logo: economy.png
+  EconomyCasino:
+    path: EconomyCasino/
+    logo: economy.png
+  EconomyJob:
+    path: EconomyJob/
+    logo: economy.png
+  EconomyLand:
+    path: EconomyLand/
+    logo: economy.png
+  EconomyPShop:
+    path: EconomyPShop/
+    logo: economy.png
+  EconomyProperty:
+    path: EconomyProperty/
+    logo: economy.png
+  EconomySell:
+    path: EconomySell/
+    logo: economy.png
+  EconomyShop:
+    path: EconomyShop/
+    logo: economy.png
+  EconomyTax:
+    path: EconomyTax/
+    logo: economy.png
+  EconomyUsury:
+    path: EconomyUsury/
+    logo: economy.png
+...
