@@ -4,7 +4,7 @@ branches:
 projects:
   EconomyAPI:
     path: EconomyAPI/
-    logo: economy.png
+    logo: EconomyAPI/economy.png
   EconomyAirport:
     path: EconomyAirport/
     logo: economy.png
