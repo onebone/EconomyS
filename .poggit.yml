@@ -19,7 +19,7 @@ projects:
     logo: economy.png
   EconomyLand:
     path: EconomyLand/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyPShop:
     path: EconomyPShop/
     logo: economy.png
@@ -31,7 +31,7 @@ projects:
     logo: economy.png
   EconomyShop:
     path: EconomyShop/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyTax:
     path: EconomyTax/
     logo: economy.png
