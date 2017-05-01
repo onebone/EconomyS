@@ -1,0 +1,67 @@
+{
+    "language": "de",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Schau dein Geldstand an"
+		},
+		"topmoney": {
+			"usage": "/topmoney [Seite]",
+			"description": "Schau die Topliste des Geldes an"
+		},
+		"setmoney": {			
+         "usage": "/setmoney <Spieler> <Betrag>",
+			"description": "Setz den Geldstand eines Spielers"
+		},
+		"seemoney": {
+			"usage": "/seemoney <Spieler>",
+			"description": "Schau dir den Geldstand eines Spielers an"
+		},
+		"givemoney": {
+			"usage": "/givemoney <Spieler> <Betrag>",	
+        "description": "Schenk ein Spieler Geld"
+},
+		"takemoney": {
+			"usage": "/takemoney <Spieler> <Betrag>",
+			"description": "Nimm ein Spieler Geld"
+		},
+		"pay": {
+			"usage": "/pay <Spieler> <Betrag>",
+			"description": "Überweis ein Spieler Geld"
+		},
+		"setlang": {
+			"usage": "/setlang <Sprache>",
+			"description": "Wähle eine Sprache"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Schau dein Geld Status an"
+		}
+	},
+    "language-set": "Sprache auf %1 gesetzt von Cathesda Server Studios und MineoutPE.bplaced.net",
+    "request-cancelled": "Ihre Anfrage wurde storniert",
+    "player-not-connected": "%1 ist Offline.",
+    "player-never-connected": "%1 war noch nie auf diesen Server bitte überprüf deine Rechtschreibung.",
+    "topmoney-tag": "> Topliste (%1/%2) <",
+    "topmoney-format": "[%1] %2: %3",
+    "pay-failed": "Bei der Überweisung ist ein Fehler unterlaufen.",
+    "pay-success": "Du hast 1%%MONETARY_UNIT% an %2 überwiesen.",
+    "money-paid": "%1 hat dir %2%MONETARY_UNIT% überwiesen.",
+    "takemoney-must-be-number": "Der Betrag muss eine Zahl sein ",
+    "takemoney-invalid-number": "Ungültige Zahl",
+    "takemoney-player-lack-of-money": "%1 hat keine %2%MONETARY_UNIT%  sein  Geldstand ist %3%MONETARY_UNIT%",
+    "takemoney-money-taken": "Bei dir wurden %1%MONETARY_UNIT% entfert" ,
+    "takemoney-took-money": "Du hast %2%MONETARY_UNIT% bei %1 entfernt",
+    "takemoney-failed": "Fehler beim Ausführen des Commands",
+    "givemoney-must-be-number": "Der Betrag muss eine zahl sein",
+    "givemoney-invalid-number": "Ungültige Zahl",
+    "givemoney-money-given": "Du hast %1%MONETARY_UNIT% bekommen",
+    "givemoney-gave-money": "Du hast %1%MONETARY_UNIT% an %2 gegeben",
+    "seemoney-seemoney": "%1 Geldstand : %2%MONETARY_UNIT%",
+    "setmoney-setmoney": "%1 Geldstand wurde zu%2%MONETARY_UNIT% gesetzt",
+    "setmoney-set": "Dein Geldstand wurde zu %1%MONETARY_UNIT% gesetzt",
+    "setmoney-failed": "Unbekannter Fehler",
+    "setmoney-invalid-number": "Ungültige Zahl",
+    "mymoney-mymoney": "Dein Geldstand: %1%MONETARY_UNIT%",
+    "mystatus-show": "Dein Geld Status< : %1%"
+}
