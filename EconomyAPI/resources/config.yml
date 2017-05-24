@@ -1,5 +1,5 @@
 # monetary-unit: Set what monetary unit you want to use
-monetary-unit: "$"
+monetary-unit: "Crystal"
 # add-op-at-rank: Set whether to show OPs at top money rank
 add-op-at-rank: false
 # default-money: Set default money when player joined the server first
@@ -10,9 +10,9 @@ max-money: 9999999999
 allow-pay-offline: true
 
 # default-lang: Set default language
-default-lang: def
+default-lang: vie
 # auto-save-interval: Set interval of auto-save
-auto-save-interval: 10
+auto-save-interval: 1
 
 # provider: Set provider of database (Available: yaml, mysql)
 provider: yaml
