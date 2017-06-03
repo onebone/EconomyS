@@ -24,8 +24,8 @@ use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
-use pocketmine\network\protocol\AddItemEntityPacket;
-use pocketmine\network\protocol\RemoveEntityPacket;
+use pocketmine\network\mcpe\protocol\AddItemEntityPacket;
+use pocketmine\network\mcpe\protocol\RemoveEntityPacket;
 use pocketmine\Player;
 use pocketmine\Server;
 
@@ -49,7 +49,7 @@ class ItemDisplayer{
 
 	public function spawnTo(Player $player){
 		$pk = new AddItemEntityPacket;
-		$pk->eid = $this->eid;
+		$pk->entityRuntimeId = $this->eid;
 		$pk->item = $this->item;
 		$pk->x = $this->pos->x + 0.5;
 		$pk->y = $this->pos->y;
