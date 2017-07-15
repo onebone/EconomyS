@@ -1,6 +1,6 @@
 name: EconomyLand
 main: onebone\economyland\EconomyLand
-api: [3.0.0-ALPHA5, 3.0.0-ALPHA6]
+api: [3.0.0-ALPHA7]
 version: "2.1.0-dev1"
 author: onebone
 depend: [EconomyAPI]

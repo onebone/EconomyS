@@ -29,7 +29,7 @@ class PayTask extends PluginTask{
 		parent::__construct($plugin);
 	}
 	
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		$this->getOwner()->payTax();
 	}
 }

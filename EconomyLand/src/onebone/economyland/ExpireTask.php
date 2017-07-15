@@ -33,7 +33,7 @@ class ExpireTask extends PluginTask{
 		$this->landId = $landId;
 	}
 	
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		$this->getOwner()->expireLand($this->landId);
 	}
 }

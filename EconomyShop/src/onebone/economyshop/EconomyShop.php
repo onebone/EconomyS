@@ -92,7 +92,7 @@ class EconomyShop extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
 		switch($command->getName()){
 			case "shop":
 				switch(strtolower(array_shift($params))){

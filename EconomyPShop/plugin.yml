@@ -2,7 +2,7 @@ name: EconomyPShop
 version: "2.0.2-dev1"
 author: onebone
 main: onebone\economypshop\EconomyPShop
-api: [3.0.0-ALPHA5, 3.0.0-ALPHA6]
+api: [3.0.0-ALPHA7]
 permissions:
  economypshop.*:
   description: Allows all permissions to the player

@@ -48,7 +48,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 		}
 	}
 	
-	public function execute(CommandSender $sender, $label, array $params){
+	public function execute(CommandSender $sender, string $label, array $params) : bool{
 		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
 			return false;
 		}

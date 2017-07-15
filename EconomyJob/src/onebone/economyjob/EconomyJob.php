@@ -141,7 +141,7 @@ class EconomyJob extends PluginBase implements Listener{
 		return $this->player->getAll();
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool {
 		switch(array_shift($params)){
 			case "join":
 				if(!$sender instanceof Player){

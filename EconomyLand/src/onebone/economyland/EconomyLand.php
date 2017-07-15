@@ -149,7 +149,7 @@ class EconomyLand extends PluginBase implements Listener{
 		return static::$instance;
 	}
 
-	public function onCommand(CommandSender $sender, Command $cmd, $label, array $param){
+	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $param) : bool{
 		switch($cmd->getName()){
 			case "startp":
 			if(!$sender instanceof Player){

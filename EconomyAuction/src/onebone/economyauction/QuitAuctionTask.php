@@ -33,7 +33,7 @@
 		 $this->player = strtolower($player);
 	 }
 	 
-	 public function onRun($currentTick){
+	 public function onRun(int $currentTick){
 		 $this->getOwner()->quitAuction($this->player);
 	 }
  }

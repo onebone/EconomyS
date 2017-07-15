@@ -34,7 +34,7 @@ class InterestTask extends PluginTask{
 		$this->player = $player;
 	}
 	
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		$this->getOwner()->handleInterest($this->host, $this->player);
 	}
 }

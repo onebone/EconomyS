@@ -33,7 +33,7 @@ class MySQLPingTask extends PluginTask{
 		$this->mysql = $mysql;
 	}
 
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		if(!$this->mysql->ping()){
 			$this->getOwner()->openProvider();
 		}

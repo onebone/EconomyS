@@ -79,7 +79,7 @@ class EconomyCasino extends PluginBase implements Listener{
 		}
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
 		switch($command->getName()){
 			case "casino":
 				$sub = array_shift($params);
