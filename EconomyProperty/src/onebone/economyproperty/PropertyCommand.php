@@ -25,6 +25,7 @@ use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Level;
 use pocketmine\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 
 class PropertyCommand extends Command implements PluginIdentifiableCommand{
@@ -34,7 +35,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 	private $pos;
 
 	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make", $touchPos = "touchpos"){
-		parent::__construct($command, $plugin);
+		parent::__construct($command);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
 		$this->setPermission("economyproperty.command.property;economyproperty.command.property.pos1;economyproperty.command.property.pos2;");
 		$this->setDescription("Property manage command");
@@ -47,11 +48,11 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 		$this->pos = array();
 	}
 
-	public function getPlugin(){
+	public function getPlugin(): Plugin{
 		return $this->plugin;
 	}
 
-	public function execute(CommandSender $sender, $label, array $params){
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled() or !$this->testPermission($sender)){
 			return false;
 		}

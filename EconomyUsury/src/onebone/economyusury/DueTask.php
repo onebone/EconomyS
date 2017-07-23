@@ -36,7 +36,7 @@ class DueTask extends PluginTask{
 		$this->hostOwner = $hostOwner;
 	}
 	
-	public function onRun($currentTick){
+	public function onRun(int $currentTick){
 		$this->removeItem();
 	}
 	

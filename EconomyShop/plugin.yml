@@ -1,9 +1,7 @@
 name: EconomyShop
 version: "2.0.7"
 api:
-- 3.0.0
-- 2.0.0
-- 2.1.0
+- 3.0.0-ALPHA7
 
 main: onebone\economyshop\EconomyShop
 author: onebone
