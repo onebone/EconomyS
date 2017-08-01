@@ -1,0 +1,67 @@
+{
+    "language": "uk",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Показує ваш баланс"
+		},
+		"topmoney": {
+			"usage": "/topmoney [сторінка]",
+			"description": "Показує багачів серверу"
+		},
+		"setmoney": {
+			"usage": "/setmoney <гравець> <кількість>",
+			"description": "Встановлює баланс для гравця"
+		},
+		"seemoney": {
+			"usage": "/seemoney <гравець>",
+			"description": "Показує баланс гравця"
+		},
+		"givemoney": {
+			"usage": "/givemoney <гравець> <кількість>",
+			"description": "Видає гроші гравцю"
+		},
+		"takemoney": {
+			"usage": "/takemoney <гравець> <кількість>",
+			"description": "Забирає гроші у гравця"
+		},
+		"pay": {
+			"usage": "/pay <гравець> <кількість>",
+			"description": "Передає гравцю гроші"
+		},
+		"setlang": {
+			"usage": "/setlang <мова>",
+			"description": "Встановлює мову"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Показує статус Ваших грошей"
+		}
+	},
+    "language-set": "Встановлено мову %1 (перекладено SMLR)",
+    "request-cancelled": "Ваш запит було відхилено",
+    "гравець-not-connected": "Гравець %1 зараз не грає",
+    "гравець-never-connected": "Гравця %1 не існує",
+    "topmoney-tag": "- Список багачів серверу (%1 з %2) -",
+    "topmoney-format": "[%1] %2: %3",
+    "pay-failed": "Помилка оплати.",
+    "pay-success": "Передано %MONETARY_UNIT%%1 до %2.",
+    "money-paid": "%1 передав Вам %MONETARY_UNIT%%2.",
+    "takemoney-must-be-number": "Кількість має бути чисельним значенням",
+    "takemoney-invalid-number": "Неправильна кількість",
+    "takemoney-гравець-lack-of-money": "%1 не має %MONETARY_UNIT%%2. Баланс %1 : %MONETARY_UNIT%%3",
+    "takemoney-money-taken": "З Вас знято %MONETARY_UNIT%%1",
+    "takemoney-took-money": "Ви зняли з гравця %1 %MONETARY_UNIT%%2",
+    "takemoney-failed": "Помилка зняття",
+    "givemoney-must-be-number": "Кількість має бути чисельним значенням",
+    "givemoney-invalid-number": "Неправильна кількість",
+    "givemoney-money-given": "Ви отримали %MONETARY_UNIT%%1",
+    "givemoney-gave-money": "Видано %MONETARY_UNIT%%1 гравцю %2",
+    "seemoney-seemoney": "Баланс %1 : %MONETARY_UNIT%%2",
+    "setmoney-setmoney": "Баланс гравця %1 змінено на %MONETARY_UNIT%%2",
+    "setmoney-set": "Ваш баланс змінено на %MONETARY_UNIT%%1",
+    "setmoney-failed": "Помилка зміни балансу",
+    "setmoney-invalid-number": "%MONETARY_UNIT%%1 має бути чисельним значенням",
+    "mymoney-mymoney": "Ваш баланс : %MONETARY_UNIT%%1",
+    "mystatus-show": "Статус : %1%"
+}
