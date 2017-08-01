@@ -51,7 +51,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand{
 		return $this->plugin;
 	}
 
-	public function execute(CommandSender $sender, $label, array $params){
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled() or !$this->testPermission($sender)){
 			return false;
 		}

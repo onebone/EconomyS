@@ -20,7 +20,7 @@ class SetLangCommand extends Command{
 		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, $label, array $params){
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)){
 			return false;

@@ -1,5 +1,5 @@
 name: EconomyPShop
-version: "2.0.2-dev1"
+version: "2.0.2-dev2"
 author: onebone
 main: onebone\economypshop\EconomyPShop
 api: [3.0.0-ALPHA7]
