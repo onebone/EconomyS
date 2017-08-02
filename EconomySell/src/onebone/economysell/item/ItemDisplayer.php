@@ -67,7 +67,7 @@ class ItemDisplayer{
 
 	public function despawnFrom(Player $player){
 		$pk = new RemoveEntityPacket;
-		$pk->eid = $this->eid;
+		$pk->entityUniqueId = $this->eid;
 		$player->dataPacket($pk);
 	}
 
