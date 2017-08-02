@@ -9,7 +9,25 @@ use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-class MyStatusCommand extends Command{
+if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+	abstract class _MyStatusCommand extends Command{
+		public function execute(CommandSender $sender, string $label, array $args): bool{
+			return $this->_execute($sender, $label, $args);
+		}
+
+		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
+	}
+}else{
+	abstract class _MyStatusCommand extends Command{
+		public function execute(CommandSender $sender, $label, array $args){
+			return $this->_execute($sender, $label, $args);
+		}
+
+		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
+	}
+}
+
+class MyStatusCommand extends _MyStatusCommand{
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
@@ -21,7 +39,7 @@ class MyStatusCommand extends Command{
 		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
+	public function _execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)){
 			return false;
@@ -47,3 +65,4 @@ class MyStatusCommand extends Command{
 		return true;
 	}
 }
+

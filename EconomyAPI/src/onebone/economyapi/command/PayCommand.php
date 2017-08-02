@@ -10,7 +10,25 @@ use pocketmine\Player;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\money\PayMoneyEvent;
 
-class PayCommand extends Command{
+if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+	abstract class _PayCommand extends Command{
+		public function execute(CommandSender $sender, string $label, array $args): bool{
+			return $this->_execute($sender, $label, $args);
+		}
+
+		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
+	}
+}else{
+	abstract class _PayCommand extends Command{
+		public function execute(CommandSender $sender, $label, array $args){
+			return $this->_execute($sender, $label, $args);
+		}
+
+		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
+	}
+}
+
+class PayCommand extends _PayCommand{
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
@@ -22,7 +40,7 @@ class PayCommand extends Command{
 		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
+	public function _execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)){
 			return false;
@@ -75,3 +93,4 @@ class PayCommand extends Command{
 		return true;
 	}
 }
+

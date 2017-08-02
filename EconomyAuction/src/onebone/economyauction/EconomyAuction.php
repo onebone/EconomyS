@@ -29,7 +29,7 @@ use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
 
-class EconomyAuction extends PluginBase{
+class _EconomyAuction extends PluginBase{
 	/*
 	@var int[] $auctions
 	key : player name
@@ -79,7 +79,7 @@ class EconomyAuction extends PluginBase{
 		file_put_contents($this->getDataFolder()."QuitQueue.dat", serialize($this->queue));
 	}
 	
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool{
+	public function _onCommand(CommandSender $sender, Command $command, $label, array $params){
 		switch($command->getName()){
 			case "auction":
 			$sub = array_shift($params);
@@ -265,5 +265,19 @@ class EconomyAuction extends PluginBase{
 			$this->getServer()->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
 		unset($this->auctions[$auction]);
+	}
+}
+
+if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+	class EconomyAuction extends _EconomyAuction{
+		public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
+			return parent::_onCommand($sender, $command, $label, $args);
+		}
+	}
+}else{
+	class EconomyAuction extends _EconomyAuction{
+		public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+			return parent::_onCommand($sender, $command, $label, $args);
+		}
 	}
 }

@@ -24,7 +24,25 @@ namespace onebone\economyapi\task;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\scheduler\PluginTask;
 
-class MySQLPingTask extends PluginTask{
+if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+	abstract class _MySQLPingTask extends PluginTask{
+		public function onRun(int $currentTick){
+			$this->_onRun($currentTick);
+		}
+
+		abstract public function _onRun(int $currentTick);
+	}
+}else{
+	abstract class _MySQLPingTask extends PluginTask{
+		public function onRun($currentTick){
+			$this->_onRun($currentTick);
+		}
+
+		abstract public function _onRun(int $currentTick);
+	}
+}
+
+class MySQLPingTask extends _MySQLPingTask{
 	private $mysql;
 
 	public function __construct(EconomyAPI $plugin, \mysqli $mysql){
@@ -33,7 +51,7 @@ class MySQLPingTask extends PluginTask{
 		$this->mysql = $mysql;
 	}
 
-	public function onRun(int $currentTick){
+	public function _onRun(int $currentTick){
 		if(!$this->mysql->ping()){
 			$this->getOwner()->openProvider();
 		}
