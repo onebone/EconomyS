@@ -167,11 +167,10 @@ class EconomySell extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("added-rm-queue"));
 						return true;
 					case "list":
-
 						return true;
 				}
-				return false;
-		}
+            }
+        return false;
 	}
 
 	public function onPlayerJoin(PlayerJoinEvent $event){
