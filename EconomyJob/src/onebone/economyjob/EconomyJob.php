@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -141,7 +141,7 @@ class EconomyJob extends PluginBase implements Listener{
 		return $this->player->getAll();
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool {
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool{
 		switch(array_shift($params)){
 			case "join":
 				if(!$sender instanceof Player){

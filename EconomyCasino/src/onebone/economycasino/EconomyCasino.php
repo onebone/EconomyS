@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ class EconomyCasino extends PluginBase implements Listener{
 		}
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool{
 		switch($command->getName()){
 			case "casino":
 				$sub = array_shift($params);

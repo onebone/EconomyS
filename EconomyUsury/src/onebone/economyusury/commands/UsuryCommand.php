@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 		}
 	}
 	
-	public function execute(CommandSender $sender, string $label, array $params) : bool{
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)){
 			return false;
 		}

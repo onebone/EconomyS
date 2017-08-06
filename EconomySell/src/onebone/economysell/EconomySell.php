@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -92,7 +92,7 @@ class EconomySell extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool{
 		switch($command->getName()){
 			case "sell":
 				switch(strtolower(array_shift($params))){
