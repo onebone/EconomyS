@@ -170,7 +170,7 @@ class EconomySell extends PluginBase implements Listener{
 						return true;
 				}
             }
-        return false;
+        return true;
 	}
 
 	public function onPlayerJoin(PlayerJoinEvent $event){
