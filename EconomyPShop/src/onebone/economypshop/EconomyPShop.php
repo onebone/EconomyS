@@ -20,6 +20,7 @@
 
 namespace onebone\economypshop;
 
+use pocketmine\Server;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
@@ -65,11 +66,13 @@ class EconomyPShop extends PluginBase implements Listener{
 		$this->placeQueue = [];
 	}
 
-	public function onDisable(){
-		$file = new Config($this->getDataFolder()."Shops.yml", Config::YAML);
-		$file->setAll($this->shop);
-		$file->save();
-	}
+    public function onDisable(){
+        if (Server::getInstance()->isRunning()) {
+            $file = new Config($this->getDataFolder()."Shops.yml", Config::YAML);
+            $file->setAll($this->shop);
+            $file->save();
+        }
+    }
 
 	public function onSignChange(SignChangeEvent $event){
 		$line = $event->getLines();
