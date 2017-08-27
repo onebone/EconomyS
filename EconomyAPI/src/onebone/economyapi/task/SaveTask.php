@@ -29,7 +29,7 @@ class SaveTask extends PluginTask {
 		parent::__construct($plugin);
 	}
 
-	public function _onRun(int $currentTick){
+	public function onRun(int $currentTick){
 		$this->getOwner()->saveAll();
 	}
 }
