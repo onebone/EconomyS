@@ -32,7 +32,8 @@ class YamlDatabase implements Database{
 	/**
 	 * @var array
 	 */
-	private $land, $config, $path;
+	private $land, $config;
+	private $path;
 	private $landNum = 0;
 
 

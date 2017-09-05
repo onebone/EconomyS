@@ -38,6 +38,7 @@ use pocketmine\plugin\MethodEventExecutor;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\database\YamlDatabase;
+use onebone\economyland\database\SQLiteDatabase;
 use onebone\economyland\database\Database;
 
 class EconomyLand extends PluginBase implements Listener{
@@ -95,10 +96,10 @@ class EconomyLand extends PluginBase implements Listener{
 			case "yml":
 				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->getConfig(), $this->getDataFolder()."Land.sqlite3");
 				break;
-		/*	case "sqlite3":
+			case "sqlite3":
 			case "sqlite":
 				$this->db = new SQLiteDatabase($this->getDataFolder()."Land.sqlite3", $this->getConfig(), $this->getDataFolder()."Land.yml");
-				break;*/
+				break;
 			default:
 				$this->db = new YamlDatabase($this->getDataFolder()."Land.yml", $this->getConfig(), $this->getDataFolder()."Land.sqlite3");
 				$this->getLogger()->alert("Specified database type is unavailable. Database type is YAML.");
@@ -149,15 +150,15 @@ class EconomyLand extends PluginBase implements Listener{
 		return static::$instance;
 	}
 
-	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $param): bool{
+	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $param) : bool{
 		switch($cmd->getName()){
 			case "startp":
 			if(!$sender instanceof Player){
 				$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 				return true;
 			}
-			$x = floor($sender->x);
-			$z = floor($sender->z);
+			$x = (int) floor($sender->x);
+			$z = (int) floor($sender->z);
 			$level = $sender->getLevel()->getFolderName();
 			$this->start[$sender->getName()] = array("x" => $x, "z" => $z, "level" => $level);
 			$sender->sendMessage($this->getMessage("first-position-saved"));
@@ -176,10 +177,10 @@ class EconomyLand extends PluginBase implements Listener{
 				return true;
 			}
 
-			$startX = $this->start[$sender->getName()]["x"];
-			$startZ = $this->start[$sender->getName()]["z"];
-			$endX = floor($sender->x);
-			$endZ = floor($sender->z);
+			$startX = (int) $this->start[$sender->getName()]["x"];
+			$startZ = (int) $this->start[$sender->getName()]["z"];
+			$endX = (int) floor($sender->x);
+			$endZ = (int) floor($sender->z);
 			$this->end[$sender->getName()] = array(
 				"x" => $endX,
 				"z" => $endZ
@@ -240,10 +241,10 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$l = $this->start[$sender->getName()];
 				$endp = $this->end[$sender->getName()];
-				$startX = floor($l["x"]);
-				$endX = floor($endp["x"]);
-				$startZ = floor($l["z"]);
-				$endZ = floor($endp["z"]);
+				$startX = (int) floor($l["x"]);
+				$endX = (int) floor($endp["x"]);
+				$startZ = (int) floor($l["z"]);
+				$endZ = (int) floor($endp["z"]);
 				if($startX > $endX){
 					$backup = $startX;
 					$startX = $endX;
@@ -722,11 +723,11 @@ class EconomyLand extends PluginBase implements Listener{
 
 	private function createConfig(){
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
-			"sold-land" => "Has been sold the land for %MONETARY_UNIT%%1",
-			"not-my-land" => "Here is not your land",
-			"no-one-owned" => "No one has this land",
+			"sold-land" => "The land was sold for %MONETARY_UNIT%%1",
+			"not-my-land" => "This is not your land",
+			"no-one-owned" => "No one owns this land",
 			"not-your-land" => "Land number %1 is not your land",
-			"no-land-found" => "There's no land numbered %1",
+			"no-land-found" => "There is no land number %1",
 			"land-corrupted" => "[EconomyLand] The World %2 of Land number %1 is corrupted.",
 			"no-permission-move" => "You have no permission to move to land %1. Owner : %2",
 			"fail-moving" => "Failed moving to land %1",
@@ -734,14 +735,14 @@ class EconomyLand extends PluginBase implements Listener{
 			"land-list-top" => "Showing land list page %1 of %2\\n",
 			"land-list-format" => "#%1 Width : %2 m^2 | Owner : %3\\n",
 			"here-land" => "#%1 Here is %2's land",
-			"land-num-must-numeric" => "Land number must numeric",
-			"not-invitee" => "%1 is not invitee of your land",
-			"already-invitee" => "Player %1 is already invitee of your land",
+			"land-num-must-numeric" => "Land number must be numeric",
+			"not-invitee" => "%1 is not invited to your land",
+			"already-invitee" => "Player %1 is already invited to your land",
 			"removed-invitee" => "Has been removed %1 from land %2",
-			"invalid-invitee" => "%1 is invalid name",
-			"success-invite" => "%1 is now invitee of your land",
+			"invalid-invitee" => "%1 is an invalid name",
+			"success-invite" => "%1 is now invited to your land",
 			"player-not-connected" => "Player %1 is not connected",
-			"cannot-give-land-myself" => "You can't give your land yourself",
+			"cannot-give-land-myself" => "You can't give your land to yourself",
 			"gave-land" => "Has been gave land %1 for %2",
 			"got-land" => "[EconomyLand] %1 gave you land %2",
 			"land-limit" => "You have %1 lands. The limit of land is %2",
@@ -750,13 +751,13 @@ class EconomyLand extends PluginBase implements Listener{
 			"set-second-position" => "Please set second position",
 			"not-allowed-to-buy" => "This world is not allowed to buy land",
 			"land-around-here" => "[EconomyLand] There are ID:%2 land around here. Owner : %1",
-			"no-money-to-buy-land" => "You don't have money to buy this land",
-			"bought-land" => "Has been bought land for %MONETARY_UNIT%%1",
+			"no-money-to-buy-land" => "You don't have enough money to buy this land",
+			"bought-land" => "Land purchased for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
 			"second-position-saved" => "Second position saved",
 			"cant-set-position-in-different-world" => "You can't set position in different world",
 			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
-			"confirm-warning" => "WARNING: Your land seems overlapping with #%1.",
+			"confirm-warning" => "WARNING: Your land seems to overlapping with #%1.",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
 			"not-owned" => "[EconomyLand] You must buy land to edit this block",

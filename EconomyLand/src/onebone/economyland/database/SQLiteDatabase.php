@@ -26,14 +26,15 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 
 class SQLiteDatabase implements Database{
-	/**
-	 * @var \SQLite3
-	 */
-	private $land;
-	private $config;
+    /**
+     * @var array
+     */
+    private $land, $config;
+    private $path;
 
-	public function __construct($fileName, $config){
-		$this->land = new \SQLite3($fileName);
+	public function __construct($fileName, $config, $otherName = ""){
+        $this->path = $fileName;
+        $this->land = new \SQLite3($fileName);
 		$this->land->exec("CREATE TABLE IF NOT EXISTS land(
 			ID INTEGER PRIMARY KEY AUTOINCREMENT,
 			startX INTEGER NOT NULL,
@@ -50,11 +51,17 @@ class SQLiteDatabase implements Database{
 		$this->config = $config;
 	}
 
-	public function getByCoord($x, $z, $level){
+    public function save(){
+        $config = new Config($this->path,Config::YAML);
+        $config->setAll($this->land);
+        $config->save();
+    }
+
+    public function getByCoord($x, $z, $level){
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		return $this->land->query("SELECT * FROM land WHERE (startX <= $x AND endX >= $x) AND (startZ <= $z AND endZ >= $z) AND $level")->fetchArray(SQLITE3_ASSOC);
+		return $this->land->query("SELECT * FROM land WHERE (startX <= $x AND endX >= $x) AND (startZ <= $z AND endZ >= $z) AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 	}
 
 	public function getAll(){
@@ -122,7 +129,7 @@ class SQLiteDatabase implements Database{
 			$level = $level->getFolderName();
 		}
 		
-		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$player', '$level', $price, '{}'".($expires === null ? "":", $expires").")");
+		$this->land->exec("INSERT INTO land (startX, endX, startZ, endZ, owner, level, price, invitee".($expires === null?"":", expires").") VALUES ($startX, $endX, $startZ, $endZ, '$owner', '$level', $price, '{}'".($expires === null ? "":", $expires").")");
 		return $this->land->query("SELECT seq FROM sqlite_sequence")->fetchArray(SQLITE3_ASSOC)["seq"] - 1;
 	}
 
@@ -150,8 +157,8 @@ class SQLiteDatabase implements Database{
 		if($level instanceof Level){
 			$level = $level->getFolderName();
 		}
-		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
-		return !is_bool($result);
+		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $startX AND startZ <= $endZ AND endZ >= $startZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
+		return $result !== null ? $result : false;
 	}
 
 	public function close(){
