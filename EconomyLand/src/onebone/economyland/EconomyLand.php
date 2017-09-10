@@ -31,6 +31,7 @@ use pocketmine\utils\Config;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
+use pocketmine\Server;
 use pocketmine\level\Position;
 use pocketmine\level\Level;
 use pocketmine\event\EventPriority;
@@ -126,10 +127,13 @@ class EconomyLand extends PluginBase implements Listener{
 	}
 
 	public function onDisable(){
-		$this->save();
-		if($this->db instanceof Database){
-			$this->db->close();
-		}
+        if (Server::getInstance()->isRunning()) {
+            $this->save();
+            if($this->db instanceof Database){
+                $this->db->close();
+            }
+        }
+
 	}
 
 	public function save(){
@@ -317,7 +321,7 @@ class EconomyLand extends PluginBase implements Listener{
 				}
 				$sender->sendMessage("Results from query : $player\n");
 				foreach($lands as $info)
-					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], (($info["endX"] + 1) - ($info["startX"] - 1) - 1) * (($info["endZ"] + 1) - ($info["startZ"] - 1) - 1 ), $info["owner"])));
+					$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], ($info["endX"] - $info["startX"]) * ($info["endZ"] - $info["startZ"]), $info["owner"])));
 				break;
 				case "move":
 				if(!$sender instanceof Player){
@@ -725,42 +729,42 @@ class EconomyLand extends PluginBase implements Listener{
 		$this->lang = new Config($this->getDataFolder()."language.properties", Config::PROPERTIES, array(
 			"sold-land" => "The land was sold for %MONETARY_UNIT%%1",
 			"not-my-land" => "This is not your land",
-			"no-one-owned" => "No one owns this land",
+			"no-one-owned" => "Nobody owns this land",
 			"not-your-land" => "Land number %1 is not your land",
 			"no-land-found" => "There is no land number %1",
 			"land-corrupted" => "[EconomyLand] The World %2 of Land number %1 is corrupted.",
 			"no-permission-move" => "You have no permission to move to land %1. Owner : %2",
-			"fail-moving" => "Failed moving to land %1",
-			"success-moving" => "Has been moved to land %1",
+			"fail-moving" => "Failed to move to land %1",
+			"success-moving" => "Moved to land %1",
 			"land-list-top" => "Showing land list page %1 of %2\\n",
-			"land-list-format" => "#%1 Width : %2 m^2 | Owner : %3\\n",
-			"here-land" => "#%1 Here is %2's land",
+			"land-list-format" => "#%1 Area : %2 m^2 | Owner : %3\\n",
+			"here-land" => "#%1 This land belongs to %2",
 			"land-num-must-numeric" => "Land number must be numeric",
 			"not-invitee" => "%1 is not invited to your land",
-			"already-invitee" => "Player %1 is already invited to your land",
-			"removed-invitee" => "Has been removed %1 from land %2",
+			"already-invitee" => "Player %1 is already invited to this land",
+			"removed-invitee" => " %1 has been uninvited from land %2",
 			"invalid-invitee" => "%1 is an invalid name",
-			"success-invite" => "%1 is now invited to your land",
+			"success-invite" => "%1 is now invited to this land",
 			"player-not-connected" => "Player %1 is not connected",
-			"cannot-give-land-myself" => "You can't give your land to yourself",
-			"gave-land" => "Has been gave land %1 for %2",
+			"cannot-give-land-myself" => "You can't give land to yourself",
+			"gave-land" => "Land %1 was given to %2",
 			"got-land" => "[EconomyLand] %1 gave you land %2",
-			"land-limit" => "You have %1 lands. The limit of land is %2",
-			"give-land-limit" => "%1 has %2 lands. The limit of land is %3",
-			"set-first-position" => "Please set first position",
-			"set-second-position" => "Please set second position",
-			"not-allowed-to-buy" => "This world is not allowed to buy land",
-			"land-around-here" => "[EconomyLand] There are ID:%2 land around here. Owner : %1",
+			"land-limit" => "You have %1 lands. The limit is %2",
+			"give-land-limit" => "%1 has %2 lands. The limit is %3",
+			"set-first-position" => "Please set the first position",
+			"set-second-position" => "Please set the second position",
+			"not-allowed-to-buy" => "Land cannot be bought in this world",
+			"land-around-here" => "[EconomyLand] There is ID:%2 land near here. Owner : %1",
 			"no-money-to-buy-land" => "You don't have enough money to buy this land",
 			"bought-land" => "Land purchased for %MONETARY_UNIT%%1",
 			"first-position-saved" => "First position saved",
 			"second-position-saved" => "Second position saved",
-			"cant-set-position-in-different-world" => "You can't set position in different world",
-			"confirm-buy-land" => "Land price : %MONETARY_UNIT%%1\\nBuy land with command /land buy",
-			"confirm-warning" => "WARNING: Your land seems to overlapping with #%1.",
+			"cant-set-position-in-different-world" => "You can't set a position in different world",
+			"confirm-buy-land" => "Price: %MONETARY_UNIT%%1\\nBuy this land with /land buy",
+			"confirm-warning" => "WARNING: This land seems to overlap with #%1.",
 			"no-permission" => "You don't have permission to edit this land. Owner : %1",
 			"no-permission-command" => "[EconomyLand] You don't have permissions to use this command.",
-			"not-owned" => "[EconomyLand] You must buy land to edit this block",
+			"not-owned" => "[EconomyLand] You must buy land to build here",
 			"run-cmd-in-game" => "[EconomyLand] Please run this command in-game."
 		));
 	}
