@@ -1,8 +1,8 @@
 name: EconomyCasino
 main: onebone\economycasino\EconomyCasino
-version: "2.0.2-dev2"
+version: "2.0.2-1.alpha8"
 author: onebone
-api: [3.0.0-ALPHA7]
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8]
 depend: [EconomyAPI]
 
 permissions:

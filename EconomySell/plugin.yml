@@ -1,6 +1,6 @@
 name: EconomySell
-version: "2.0.7-dev2"
-api: [3.0.0-ALPHA7]
+version: "2.0.7-1.alpha8"
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8]
 main: onebone\economysell\EconomySell
 author: onebone
 depend: [EconomyAPI]

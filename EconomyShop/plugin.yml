@@ -1,6 +1,6 @@
 name: EconomyShop
-version: 2.0.8-dev2
-api: [3.0.0-ALPHA7]
+version: 2.0.8-1.alpha8
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8]
 main: onebone\economyshop\EconomyShop
 author: onebone
 depend: [EconomyAPI]
