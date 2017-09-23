@@ -62,5 +62,6 @@ class TopMoneyCommand extends Command{
 
 		$task = new SortTask($sender->getName(), $this->plugin->getAllMoney(), $this->plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
 		$server->getScheduler()->scheduleAsyncTask($task);
+		return true;
 	}
 }

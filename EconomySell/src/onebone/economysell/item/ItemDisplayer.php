@@ -51,10 +51,10 @@ class ItemDisplayer{
 		$pk = new AddItemEntityPacket;
 		$pk->entityRuntimeId = $this->eid;
 		$pk->item = $this->item;
-		$pk->x = $this->pos->x + 0.5;
-		$pk->y = $this->pos->y;
-		$pk->z = $this->pos->z + 0.5;
-		$pk->speedX = $pk->speedY = $pk->speedZ = 0;
+        $position = new Vector3($this->pos->x + 0.5, $this->pos->y, $this->pos->z + 0.5);
+        $motion = new Vector3(0, 0, 0);
+        $pk->position = $position;
+        $pk->motion = $motion;
 
 		$player->dataPacket($pk);
 	}
