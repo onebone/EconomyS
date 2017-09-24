@@ -29,6 +29,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -322,7 +323,12 @@ class EconomySell extends PluginBase implements Listener{
 			$player->sendMessage($this->getMessage("no-permission-sell"));
 			return false;
 		}
-		$item = Item::get($sell[4], $sell[5], $sell[7]);
+        if (is_string($sell[4])){
+            $itemId = ItemFactory::fromString($sell[4], false)->getId();
+        }else{
+            $itemId = ItemFactory::get((int) $sell[4], false)->getId();
+        }
+        $item = ItemFactory::get($itemId, (int) $sell[5], (int) $sell[7]);
 		if($player->getInventory()->contains($item)){
 			$ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
 			$this->getServer()->getPluginManager()->callEvent($ev);
