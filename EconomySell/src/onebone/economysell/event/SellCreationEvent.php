@@ -26,42 +26,42 @@ use pocketmine\item\Item;
 use pocketmine\level\Position;
 
 class SellCreationEvent extends Event implements Cancellable{
-	public static $handlerList = null;
+    public static $handlerList = null;
 
-	private $position, $item, $price, $side;
+    private $position, $item, $price, $side;
 
-	public function __construct(Position $position, Item $item, $price, $side){
-		$this->position = $position;
-		$this->item = $item;
-		$this->price = $price;
-		$this->side = $side;
-	}
+    public function __construct(Position $position, Item $item, $price, $side){
+        $this->position = $position;
+        $this->item = $item;
+        $this->price = $price;
+        $this->side = $side;
+    }
 
-	/**
-	 * @return Position
-	 */
-	public function getPosition(){
-		return $this->position;
-	}
+    /**
+     * @return Position
+     */
+    public function getPosition(){
+        return $this->position;
+    }
 
-	/**
-	 * @return Item
-	 */
-	public function getItem(){
-		return $this->item;
-	}
+    /**
+     * @return Item
+     */
+    public function getItem(){
+        return $this->item;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getPrice(){
-		return $this->price;
-	}
+    /**
+     * @return float
+     */
+    public function getPrice(){
+        return $this->price;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getSide(){
-		return $this->side;
-	}
+    /**
+     * @return int
+     */
+    public function getSide(){
+        return $this->side;
+    }
 }
