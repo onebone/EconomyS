@@ -29,6 +29,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
 use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -170,8 +171,8 @@ class EconomyShop extends PluginBase implements Listener{
 
 						return true;
 				}
-				return false;
 		}
+        return false;
 	}
 
 	public function onPlayerJoin(PlayerJoinEvent $event){
@@ -328,8 +329,13 @@ class EconomyShop extends PluginBase implements Listener{
 		if($money < $shop[8]){
 			$player->sendMessage($this->getMessage("no-money", [$shop[8], $shop[6]]));
 		}else{
-			$item = Item::get($shop[4], $shop[5], $shop[7]);
-			if($player->getInventory()->canAddItem($item)){
+		    if (is_string($shop[4])){
+                $itemId = ItemFactory::fromString($shop[4], false)->getId();
+            }else{
+                $itemId = ItemFactory::get((int) $shop[4], false)->getId();
+            }
+            $item = ItemFactory::get($itemId, (int) $shop[5], (int) $shop[7]);
+            if($player->getInventory()->canAddItem($item)){
 				$ev = new ShopTransactionEvent($player, new Position($shop[0], $shop[1], $shop[2], $this->getServer()->getLevelByName($shop[3])), $item, $shop[8]);
 				$this->getServer()->getPluginManager()->callEvent($ev);
 				if($ev->isCancelled()){
