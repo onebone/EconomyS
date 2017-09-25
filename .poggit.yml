@@ -7,35 +7,35 @@ projects:
     logo: EconomyAPI/icon.png
   EconomyAirport:
     path: EconomyAirport/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyAuction:
     path: EconomyAuction/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyCasino:
     path: EconomyCasino/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyJob:
     path: EconomyJob/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyLand:
     path: EconomyLand/
     logo: EconomyAPI/icon.png
   EconomyPShop:
     path: EconomyPShop/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyProperty:
     path: EconomyProperty/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomySell:
     path: EconomySell/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyShop:
     path: EconomyShop/
     logo: EconomyAPI/icon.png
   EconomyTax:
     path: EconomyTax/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
   EconomyUsury:
     path: EconomyUsury/
-    logo: economy.png
+    logo: EconomyAPI/icon.png
 ...
