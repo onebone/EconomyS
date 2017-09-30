@@ -1,7 +1,7 @@
 name: EconomyAirport
-version: "2.0.4-1.alpha8"
+version: "2.0.4-2"
 author: onebone
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8]
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9]
 main: onebone\economyairport\EconomyAirport
 depend: [EconomyAPI]
 
