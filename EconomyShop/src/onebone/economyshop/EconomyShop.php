@@ -259,7 +259,7 @@ class EconomyShop extends PluginBase implements Listener{
 			foreach($this->items as $level => $arr){
 				foreach($arr as $key => $displayer){
 					$link = $displayer->getLinked();
-					if($link->getX() === $shop[0] and $link->getY() === $shop[1] and $link->getZ() === $shop[2] and $link->getLevel()->getFolderName() === $shop[3]){
+					if($link->getLevel() !== null and $link->getX() === $shop[0] and $link->getY() === $shop[1] and $link->getZ() === $shop[2] and $link->getLevel()->getFolderName() === $shop[3]){
 						$displayer->despawnFromAll();
 						unset($this->items[$key]);
 						break 2;
@@ -330,7 +330,7 @@ class EconomyShop extends PluginBase implements Listener{
 			$player->sendMessage($this->getMessage("no-money", [$shop[8], $shop[6]]));
 		}else{
 		    if (is_string($shop[4])){
-                $itemId = ItemFactory::fromString($shop[4], false)->getId();
+                $itemId = ItemFactory::fromString((string) $shop[4], false)->getId();
             }else{
                 $itemId = ItemFactory::get((int) $shop[4], false)->getId();
             }
