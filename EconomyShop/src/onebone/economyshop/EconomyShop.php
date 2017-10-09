@@ -86,7 +86,7 @@ class EconomyShop extends PluginBase implements Listener{
 				if(isset($shop[9]) && $shop[9] !== -1){
 					$display = $pos->getSide($shop[9]);
 				}
-				$this->items[$shop[3]][] = new ItemDisplayer($display, Item::get($shop[4], $shop[5]), $pos);
+				$this->items[$shop[3]][] = new ItemDisplayer($display, Itemfactory::get((int) $shop[5], (int) $shop[7], (int) $shop[8]), $pos);
 			}
 		}
 
@@ -329,13 +329,13 @@ class EconomyShop extends PluginBase implements Listener{
 		if($money < $shop[8]){
 			$player->sendMessage($this->getMessage("no-money", [$shop[8], $shop[6]]));
 		}else{
-		    if (is_string($shop[4])){
-                $itemId = ItemFactory::fromString((string) $shop[4], false)->getId();
-            }else{
-                $itemId = ItemFactory::get((int) $shop[4], false)->getId();
-            }
-            $item = ItemFactory::get($itemId, (int) $shop[5], (int) $shop[7]);
-            if($player->getInventory()->canAddItem($item)){
+			if (is_string($shop[4])){
+				$itemId = ItemFactory::fromString((string) $shop[4], false)->getId();
+			}else{
+				$itemId = ItemFactory::get((int) $shop[4], false)->getId();
+			}
+			$item = ItemFactory::get($itemId, (int) $shop[5], (int) $shop[7]);
+			if($player->getInventory()->canAddItem($item)){
 				$ev = new ShopTransactionEvent($player, new Position($shop[0], $shop[1], $shop[2], $this->getServer()->getLevelByName($shop[3])), $item, $shop[8]);
 				$this->getServer()->getPluginManager()->callEvent($ev);
 				if($ev->isCancelled()){
