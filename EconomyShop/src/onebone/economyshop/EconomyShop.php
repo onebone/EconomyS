@@ -77,13 +77,13 @@ class EconomyShop extends PluginBase implements Listener{
 
 		$levels = [];
 		foreach($this->provider->getAll() as $shop){
-			if($shop[9] !== -2){
+			if(!isset($shop[9]) or $shop[9] !== -2){
 				if(!isset($levels[$shop[3]])){
 					$levels[$shop[3]] = $this->getServer()->getLevelByName($shop[3]);
 				}
 				$pos = new Position($shop[0], $shop[1], $shop[2], $levels[$shop[3]]);
 				$display = $pos;
-				if($shop[9] !== -1){
+				if(isset($shop[9]) && $shop[9] !== -1){
 					$display = $pos->getSide($shop[9]);
 				}
 				$this->items[$shop[3]][] = new ItemDisplayer($display, Item::get($shop[4], $shop[5]), $pos);
