@@ -77,16 +77,17 @@ class EconomySell extends PluginBase implements Listener{
 
         $levels = [];
         foreach($this->provider->getAll() as $sell){
-            if($sell[9] !== -2){
-                if(!isset($levels[$sell[3]])){
-                    $levels[$sell[3]] = $this->getServer()->getLevelByName($sell[3]);
+            if(!isset($sell[9]) or $sell[9] !== -2){
+            	$level = $sell["level"] ?? $sell[3];
+                if(!isset($levels[$level])){
+                    $levels[$level] = $this->getServer()->getLevelByName($level);
                 }
-                $pos = new Position($sell[0], $sell[1], $sell[2], $levels[$sell[3]]);
+                $pos = new Position($sell["x"] ?? $sell[0], $sell["y"] ?? $sell[1], $sell["z"] ?? $sell[2], $levels[$level]);
                 $display = $pos;
-                if($sell[9] !== -1){
+                if(isset($sell[9]) && $sell[9] !== -1){
                     $display = $pos->getSide($sell[9]);
                 }
-                $this->items[$sell[3]][] = new ItemDisplayer($display, Item::get($sell[4], $sell[5]), $pos);
+                $this->items[$level][] = new ItemDisplayer($display, ItemFactory::get(($sell["item"] ?? $sell[4]), $sell["meta"] ?? $sell[5], $sell["amount"] ?? $sell[7]), $pos);
             }
         }
 
@@ -282,7 +283,7 @@ class EconomySell extends PluginBase implements Listener{
             foreach($this->items as $level => $arr){
                 foreach($arr as $key => $displayer){
                     $link = $displayer->getLinked();
-                    if($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getLevel()->getFolderName() === $sell[3]){
+                    if($link->getX() === ($sell["x"] ?? $sell[0]) && ($link->getY() === $sell["y"] ?? $sell[1]) and ($link->getZ() === $sell["z"] ?? $sell[2]) and ($link->getLevel()->getFolderName() === $sell["level"] ?? $sell[3])){
                         $displayer->despawnFromAll();
                         unset($this->items[$key]);
                         break 2;
@@ -309,7 +310,11 @@ class EconomySell extends PluginBase implements Listener{
                     unset($this->tap[$iusername]);
                 }else{
                     $this->tap[$iusername] = $now;
-                    $player->sendMessage($this->getMessage("tap-again", [$sell[6], $sell[7], $sell[8]]));
+					$itemname= $sell["item"] ?? $sell[6];
+                    if(is_numeric($itemname)){
+						$itemname = ItemFactory::get((int) $itemname, false)->getName();
+					}
+                    $player->sendMessage($this->getMessage("tap-again", [$sell["amount"] ?? $sell[7], $itemname, $sell["cost"] ?? $sell[8]]));
                 }
             }else{
                 $this->sellItem($player, $sell);
@@ -347,24 +352,26 @@ class EconomySell extends PluginBase implements Listener{
             $player->sendMessage($this->getMessage("no-permission-sell"));
             return false;
         }
-        if(is_string($sell[4])){
-            $itemId = ItemFactory::fromString($sell[4], false)->getId();
+		$itemname = $sell["item"] ?? $sell[4];
+        if(is_string($itemname)){
+            $itemId = ItemFactory::fromString((string) $itemname, false)->getId();
         }else{
-            $itemId = ItemFactory::get((int)$sell[4], false)->getId();
+            $itemId = ItemFactory::get((int) $itemname, false)->getId();
+			$itemname = ItemFactory::get((int) $itemname, false)->getName();
         }
-        $item = ItemFactory::get($itemId, (int)$sell[5], (int)$sell[7]);
+        $item = ItemFactory::get($itemId, (int) ($sell["amount"] ?? $sell[5]), (int)($sell["amount"] ?? $sell[7]));
         if($player->getInventory()->contains($item)){
-            $ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
+            $ev = new SellTransactionEvent($player, new Position($sell["x"] ?? $sell[0], $sell["y"] ?? $sell[1], $sell["z"] ?? $sell[2], $this->getServer()->getLevelByName($sell["level"] ?? $sell[3])), $item, $sell["cost"] ?? $sell[8]);
             $this->getServer()->getPluginManager()->callEvent($ev);
             if($ev->isCancelled()){
                 $player->sendMessage($this->getMessage("failed-sell"));
                 return true;
             }
             $player->getInventory()->removeItem($item);
-            $player->sendMessage($this->getMessage("sold-item", [$sell[6], $sell[7], $sell[8]]));
-            EconomyAPI::getInstance()->addMoney($player, $sell[8]);
+            $player->sendMessage($this->getMessage("sold-item", $sell["amount"] ?? $sell[7], $itemname, $sell["cost"] ?? $sell[8]));
+            EconomyAPI::getInstance()->addMoney($player, $sell["cost"] ?? $sell[8]);
         }else{
-            $player->sendMessage($this->getMessage("no-item", [$sell[6]]));
+            $player->sendMessage($this->getMessage("no-item", [$itemname]));
         }
         return true;
     }
@@ -378,8 +385,8 @@ class EconomySell extends PluginBase implements Listener{
 
             $search[] = "%MONETARY_UNIT%";
             $replace[] = EconomyAPI::getInstance()->getMonetaryUnit();
-
-            for($i = 1; $i <= count($replacement); $i++){
+			$replacecount = count($replacement);
+            for($i = 1; $i <= $replacecount; $i++){
                 $search[] = "%" . $i;
                 $replace[] = $replacement[$i - 1];
             }
