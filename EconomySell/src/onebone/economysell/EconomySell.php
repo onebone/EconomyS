@@ -368,7 +368,7 @@ class EconomySell extends PluginBase implements Listener{
                 return true;
             }
             $player->getInventory()->removeItem($item);
-            $player->sendMessage($this->getMessage("sold-item", $sell["amount"] ?? $sell[7], $itemname, $sell["cost"] ?? $sell[8]));
+            $player->sendMessage($this->getMessage("sold-item", [$sell["amount"] ?? $sell[7], $itemname, $sell["cost"] ?? $sell[8]]));
             EconomyAPI::getInstance()->addMoney($player, $sell["cost"] ?? $sell[8]);
         }else{
             $player->sendMessage($this->getMessage("no-item", [$itemname]));
