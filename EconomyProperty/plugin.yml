@@ -1,6 +1,6 @@
 name: EconomyProperty
 main: onebone\economyproperty\EconomyProperty
-version: "2.0.7-2"
+version: "2.0.7-3"
 author: onebone
 api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10]
 depend:

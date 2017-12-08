@@ -1,5 +1,5 @@
 name: EconomyShop
-version: 2.0.8-5
+version: 2.0.8-6
 api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10]
 main: onebone\economyshop\EconomyShop
 author: onebone
