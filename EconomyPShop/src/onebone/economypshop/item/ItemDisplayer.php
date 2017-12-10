@@ -31,56 +31,56 @@ use pocketmine\Player;
 use pocketmine\Server;
 
 class ItemDisplayer{
-    /** @var Position */
-    private $pos;
-    /** @var Item */
-    private $item;
-    /** @var Position */
-    private $linked;
+	/** @var Position */
+	private $pos;
+	/** @var Item */
+	private $item;
+	/** @var Position */
+	private $linked;
 
-    private $eid;
+	private $eid;
 
-    public function __construct(Position $pos, Item $item, Position $linked){
-        $this->pos = $pos;
-        $this->item = $item;
-        $this->linked = $linked;
+	public function __construct(Position $pos, Item $item, Position $linked){
+		$this->pos = $pos;
+		$this->item = $item;
+		$this->linked = $linked;
 
-        $this->eid = Entity::$entityCount++;
-    }
+		$this->eid = Entity::$entityCount++;
+	}
 
-    public function spawnTo(Player $player){
-        $pk = new AddItemEntityPacket;
-        $pk->entityRuntimeId = $this->eid;
-        $pk->item = $this->item;
-        $position = new Vector3($this->pos->x + 0.5, $this->pos->y, $this->pos->z + 0.5);
-        $motion = new Vector3(0, 0, 0);
-        $pk->position = $position;
-        $pk->motion = $motion;
-        $player->dataPacket($pk);
-    }
+	public function spawnTo(Player $player){
+		$pk = new AddItemEntityPacket;
+		$pk->entityRuntimeId = $this->eid;
+		$pk->item = $this->item;
+		$position = new Vector3($this->pos->x + 0.5, $this->pos->y, $this->pos->z + 0.5);
+		$motion = new Vector3(0, 0, 0);
+		$pk->position = $position;
+		$pk->motion = $motion;
+		$player->dataPacket($pk);
+	}
 
-    public function spawnToAll(Level $level = null){
-        foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
-            $this->spawnTo($player);
-        }
-    }
+	public function spawnToAll(Level $level = null){
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
+			$this->spawnTo($player);
+		}
+	}
 
-    public function despawnFrom(Player $player){
-        $pk = new RemoveEntityPacket;
-        $pk->entityUniqueId = $this->eid;
-        $player->dataPacket($pk);
-    }
+	public function despawnFrom(Player $player){
+		$pk = new RemoveEntityPacket;
+		$pk->entityUniqueId = $this->eid;
+		$player->dataPacket($pk);
+	}
 
-    public function despawnFromAll(Level $level = null){
-        foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
-            $this->despawnFrom($player);
-        }
-    }
+	public function despawnFromAll(Level $level = null){
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
+			$this->despawnFrom($player);
+		}
+	}
 
-    /**
-     * @return Position
-     */
-    public function getLinked(){
-        return $this->linked;
-    }
+	/**
+	 * @return Position
+	 */
+	public function getLinked(){
+		return $this->linked;
+	}
 }

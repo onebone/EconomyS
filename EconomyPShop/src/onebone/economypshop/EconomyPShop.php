@@ -68,10 +68,10 @@ class EconomyPShop extends PluginBase implements Listener{
 		$this->saveResource("language.properties");
 		$this->saveDefaultConfig();
 
-		$this->shop = (new Config($this->getDataFolder()."Shops.yml", Config::YAML))->getAll();
-		$this->shopText = (new Config($this->getDataFolder()."ShopText.yml", Config::YAML));
-		$this->lang = (new Config($this->getDataFolder()."language.properties", Config::PROPERTIES));
-		if (!$this->lang->exists("added-queue")){
+		$this->shop = (new Config($this->getDataFolder() . "Shops.yml", Config::YAML))->getAll();
+		$this->shopText = (new Config($this->getDataFolder() . "ShopText.yml", Config::YAML));
+		$this->lang = (new Config($this->getDataFolder() . "language.properties", Config::PROPERTIES));
+		if(!$this->lang->exists("added-queue")){
 			$langArr = $this->lang->getAll();
 			$langArr["added-queue"] = "Touch any block to create a PShop.";
 			$this->lang->setAll($langArr);
@@ -106,7 +106,7 @@ class EconomyPShop extends PluginBase implements Listener{
 		}
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool{
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
 		switch($command->getName()){
 			case "pshop":
 				switch(strtolower(array_shift($params))){
@@ -114,7 +114,7 @@ class EconomyPShop extends PluginBase implements Listener{
 					case "cr":
 					case "c":
 						if(!$sender instanceof Player){
-							$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+							$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 							return true;
 						}
 						if(!$sender->hasPermission("economypshop.shop.create")){
@@ -148,7 +148,7 @@ class EconomyPShop extends PluginBase implements Listener{
 							return true;
 						}
 
-						if($cost < 0 or $amount < 1 or (int)$amount != $amount){
+						if($cost < 0 or $amount < 1 or (int) $amount != $amount){
 							$sender->sendMessage($this->getMessage("wrong-num"));
 							return true;
 						}
@@ -163,14 +163,38 @@ class EconomyPShop extends PluginBase implements Listener{
 							$side = Vector3::SIDE_UP;
 						}else{
 							switch(strtolower($side)){
-								case "up": case Vector3::SIDE_UP: $side = Vector3::SIDE_UP;break;
-								case "down": case Vector3::SIDE_DOWN: $side = Vector3::SIDE_DOWN;break;
-								case "west": case Vector3::SIDE_WEST: $side = Vector3::SIDE_WEST;break;
-								case "east": case Vector3::SIDE_EAST: $side = Vector3::SIDE_EAST;break;
-								case "north": case Vector3::SIDE_NORTH: $side = Vector3::SIDE_NORTH;break;
-								case "south": case Vector3::SIDE_SOUTH: $side = Vector3::SIDE_SOUTH;break;
-								case "shop": case -1: $side = -1;break;
-								case "none": case -2: $side = -2;break;
+								case "up":
+								case Vector3::SIDE_UP:
+									$side = Vector3::SIDE_UP;
+									break;
+								case "down":
+								case Vector3::SIDE_DOWN:
+									$side = Vector3::SIDE_DOWN;
+									break;
+								case "west":
+								case Vector3::SIDE_WEST:
+									$side = Vector3::SIDE_WEST;
+									break;
+								case "east":
+								case Vector3::SIDE_EAST:
+									$side = Vector3::SIDE_EAST;
+									break;
+								case "north":
+								case Vector3::SIDE_NORTH:
+									$side = Vector3::SIDE_NORTH;
+									break;
+								case "south":
+								case Vector3::SIDE_SOUTH:
+									$side = Vector3::SIDE_SOUTH;
+									break;
+								case "shop":
+								case -1:
+									$side = -1;
+									break;
+								case "none":
+								case -2:
+									$side = -2;
+									break;
 								default:
 									$sender->sendMessage($this->getMessage("invalid-side"));
 									return true;
@@ -193,7 +217,7 @@ class EconomyPShop extends PluginBase implements Listener{
 	 */
 	public function onBlockBreak(BlockBreakEvent $event){
 		$block = $event->getBlock();
-		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName();
+		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName();
 		if(isset($this->shop[$loc])){
 			$player = $event->getPlayer();
 			$shop = $this->shop[$loc];
@@ -234,7 +258,7 @@ class EconomyPShop extends PluginBase implements Listener{
 			return;
 		}
 		$block = $event->getBlock();
-		$loc = $block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName();
+		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName();
 		$player = $event->getPlayer();
 		if(isset($this->shop[$loc])){
 			if($player->hasPermission("economypshop.shop.buy")){
@@ -250,7 +274,7 @@ class EconomyPShop extends PluginBase implements Listener{
 				}
 
 				$now = microtime(true);
-				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5  or $this->tap[$player->getName()][0] !== $loc){
+				if(!isset($this->tap[$player->getName()]) or $now - $this->tap[$player->getName()][1] >= 1.5 or $this->tap[$player->getName()][0] !== $loc){
 					$this->tap[$player->getName()] = [$loc, $now];
 					$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"], $shop["price"], $shop["amount"]]));
 					return;
@@ -269,7 +293,7 @@ class EconomyPShop extends PluginBase implements Listener{
 							if($api->myMoney($player) > $shop["price"]){
 								$player->getInventory()->addItem($item);
 								$api->reduceMoney($player, $shop["price"], true, "EconomyPShop");
-								$player->sendMessage($this->getMessage("bought-item", [$shop["item"].":".$shop["meta"], $shop["price"], $shop["amount"]]));
+								$player->sendMessage($this->getMessage("bought-item", [$shop["item"] . ":" . $shop["meta"], $shop["price"], $shop["amount"]]));
 								$cloud->removeItem($shop["item"], $shop["meta"], $shop["amount"]);
 								$api->addMoney($shop["owner"], $shop["price"], true, "EconomyPShop");
 							}else{
@@ -297,7 +321,7 @@ class EconomyPShop extends PluginBase implements Listener{
 				$item->setCount($queue[1]);
 
 				$block = $event->getBlock();
-				$this->shop[$block->getX().":".$block->getY().":".$block->getZ().":".$block->getLevel()->getFolderName()] = [
+				$this->shop[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()] = [
 					"x" => $block->getX(),
 					"y" => $block->getY(),
 					"z" => $block->getZ(),
@@ -345,15 +369,6 @@ class EconomyPShop extends PluginBase implements Listener{
 		}
 	}
 
-	public function getTag($firstLine){
-		foreach($this->shopText->getAll() as $key => $val){
-			if($key == $firstLine){
-				return $val;
-			}
-		}
-		return false;
-	}
-
 	public function onPlayerJoin(PlayerJoinEvent $event){
 		$player = $event->getPlayer();
 		$level = $player->getLevel()->getFolderName();
@@ -383,8 +398,8 @@ class EconomyPShop extends PluginBase implements Listener{
 		}
 	}
 
-	public function saveShops() {
-		$file = new Config($this->getDataFolder()."Shops.yml", Config::YAML);
+	public function saveShops(){
+		$file = new Config($this->getDataFolder() . "Shops.yml", Config::YAML);
 		$file->setAll($this->shop);
 		$file->save();
 	}
