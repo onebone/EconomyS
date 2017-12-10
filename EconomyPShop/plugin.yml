@@ -1,8 +1,14 @@
 name: EconomyPShop
-version: "2.0.2-3"
+version: "2.0.2-4"
 author: onebone
 main: onebone\economypshop\EconomyPShop
 api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10]
+commands:
+ pshop:
+  description: Management command for creating/removing PShops
+  usage: /pshop <create|remove|list> [item[:damage]] [amount] [price] [side]
+  permission: economypshop.shop.create
+
 permissions:
  economypshop.*:
   description: Allows all permissions to the player
@@ -11,7 +17,7 @@ permissions:
     description: Allows player all permissions related to shop
     children:
      economypshop.shop.create:
-      description: Allows player to create shop
+      description: Allows player to create PShops
       default: true
      economypshop.shop.buy:
       description: Allows player to buy items from shop
