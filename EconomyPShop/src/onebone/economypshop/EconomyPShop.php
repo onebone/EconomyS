@@ -286,7 +286,7 @@ class EconomyPShop extends PluginBase implements Listener{
 					if($shop["amount"] > $cloud->getCount($shop["item"], $shop["meta"])){
 						$player->sendMessage($this->getMessage("no-stock"));
 					}else{
-						if($player->getInventory()->canAddItem(($item = new Item($shop["item"], $shop["meta"], $shop["amount"]))) === false){
+						if($player->getInventory()->canAddItem(($item = ItemFactory::get($shop["item"], $shop["meta"], $shop["amount"]))) === false){
 							$player->sendMessage($this->getMessage("no-space"));
 						}else{
 							$api = \onebone\economyapi\EconomyAPI::getInstance();
