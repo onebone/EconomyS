@@ -77,7 +77,6 @@ class EconomyShop extends PluginBase implements Listener{
 
 		$levels = [];
 		foreach($this->provider->getAll() as $shop){
-			var_dump($shop) . PHP_EOL;
 			if(!isset($shop[9]) or $shop[9] !== -2){
 				$level = $shop["level"] ?? $shop[3];
 				if(!isset($levels[$level])){
