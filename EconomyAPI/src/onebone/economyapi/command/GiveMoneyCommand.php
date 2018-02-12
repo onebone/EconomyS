@@ -9,25 +9,7 @@ use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
-	abstract class _GiveMoneyCommand extends Command{
-		public function execute(CommandSender $sender, string $label, array $args): bool{
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}else{
-	abstract class _GiveMoneyCommand extends Command{
-		public function execute(CommandSender $sender, $label, array $args){
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}
-
-class GiveMoneyCommand extends _GiveMoneyCommand{
+class GiveMoneyCommand extends Command{
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
@@ -39,7 +21,7 @@ class GiveMoneyCommand extends _GiveMoneyCommand{
 		$this->plugin = $plugin;
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool{
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)){
 			return false;
@@ -76,7 +58,6 @@ class GiveMoneyCommand extends _GiveMoneyCommand{
 			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 			break;
 		}
-
-		return true;
+        return true;
 	}
 }

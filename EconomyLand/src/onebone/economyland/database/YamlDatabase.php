@@ -32,7 +32,8 @@ class YamlDatabase implements Database{
 	/**
 	 * @var array
 	 */
-	private $land, $config, $path;
+	private $land, $config;
+	private $path;
 	private $landNum = 0;
 
 
@@ -110,7 +111,7 @@ class YamlDatabase implements Database{
 	public function getLandsByKeyword($keyword){
 		$ret = [];
 		foreach($this->land as $land){
-			if(stripos($keyword, $land["owner"]) or stripos($land["owner"], $keyword)){
+			if(stripos($keyword, $land["owner"] !== false) or stripos($land["owner"], $keyword) !== false){
 				$ret[] = $land;
 			}
 		}

@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2016  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
 
-class _EconomyAuction extends PluginBase{
+class EconomyAuction extends PluginBase{
 	/*
 	@var int[] $auctions
 	key : player name
@@ -79,7 +79,7 @@ class _EconomyAuction extends PluginBase{
 		file_put_contents($this->getDataFolder()."QuitQueue.dat", serialize($this->queue));
 	}
 	
-	public function _onCommand(CommandSender $sender, Command $command, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params) : bool{
 		switch($command->getName()){
 			case "auction":
 			$sub = array_shift($params);
@@ -265,19 +265,5 @@ class _EconomyAuction extends PluginBase{
 			$this->getServer()->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
 		unset($this->auctions[$auction]);
-	}
-}
-
-if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
-	class EconomyAuction extends _EconomyAuction{
-		public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
-			return parent::_onCommand($sender, $command, $label, $args);
-		}
-	}
-}else{
-	class EconomyAuction extends _EconomyAuction{
-		public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-			return parent::_onCommand($sender, $command, $label, $args);
-		}
 	}
 }

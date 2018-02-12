@@ -66,6 +66,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		"ko" => "한국어",
 		"nl" => "Nederlands",
 		"ru" => "Русский",
+		"uk" => "Українська",
 		"zh" => "繁體中文",
 	];
 	private $lang = [], $playerLang = [];

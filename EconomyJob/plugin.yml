@@ -1,9 +1,7 @@
 name: EconomyJob
 main: onebone\economyjob\EconomyJob
-version: "2.0.4"
-api:
-- 3.0.0-ALPHA7
-
+version: "2.0.4-4"
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11]
 depend: [EconomyAPI]
 author: onebone
 

@@ -9,9 +9,9 @@
 	"sell-created": "&2Sell center was created successfully.",
 	"sell-removed": "&2Sell center was removed successfully.",
 	"no-permission-sell": "&4You don't have permission to sell item.",
-	"tap-again": "&eTap again to sell &2%2&e of &b%1&e for &6%MONETARY_UNIT%%3&e.",
-	"no-item": "You do not have enough item to sell &4%1&r.",
+	"tap-again": "&eTap again to sell &2%2&e &b%1&e for &6%MONETARY_UNIT%%3&e.",
+	"no-item": "You do not have enough items to sell &4%1&r.",
 	"failed-sell": "&4Failed to sell item due to unknown reason.",
-	"sold-item": "You have sold item %2 of &b%1&r for &6%MONETARY_UNIT%%3&r.",
+	"sold-item": "You have sold %2 &b%1&r for &6%MONETARY_UNIT%%3&r.",
 	"sell-breaking-forbidden": "&4You cannot break sell centers."
 }
