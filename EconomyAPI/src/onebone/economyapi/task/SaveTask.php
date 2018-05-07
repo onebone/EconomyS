@@ -24,7 +24,7 @@ use onebone\economyapi\EconomyAPI;
 
 use pocketmine\scheduler\PluginTask;
 
-if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
 	abstract class _SaveTask extends PluginTask{
 		public function onRun(int $currentTick){
 			$this->_onRun($currentTick);

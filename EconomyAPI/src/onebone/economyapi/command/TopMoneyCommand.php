@@ -26,7 +26,7 @@ use pocketmine\command\CommandSender;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\SortTask;
 
-if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
 	abstract class _TopMoneyCommand extends Command{
 		public function execute(CommandSender $sender, string $label, array $args): bool{
 			return $this->_execute($sender, $label, $args);

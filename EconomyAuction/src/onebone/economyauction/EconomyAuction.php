@@ -268,7 +268,7 @@ class _EconomyAuction extends PluginBase{
 	}
 }
 
-if(version_compare(\pocketmine\API_VERSION, "3.0.0-ALPHA7") >= 0){
+if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
 	class EconomyAuction extends _EconomyAuction{
 		public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
 			return parent::_onCommand($sender, $command, $label, $args);
