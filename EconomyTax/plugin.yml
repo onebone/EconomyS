@@ -2,7 +2,7 @@ name: EconomyTax
 main: onebone\economytax\EconomyTax
 author: onebone
 version: "2.0.3-4"
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11]
+api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12]
 depend: [EconomyAPI]
 permissions:
  economytax.tax.avoid:
