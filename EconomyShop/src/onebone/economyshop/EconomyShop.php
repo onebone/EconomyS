@@ -260,7 +260,7 @@ class EconomyShop extends PluginBase implements Listener{
 			foreach($this->items as $level => $arr){
 				foreach($arr as $key => $displayer){
 					$link = $displayer->getLinked();
-					if($link->getLevel() !== null && ($link->getX() === $shop["x"] ?? $shop[0]) && ($link->getY() === $shop["y"] ?? $shop[1]) && ($link->getZ() === $shop["z"] ?? $shop[2]) && $link->getLevel()->getFolderName() === $shop["level"] ?? $shop[3]){
+					if($link->getLevel() !== null && ($link->getX() === ($shop["x"] ?? $shop[0])) && ($link->getY() === ($shop["y"] ?? $shop[1])) && ($link->getZ() === ($shop["z"] ?? $shop[2])) && $link->getLevel()->getFolderName() === ($shop["level"] ?? $shop[3])){
 						$displayer->despawnFromAll();
 						unset($this->items[$key]);
 						break 2;
