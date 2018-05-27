@@ -8,3 +8,5 @@ auto-save: true
 data-provider: yaml
 # Language of EconomyShop will use (ch, en, ko, jp, uk, vi)
 lang: en
+# Allow Shops on any block? When false will allow ONLY Signs
+allow-any-block: true

@@ -14,5 +14,6 @@
   "full-inventory": "&4インベントリーに余裕がありません。",
   "failed-buy": "&4エラーのせいで買えませんでした。",
   "bought-item": "%2つの&b%1&rを&6%MONETARY_UNIT%%3%&rでかいました。",
-  "shop-breaking-forbidden": "&4商店は壊せません。"
+  "shop-breaking-forbidden": "&4商店は壊せません。",
+  "shop-create-allow-any-block": "&4You must create shops on a sign"
 }

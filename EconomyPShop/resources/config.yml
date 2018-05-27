@@ -3,3 +3,5 @@ shop-tax: 100
 # Worlds not to allow to create pshop
 # World names must be listed in lower case
 disallow-worlds: []
+# Allow PShops on any block? When false will allow ONLY Signs
+allow-any-block: false

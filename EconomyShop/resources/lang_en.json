@@ -14,5 +14,6 @@
   "full-inventory": "&4You do not have inventory slot to buy item.",
   "failed-buy": "&4Failed to buy item due to unknown reason.",
   "bought-item": "You have bought item %2 of &b%1&r for &6%MONETARY_UNIT%%3%&r.",
-  "shop-breaking-forbidden": "&4You cannot break shops."
+  "shop-breaking-forbidden": "&4You cannot break shops.",
+  "shop-create-allow-any-block": "&4You must create shops on a sign"
 }

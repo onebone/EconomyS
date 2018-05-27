@@ -14,5 +14,6 @@
   "full-inventory": "&4아이템을 보관할 인벤토리가 없습니다.",
   "failed-buy": "&4알 수 없는 이유로 구매에 실패하였습니다.",
   "bought-item": "%2개의 &b%1&r 를 &6%MONETARY_UNIT%%3%&r 에 구매하였습니다.",
-  "shop-breaking-forbidden": "&4상점을 때려 부술 수 없습니다."
+  "shop-breaking-forbidden": "&4상점을 때려 부술 수 없습니다.",
+  "shop-create-allow-any-block": "&4알 수 없는 이유로 상점 생성을 실패하였습니다."
 }

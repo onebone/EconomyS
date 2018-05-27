@@ -316,6 +316,11 @@ class EconomyPShop extends PluginBase implements Listener{
 			$iusername = strtolower($player->getName());
 
 			if(isset($this->queue[$iusername])){
+				$signIds = [Item::SIGN, Item::SIGN_POST, Item::WALL_SIGN];
+				if(!$this->getConfig()->get("allow-any-block", false) && !in_array($block->getItemId(), $signIds)) {
+					$player->sendMessage($this->getMessage("shop-create-allow-any-block"));
+					return;
+				}
 				$queue = $this->queue[$iusername];
 				$item = Item::fromString($queue[0]);
 				$item->setCount($queue[1]);

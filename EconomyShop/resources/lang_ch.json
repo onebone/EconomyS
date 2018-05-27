@@ -14,5 +14,6 @@
   "full-inventory": "&4你没有足够的空间购买该物品.",
   "failed-buy": "&4未知原因,购买物品失败.",
   "bought-item": "你成功购买 %2 个 &b%1&r .花费 &6%MONETARY_UNIT%%3%&r.",
-  "shop-breaking-forbidden": "&4你不能破坏商店."
+  "shop-breaking-forbidden": "&4你不能破坏商店.",
+  "shop-create-allow-any-block": "&4未知原因,创建商店失败."
 }
