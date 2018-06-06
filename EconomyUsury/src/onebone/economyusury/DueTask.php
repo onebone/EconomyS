@@ -20,17 +20,16 @@
  
 namespace onebone\economyusury;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
-class DueTask extends PluginTask{
+class DueTask extends Task{
 	private $guarantee, $playerName, $hostOwner;
 	
 	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner){
-		parent::__construct($plugin);
-		
+		$this->plugin = $plugin;
 		$this->guarantee = $guarantee;
 		$this->playerName = $playerName;
 		$this->hostOwner = $hostOwner;
@@ -42,7 +41,7 @@ class DueTask extends PluginTask{
 	
 	public function removeItem(){
 		/** @var $owner EconomyUsury */
-		$owner = $this->getOwner();
+		$owner = $this->plugin;
 
 		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
 			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));

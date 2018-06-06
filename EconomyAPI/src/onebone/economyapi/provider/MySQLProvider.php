@@ -60,7 +60,7 @@ class MySQLProvider implements Provider{
 			return;
 		}
 
-		$this->plugin->getServer()->getScheduler()->scheduleRepeatingTask(new MySQLPingTask($this->plugin, $this->db), 600);
+		$this->plugin->getScheduler()->scheduleRepeatingTask(new MySQLPingTask($this->plugin, $this->db), 600);
 	}
 
 	/**
