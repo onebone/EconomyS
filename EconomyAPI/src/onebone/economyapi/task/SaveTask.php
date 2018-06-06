@@ -22,14 +22,15 @@ namespace onebone\economyapi\task;
 
 use onebone\economyapi\EconomyAPI;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class SaveTask extends PluginTask {
+class SaveTask extends Task {
+    private $plugin;
 	public function __construct(EconomyAPI $plugin){
-		parent::__construct($plugin);
+		$this->plugin = $plugin;
 	}
 
 	public function onRun(int $currentTick){
-		$this->getOwner()->saveAll();
+		$this->plugin->saveAll();
 	}
 }
