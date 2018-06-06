@@ -27,7 +27,7 @@ use pocketmine\scheduler\Task;
 class MySQLPingTask extends Task{
 	private $mysql;
 	
-	private $plugin
+	private $plugin;
 
 	public function __construct(EconomyAPI $plugin, \mysqli $mysql){
 		$this->plugin = $plugin;
