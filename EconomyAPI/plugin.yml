@@ -1,7 +1,7 @@
 name: EconomyAPI
 main: onebone\economyapi\EconomyAPI
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12]
-version: 5.7.1-6
+api: [3.0.0]
+version: 5.7.2
 author: onebone
 permissions:
  economyapi.*:

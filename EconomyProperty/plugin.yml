@@ -1,8 +1,8 @@
 name: EconomyProperty
 main: onebone\economyproperty\EconomyProperty
-version: "2.0.7-5"
+version: 2.0.8
 author: onebone
-api: [3.0.0-ALPHA7, 3.0.0-ALPHA8, 3.0.0-ALPHA9, 3.0.0-ALPHA10, 3.0.0-ALPHA11, 3.0.0-ALPHA12]
+api: [3.0.0]
 depend:
 - EconomyLand
 - EconomyAPI

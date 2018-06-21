@@ -1,7 +1,7 @@
 name: EconomyAuction
 main: onebone\economyauction\EconomyAuction
-version: "2.0.2-6"
-api: [3.0.0-ALPHA12]
+version: 2.0.3
+api: [3.0.0]
 author: onebone
 depend: [EconomyAPI]
 

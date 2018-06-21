@@ -1,7 +1,7 @@
 name: EconomyUsury
-version: "1.0.1-6"
+version: 1.0.2
 author: onebone
-api: [3.0.0-ALPHA12]
+api: [3.0.0]
 main: onebone\economyusury\EconomyUsury
 depend: [EconomyAPI]
 
