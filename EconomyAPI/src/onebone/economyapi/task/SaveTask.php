@@ -44,7 +44,6 @@ if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onComman
 
 class SaveTask extends _SaveTask{
 	public function __construct(EconomyAPI $plugin){
-		parent::__construct($plugin);
 	}
 
 	public function _onRun(int $currentTick){

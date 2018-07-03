@@ -46,7 +46,6 @@ class MySQLPingTask extends _MySQLPingTask{
 	private $mysql;
 
 	public function __construct(EconomyAPI $plugin, \mysqli $mysql){
-		parent::__construct($plugin);
 
 		$this->mysql = $mysql;
 	}
