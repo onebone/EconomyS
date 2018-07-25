@@ -3,15 +3,7 @@ main: onebone\economytax\EconomyTax
 author: onebone
 version: "2.0.3"
 api:
-- 3.0.0-ALPHA7
-- 3.0.0-ALPHA8
-- 3.0.0-ALPHA9
-- 3.0.0-ALPHA10
-- 3.0.0-ALPHA11
-- 3.0.0-ALPHA12
-- 3.0.0-ALPHA13
-- 3.0.0-ALPHA14
-- 3.0.0-ALPHA15
+- 4.0.0
 
 depend: [EconomyAPI]
 permissions:

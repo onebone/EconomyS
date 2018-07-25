@@ -9,37 +9,18 @@ use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	abstract class _GiveMoneyCommand extends Command{
-		public function execute(CommandSender $sender, string $label, array $args): bool{
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}else{
-	abstract class _GiveMoneyCommand extends Command{
-		public function execute(CommandSender $sender, $label, array $args){
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}
-
-class GiveMoneyCommand extends _GiveMoneyCommand{
+class GiveMoneyCommand extends Command{
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
-		$desc = $plugin->getCommandMessage("givemoney");
-		parent::__construct("givemoney", $desc["description"], $desc["usage"]);
+	    $desc = $plugin->getCommandMessage("givemoney");
+	    parent::__construct("givemoney", $desc["description"], $desc["usage"]);
+	    $this->setPermission("economyapi.command.givemoney");
 
-		$this->setPermission("economyapi.command.givemoney");
+	    $this->plugin = $plugin;
+    }
 
-		$this->plugin = $plugin;
-	}
-
-	public function _execute(CommandSender $sender, string $label, array $params): bool{
+    public function execute(CommandSender $sender, string $label, array $args): bool{
 		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)){
 			return false;
@@ -60,21 +41,21 @@ class GiveMoneyCommand extends _GiveMoneyCommand{
 		$result = $this->plugin->addMoney($player, $amount);
 		switch($result){
 			case EconomyAPI::RET_INVALID:
-			$sender->sendMessage($this->plugin->getMessage("givemoney-invalid-number", [$amount], $sender->getName()));
-			break;
+				$sender->sendMessage($this->plugin->getMessage("givemoney-invalid-number", [$amount], $sender->getName()));
+				break;
 			case EconomyAPI::RET_SUCCESS:
-			$sender->sendMessage($this->plugin->getMessage("givemoney-gave-money", [$amount, $player], $sender->getName()));
+				$sender->sendMessage($this->plugin->getMessage("givemoney-gave-money", [$amount, $player], $sender->getName()));
 
-			if($p instanceof Player){
-				$p->sendMessage($this->plugin->getMessage("givemoney-money-given", [$amount], $sender->getName()));
-			}
-			break;
+				if($p instanceof Player){
+					$p->sendMessage($this->plugin->getMessage("givemoney-money-given", [$amount], $sender->getName()));
+				}
+				break;
 			case EconomyAPI::RET_CANCELLED:
-			$sender->sendMessage($this->plugin->getMessage("request-cancelled", [], $sender->getName()));
-			break;
+				$sender->sendMessage($this->plugin->getMessage("request-cancelled", [], $sender->getName()));
+				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
-			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
-			break;
+				$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+				break;
 		}
 
 		return true;
