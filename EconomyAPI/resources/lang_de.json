@@ -3,7 +3,7 @@
 	"commands": {
 		"mymoney": {
 			"usage": "/mymoney",
-			"description": "Schau dein Geldstand an"
+			"description": "Schau deinen Kontostand an"
 		},
 		"topmoney": {
 			"usage": "/topmoney [Seite]",
@@ -11,23 +11,23 @@
 		},
 		"setmoney": {			
          "usage": "/setmoney <Spieler> <Betrag>",
-			"description": "Setz den Geldstand eines Spielers"
+			"description": "Setzt den Kontostand eines Spielers"
 		},
 		"seemoney": {
 			"usage": "/seemoney <Spieler>",
-			"description": "Schau dir den Geldstand eines Spielers an"
+			"description": "Schau dir den Kontostand eines Spielers an"
 		},
 		"givemoney": {
 			"usage": "/givemoney <Spieler> <Betrag>",	
-        "description": "Schenk ein Spieler Geld"
+        "description": "Schenk einem Spieler Geld"
 },
 		"takemoney": {
 			"usage": "/takemoney <Spieler> <Betrag>",
-			"description": "Nimm ein Spieler Geld"
+			"description": "Nimm einem Spieler Geld"
 		},
 		"pay": {
 			"usage": "/pay <Spieler> <Betrag>",
-			"description": "Überweis ein Spieler Geld"
+			"description": "Überweis einem Spieler Geld"
 		},
 		"setlang": {
 			"usage": "/setlang <Sprache>",
@@ -35,16 +35,16 @@
 		},
 		"mystatus": {
 			"usage": "/mystatus",
-			"description": "Schau dein Geld Status an"
+			"description": "Schau deinen Geldstatus an"
 		}
 	},
-    "language-set": "Sprache auf %1 gesetzt von CapricornOfLynx und DokiaCraft",
+    "language-set": "Sprache auf %1 gesetzt von CapricornOfLynx, PNG Software und DokiaCraft",
     "request-cancelled": "Ihre Anfrage wurde storniert",
     "player-not-connected": "%1 ist Offline.",
     "player-never-connected": "%1 war noch nie auf diesen Server bitte überprüfe deine Rechtschreibung.",
     "topmoney-tag": "> Topliste (%1/%2) <",
     "topmoney-format": "[%1] %2: %3",
-    "pay-failed": "Oops bei der Überweisung ist ein Fehler passiert",
+    "pay-failed": "Oops bei der Überweisung ist ein Fehler aufgetreten",
     "pay-success": "Du hast 1%%MONETARY_UNIT% an %2 überwiesen.",
     "money-paid": "%1 hat dir %2%MONETARY_UNIT% überwiesen.",
     "takemoney-must-be-number": "Du kannst dem Spieler keine Buchstaben oder Sonderzeichen überweisen",
