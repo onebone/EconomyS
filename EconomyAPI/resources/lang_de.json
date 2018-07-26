@@ -23,7 +23,7 @@
 },
 		"takemoney": {
 			"usage": "/takemoney <Spieler> <Betrag>",
-			"description": "Nimm einem Spieler Geld"
+			"description": "Nimm einem Spieler Geld weg"
 		},
 		"pay": {
 			"usage": "/pay <Spieler> <Betrag>",
@@ -38,30 +38,30 @@
 			"description": "Schau deinen Geldstatus an"
 		}
 	},
-    "language-set": "Sprache auf %1 gesetzt von CapricornOfLynx, PNG Software und DokiaCraft",
+    "language-set": "Sprache auf %1 gesetzt von CapricornOfLynx, PNG Software, Flaplim und DokiaCraft",
     "request-cancelled": "Ihre Anfrage wurde storniert",
     "player-not-connected": "%1 ist Offline.",
-    "player-never-connected": "%1 war noch nie auf diesen Server bitte überprüfe deine Rechtschreibung.",
+    "player-never-connected": "%1 war noch nie auf diesem Server. Bitte überprüfe deine Rechtschreibung.",
     "topmoney-tag": "> Topliste (%1/%2) <",
     "topmoney-format": "[%1] %2: %3",
     "pay-failed": "Oops bei der Überweisung ist ein Fehler aufgetreten",
     "pay-success": "Du hast 1%%MONETARY_UNIT% an %2 überwiesen.",
     "money-paid": "%1 hat dir %2%MONETARY_UNIT% überwiesen.",
-    "takemoney-must-be-number": "Du kannst dem Spieler keine Buchstaben oder Sonderzeichen überweisen",
+    "takemoney-must-be-number": "Du kannst einem Spieler keine Buchstaben oder Sonderzeichen wegnehmen",
     "takemoney-invalid-number": "Ungültige Zahl",
     "takemoney-player-lack-of-money": "%1 hat keine %2%MONETARY_UNIT%  sein  Guthaben ist %3%MONETARY_UNIT%",
-    "takemoney-money-taken": "Bei dir wurden %1%MONETARY_UNIT% entfert" ,
+    "takemoney-money-taken": "Bei dir wurden %1%MONETARY_UNIT% entfernt" ,
     "takemoney-took-money": "Du hast %2%MONETARY_UNIT% bei %1 entfernt",
     "takemoney-failed": "Fehler beim Ausführen des Commands",
-    "givemoney-must-be-number": "Du kannst dem Spieler keine Buchstaben oder Sonderzeichen überweisen",
+    "givemoney-must-be-number": "Du kannst einem Spieler keine Buchstaben oder Sonderzeichen schenken",
     "givemoney-invalid-number": "Ungültige Zahl",
     "givemoney-money-given": "Du hast %1%MONETARY_UNIT% bekommen",
     "givemoney-gave-money": "Du hast %1%MONETARY_UNIT% an %2 gegeben",
-    "seemoney-seemoney": "%1 Guthaben : %2%MONETARY_UNIT%",
-    "setmoney-setmoney": "%1 Guthaben wurde zu %2%MONETARY_UNIT% gesetzt",
+    "seemoney-seemoney": "%1 Guthaben: %2%MONETARY_UNIT%",
+    "setmoney-setmoney": "%1 Guthaben wurde auf %2%MONETARY_UNIT% gesetzt",
     "setmoney-set": "Dein Guthaben wurde auf %1%MONETARY_UNIT% gesetzt",
     "setmoney-failed": "Unbekannter Fehler",
     "setmoney-invalid-number": "Ungültige Zahl",
     "mymoney-mymoney": "Dein Guthaben: %1%MONETARY_UNIT%",
-    "mystatus-show": "Dein Guthaben : %1%"
+    "mystatus-show": "Dein Guthabenstatus: %1%"
 }
