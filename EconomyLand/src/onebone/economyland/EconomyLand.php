@@ -513,10 +513,8 @@ class EconomyLand extends PluginBase implements Listener{
 					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
-				$x = $sender->x;
-				$z = $sender->z;
 
-				$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
+				$info = $this->getLandInfoByPosition($sender);
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-one-owned"));
 					return true;
@@ -707,6 +705,11 @@ class EconomyLand extends PluginBase implements Listener{
 
 	public function getLandInfo($landId){
 		return $this->db->getLandById($landId);
+	}
+
+	public function getLandInfoByPosition( Position $pos )
+	{
+		return $this->db->getByCoord($pos->x, $pos->y, $pos->level->getFolderName());
 	}
 
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level){
