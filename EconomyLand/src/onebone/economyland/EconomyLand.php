@@ -514,7 +514,7 @@ class EconomyLand extends PluginBase implements Listener{
 					return true;
 				}
 
-				$info = $this->getLandInfoByPosition( $sender );
+				$info = $this->getLandInfoByPosition($sender);
 				if($info === false){
 					$sender->sendMessage($this->getMessage("no-one-owned"));
 					return true;
