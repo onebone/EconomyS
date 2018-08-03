@@ -50,7 +50,7 @@ class EconomyTax extends PluginBase{
 			"tax-as-percentage" => "",
 			"tax-as-money" => 100
 		));
-		$this->getServer()->getScheduler()->scheduleRepeatingTask(new PayTask($this), $this->config->get("time-for-tax")*1200);
+		$this->getScheduler()->scheduleRepeatingTask(new PayTask($this), $this->config->get("time-for-tax")*1200);
 	}
 
 	public function payTax(){

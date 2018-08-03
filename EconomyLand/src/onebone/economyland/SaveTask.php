@@ -20,16 +20,16 @@
 
 namespace onebone\economyland;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-use onebone\economyland\EconomyLand;
+class SaveTask extends Task{
+	private $plugin;
 
-class SaveTask extends PluginTask{
 	public function __construct(EconomyLand $plugin){
-		parent::__construct($plugin);
+		$this->plugin = $plugin;
 	}
 
 	public function onRun(int $currentTick){
-		$this->getOwner()->save();
+		$this->plugin->save();
 	}
 }

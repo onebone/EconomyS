@@ -27,14 +27,14 @@ use pocketmine\Player;
 use onebone\economyapi\EconomyAPI;
 
 class SortTask extends AsyncTask{
-	private $player, $moneyData, $addOp, $page, $ops, $banList;
+	private $sender, $moneyData, $addOp, $page, $ops, $banList;
 
 	private $max = 0;
 
 	private $topList;
 
 	/**
-	 * @param string			$player
+	 * @param string			$sender
 	 * @param array				$moneyData
 	 * @param bool				$addOp
 	 * @param int				$page
