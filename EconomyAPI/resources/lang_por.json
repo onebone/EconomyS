@@ -1,0 +1,67 @@
+{
+    "language": "por",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Mostra seu saldo"
+		},
+		"topmoney": {
+			"usage": "/topmoney [page]",
+			"description": "Mostra o rank de riquesa desse servidorr"
+		},
+		"setmoney": {
+			"usage": "/setmoney <player> <amount>",
+			"description": "Seta o saldo de um jogadorr"
+		},
+		"seemoney": {
+			"usage": "/seemoney <player>",
+			"description": "Mostra o dinheiro de um jogador"
+		},
+		"givemoney": {
+			"usage": "/givemoney <player> <amount>",
+			"description": "Da dinheiro a um jogador"
+		},
+		"takemoney": {
+			"usage": "/takemoney <player> <amount>",
+			"description": "Pega dinheiro de um jogador"
+		},
+		"pay": {
+			"usage": "/pay <player> <amount>",
+			"description": "Paga dinheiro a um jogador"
+		},
+		"setlang": {
+			"usage": "/setlang <language>",
+			"description": "set sua linguagem"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Mostra seu status de Saldo"
+		}
+	},
+    "language-set": "Idioma configurado para %1 por Winchester",
+    "request-cancelled": "Seu pedido foi cancelado",
+    "player-not-connected": "Jogador %1 não esta online.",
+    "player-never-connected": "Jogador %1 nunca se conectou.",
+    "topmoney-tag": "- Lista dos Mais Ricos (%1 of %2) -",
+    "topmoney-format": "[%1] %2: %3",
+    "pay-failed": "Falha ao pagar.",
+    "pay-success": "pago %MONETARY_UNIT%%1 para %2.",
+    "money-paid": "%1 Deu para você %MONETARY_UNIT%%2.",
+    "takemoney-must-be-number": "O valor deve ser numérico",
+    "takemoney-invalid-number": "INumero invalido",
+    "takemoney-player-lack-of-money": "%1 Você não tem %MONETARY_UNIT%%2. %1'de saldo: %MONETARY_UNIT%%3",
+    "takemoney-money-taken": "Seu %MONETARY_UNIT%%1 pego por",
+    "takemoney-took-money": "Pego %MONETARY_UNIT%%2 por %1",
+    "takemoney-failed": "Falha ao pegar o dinheiro",
+    "givemoney-must-be-number": "O valor deve ser numérico",
+    "givemoney-invalid-number": "Numero invalido",
+    "givemoney-money-given": "Você Ganhou %MONETARY_UNIT%%1",
+    "givemoney-gave-money": "Deu %MONETARY_UNIT%%1 para %2",
+    "seemoney-seemoney": "Jogador %1'Saldo : %2",
+    "setmoney-setmoney": "Jogador %1'Seu saldo foi setado para %MONETARY_UNIT%%2",
+    "setmoney-set": "Seu saldo foi setado para %MONETARY_UNIT%%1",
+    "setmoney-failed": "Falha ao setar o saldo por um erro desconhecido",
+    "setmoney-invalid-number": "%MONETARY_UNIT%%1 deve ser um valor numérico",
+    "mymoney-mymoney": "Seu saldo : %MONETARY_UNIT%%1",
+    "mystatus-show": "Meu Saldo : %1%"
+}
