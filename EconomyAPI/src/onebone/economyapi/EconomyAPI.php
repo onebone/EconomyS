@@ -25,6 +25,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\utils\Config;
+use pocketmine\utils\Internet;
 use pocketmine\utils\Utils;
 use pocketmine\utils\TextFormat;
 
@@ -387,7 +388,7 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	private function checkUpdate(){
 		try{
-			$info = json_decode(Utils::getURL($this->getConfig()->get("update-host")."?version=".$this->getDescription()->getVersion()."&package_version=".self::PACKAGE_VERSION), true);
+			$info = json_decode(Internet::getURL($this->getConfig()->get("update-host")."?version=".$this->getDescription()->getVersion()."&package_version=".self::PACKAGE_VERSION), true);
 			if(!isset($info["status"]) or $info["status"] !== true){
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;
