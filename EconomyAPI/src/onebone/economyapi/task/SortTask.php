@@ -50,7 +50,7 @@ class SortTask extends AsyncTask{
 		$this->banList = $banList;
 	}
 
-	public function onRun(){
+	public function onRun() : void{
 		$this->topList = serialize((array)$this->getTopList());
 	}
 
@@ -81,7 +81,8 @@ class SortTask extends AsyncTask{
 		return $ret;
 	}
 
-	public function onCompletion(Server $server){
+	public function onCompletion() : void{
+		$server = Server::getInstance();
 		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player){ // TODO: Rcon
 			$plugin = EconomyAPI::getInstance();
 
