@@ -128,9 +128,10 @@ class EconomyAPI extends PluginBase implements Listener{
 
 	/**
 	 * @param string|Player		$player
-	 * @param float				$defaultMoney
-	 * @param bool				$force
+	 * @param float|bool    		$defaultMoney
+	 * @param bool			    	$force
 	 *
+	 * @throws \ReflectionException
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = false, bool $force = false) : bool{
@@ -174,6 +175,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @param bool				$force
 	 * @param string			$issuer
 	 *
+	 * @throws \ReflectionException
 	 * @return int
 	 */
 	public function setMoney($player, $amount, bool $force = false, string $issuer = "none") : int{
@@ -208,6 +210,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @param bool				$force
 	 * @param string			$issuer
 	 *
+	 * @throws \ReflectionException
 	 * @return int
 	 */
 	public function addMoney($player, $amount, bool $force = false, $issuer = "none") : int{
@@ -241,6 +244,7 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @param bool				$force
 	 * @param string			$issuer
 	 *
+	 * @throws \ReflectionException
 	 * @return int
 	 */
 	public function reduceMoney($player, $amount, bool $force = false, $issuer = "none") : int{
@@ -311,6 +315,10 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
+	/**
+	 * @param PlayerJoinEvent $event
+	 * @throws \ReflectionException
+	 */
 	public function onJoin(PlayerJoinEvent $event){
 		$player = $event->getPlayer();
 
@@ -378,6 +386,8 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->initializeLanguage();
 		$this->getLogger()->notice("Database provider was set to: ".$this->provider->getName());
 		$this->registerCommands();
+
+		return true;
 	}
 
 	public function openProvider(){

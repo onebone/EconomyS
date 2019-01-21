@@ -218,7 +218,7 @@ class EconomyProperty extends PluginBase implements Listener{
 
 	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $rentTime = null, $expectedYaw = 0){
 		if(!$level instanceof Level){
-			$level = $this->getServer()->getLevelByName($level);
+			$level = $this->getServer()->getLevelManager()->getLevelByName($level);
 			if(!$level instanceof Level){
 				return false;
 			}
@@ -290,7 +290,7 @@ class EconomyProperty extends PluginBase implements Listener{
 
 	public function checkOverlapping($first, $sec, $level){
 		if($level instanceof Level){
-			$level = $level->getName();
+			$level = $level->getFolderName();
 		}
 		$d = $this->property->query("SELECT * FROM Property WHERE (((startX <= $first[0] AND landX >= $first[0]) AND (startZ <= $first[1] AND landZ >= $first[1])) OR ((startX <= $sec[0] AND landX >= $sec[0]) AND (startZ <= $first[1] AND landZ >= $sec[1]))) AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
 		return !is_bool($d);

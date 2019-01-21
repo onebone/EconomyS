@@ -62,8 +62,10 @@ class EconomyLand extends PluginBase implements Listener{
 	const RET_LAND_LIMIT = 1;
 	const RET_SUCCESS = 2;
 
+	/**
+	 * @throws \ReflectionException
+	 */
 	public function onEnable(){
-
 		if(!static::$instance instanceof EconomyLand){
 			static::$instance = $this;
 		}
@@ -106,9 +108,9 @@ class EconomyLand extends PluginBase implements Listener{
 				$this->getLogger()->alert("Specified database type is unavailable. Database type is YAML.");
 		}
 
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlaceEvent"), $this);
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onBreakEvent"), $this);
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\player\\PlayerInteractEvent", $this, EventPriority::HIGHEST, new MethodEventExecutor("onPlayerInteract"), $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", \Closure::fromCallable([$this, 'onPlaceEvent']), EventPriority::HIGHEST, $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", \Closure::fromCallable([$this, 'onBreakEvent']), EventPriority::HIGHEST, $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\player\\PlayerInteractEvent", \Closure::fromCallable([$this, 'onPlayerInteract']), EventPriority::HIGHEST, $this);
 	}
 
 	public function expireLand($landId){
