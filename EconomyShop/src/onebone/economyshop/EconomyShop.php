@@ -28,6 +28,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\level\Position;
@@ -52,7 +53,7 @@ class EconomyShop extends PluginBase implements Listener{
 
 	private $lang;
 
-	private $queue = [], $tap = [], $removeQueue = [], $placeQueue = [];
+	private $queue = [], $tap = [], $removeQueue = [], $placeQueue = [], $canBuy = [];
 
 	/** @var ItemDisplayer[][] */
 	private $items = [];
@@ -179,9 +180,9 @@ class EconomyShop extends PluginBase implements Listener{
 	public function onPlayerJoin(PlayerJoinEvent $event){
 		$player = $event->getPlayer();
 		$level = $player->getLevel()->getFolderName();
-
-		if(isset($this->items[$level])){
-			foreach($this->items[$level] as $displayer){
+		$this->canBuy[strtolower($player->getName())] = true;
+		if (isset($this->items[$level])) {
+			foreach ($this->items[$level] as $displayer) {
 				$displayer->spawnTo($player);
 			}
 		}
@@ -284,8 +285,8 @@ class EconomyShop extends PluginBase implements Listener{
 			return;
 		}
 
-		if(($shop = $this->provider->getShop($block)) !== false){
-			if($this->getConfig()->get("enable-double-tap")){
+		if (($shop = $this->provider->getShop($block)) !== false && $this->canBuy[$iusername] == true) {
+			if ($this->getConfig()->get("enable-double-tap")) {
 				$now = time();
 				if(isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1){
 					$this->buyItem($player, $shop);
@@ -293,15 +294,21 @@ class EconomyShop extends PluginBase implements Listener{
 				}else{
 					$this->tap[$iusername] = $now;
 					$player->sendMessage($this->getMessage("tap-again", [$shop["itemName"] ?? $shop[6], $shop["amount"] ?? $shop[7], $shop["price"] ?? $shop[8]]));
+					return;
 				}
-			}else{
+			} else {
 				$this->buyItem($player, $shop);
 			}
-
-			if($event->getItem()->canBePlaced()){
+			if ($event->getItem()->canBePlaced()) {
 				$this->placeQueue[$iusername] = true;
 			}
+			$this->canBuy[$iusername] = false;
 		}
+	}
+
+	public function onPlayerMove(PlayerMoveEvent $event) {
+		$iusername = strtolower($event->getPlayer()->getName());
+		$this->canBuy[$iusername] = true;
 	}
 
 	public function onBlockPlace(BlockPlaceEvent $event){
