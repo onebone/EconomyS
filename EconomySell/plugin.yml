@@ -1,5 +1,5 @@
 name: EconomySell
-version: 2.0.8
+version: 2.0.9
 api: [3.0.0]
 main: onebone\economysell\EconomySell
 author: onebone
