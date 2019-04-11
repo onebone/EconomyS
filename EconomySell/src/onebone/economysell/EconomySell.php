@@ -284,7 +284,7 @@ class EconomySell extends PluginBase implements Listener{
             foreach($this->items as $level => $arr){
                 foreach($arr as $key => $displayer){
                     $link = $displayer->getLinked();
-                    if($link->getX() === ($sell["x"] ?? $sell[0]) && ($link->getY() === $sell["y"] ?? $sell[1]) and ($link->getZ() === $sell["z"] ?? $sell[2]) and ($link->getLevel()->getFolderName() === $sell["level"] ?? $sell[3])){
+                    if($link->getX() === ($sell["x"] ?? $sell[0]) and $link->getY() === ($sell["y"] ?? $sell[1]) and $link->getZ() === ($sell["z"] ?? $sell[2]) and $link->getLevel()->getFolderName() === ($sell["level"] ?? $sell[3])){
                         $displayer->despawnFromAll();
                         unset($this->items[$key]);
                         break 2;
@@ -293,7 +293,7 @@ class EconomySell extends PluginBase implements Listener{
             }
 
             $this->provider->removeSell($block);
-
+            $this->provider->save();
             unset($this->removeQueue[$iusername]);
             $player->sendMessage($this->getMessage("sell-removed"));
 
