@@ -20,7 +20,7 @@
 
 namespace onebone\economyapi;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -131,7 +131,6 @@ class EconomyAPI extends PluginBase implements Listener{
 	 * @param float|bool    		$defaultMoney
 	 * @param bool			    	$force
 	 *
-	 * @throws \ReflectionException
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = false, bool $force = false) : bool{

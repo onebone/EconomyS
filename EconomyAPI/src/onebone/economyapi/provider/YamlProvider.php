@@ -22,7 +22,7 @@ namespace onebone\economyapi\provider;
 
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
 class YamlProvider implements Provider{
