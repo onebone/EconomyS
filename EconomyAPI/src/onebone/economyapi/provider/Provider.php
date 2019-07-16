@@ -28,20 +28,20 @@ interface Provider{
 	public function open();
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @return bool
 	 */
 	public function accountExists($player);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @param float $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @return bool
 	 */
 	public function removeAccount($player);
@@ -53,21 +53,21 @@ interface Provider{
 	public function getMoney($player);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
 	public function setMoney($player, $amount);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
 	public function addMoney($player, $amount);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param \pocketmine\player\Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
