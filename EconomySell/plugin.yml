@@ -4,6 +4,7 @@ api: [3.0.0]
 main: onebone\economysell\EconomySell
 author: onebone
 depend: [EconomyAPI]
+mcpe-protocol: 361
 
 commands:
  sell:
