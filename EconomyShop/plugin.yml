@@ -1,9 +1,10 @@
 name: EconomyShop
-version: 2.0.10
+version: 2.0.11
 api: [3.0.0]
 main: onebone\economyshop\EconomyShop
 author: onebone
 depend: [EconomyAPI]
+mcpe-protocol: 361
 
 commands:
  shop:

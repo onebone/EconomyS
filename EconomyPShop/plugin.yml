@@ -1,8 +1,9 @@
 name: EconomyPShop
-version: 2.0.3
+version: 2.0.4
 author: onebone
 main: onebone\economypshop\EconomyPShop
 api: [3.0.0]
+mcpe-protocol: 361
 commands:
  pshop:
   description: Management command for creating/removing PShops
