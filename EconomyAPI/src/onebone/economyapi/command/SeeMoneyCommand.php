@@ -2,63 +2,43 @@
 
 namespace onebone\economyapi\command;
 
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
-use pocketmine\Player;
-
 use onebone\economyapi\EconomyAPI;
+use pocketmine\command\CommandSender;
+use pocketmine\command\PluginCommand;
+use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	abstract class _SeeMoneyCommand extends Command{
-		public function execute(CommandSender $sender, string $label, array $args): bool{
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}else{
-	abstract class _SeeMoneyCommand extends Command{
-		public function execute(CommandSender $sender, $label, array $args){
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}
-
-class SeeMoneyCommand extends _SeeMoneyCommand{
+class SeeMoneyCommand extends PluginCommand {
 	private $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("seemoney");
-		parent::__construct("seemoney", $desc["description"], $desc["usage"]);
+		parent::__construct("seemoney", $plugin);
+		$this->setDescription($desc["description"]);
+		$this->setUsage($desc["usage"]);
 
 		$this->setPermission("economyapi.command.seemoney");
-
-		$this->plugin = $plugin;
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
-		if(!$this->testPermission($sender)){
+	public function _execute(CommandSender $sender, string $label, array $params): bool {
+		if (!$this->testPermission($sender)) {
 			return false;
 		}
 
 		$player = array_shift($params);
-		if(trim($player) === ""){
+		if (trim($player) === "") {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
-		if(($p = $this->plugin->getServer()->getPlayer($player)) instanceof Player){
+		if (($p = $this->plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
 		$money = $this->plugin->myMoney($player);
-		if($money !== false){
+		if ($money !== false) {
 			$sender->sendMessage($this->plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
-		}else{
+		} else {
 			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 		}
 		return true;

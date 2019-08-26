@@ -22,17 +22,17 @@ namespace onebone\economyshop\event;
 
 
 use pocketmine\event\Cancellable;
-use pocketmine\item\Item;
 use pocketmine\event\Event;
+use pocketmine\item\Item;
 use pocketmine\level\Position;
 use pocketmine\Player;
 
-class ShopTransactionEvent extends Event implements Cancellable{
+class ShopTransactionEvent extends Event implements Cancellable {
 	public static $handlerList;
 
 	private $player, $position, $item, $price;
 
-	public function __construct(Player $player, Position $position, Item $item, $price){
+	public function __construct(Player $player, Position $position, Item $item, $price) {
 		$this->player = $player;
 		$this->position = $position;
 		$this->item = $item;
@@ -42,28 +42,28 @@ class ShopTransactionEvent extends Event implements Cancellable{
 	/**
 	 * @return Player
 	 */
-	public function getPlayer(){
+	public function getPlayer() {
 		return $this->player;
 	}
 
 	/**
 	 * @return Position
 	 */
-	public function getPosition(){
+	public function getPosition() {
 		return $this->position;
 	}
 
 	/**
 	 * @return Item
 	 */
-	public function getItem(){
+	public function getItem() {
 		return $this->item;
 	}
 
 	/**
 	 * @return float
 	 */
-	public function getPrice(){
+	public function getPrice() {
 		return $this->price;
 	}
 }

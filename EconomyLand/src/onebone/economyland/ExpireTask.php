@@ -22,18 +22,16 @@ namespace onebone\economyland;
 
 use pocketmine\scheduler\PluginTask;
 
-use onebone\economyland\EconomyLand;
-
-class ExpireTask extends PluginTask{
+class ExpireTask extends PluginTask {
 	private $landId;
-	
-	public function __construct(EconomyLand $plugin, $landId){
+
+	public function __construct(EconomyLand $plugin, $landId) {
 		parent::__construct($plugin);
-		
+
 		$this->landId = $landId;
 	}
-	
-	public function onRun(int $currentTick){
+
+	public function onRun(int $currentTick) {
 		$this->getOwner()->expireLand($this->landId);
 	}
 }

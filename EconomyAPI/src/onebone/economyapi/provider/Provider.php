@@ -22,7 +22,7 @@ namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
 
-interface Provider{
+interface Provider {
 	public function __construct(EconomyAPI $plugin);
 
 	public function open();
@@ -35,7 +35,7 @@ interface Provider{
 
 	/**
 	 * @param \pocketmine\Player|string $player
-	 * @param float $defaultMoney
+	 * @param int $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000);
@@ -84,5 +84,6 @@ interface Provider{
 	public function getName();
 
 	public function save();
+
 	public function close();
 }

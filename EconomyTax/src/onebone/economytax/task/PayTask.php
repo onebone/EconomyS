@@ -20,16 +20,15 @@
 
 namespace onebone\economytax\task;
 
+use onebone\economytax\EconomyTax;
 use pocketmine\scheduler\PluginTask;
 
-use onebone\economytax\EconomyTax;
-
-class PayTask extends PluginTask{
-	public function __construct(EconomyTax $plugin){
+class PayTask extends PluginTask {
+	public function __construct(EconomyTax $plugin) {
 		parent::__construct($plugin);
 	}
-	
-	public function onRun(int $currentTick){
+
+	public function onRun(int $currentTick) {
 		$this->getOwner()->payTax();
 	}
 }
