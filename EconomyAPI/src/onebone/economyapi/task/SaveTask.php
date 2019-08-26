@@ -21,34 +21,18 @@
 namespace onebone\economyapi\task;
 
 use onebone\economyapi\EconomyAPI;
+use pocketmine\scheduler\Task;
 
-use pocketmine\scheduler\PluginTask;
+class SaveTask extends Task {
+    /** @var EconomyAPI */
+    protected $plugin;
 
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	abstract class _SaveTask extends PluginTask{
-		public function onRun(int $currentTick){
-			$this->_onRun($currentTick);
-		}
+    public function __construct(EconomyAPI $plugin) {
+        $this->plugin = $plugin;
+    }
 
-		abstract public function _onRun(int $currentTick);
-	}
-}else{
-	abstract class _SaveTask extends PluginTask{
-		public function onRun($currentTick){
-			$this->_onRun($currentTick);
-		}
-
-		abstract public function _onRun(int $currentTick);
-	}
-}
-
-class SaveTask extends _SaveTask{
-	public function __construct(EconomyAPI $plugin){
-		parent::__construct($plugin);
-	}
-
-	public function _onRun(int $currentTick){
-		$this->getOwner()->saveAll();
-	}
+    public function onRun(int $currentTick) {
+        $this->plugin->saveAll();
+    }
 }
 

@@ -35,7 +35,7 @@ interface Provider{
 
 	/**
 	 * @param \pocketmine\Player|string $player
-	 * @param float $defaultMoney
+	 * @param int $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000);

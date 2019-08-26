@@ -70,8 +70,8 @@ class EconomyUsury extends PluginBase implements Listener{
 			foreach($val["players"] as $player => $data){
 				if($data[3] === null) continue;
 				
-				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
-				$tid2 = $this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $host, $player), $data[8], $val[1] * 1200)->getTaskId();
+				$tid = $this->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player, $host), $data[4])->getTaskId();
+				$tid2 = $this->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $host, $player), $data[8], $val[1] * 1200)->getTaskId();
 				$this->usuryHosts[$host]["players"][$player] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid, time(), $data[8], $tid2];
 			}
 		}
@@ -116,8 +116,8 @@ class EconomyUsury extends PluginBase implements Listener{
 				$this->usuryHosts[$host]["players"][$player][3] = time();
 				$this->usuryHosts[$host]["players"][$player][4] -= $reduce;
 				if($cancelTask){
-					if($this->getServer()->getScheduler()->isQueued($data[6])){
-						$this->getServer()->getScheduler()->cancelTask($data[6]);
+					if($this->getScheduler()->isQueued($data[6])){
+						$this->getScheduler()->cancelTask($data[6]);
 					}
 				}
 			}
@@ -136,8 +136,8 @@ class EconomyUsury extends PluginBase implements Listener{
 		
 		if(isset($this->schedule_req[$player->getName()])){
 			foreach($this->schedule_req[$player->getName()] as $data){
-				$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
-				$tid2 = $this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $data[3], $player->getName()), $this->usuryHosts[$data[3]][1] * 1200, $this->usuryHosts[$data[3]][1] * 1200)->getTaskId();
+				$tid = $this->getScheduler()->scheduleDelayedTask(new DueTask($this, Item::get($data[0], $data[1], $data[2]), $player->getName(), $data[3]), $data[4])->getTaskId();
+				$tid2 = $this->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $data[3], $player->getName()), $this->usuryHosts[$data[3]][1] * 1200, $this->usuryHosts[$data[3]][1] * 1200)->getTaskId();
 				$this->usuryHosts[$data[3]]["players"][$player->getName()] = [$data[0], $data[1], $data[2], time(), $data[4], $data[5], $tid, time(), $this->usuryHosts[$data[3]][1] * 1200, $tid2];
 			}
 			unset($this->schedule_req[$player->getName()]);
@@ -160,7 +160,7 @@ class EconomyUsury extends PluginBase implements Listener{
 				
 				$this->addItem($player, Item::get($condition[0], $condition[2], $condition[3]));
 				
-				$this->getServer()->getScheduler()->cancelTask($condition[6]);
+				$this->getScheduler()->cancelTask($condition[6]);
 				
 				unset($this->usuryHosts[$target]["players"][$player]);
 				return;
@@ -212,11 +212,11 @@ class EconomyUsury extends PluginBase implements Listener{
 				continue;
 			}
 			$this->addItem($username, Item::get($val[0], $val[1], $val[2]));
-			if($this->getServer()->getScheduler()->isQueued($val[6])){
-				$this->getServer()->getScheduler()->cancelTask($val[6]);
+			if($this->getScheduler()->isQueued($val[6])){
+				$this->getScheduler()->cancelTask($val[6]);
 			}
-			if($this->getServer()->getScheduler()->isQueued($val[9])){
-				$this->getServer()->getScheduler()->cancelTask($val[9]);
+			if($this->getScheduler()->isQueued($val[9])){
+				$this->getScheduler()->cancelTask($val[9]);
 			}
 		}
 		
@@ -257,8 +257,8 @@ class EconomyUsury extends PluginBase implements Listener{
 		$this->removeItem($player, $guarantee);
 		
 		if($this->getServer()->getPlayerExact($player) instanceof Player){
-			$tid = $this->getServer()->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
-			$tid2 = $this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $host, $player), $this->usuryHosts[$host][1] * 1200, $this->usuryHosts[$host][1] * 1200)->getTaskId();
+			$tid = $this->getScheduler()->scheduleDelayedTask(new DueTask($this, $guarantee, $player, $host), $due * 1200)->getTaskId();
+			$tid2 = $this->getScheduler()->scheduleDelayedRepeatingTask(new InterestTask($this, $host, $player), $this->usuryHosts[$host][1] * 1200, $this->usuryHosts[$host][1] * 1200)->getTaskId();
 			$this->usuryHosts[$host]["players"][$player] = [
 				$guarantee->getId(), $guarantee->getDamage(), $guarantee->getCount(), time(), $due * 1200, $money, $tid, time(),  $this->usuryHosts[$host][1] * 1200, $tid2
 			];
@@ -298,11 +298,11 @@ class EconomyUsury extends PluginBase implements Listener{
 		if(!isset($this->usuryHosts[$host]["players"][$player])){
 			return false;
 		}
-		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][5])){
-			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][5]);
+		if($this->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][5])){
+			$this->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][5]);
 		}
-		if($this->getServer()->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][9])){
-			$this->getServer()->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][9]);
+		if($this->getScheduler()->isQueued($this->usuryHosts[$host]["players"][$player][9])){
+			$this->getScheduler()->cancelTask($this->usuryHosts[$host]["players"][$player][9]);
 		}
 		unset($this->usuryHosts[$host]["players"][$player]);
 		return true;

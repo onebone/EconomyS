@@ -78,7 +78,7 @@ class EconomyLand extends PluginBase implements Listener{
 		if(is_numeric($interval = $this->getConfig()->get("auto-save-interval", 10))){
 			if($interval > 0){
 				$interval = $interval * 1200;
-				$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
+				$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
 			}
 		}
 
@@ -87,7 +87,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$now = time();
 		foreach($this->expire as $landId => &$time){
 			$time[1] = $now;
-			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
+			$this->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
 		}
 
 		switch(strtolower($this->getConfig()->get("database-type", "yaml"))){
@@ -688,7 +688,7 @@ class EconomyLand extends PluginBase implements Listener{
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
 		if($expires !== null){
-			$this->getServer()->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
+			$this->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
 			$this->expire[$id] = array(
 				$expires * 60,
 				time()

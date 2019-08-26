@@ -29,7 +29,7 @@ use pocketmine\utils\TextFormat;
 
 use onebone\economyapi\EconomyAPI;
 
-class _EconomyAuction extends PluginBase{
+class EconomyAuction extends PluginBase{
 	/*
 	@var int[] $auctions
 	key : player name
@@ -61,7 +61,7 @@ class _EconomyAuction extends PluginBase{
 		
 		foreach($this->auctions as $player => $data){
 			if(isset($this->auctions[$player][6])){
-				$id = $this->getServer()->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $player), $this->auctions[$player][6])->getTaskId();
+				$id = $this->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $player), $this->auctions[$player][6])->getTaskId();
 				$this->auctions[$player][7] = time();
 				$this->auctions[$player][8] = $id;
 			}
@@ -79,7 +79,7 @@ class _EconomyAuction extends PluginBase{
 		file_put_contents($this->getDataFolder()."QuitQueue.dat", serialize($this->queue));
 	}
 	
-	public function _onCommand(CommandSender $sender, Command $command, $label, array $params){
+	public function onCommand(CommandSender $sender, Command $command, $label, array $params):bool {
 		switch($command->getName()){
 			case "auction":
 			$sub = array_shift($params);
@@ -182,7 +182,7 @@ class _EconomyAuction extends PluginBase{
 				if($count <= $cnt){
 					$item->setCount($count);
 					$sender->getInventory()->removeItem($item);
-					$id = $this->getServer()->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $sender->getName()), ($time * 20))->getTaskId();
+					$id = $this->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $sender->getName()), ($time * 20))->getTaskId();
 					$this->auctions[strtolower($sender->getName())] = array(
 						$item->getID(), $item->getDamage(), $count, (float) $startPrice, null, (float) $startPrice, $time, time(), $id
 					);
@@ -236,7 +236,7 @@ class _EconomyAuction extends PluginBase{
 	
 	public function quitAuction($auction){
 		if($this->auctions[$auction][7] !== null){
-			$this->getServer()->getScheduler()->cancelTask($this->auctions[$auction][7]);
+			$this->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
 		if($this->auctions[$auction][4] !== null){
 			$p = $this->getServer()->getPlayerExact($this->auctions[$auction][4]);
@@ -262,22 +262,8 @@ class _EconomyAuction extends PluginBase{
 			}
 		}
 		if(isset($this->auctions[$auction][7])){
-			$this->getServer()->getScheduler()->cancelTask($this->auctions[$auction][7]);
+			$this->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
 		unset($this->auctions[$auction]);
-	}
-}
-
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	class EconomyAuction extends _EconomyAuction{
-		public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
-			return parent::_onCommand($sender, $command, $label, $args);
-		}
-	}
-}else{
-	class EconomyAuction extends _EconomyAuction{
-		public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-			return parent::_onCommand($sender, $command, $label, $args);
-		}
 	}
 }

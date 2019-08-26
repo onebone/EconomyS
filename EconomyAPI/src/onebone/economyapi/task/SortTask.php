@@ -27,14 +27,14 @@ use pocketmine\Player;
 use onebone\economyapi\EconomyAPI;
 
 class SortTask extends AsyncTask{
-	private $player, $moneyData, $addOp, $page, $ops, $banList;
+	private $sender, $moneyData, $addOp, $page, $ops, $banList;
 
 	private $max = 0;
 
 	private $topList;
 
 	/**
-	 * @param string			$player
+	 * @param string			$sender
 	 * @param array				$moneyData
 	 * @param bool				$addOp
 	 * @param int				$page
@@ -82,7 +82,7 @@ class SortTask extends AsyncTask{
 	}
 
 	public function onCompletion(Server $server){
-		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player){ // TODO: Rcon
+		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player){
 			$plugin = EconomyAPI::getInstance();
 
 			$output = ($plugin->getMessage("topmoney-tag", [$this->page, $this->max], $this->sender)."\n");

@@ -305,7 +305,7 @@ class EconomyAPI extends PluginBase implements Listener{
 		$this->initialize();
 
 		if($this->getConfig()->get("auto-save-interval") > 0){
-			$this->getServer()->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->getConfig()->get("auto-save-interval") * 1200, $this->getConfig()->get("auto-save-interval") * 1200);
+			$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->getConfig()->get("auto-save-interval") * 1200, $this->getConfig()->get("auto-save-interval") * 1200);
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -371,7 +371,7 @@ class EconomyAPI extends PluginBase implements Listener{
 			break;
 			default:
 			$this->getLogger()->critical("Invalid database was given.");
-			return false;
+			return;
 		}
 		$this->provider->open();
 

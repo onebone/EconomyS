@@ -20,20 +20,19 @@
  
  namespace onebone\economyauction;
  
- use pocketmine\scheduler\PluginTask;
+ use pocketmine\scheduler\Task;
  
- use onebone\economyauction\EconomyAuction;
- 
- class QuitAuctionTask extends PluginTask{
+ class QuitAuctionTask extends Task{
+     protected $plugin;
 	 private $player;
 	 
 	 public function __construct(EconomyAuction $plugin, $player){
-		 parent::__construct($plugin);
+	     $this->plugin = $plugin;
 		 
 		 $this->player = strtolower($player);
 	 }
 	 
 	 public function onRun(int $currentTick){
-		 $this->getOwner()->quitAuction($this->player);
+		 $this->plugin->quitAuction($this->player);
 	 }
  }

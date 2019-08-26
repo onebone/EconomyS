@@ -4,43 +4,25 @@ namespace onebone\economyapi\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
+use pocketmine\command\PluginCommand;
 use pocketmine\utils\TextFormat;
 use pocketmine\Player;
 
 use onebone\economyapi\EconomyAPI;
 
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	abstract class _TakeMoneyCommand extends Command{
-		public function execute(CommandSender $sender, string $label, array $args): bool{
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}else{
-	abstract class _TakeMoneyCommand extends Command{
-		public function execute(CommandSender $sender, $label, array $args){
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}
-
-class TakeMoneyCommand extends _TakeMoneyCommand{
+class TakeMoneyCommand extends PluginCommand {
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
 		$desc = $plugin->getCommandMessage("takemoney");
-		parent::__construct("takemoney", $desc["description"], $desc["usage"]);
+		parent::__construct("takemoney", $plugin);
+		$this->setDescription($desc["description"]);
+		$this->setUsage($desc["usage"]);
 
 		$this->setPermission("economyapi.command.takemoney");
-
-		$this->plugin = $plugin;
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
+	public function execute(CommandSender $sender, string $label, array $params): bool{
 		if(!$this->testPermission($sender)){
 			return false;
 		}

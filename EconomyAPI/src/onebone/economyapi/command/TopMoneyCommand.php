@@ -25,40 +25,22 @@ use pocketmine\command\CommandSender;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\SortTask;
+use pocketmine\command\PluginCommand;
 
-if((new \ReflectionClass("pocketmine\\plugin\\PluginBase"))->getMethod("onCommand")->hasReturnType()){
-	abstract class _TopMoneyCommand extends Command{
-		public function execute(CommandSender $sender, string $label, array $args): bool{
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}else{
-	abstract class _TopMoneyCommand extends Command{
-		public function execute(CommandSender $sender, $label, array $args){
-			return $this->_execute($sender, $label, $args);
-		}
-
-		abstract public function _execute(CommandSender $sender, string $label, array $args): bool;
-	}
-}
-
-class TopMoneyCommand extends _TopMoneyCommand{
+class TopMoneyCommand extends PluginCommand {
 	/** @var EconomyAPI */
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin){
 		$desc = $plugin->getCommandMessage("topmoney");
-		parent::__construct("topmoney", $desc["description"], $desc["usage"]);
+		parent::__construct("topmoney", $plugin);
+        $this->setDescription($desc["description"]);
+        $this->setUsage($desc["usage"]);
 
 		$this->setPermission("economyapi.command.topmoney");
-
-		$this->plugin = $plugin;
 	}
 
 	public function _execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
 		if(!$this->testPermission($sender)) return false;
 
 		$page = (int)array_shift($params);
