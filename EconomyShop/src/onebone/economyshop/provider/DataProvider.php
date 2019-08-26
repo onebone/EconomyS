@@ -22,7 +22,7 @@
 namespace onebone\economyshop\provider;
 
 
-interface DataProvider{
+interface DataProvider {
 	/**
 	 * @param string $file
 	 * @param bool $save
@@ -71,5 +71,6 @@ interface DataProvider{
 	public function getProviderName();
 
 	public function save();
+
 	public function close();
 }

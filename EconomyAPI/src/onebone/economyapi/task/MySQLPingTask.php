@@ -26,16 +26,16 @@ use pocketmine\scheduler\PluginTask;
 use pocketmine\scheduler\Task;
 
 class MySQLPingTask extends Task {
-    private $plugin;
+	private $plugin;
 	private $mysql;
 
-	public function __construct(EconomyAPI $plugin, \mysqli $mysql){
-	    $this->plugin = $plugin;
+	public function __construct(EconomyAPI $plugin, \mysqli $mysql) {
+		$this->plugin = $plugin;
 		$this->mysql = $mysql;
 	}
 
-	public function onRun(int $currentTick){
-		if(!$this->mysql->ping()){
+	public function onRun(int $currentTick) {
+		if (!$this->mysql->ping()) {
 			$this->plugin->openProvider();
 		}
 	}

@@ -17,22 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
- namespace onebone\economyauction;
- 
- use pocketmine\scheduler\Task;
- 
- class QuitAuctionTask extends Task{
-     protected $plugin;
-	 private $player;
-	 
-	 public function __construct(EconomyAuction $plugin, $player){
-	     $this->plugin = $plugin;
-		 
-		 $this->player = strtolower($player);
-	 }
-	 
-	 public function onRun(int $currentTick){
-		 $this->plugin->quitAuction($this->player);
-	 }
- }
+
+namespace onebone\economyauction;
+
+use pocketmine\scheduler\Task;
+
+class QuitAuctionTask extends Task {
+	protected $plugin;
+	private $player;
+
+	public function __construct(EconomyAuction $plugin, $player) {
+		$this->plugin = $plugin;
+
+		$this->player = strtolower($player);
+	}
+
+	public function onRun(int $currentTick) {
+		$this->plugin->quitAuction($this->player);
+	}
+}

@@ -20,14 +20,12 @@
 
 namespace onebone\economytax;
 
+use onebone\economyapi\EconomyAPI;
+use onebone\economytax\task\PayTask;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
-use onebone\economytax\task\PayTask;
-
-use onebone\economyapi\EconomyAPI;
-
-class EconomyTax extends PluginBase{
+class EconomyTax extends PluginBase {
 
 	/**
 	 * @var EconomyAPI
@@ -39,41 +37,41 @@ class EconomyTax extends PluginBase{
 	 */
 	private $config;
 
-	public function onEnable(){
-		if(!file_exists($this->getDataFolder())){
+	public function onEnable() {
+		if (!file_exists($this->getDataFolder())) {
 			mkdir($this->getDataFolder());
 		}
-		
+
 		$this->api = EconomyAPI::getInstance();
-		$this->config = new Config($this->getDataFolder()."tax.properties", Config::PROPERTIES, array(
-			"time-for-tax" => 10,
-			"tax-as-percentage" => "",
-			"tax-as-money" => 100
+		$this->config = new Config($this->getDataFolder() . "tax.properties", Config::PROPERTIES, array(
+				"time-for-tax" => 10,
+				"tax-as-percentage" => "",
+				"tax-as-money" => 100
 		));
-		$this->getScheduler()->scheduleRepeatingTask(new PayTask($this), $this->config->get("time-for-tax")*1200);
+		$this->getScheduler()->scheduleRepeatingTask(new PayTask($this), $this->config->get("time-for-tax") * 1200);
 	}
 
-	public function payTax(){
-		if(($percent = $this->config->get("tax-as-percentage")) !== ""){
+	public function payTax() {
+		if (($percent = $this->config->get("tax-as-percentage")) !== "") {
 			$players = $this->getServer()->getOnlinePlayers();
-			foreach($players as $player){
-				if($player->hasPermission("economytax.tax.avoid")){
+			foreach ($players as $player) {
+				if ($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
 				$money = $this->api->myMoney($player);
 				$taking = $money * ($percent / 100);
 				$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
-				$player->sendMessage("Your ".EconomyAPI::getInstance()->getMonetaryUnit()."$taking has taken by tax.");
+				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$taking has taken by tax.");
 			}
-		}else{
+		} else {
 			$money = $this->config->get("tax-as-money");
 			$players = $this->getServer()->getOnlinePlayers();
-				foreach($players as $player){
-				if($player->hasPermission("economytax.tax.avoid")){
+			foreach ($players as $player) {
+				if ($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
 				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");
-				$player->sendMessage("Your ".EconomyAPI::getInstance()->getMonetaryUnit()."$money has taken by tax.");
+				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$money has taken by tax.");
 			}
 		}
 	}

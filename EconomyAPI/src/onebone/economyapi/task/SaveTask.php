@@ -24,15 +24,15 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\scheduler\Task;
 
 class SaveTask extends Task {
-    /** @var EconomyAPI */
-    protected $plugin;
+	/** @var EconomyAPI */
+	protected $plugin;
 
-    public function __construct(EconomyAPI $plugin) {
-        $this->plugin = $plugin;
-    }
+	public function __construct(EconomyAPI $plugin) {
+		$this->plugin = $plugin;
+	}
 
-    public function onRun(int $currentTick) {
-        $this->plugin->saveAll();
-    }
+	public function onRun(int $currentTick) {
+		$this->plugin->saveAll();
+	}
 }
 

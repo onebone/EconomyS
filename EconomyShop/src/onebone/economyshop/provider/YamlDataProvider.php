@@ -24,20 +24,20 @@ use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\utils\Config;
 
-class YamlDataProvider implements DataProvider{
+class YamlDataProvider implements DataProvider {
 	/** @var Config */
 	private $config;
 
 	private $save;
 
-	public function __construct($file, $save){
+	public function __construct($file, $save) {
 		$this->config = new Config($file, Config::YAML);
 
 		$this->save = $save;
 	}
 
-	public function addShop($x, $y = 0, $z = 0, $level = null, $data = []){
-		if($x instanceof Position){
+	public function addShop($x, $y = 0, $z = 0, $level = null, $data = []) {
+		if ($x instanceof Position) {
 			$data = $y;
 
 			$y = $x->getFloorY();
@@ -45,67 +45,67 @@ class YamlDataProvider implements DataProvider{
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if ($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if($this->config->exists($x.":".$y.":".$z.":".$level)){
+		if ($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
 
-		$this->config->set($x.":".$y.":".$z.":".$level, $data);
-		if($this->save){
+		$this->config->set($x . ":" . $y . ":" . $z . ":" . $level, $data);
+		if ($this->save) {
 			$this->save();
 		}
 		return true;
 	}
 
-	public function getShop($x, $y = 0, $z = 0, $level = null){
-		if($x instanceof Position){
+	public function save() {
+		$this->config->save();
+	}
+
+	public function getShop($x, $y = 0, $z = 0, $level = null) {
+		if ($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if ($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if(!$this->config->exists($x.":".$y.":".$z.":".$level)){
+		if (!$this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
-		return $this->config->get($x.":".$y.":".$z.":".$level);
+		return $this->config->get($x . ":" . $y . ":" . $z . ":" . $level);
 	}
 
-	public function getAll(){
+	public function getAll() {
 		return $this->config->getAll();
 	}
 
-	public function removeShop($x, $y = 0, $z = 0, $level = null){
-		if($x instanceof Position){
+	public function removeShop($x, $y = 0, $z = 0, $level = null) {
+		if ($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if ($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 
-		if($this->config->exists($x.":".$y.":".$z.":".$level)){
-			$this->config->remove($x.":".$y.":".$z.":".$level);
+		if ($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
+			$this->config->remove($x . ":" . $y . ":" . $z . ":" . $level);
 			return true;
 		}
 		return false;
 	}
 
-	public function save(){
-		$this->config->save();
-	}
-
-	public function close(){
+	public function close() {
 		$this->save();
 	}
 
-	public function getProviderName(){
+	public function getProviderName() {
 		return "Yaml";
 	}
 }

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
@@ -17,43 +17,42 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 namespace onebone\economyusury;
 
-use pocketmine\scheduler\PluginTask;
 use pocketmine\item\Item;
-use pocketmine\utils\TextFormat;
 use pocketmine\Player;
+use pocketmine\scheduler\PluginTask;
 
-class DueTask extends PluginTask{
+class DueTask extends PluginTask {
 	private $guarantee, $playerName, $hostOwner;
-	
-	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner){
+
+	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner) {
 		parent::__construct($plugin);
-		
+
 		$this->guarantee = $guarantee;
 		$this->playerName = $playerName;
 		$this->hostOwner = $hostOwner;
 	}
-	
-	public function onRun(int $currentTick){
+
+	public function onRun(int $currentTick) {
 		$this->removeItem();
 	}
-	
-	public function removeItem(){
+
+	public function removeItem() {
 		/** @var $owner EconomyUsury */
 		$owner = $this->getOwner();
 
-		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
+		if (($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player) {
 			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));
-		}else{
+		} else {
 			$owner->queueMessage($this->playerName, $owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}
-		
-		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
+
+		if (($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player) {
 			$player->getInventory()->addItem($this->guarantee);
 			$player->sendMessage($owner->getMessage("usury-expired", [$this->playerName]));
-		}else{
+		} else {
 			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
 			$c = $this->guarantee->getCount();
 			$owner->addItem($this->hostOwner, $this->guarantee);

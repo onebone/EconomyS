@@ -22,7 +22,7 @@ namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
 
-interface Provider{
+interface Provider {
 	public function __construct(EconomyAPI $plugin);
 
 	public function open();
@@ -84,5 +84,6 @@ interface Provider{
 	public function getName();
 
 	public function save();
+
 	public function close();
 }

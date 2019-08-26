@@ -25,7 +25,7 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
-class YamlProvider implements Provider{
+class YamlProvider implements Provider {
 	/**
 	 * @var Config
 	 */
@@ -36,17 +36,17 @@ class YamlProvider implements Provider{
 
 	private $money = [];
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin) {
 		$this->plugin = $plugin;
 	}
 
-	public function open(){
+	public function open() {
 		$this->config = new Config($this->plugin->getDataFolder() . "Money.yml", Config::YAML, ["version" => 2, "money" => []]);
 		$this->money = $this->config->getAll();
 	}
 
-	public function accountExists($player){
-		if($player instanceof Player){
+	public function accountExists($player) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -54,51 +54,51 @@ class YamlProvider implements Provider{
 		return isset($this->money["money"][$player]);
 	}
 
-	public function createAccount($player, $defaultMoney = 1000){
-		if($player instanceof Player){
+	public function createAccount($player, $defaultMoney = 1000) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(!isset($this->money["money"][$player])){
+		if (!isset($this->money["money"][$player])) {
 			$this->money["money"][$player] = $defaultMoney;
 			return true;
 		}
 		return false;
 	}
 
-	public function removeAccount($player){
-		if($player instanceof Player){
+	public function removeAccount($player) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
+		if (isset($this->money["money"][$player])) {
 			unset($this->money["money"][$player]);
 			return true;
 		}
 		return false;
 	}
 
-	public function getMoney($player){
-		if($player instanceof Player){
+	public function getMoney($player) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
+		if (isset($this->money["money"][$player])) {
 			return $this->money["money"][$player];
 		}
 		return false;
 	}
 
-	public function setMoney($player, $amount){
-		if($player instanceof Player){
+	public function setMoney($player, $amount) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
+		if (isset($this->money["money"][$player])) {
 			$this->money["money"][$player] = $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
@@ -106,13 +106,13 @@ class YamlProvider implements Provider{
 		return false;
 	}
 
-	public function addMoney($player, $amount){
-		if($player instanceof Player){
+	public function addMoney($player, $amount) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
+		if (isset($this->money["money"][$player])) {
 			$this->money["money"][$player] += $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
@@ -120,13 +120,13 @@ class YamlProvider implements Provider{
 		return false;
 	}
 
-	public function reduceMoney($player, $amount){
-		if($player instanceof Player){
+	public function reduceMoney($player, $amount) {
+		if ($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if(isset($this->money["money"][$player])){
+		if (isset($this->money["money"][$player])) {
 			$this->money["money"][$player] -= $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
@@ -134,20 +134,20 @@ class YamlProvider implements Provider{
 		return false;
 	}
 
-	public function getAll(){
+	public function getAll() {
 		return isset($this->money["money"]) ? $this->money["money"] : [];
 	}
 
-	public function save(){
+	public function close() {
+		$this->save();
+	}
+
+	public function save() {
 		$this->config->setAll($this->money);
 		$this->config->save();
 	}
 
-	public function close(){
-		$this->save();
-	}
-
-	public function getName(){
+	public function getName() {
 		return "Yaml";
 	}
 }
