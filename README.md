@@ -1,16 +1,16 @@
 # EconomyS
 
-Currently the maintainer of the plugin is preparing for [Korean CSAT](https://en.wikipedia.org/wiki/College_Scholastic_Ability_Test) in Nov 14 2019. Issue or PR handling is unavailable for this time. Please contact [@nnnlog](https://github.com/nnnlog) for temporal maintenence. 
+Currently, the maintainer of the plugin is preparing for [Korean CSAT](https://en.wikipedia.org/wiki/College_Scholastic_Ability_Test) on Nov 14, 2019. Issue or PR handling is unavailable for this time. Please contact [@nnnlog](https://github.com/nnnlog) for temporal maintenance.
 
 ## FAQ
 **Q>** Why did you try support API 4.0 with some crazy hacks?<br>
-**A>** In South Korea, servers were trying to use API 4.0. Don't ask me why they wanted to use dev branch for production. Really, literally I don't know.
+**A>** In South Korea, servers were trying to use API 4.0. Don't ask me why they wanted to use a dev branch for production. Really, literally I don't know.
 
 **Q>** Then why did you drop support for the stable API and only support API 4.0?<br>
-**A>** I have asked @nnnlog to create a branch for API 3.x. Sorry! Was fully my mistake to drop support for stable version.
+**A>** I have asked @nnnlog to create a branch for API 3.x. Sorry! It was fully my mistake to drop support for the stable version.
 
 **Q>** Are you going to maintain after Nov 14?<br>
-**A>** Proabably, with new features and code improvements for EconomyAPI and other Economy* plugins.
+**A>** Probably, with new features and code improvements for EconomyAPI and other Economy* plugins.
 
 **Q>** Your plugin sucks!<br>
 **A>** ㅠㅠ
