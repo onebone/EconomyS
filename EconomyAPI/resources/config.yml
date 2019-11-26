@@ -6,7 +6,7 @@ add-op-at-rank: false
 default-money: 1000
 # max-money: Set max money that player can have
 max-money: 9999999999
-# Whether to allow player to pay when taret player is offline
+# Whether to allow player to pay when target player is offline
 allow-pay-offline: true
 
 # default-lang: Set default language
