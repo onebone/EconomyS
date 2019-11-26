@@ -20,6 +20,15 @@
 
 namespace onebone\economyapi;
 
+use onebone\economyapi\command\GiveMoneyCommand;
+use onebone\economyapi\command\MyMoneyCommand;
+use onebone\economyapi\command\MyStatusCommand;
+use onebone\economyapi\command\PayCommand;
+use onebone\economyapi\command\SeeMoneyCommand;
+use onebone\economyapi\command\SetLangCommand;
+use onebone\economyapi\command\SetMoneyCommand;
+use onebone\economyapi\command\TakeMoneyCommand;
+use onebone\economyapi\command\TopMoneyCommand;
 use onebone\economyapi\event\account\CreateAccountEvent;
 use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
@@ -361,20 +370,15 @@ class EconomyAPI extends PluginBase implements Listener {
 	private function registerCommands() {
 		$map = $this->getServer()->getCommandMap();
 
-		$commands = [
-				"mymoney" => "\\onebone\\economyapi\\command\\MyMoneyCommand",
-				"topmoney" => "\\onebone\\economyapi\\command\\TopMoneyCommand",
-				"setmoney" => "\\onebone\\economyapi\\command\\SetMoneyCommand",
-				"seemoney" => "\\onebone\\economyapi\\command\\SeeMoneyCommand",
-				"givemoney" => "\\onebone\\economyapi\\command\\GiveMoneyCommand",
-				"takemoney" => "\\onebone\\economyapi\\command\\TakeMoneyCommand",
-				"pay" => "\\onebone\\economyapi\\command\\PayCommand",
-				"setlang" => "\\onebone\\economyapi\\command\\SetLangCommand",
-				"mystatus" => "\\onebone\\economyapi\\command\\MyStatusCommand"
-		];
-		foreach ($commands as $cmd => $class) {
-			$map->register("economyapi", new $class($this));
-		}
+		$map->register("economyapi", new MyMoneyCommand($this));
+		$map->register("economyapi", new TopMoneyCommand($this));
+		$map->register("economyapi", new SetMoneyCommand($this));
+		$map->register("economyapi", new SeeMoneyCommand($this));
+		$map->register("economyapi", new GiveMoneyCommand($this));
+		$map->register("economyapi", new TakeMoneyCommand($this));
+		$map->register("economyapi", new PayCommand($this));
+		$map->register("economyapi", new SetLangCommand($this));
+		$map->register("economyapi", new MyStatusCommand($this));
 	}
 
 	public function onJoin(PlayerJoinEvent $event) {
