@@ -9,8 +9,6 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetMoneyCommand extends PluginCommand {
-	private $plugin;
-
 	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("setmoney");
 		parent::__construct("setmoney", $plugin);
@@ -20,7 +18,7 @@ class SetMoneyCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.setmoney");
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool {
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -33,26 +31,28 @@ class SetMoneyCommand extends PluginCommand {
 			return true;
 		}
 
-		if (($p = $this->plugin->getServer()->getPlayer($player)) instanceof Player) {
+		/** @var EconomyAPI $plugin */
+		$plugin = $this->getPlugin();
+		if (($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		$result = $this->plugin->setMoney($player, $amount);
+		$result = $plugin->setMoney($player, $amount);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
-				$sender->sendMessage($this->plugin->getMessage("setmoney-invalid-number", [$amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-invalid-number", [$amount], $sender->getName()));
 				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
-				$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 				break;
 			case EconomyAPI::RET_CANCELLED:
-				$sender->sendMessage($this->plugin->getMessage("setmoney-failed", [], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-failed", [], $sender->getName()));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($this->plugin->getMessage("setmoney-setmoney", [$player, $amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-setmoney", [$player, $amount], $sender->getName()));
 
 				if ($p instanceof Player) {
-					$p->sendMessage($this->plugin->getMessage("setmoney-set", [$amount], $p->getName()));
+					$p->sendMessage($plugin->getMessage("setmoney-set", [$amount], $p->getName()));
 				}
 				break;
 			default:

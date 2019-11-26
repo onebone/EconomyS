@@ -26,9 +26,6 @@ use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 
 class TopMoneyCommand extends PluginCommand {
-	/** @var EconomyAPI */
-	private $plugin;
-
 	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("topmoney");
 		parent::__construct("topmoney", $plugin);
@@ -43,23 +40,25 @@ class TopMoneyCommand extends PluginCommand {
 
 		$page = (int) array_shift($params);
 
-		$server = $this->plugin->getServer();
+		/** @var EconomyAPI $plugin */
+		$plugin = $this->getPlugin();
+		$server = $plugin->getServer();
 
 		$banned = [];
 		foreach ($server->getNameBans()->getEntries() as $entry) {
-			if ($this->plugin->accountExists($entry->getName())) {
+			if ($plugin->accountExists($entry->getName())) {
 				$banned[] = $entry->getName();
 			}
 		}
 		$ops = [];
 		foreach ($server->getOps()->getAll() as $op) {
-			if ($this->plugin->accountExists($op)) {
+			if ($plugin->accountExists($op)) {
 				$ops[] = $op;
 			}
 		}
 
-		$task = new SortTask($sender->getName(), $this->plugin->getAllMoney(), $this->plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
-		$server->getScheduler()->scheduleAsyncTask($task);
+		$task = new SortTask($sender->getName(), $plugin->getAllMoney(), $plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
+		$server->getAsyncPool()->submitTask($task);
 
 		return true;
 	}

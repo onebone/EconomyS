@@ -36,7 +36,6 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\Internet;
 use pocketmine\utils\TextFormat;
-use pocketmine\utils\Utils;
 
 class EconomyAPI extends PluginBase implements Listener {
 	const API_VERSION = 3;

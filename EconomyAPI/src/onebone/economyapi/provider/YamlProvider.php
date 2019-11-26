@@ -20,7 +20,6 @@
 
 namespace onebone\economyapi\provider;
 
-
 use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 use pocketmine\utils\Config;

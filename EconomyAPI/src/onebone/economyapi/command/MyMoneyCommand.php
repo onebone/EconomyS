@@ -18,14 +18,17 @@ class MyMoneyCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.mymoney");
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool {
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
 
 		if ($sender instanceof Player) {
-			$money = $this->getPlugin()->myMoney($sender);
-			$sender->sendMessage($this->getPlugin()->getMessage("mymoney-mymoney", [$money]));
+			/** @var EconomyAPI $plugin */
+			$plugin = $this->getPlugin();
+
+			$money = $plugin->myMoney($sender);
+			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", [$money]));
 			return true;
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");

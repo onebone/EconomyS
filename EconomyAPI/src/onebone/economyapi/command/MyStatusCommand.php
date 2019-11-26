@@ -9,8 +9,6 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class MyStatusCommand extends PluginCommand {
-	private $plugin;
-
 	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("mystatus");
 		parent::__construct("mystatus", $plugin);
@@ -20,7 +18,7 @@ class MyStatusCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.mystatus");
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool {
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -30,7 +28,10 @@ class MyStatusCommand extends PluginCommand {
 			return true;
 		}
 
-		$money = $this->plugin->getAllMoney();
+		/** @var EconomyAPI $plugin */
+		$plugin = $this->getPlugin();
+
+		$money = $plugin->getAllMoney();
 
 		$allMoney = 0;
 		foreach ($money as $m) {
@@ -41,7 +42,7 @@ class MyStatusCommand extends PluginCommand {
 			$topMoney = round((($money[strtolower($sender->getName())] / $allMoney) * 100), 2);
 		}
 
-		$sender->sendMessage($this->plugin->getMessage("mystatus-show", [$topMoney], $sender->getName()));
+		$sender->sendMessage($plugin->getMessage("mystatus-show", [$topMoney], $sender->getName()));
 		return true;
 	}
 }

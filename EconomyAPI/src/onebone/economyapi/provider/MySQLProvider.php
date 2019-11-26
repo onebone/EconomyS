@@ -63,8 +63,8 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param float $defaultMoney
+	 * @param Player|string $player
+	 * @param float         $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000.0) {
@@ -81,7 +81,7 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
 	public function accountExists($player) {
@@ -95,7 +95,7 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
 	public function removeAccount($player) {
@@ -125,8 +125,8 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param float $amount
+	 * @param Player|string $player
+	 * @param float         $amount
 	 * @return bool
 	 */
 	public function setMoney($player, $amount) {
@@ -141,8 +141,8 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param float $amount
+	 * @param Player|string $player
+	 * @param float         $amount
 	 * @return bool
 	 */
 	public function addMoney($player, $amount) {
@@ -157,8 +157,8 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param \pocketmine\Player|string $player
-	 * @param float $amount
+	 * @param Player|string $player
+	 * @param float         $amount
 	 * @return bool
 	 */
 	public function reduceMoney($player, $amount) {

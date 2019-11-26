@@ -9,8 +9,6 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SeeMoneyCommand extends PluginCommand {
-	private $plugin;
-
 	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("seemoney");
 		parent::__construct("seemoney", $plugin);
@@ -20,7 +18,7 @@ class SeeMoneyCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.seemoney");
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool {
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if (!$this->testPermission($sender)) {
 			return false;
 		}
@@ -31,15 +29,17 @@ class SeeMoneyCommand extends PluginCommand {
 			return true;
 		}
 
-		if (($p = $this->plugin->getServer()->getPlayer($player)) instanceof Player) {
+		/** @var EconomyAPI $plugin */
+		$plugin = $this->getPlugin();
+		if (($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		$money = $this->plugin->myMoney($player);
+		$money = $plugin->myMoney($player);
 		if ($money !== false) {
-			$sender->sendMessage($this->plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
 		} else {
-			$sender->sendMessage($this->plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 		}
 		return true;
 	}
