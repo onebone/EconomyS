@@ -5,13 +5,10 @@ namespace onebone\economyapi\command;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
-use pocketmine\event\TranslationContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class MyMoneyCommand extends PluginCommand {
-	private $plugin;
-
 	public function __construct(EconomyAPI $plugin) {
 		$desc = $plugin->getCommandMessage("mymoney");
 		parent::__construct("mymoney", $plugin);
@@ -27,8 +24,8 @@ class MyMoneyCommand extends PluginCommand {
 		}
 
 		if ($sender instanceof Player) {
-			$money = $this->plugin->myMoney($sender);
-			$sender->sendMessage($this->plugin->getMessage("mymoney-mymoney", [$money]));
+			$money = $this->getPlugin()->myMoney($sender);
+			$sender->sendMessage($this->getPlugin()->getMessage("mymoney-mymoney", [$money]));
 			return true;
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");

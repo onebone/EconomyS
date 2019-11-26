@@ -30,7 +30,7 @@ class SQLiteDatabase implements Database {
 	private $land;
 	private $config;
 
-	public function __construct($fileName, $config) {
+	public function __construct($fileName, $config, $otherName) {
 		$this->land = new \SQLite3($fileName);
 		$this->land->exec("CREATE TABLE IF NOT EXISTS land(
 			ID INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -58,8 +58,8 @@ class SQLiteDatabase implements Database {
 	public function getAll() {
 		$result = $this->land->query("SELECT * FROM land");
 		$ret = [];
-		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
-		}
+		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false);
+
 		return $ret;
 	}
 
@@ -70,16 +70,14 @@ class SQLiteDatabase implements Database {
 	public function getLandsByOwner($owner) {
 		$result = $this->land->query("SELECT * FROM land WHERE owner = '$owner'");
 		$ret = [];
-		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
-		}
+		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false);
 		return $ret;
 	}
 
 	public function getLandsByKeyword($keyword) {
 		$result = $this->land->query("SELECT * FROM land WHERE owner LIKE '%$keyword%'");
 		$ret = [];
-		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
-		}
+		while (($ret[] = $result->fetchArray(SQLITE3_ASSOC)) !== false);
 		return $ret;
 	}
 
@@ -157,5 +155,9 @@ class SQLiteDatabase implements Database {
 
 	public function close() {
 		$this->land->close();
+	}
+
+	public function save() {
+
 	}
 }

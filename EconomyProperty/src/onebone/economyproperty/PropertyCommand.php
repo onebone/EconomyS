@@ -27,6 +27,7 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 
 class PropertyCommand extends Command implements PluginIdentifiableCommand {
 	private $plugin;
@@ -148,7 +149,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 				$id = array_shift($params);
 
 				if (!is_numeric($id)) {
-					$sender->sendMessage(TextFormat::RED . "Usage: " . $command->getUsage());
+					$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 					return true;
 				}
 

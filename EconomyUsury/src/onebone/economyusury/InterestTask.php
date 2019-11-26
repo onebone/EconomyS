@@ -20,18 +20,19 @@
 
 namespace onebone\economyusury;
 
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class InterestTask extends PluginTask {
+class InterestTask extends Task {
+	private $plugin;
 	private $host, $player;
 
 	public function __construct(EconomyUsury $plugin, $host, $player) {
-		parent::__construct($plugin);
+		$this->plugin = $plugin;
 		$this->host = $host;
 		$this->player = $player;
 	}
 
 	public function onRun(int $currentTick) {
-		$this->getOwner()->handleInterest($this->host, $this->player);
+		$this->plugin->handleInterest($this->host, $this->player);
 	}
 }

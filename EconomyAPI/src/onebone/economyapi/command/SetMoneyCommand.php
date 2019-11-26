@@ -5,7 +5,6 @@ namespace onebone\economyapi\command;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
-use pocketmine\event\TranslationContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 

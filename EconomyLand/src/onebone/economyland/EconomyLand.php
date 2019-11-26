@@ -687,15 +687,15 @@ class EconomyLand extends PluginBase implements Listener {
 	/**
 	 * Adds land to the EconomyLand database
 	 *
+	 * @param      $player
+	 * @param      $startX
+	 * @param      $startZ
+	 * @param      $endX
+	 * @param      $endZ
+	 * @param      $level
+	 * @param      $expires
+	 * @param      $id
 	 * @return int
-	 * @var int $startX
-	 * @var int $startZ
-	 * @var int $endX
-	 * @var int $endZ
-	 * @var Level|string $level
-	 * @var float $expires
-	 *
-	 * @var Player|string $player
 	 */
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null, &$id = null) {
 		if ($level instanceof Level) {

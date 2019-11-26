@@ -33,7 +33,7 @@ use pocketmine\utils\TextFormat;
 class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, Listener {
 	private $requests = [];
 
-	public function __construct($cmd = "usury", $plugin) {
+	public function __construct($cmd, $plugin) {
 		parent::__construct($cmd, $plugin);
 		$this->setUsage("/$cmd <host|request|cancel|list|left>");
 		$this->setDescription("Usury master command");

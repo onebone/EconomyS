@@ -39,10 +39,11 @@ use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Tile;
+use SQLite3;
 
 class EconomyProperty extends PluginBase implements Listener {
 	/**
-	 * @var \SQLite3
+	 * @var SQLite3
 	 */
 	private $property;
 
@@ -63,7 +64,7 @@ class EconomyProperty extends PluginBase implements Listener {
 			mkdir($this->getDataFolder());
 		}
 
-		$this->property = new \SQLite3($this->getDataFolder() . "Property.sqlite3");
+		$this->property = new SQLite3($this->getDataFolder() . "Property.sqlite3");
 		$this->property->exec(stream_get_contents($resource = $this->getResource("sqlite3.sql")));
 		@fclose($resource);
 		$this->parseOldData();
@@ -75,15 +76,15 @@ class EconomyProperty extends PluginBase implements Listener {
 		$this->command = new PropertyCommand($this, $command["command"], $command["pos1"], $command["pos2"], $command["make"], $command["touchPos"]);
 		$this->getServer()->getCommandMap()->register("economyproperty", $this->command);
 
-		$this->tap = array();
-		$this->touch = array();
-		$this->placeQueue = array();
+		$this->tap = [];
+		$this->touch = [];
+		$this->placeQueue = [];
 	}
 
 	private function parseOldData() {
 		if (is_file($this->getDataFolder() . "Properties.sqlite3")) {
 			$cnt = 0;
-			$property = new \SQLite3($this->getDataFolder() . "Properties.sqlite3");
+			$property = new SQLite3($this->getDataFolder() . "Properties.sqlite3");
 			$result = $property->query("SELECT * FROM Property");
 			while (($d = $result->fetchArray(SQLITE3_ASSOC)) !== false) {
 				$this->property->exec("INSERT INTO Property (x, y, z, price, level, startX, startZ, landX, landZ) VALUES ($d[x], $d[y], $d[z], $d[price], '$d[level]', $d[startX], $d[startZ], $d[landX], $d[landZ])");

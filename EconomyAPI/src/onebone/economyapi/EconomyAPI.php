@@ -34,6 +34,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
+use pocketmine\utils\Internet;
 use pocketmine\utils\TextFormat;
 use pocketmine\utils\Utils;
 
@@ -193,10 +194,11 @@ class EconomyAPI extends PluginBase implements Listener {
 				return self::RET_INVALID;
 			}
 
-			$this->getServer()->getPluginManager()->callEvent($ev = new SetMoneyEvent($this, $player, $amount, $issuer));
+			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
+			$ev->call();
 			if (!$ev->isCancelled() or $force === true) {
 				$this->provider->setMoney($player, $amount);
-				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $amount, $issuer));
+				(new MoneyChangedEvent($this, $player, $amount, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
 			return self::RET_CANCELLED;
@@ -226,10 +228,11 @@ class EconomyAPI extends PluginBase implements Listener {
 				return self::RET_INVALID;
 			}
 
-			$this->getServer()->getPluginManager()->callEvent($ev = new AddMoneyEvent($this, $player, $amount, $issuer));
+			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
+			$ev->call();
 			if (!$ev->isCancelled() or $force === true) {
 				$this->provider->addMoney($player, $amount);
-				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $amount + $money, $issuer));
+				(new MoneyChangedEvent($this, $player, $amount + $money, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
 			return self::RET_CANCELLED;
@@ -259,10 +262,11 @@ class EconomyAPI extends PluginBase implements Listener {
 				return self::RET_INVALID;
 			}
 
-			$this->getServer()->getPluginManager()->callEvent($ev = new ReduceMoneyEvent($this, $player, $amount, $issuer));
+			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);
+			$ev->call();
 			if (!$ev->isCancelled() or $force === true) {
 				$this->provider->reduceMoney($player, $amount);
-				$this->getServer()->getPluginManager()->callEvent(new MoneyChangedEvent($this, $player, $money - $amount, $issuer));
+				(new MoneyChangedEvent($this, $player, $money - $amount, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
 			return self::RET_CANCELLED;
@@ -330,7 +334,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function checkUpdate() {
 		try {
-			$info = json_decode(Utils::getURL($this->getConfig()->get("update-host") . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
+			$info = json_decode(Internet::getURL($this->getConfig()->get("update-host") . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
 			if (!isset($info["status"]) or $info["status"] !== true) {
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;
@@ -388,7 +392,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param float $defaultMoney
+	 * @param float|bool $defaultMoney
 	 * @param bool $force
 	 *
 	 * @return bool
@@ -402,7 +406,8 @@ class EconomyAPI extends PluginBase implements Listener {
 		if (!$this->provider->accountExists($player)) {
 			$defaultMoney = ($defaultMoney === false) ? $this->getConfig()->get("default-money") : $defaultMoney;
 
-			$this->getServer()->getPluginManager()->callEvent($ev = new CreateAccountEvent($this, $player, $defaultMoney, "none"));
+			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
+			$ev->call();
 			if (!$ev->isCancelled() or $force === true) {
 				$this->provider->createAccount($player, $ev->getDefaultMoney());
 			}

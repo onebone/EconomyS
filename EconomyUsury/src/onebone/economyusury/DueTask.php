@@ -22,14 +22,14 @@ namespace onebone\economyusury;
 
 use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\scheduler\Task;
 
-class DueTask extends PluginTask {
+class DueTask extends Task {
+	private $plugin;
 	private $guarantee, $playerName, $hostOwner;
 
 	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner) {
-		parent::__construct($plugin);
-
+		$this->plugin = $plugin;
 		$this->guarantee = $guarantee;
 		$this->playerName = $playerName;
 		$this->hostOwner = $hostOwner;
@@ -40,8 +40,7 @@ class DueTask extends PluginTask {
 	}
 
 	public function removeItem() {
-		/** @var $owner EconomyUsury */
-		$owner = $this->getOwner();
+		$owner = $this->plugin;
 
 		if (($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player) {
 			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));
@@ -56,7 +55,7 @@ class DueTask extends PluginTask {
 			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
 			$c = $this->guarantee->getCount();
 			$owner->addItem($this->hostOwner, $this->guarantee);
-			$owner->queueMessage($this->hostOwner, $owner->getMessage("usury-expired", [$this->playerName], false));
+			$owner->queueMessage($this->hostOwner, $owner->getMessage("usury-expired", [$this->playerName]));
 		}
 		$owner->removePlayerFromHost($this->playerName, $this->hostOwner);
 	}

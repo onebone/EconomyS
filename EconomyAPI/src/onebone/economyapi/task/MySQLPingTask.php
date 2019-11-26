@@ -22,7 +22,6 @@ namespace onebone\economyapi\task;
 
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\scheduler\PluginTask;
 use pocketmine\scheduler\Task;
 
 class MySQLPingTask extends Task {

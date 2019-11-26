@@ -206,8 +206,9 @@ class EconomySell extends PluginBase implements Listener {
 
 						return true;
 				}
-				return false;
 		}
+
+		return false;
 	}
 
 	public function getMessage($key, $replacement = []) {
@@ -308,7 +309,7 @@ class EconomySell extends PluginBase implements Listener {
 			$item->setCount($queue[1]);
 
 			$ev = new SellCreationEvent($block, $item, $queue[2], $queue[3]);
-			$this->getServer()->getPluginManager()->callEvent($ev);
+			$ev->call();
 
 			if ($ev->isCancelled()) {
 				$player->sendMessage($this->getMessage("sell-create-failed"));
@@ -397,7 +398,7 @@ class EconomySell extends PluginBase implements Listener {
 		$item = Item::get($sell[4], $sell[5], $sell[7]);
 		if ($player->getInventory()->contains($item)) {
 			$ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
-			$this->getServer()->getPluginManager()->callEvent($ev);
+			$ev->call();
 			if ($ev->isCancelled()) {
 				$player->sendMessage($this->getMessage("failed-sell"));
 				return true;

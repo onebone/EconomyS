@@ -206,8 +206,9 @@ class EconomyShop extends PluginBase implements Listener {
 
 						return true;
 				}
-				return false;
 		}
+
+		return false;
 	}
 
 	public function getMessage($key, $replacement = []) {
@@ -308,7 +309,7 @@ class EconomyShop extends PluginBase implements Listener {
 			$item->setCount($queue[1]);
 
 			$ev = new ShopCreationEvent($block, $item, $queue[2], $queue[3]);
-			$this->getServer()->getPluginManager()->callEvent($ev);
+			$ev->call();
 
 			if ($ev->isCancelled()) {
 				$player->sendMessage($this->getMessage("shop-create-failed"));
@@ -402,7 +403,7 @@ class EconomyShop extends PluginBase implements Listener {
 			$item = Item::get($shop[4], $shop[5], $shop[7]);
 			if ($player->getInventory()->canAddItem($item)) {
 				$ev = new ShopTransactionEvent($player, new Position($shop[0], $shop[1], $shop[2], $this->getServer()->getLevelByName($shop[3])), $item, $shop[8]);
-				$this->getServer()->getPluginManager()->callEvent($ev);
+				$ev->call();
 				if ($ev->isCancelled()) {
 					$player->sendMessage($this->getMessage("failed-buy"));
 					return true;
