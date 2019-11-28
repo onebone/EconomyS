@@ -21,40 +21,127 @@
 namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
+use pocketmine\event\HandlerList;
+use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 
-class YamlUserProvider implements UserProvider {
+class YamlUserProvider implements UserProvider, Listener {
 	/** @var $api EconomyAPI */
 	private $api;
+	private $data = [];
+
+	private $root;
 
 	public function __construct(EconomyAPI $api) {
 		$this->api = $api;
+
+		$this->root = $this->api->getDataFolder() . 'users' . DIRECTORY_SEPARATOR;
+		if(!file_exists($this->root)) {
+			mkdir($this->root);
+		}
+
+		$api->getServer()->getPluginManager()->registerEvents($this, $api);
 	}
 
-	public function addWallet(string $username, string $wallet): bool {
-
+	public function getName(): string {
+		return 'Yaml';
 	}
 
-	public function removeWallet(string $username, string $wallet): bool {
-		// TODO: Implement removeWallet() method.
-	}
-
-	public function getWallets(string $username): array {
-		// TODO: Implement getWallets() method.
+	public function exists(string $username): bool {
+		$username = strtolower($username);
+		$path = $this->root . $username[0] . DIRECTORY_SEPARATOR . $username . '.yml';
+		return is_file($path);
 	}
 
 	public function setLanguage(string $username, string $lang): bool {
-		// TODO: Implement setLanguage() method.
+		$username = strtolower($username);
+		if(!$this->api->hasLanguage($lang)) return false;
+
+		if(isset($this->data[$username])) {
+			$this->data[$username]['language'] = $lang;
+
+			return true;
+		}else{
+			if($this->exists($username)) {
+				$this->loadPlayer($username);
+				$this->data[$username]['language'] = $lang;
+				$this->unloadPlayer($username);
+				// ..??
+
+				return true;
+			}
+		}
+
+		return false;
 	}
 
-	public function getLanguage(string $username): bool {
-		// TODO: Implement getLanguage() method.
+	public function getLanguage(string $username): string {
+		return $this->data[$username] ?? null;
 	}
 
-	public function save() {
-		// TODO: Implement save() method.
-	}
+	public function save() {}
 
 	public function close() {
-		// TODO: Implement close() method.
+		HandlerList::unregisterAll($this);
+	}
+
+	public function onPlayerJoin(PlayerJoinEvent $event) {
+		$this->loadPlayer(strtolower($event->getPlayer()->getName()));
+	}
+
+	public function onPlayerQuit(PlayerQuitEvent $event) {
+		$this->unloadPlayer(strtolower($event->getPlayer()->getName()));
+	}
+
+	public function loadPlayer(string $username) {
+		$username = strtolower($username);
+		if(isset($this->data[$username])) return;
+
+		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
+		if(!file_exists($base)) {
+			mkdir($base);
+		}
+
+		$path = $base . $username . '.yml';
+		if(!is_file($path)) {
+			yaml_emit_file($path, [
+				'language' => $this->api->getDefaultLanguage()
+			]);
+		}
+
+		$data = yaml_parse_file($path);
+		if($this->validate($data)) {
+			$this->data[$username] = $data;
+		}else{
+			yaml_emit_file($path, [
+				'language' => $this->api->getDefaultLanguage()
+			]);
+		}
+	}
+
+	private function validate(&$data): bool {
+		if(!isset($data['language'])) return false;
+
+		if(!is_string($data['language'])) return false;
+
+		if(!$this->api->hasLanguage($data['language'])) {
+			$data['language'] = $this->api->getDefaultLanguage();
+		}
+
+		return true;
+	}
+
+	public function unloadPlayer(string $username) {
+		$username = strtolower($username);
+		if(!isset($this->data[$username])) return;
+
+		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
+		if(!file_exists($base)) {
+			mkdir($base);
+		}
+
+		$path = $base . $username . '.yml';
+		yaml_emit_file($path, $this->data[$username]);
 	}
 }

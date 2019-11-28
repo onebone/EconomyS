@@ -30,11 +30,15 @@ use onebone\economyapi\command\SetMoneyCommand;
 use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
 use onebone\economyapi\defaults\CurrencyDollar;
+use onebone\economyapi\defaults\CurrencyWon;
 use onebone\economyapi\event\account\CreateAccountEvent;
 use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\provider\DummyUserProvider;
+use onebone\economyapi\provider\UserProvider;
+use onebone\economyapi\provider\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -61,6 +65,9 @@ class EconomyAPI extends PluginBase implements Listener {
 	/** @var Currency */
 	private $defaultCurrency;
 	private $currencyConfig;
+
+	/** @var UserProvider */
+	private $provider;
 
 	private $langList = [
 			"def" => "Default",
@@ -162,6 +169,10 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$this->currencies[$id] = $currency;
 		return true;
+	}
+
+	public function hasCurrency(string $id) {
+		return isset($this->currencies[$id]);
 	}
 
 	/**
@@ -292,6 +303,40 @@ class EconomyAPI extends PluginBase implements Listener {
 		return self::RET_NO_ACCOUNT;
 	}
 
+	public function hasLanguage(string $lang): bool {
+		return isset($this->langList[$lang]);
+	}
+
+	// config data
+	public function getDefaultCurrency() {
+		return $this->getConfig()->get('default-currency', 'dollar');
+	}
+
+	public function getAddOpAtRank() {
+		return $this->getConfig()->get('add-op-at-rank', false);
+	}
+
+	public function getAllowPayOffline() {
+		return $this->getConfig()->get('allow-pay-offline', true);
+	}
+
+	public function getDefaultLanguage() {
+		return $this->getConfig()->get('default-lang', 'def');
+	}
+
+	public function getAutoSaveInterval() {
+		return $this->getConfig()->get('auto-save-interval', 10);
+	}
+
+	public function getCheckUpdate() {
+		return $this->getConfig()->get('check-update', true);
+	}
+
+	public function getUpdateHost() {
+		return $this->getConfig()->get('update-host', 'onebone.me/plugins/economys/api');
+	}
+	// config end
+
 	public function onLoad() {
 		self::$instance = $this;
 	}
@@ -333,7 +378,20 @@ class EconomyAPI extends PluginBase implements Listener {
 			$this->checkUpdate();
 		}
 
+		switch($this->getConfig()->get('provider', 'yaml')) {
+			case 'yaml':
+				$this->provider = new YamlUserProvider($this);
+				break;
+			default:
+				$this->provider = new DummyUserProvider();
+				$this->getLogger()->warning('Invalid data provider given.');
+				break;
+		}
+
+		$this->getLogger()->info('User provider was set to: ' . $this->provider->getName());
+
 		$this->registerCurrency('dollar', new CurrencyDollar($this));
+		$this->registerCurrency('won', new CurrencyWon($this));
 
 		$this->parseCurrencies();
 		$this->initializeLanguage();

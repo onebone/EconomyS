@@ -24,11 +24,11 @@ namespace onebone\economyapi\provider;
 // It is instantiated once on EconomyAPI main class unlike
 // Provider that is created by each currencies.
 interface UserProvider {
-	public function addWallet(string $username, string $wallet): bool;
-	public function removeWallet(string $username, string $wallet): bool;
-	public function getWallets(string $username): array;
+	public function getName(): string;
+
+	public function exists(string $username): bool;
 	public function setLanguage(string $username, string $lang): bool;
-	public function getLanguage(string $username): bool;
+	public function getLanguage(string $username): string;
 
 	public function save();
 	public function close();

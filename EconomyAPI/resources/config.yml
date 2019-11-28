@@ -2,10 +2,6 @@
 default-currency: dollar
 # add-op-at-rank: Set whether to show OPs at top money rank
 add-op-at-rank: false
-# default-money: Set default money when player joined the server first
-default-money: 1000
-# max-money: Set max money that player can have
-max-money: 9999999999
 # Whether to allow player to pay when target player is offline
 allow-pay-offline: true
 
@@ -26,7 +22,7 @@ currencies:
     exchange:
       dollar: [1000, 1]
 
-# provider: Set provider of database (Available: yaml, mysql)
+# provider: Set user-provider type of database (Available: yaml, mysql)
 provider: yaml
 
 # check-update: Set whether to check update from server
