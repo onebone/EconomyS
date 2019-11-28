@@ -24,4 +24,12 @@ class DummyUserProvider implements UserProvider {
 
 	public function close() {
 	}
+
+	public function create(string $username): bool {
+		return false;
+	}
+
+	public function delete(string $username): bool {
+		return false;
+	}
 }

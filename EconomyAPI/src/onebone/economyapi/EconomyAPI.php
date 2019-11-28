@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2019  onebone <jyc00410@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			"ru" => "Русский",
 			"zh" => "繁體中文",
 	];
-	private $lang = [], $playerLang = [];
+	private $lang = [];
 
 	/**
 	 * @return EconomyAPI
@@ -121,7 +121,9 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function getMessage(string $key, array $params = [], string $player = "console"): string {
 		$player = strtolower($player);
 		if (isset($this->lang[$this->playerLang[$player]][$key])) {
-			return $this->replaceParameters($this->lang[$this->playerLang[$player]][$key], $params);
+			$lang = $this->provider->getLanguage($player);
+
+			return $this->replaceParameters($this->lang[$lang][$key], $params);
 		} elseif (isset($this->lang["def"][$key])) {
 			return $this->replaceParameters($this->lang["def"][$key], $params);
 		}
@@ -156,8 +158,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 		$language = strtolower($language);
 		if (isset($this->lang[$language])) {
-			$this->playerLang[$player] = $language;
-			return true;
+			return $this->provider->setLanguage($player, $language);
 		}
 		return false;
 	}
@@ -303,6 +304,31 @@ class EconomyAPI extends PluginBase implements Listener {
 		return self::RET_NO_ACCOUNT;
 	}
 
+	/**
+	 * @param string|Player $player
+	 * @param float|bool $defaultMoney
+	 * @param bool $force
+	 *
+	 * @return bool
+	 */
+	public function createAccount($player, $defaultMoney = false, bool $force = false): bool {
+		if ($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
+			$defaultMoney = ($defaultMoney === false) ? $this->getConfig()->get("default-money") : $defaultMoney;
+
+			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
+			$ev->call();
+			if (!$ev->isCancelled() or $force === true) {
+				$this->defaultCurrency->getProvider()->createAccount($player, $ev->getDefaultMoney());
+			}
+		}
+		return false;
+	}
+
 	public function hasLanguage(string $lang): bool {
 		return isset($this->langList[$lang]);
 	}
@@ -353,17 +379,6 @@ class EconomyAPI extends PluginBase implements Listener {
 		 */
 		$this->saveDefaultConfig();
 
-		if (!is_file($this->getDataFolder() . "PlayerLang.dat")) {
-			file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize([]));
-		}
-		$this->playerLang = unserialize(file_get_contents($this->getDataFolder() . "PlayerLang.dat"));
-
-		if (!isset($this->playerLang["console"])) {
-			$this->playerLang["console"] = $this->getConfig()->get("default-lang");
-		}
-		if (!isset($this->playerLang["rcon"])) {
-			$this->playerLang["rcon"] = $this->getConfig()->get("default-lang");
-		}
 		$this->initialize();
 
 		if ($this->getConfig()->get("auto-save-interval") > 0) {
@@ -462,39 +477,10 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function onJoin(PlayerJoinEvent $event) {
 		$player = $event->getPlayer();
 
-		if (!isset($this->playerLang[strtolower($player->getName())])) {
-			$this->playerLang[strtolower($player->getName())] = $this->getConfig()->get("default-lang");
-		}
-
 		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
 			$this->createAccount($player, false, true);
 		}
-	}
-
-	/**
-	 * @param string|Player $player
-	 * @param float|bool $defaultMoney
-	 * @param bool $force
-	 *
-	 * @return bool
-	 */
-	public function createAccount($player, $defaultMoney = false, bool $force = false): bool {
-		if ($player instanceof Player) {
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
-			$defaultMoney = ($defaultMoney === false) ? $this->getConfig()->get("default-money") : $defaultMoney;
-
-			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
-			$ev->call();
-			if (!$ev->isCancelled() or $force === true) {
-				$this->defaultCurrency->getProvider()->createAccount($player, $ev->getDefaultMoney());
-			}
-		}
-		return false;
 	}
 
 	public function onDisable() {
@@ -509,6 +495,5 @@ class EconomyAPI extends PluginBase implements Listener {
 		foreach($this->currencies as $currency) {
 			$currency->save();
 		}
-		file_put_contents($this->getDataFolder() . "PlayerLang.dat", serialize($this->playerLang));
 	}
 }

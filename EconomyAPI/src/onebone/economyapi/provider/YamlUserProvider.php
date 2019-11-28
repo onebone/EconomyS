@@ -33,6 +33,8 @@ class YamlUserProvider implements UserProvider, Listener {
 
 	private $root;
 
+	private $defaultSchema;
+
 	public function __construct(EconomyAPI $api) {
 		$this->api = $api;
 
@@ -41,11 +43,48 @@ class YamlUserProvider implements UserProvider, Listener {
 			mkdir($this->root);
 		}
 
+		$this->defaultSchema = [
+			'language' => $this->api->getDefaultLanguage()
+		];
+
 		$api->getServer()->getPluginManager()->registerEvents($this, $api);
 	}
 
 	public function getName(): string {
 		return 'Yaml';
+	}
+
+	public function create(string $username): bool {
+		$username = strtolower($username);
+		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
+		if(!file_exists($base)) {
+			mkdir($base);
+		}
+
+		$path = $base . $username . '.yml';
+		if(!is_file($path)) {
+			yaml_emit_file($path, [
+				'language' => $this->api->getDefaultLanguage()
+			]);
+			return true;
+		}
+
+		return false;
+	}
+
+	public function delete(string $username): bool {
+		$username = strtolower($username);
+		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
+		if(!file_exists($base)) {
+			return false;
+		}
+
+		$path = $base . $username . '.yml';
+		if(is_file($path)) {
+			unlink($path);
+		}
+
+		return true;
 	}
 
 	public function exists(string $username): bool {
@@ -60,24 +99,17 @@ class YamlUserProvider implements UserProvider, Listener {
 
 		if(isset($this->data[$username])) {
 			$this->data[$username]['language'] = $lang;
-
-			return true;
 		}else{
-			if($this->exists($username)) {
-				$this->loadPlayer($username);
-				$this->data[$username]['language'] = $lang;
-				$this->unloadPlayer($username);
-				// ..??
-
-				return true;
-			}
+			$this->loadPlayer($username);
+			$this->data[$username]['language'] = $lang;
+			$this->unloadPlayer($username);
 		}
 
-		return false;
+		return true;
 	}
 
 	public function getLanguage(string $username): string {
-		return $this->data[$username] ?? null;
+		return $this->data[$username] ?? $this->api->getDefaultLanguage();
 	}
 
 	public function save() {}
