@@ -32,7 +32,11 @@ class CurrencyWon implements Currency {
 
 	public function __construct(EconomyAPI $plugin) {
 		// TODO customizable
-		$this->provider = new YamlProvider($plugin);
+		$this->provider = new YamlProvider($plugin, 'Won.yml');
+	}
+
+	public function getName(): string {
+		return 'Won';
 	}
 
 	public function isCurrencyAvailable(Player $player): bool {

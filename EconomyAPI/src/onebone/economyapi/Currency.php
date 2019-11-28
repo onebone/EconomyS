@@ -24,6 +24,8 @@ use onebone\economyapi\provider\Provider;
 use pocketmine\Player;
 
 interface Currency {
+	public function getName(): string;
+
 	/**
 	 * Returns if the currency is available to player. Availability
 	 * may vary on the world where player is in or position or

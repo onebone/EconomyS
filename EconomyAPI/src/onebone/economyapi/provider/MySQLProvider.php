@@ -35,17 +35,15 @@ class MySQLProvider implements Provider {
 
 	public function __construct(EconomyAPI $plugin) {
 		$this->plugin = $plugin;
-	}
 
-	public function open() {
 		$config = $this->plugin->getConfig()->get("provider-settings", []);
 
 		$this->db = new \mysqli(
-				$config["host"] ?? "127.0.0.1",
-				$config["user"] ?? "onebone",
-				$config["password"] ?? "hello_world",
-				$config["db"] ?? "economyapi",
-				$config["port"] ?? 3306);
+			$config["host"] ?? "127.0.0.1",
+			$config["user"] ?? "onebone",
+			$config["password"] ?? "hello_world",
+			$config["db"] ?? "economyapi",
+			$config["port"] ?? 3306);
 		if ($this->db->connect_error) {
 			$this->plugin->getLogger()->critical("Could not connect to MySQL server: " . $this->db->connect_error);
 			return;

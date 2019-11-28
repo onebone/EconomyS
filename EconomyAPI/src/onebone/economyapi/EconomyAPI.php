@@ -120,7 +120,9 @@ class EconomyAPI extends PluginBase implements Listener {
 	 */
 	public function getMessage(string $key, array $params = [], string $player = "console"): string {
 		$player = strtolower($player);
-		if (isset($this->lang[$this->playerLang[$player]][$key])) {
+
+		$lang = $this->provider->getLanguage($player);
+		if (isset($this->lang[$lang][$key])) {
 			$lang = $this->provider->getLanguage($player);
 
 			return $this->replaceParameters($this->lang[$lang][$key], $params);
@@ -408,6 +410,16 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->registerCurrency('dollar', new CurrencyDollar($this));
 		$this->registerCurrency('won', new CurrencyWon($this));
 
+		$default = $this->getDefaultCurrency();
+		foreach($this->currencies as $key => $currency) {
+			if($key === $default) {
+				$this->defaultCurrency = $currency;
+
+				$this->getLogger()->info('Default currency is set to: ' . $currency->getName());
+				break;
+			}
+		}
+
 		$this->parseCurrencies();
 		$this->initializeLanguage();
 		$this->registerCommands();
@@ -484,8 +496,6 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	public function onDisable() {
-		$this->saveAll();
-
 		foreach($this->currencies as $currency) {
 			$currency->close();
 		}

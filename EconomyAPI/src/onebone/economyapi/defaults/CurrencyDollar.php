@@ -32,7 +32,11 @@ class CurrencyDollar implements Currency {
 
 	public function __construct(EconomyAPI $plugin) {
 		// TODO make this customizable
-		$this->provider = new YamlProvider($plugin);
+		$this->provider = new YamlProvider($plugin, 'Money.yml');
+	}
+
+	public function getName(): string {
+		return 'Dollar';
 	}
 
 	public function isCurrencyAvailable(Player $player): bool {

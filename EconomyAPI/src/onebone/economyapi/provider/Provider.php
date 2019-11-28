@@ -42,10 +42,6 @@ use onebone\economyapi\EconomyAPI;
 
 // Provider is currency-related data provider
 interface Provider {
-	public function __construct(EconomyAPI $plugin);
-
-	public function open();
-
 	/**
 	 * @param \pocketmine\Player|string $player
 	 * @return bool
