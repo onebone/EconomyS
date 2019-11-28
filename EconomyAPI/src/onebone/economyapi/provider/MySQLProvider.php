@@ -20,7 +20,6 @@
 
 namespace onebone\economyapi\provider;
 
-
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\MySQLPingTask;
 use pocketmine\Player;
