@@ -154,7 +154,7 @@ class YamlUserProvider implements UserProvider, Listener {
 	}
 
 	public function getLanguage(string $username): string {
-		return $this->data[$username] ?? $this->api->getPluginConfig()->getDefaultLanguage();
+		return $this->data[$username]['language'] ?? $this->api->getPluginConfig()->getDefaultLanguage();
 	}
 
 	public function save() {
