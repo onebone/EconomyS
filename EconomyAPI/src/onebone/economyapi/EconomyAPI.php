@@ -29,6 +29,7 @@ use onebone\economyapi\command\SetLangCommand;
 use onebone\economyapi\command\SetMoneyCommand;
 use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
+use onebone\economyapi\config\PluginConfig;
 use onebone\economyapi\defaults\CurrencyDollar;
 use onebone\economyapi\defaults\CurrencyWon;
 use onebone\economyapi\event\account\CreateAccountEvent;
@@ -47,6 +48,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\Internet;
 use pocketmine\utils\TextFormat;
+use Throwable;
 
 class EconomyAPI extends PluginBase implements Listener {
 	const API_VERSION = 4;
@@ -54,11 +56,18 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	const RET_NO_ACCOUNT = -3;
 	const RET_CANCELLED = -2;
+    /**
+     * @deprecated No longer used by internal code.
+     * @deprecated It will be removed in a future release.
+     */
 	const RET_NOT_FOUND = -1;
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
 	private static $instance = null;
+
+	/** @var PluginConfig $pluginConfig */
+	private $pluginConfig;
 
 	/** @var Currency[] */
 	private $currencies = [];
@@ -101,7 +110,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 */
 	public function getCommandMessage(string $command, $lang = false): array {
 		if ($lang === false) {
-			$lang = $this->getConfig()->get("default-lang");
+			$lang = $this->pluginConfig->getDefaultLanguage();
 		}
 		$command = strtolower($command);
 		if (isset($this->lang[$lang]["commands"][$command])) {
@@ -134,7 +143,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function replaceParameters($message, $params = []) {
 		$search = ["%MONETARY_UNIT%"];
-		$replace = [$this->getMonetaryUnit()];
+		$replace = [$this->pluginConfig->getMonetaryUnit()];
 
 		for ($i = 0; $i < count($params); $i++) {
 			$search[] = "%" . ($i + 1);
@@ -152,8 +161,13 @@ class EconomyAPI extends PluginBase implements Listener {
 		return str_replace($search, $replace, $message);
 	}
 
+    /**
+     * @deprecated No longer used by internal code.
+     * @deprecated It will be removed in a future release.
+     * @see PluginConfig::getMonetaryUnit() Use EconomyAPI::getInstance()->getPluginConfig()->getMonetaryUnit() instead of EconomyAPI::getInstance()->getMonetaryUnit().
+     */
 	public function getMonetaryUnit(): string {
-		return $this->getConfig()->get("monetary-unit");
+		return $this->pluginConfig->getMonetaryUnit();
 	}
 
 	public function setPlayerLanguage(string $player, string $language): bool {
@@ -222,7 +236,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 		if ($this->defaultCurrency->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
-			if ($amount > $this->getConfig()->get("max-money")) {
+			if ($amount > $this->pluginConfig->getMaxMoney()) {
 				return self::RET_INVALID;
 			}
 
@@ -256,7 +270,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 		if (($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			if ($money + $amount > $this->getConfig()->get("max-money")) {
+			if ($money + $amount > $this->pluginConfig->getMaxMoney()) {
 				return self::RET_INVALID;
 			}
 
@@ -320,7 +334,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
-			$defaultMoney = ($defaultMoney === false) ? $this->getConfig()->get("default-money") : $defaultMoney;
+			$defaultMoney = ($defaultMoney === false) ? $this->pluginConfig->getDefaultMoney() : $defaultMoney;
 
 			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
 			$ev->call();
@@ -334,36 +348,6 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function hasLanguage(string $lang): bool {
 		return isset($this->langList[$lang]);
 	}
-
-	// config data
-	public function getDefaultCurrency() {
-		return $this->getConfig()->get('default-currency', 'dollar');
-	}
-
-	public function getAddOpAtRank() {
-		return $this->getConfig()->get('add-op-at-rank', false);
-	}
-
-	public function getAllowPayOffline() {
-		return $this->getConfig()->get('allow-pay-offline', true);
-	}
-
-	public function getDefaultLanguage() {
-		return $this->getConfig()->get('default-lang', 'def');
-	}
-
-	public function getAutoSaveInterval() {
-		return $this->getConfig()->get('auto-save-interval', 10);
-	}
-
-	public function getCheckUpdate() {
-		return $this->getConfig()->get('check-update', true);
-	}
-
-	public function getUpdateHost() {
-		return $this->getConfig()->get('update-host', 'onebone.me/plugins/economys/api');
-	}
-	// config end
 
 	public function onLoad() {
 		self::$instance = $this;
@@ -383,19 +367,21 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$this->initialize();
 
-		if ($this->getConfig()->get("auto-save-interval") > 0) {
-			$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->getConfig()->get("auto-save-interval") * 1200, $this->getConfig()->get("auto-save-interval") * 1200);
+		if ($this->pluginConfig->getAutoSaveInterval() > 0) {
+			$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->pluginConfig->getAutoSaveInterval() * 1200, $this->pluginConfig->getAutoSaveInterval() * 1200);
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 
 	private function initialize() {
-		if ($this->getConfig()->get("check-update")) {
+        $this->pluginConfig = new PluginConfig($this->getConfig());
+
+		if ($this->pluginConfig->getCheckUpdate()) {
 			$this->checkUpdate();
 		}
 
-		switch($this->getConfig()->get('provider', 'yaml')) {
+		switch($this->pluginConfig->getProvider()) {
 			case 'yaml':
 				$this->provider = new YamlUserProvider($this);
 				break;
@@ -407,10 +393,16 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$this->getLogger()->info('User provider was set to: ' . $this->provider->getName());
 
-		$this->registerCurrency('dollar', new CurrencyDollar($this));
-		$this->registerCurrency('won', new CurrencyWon($this));
+		$currencies = [
+            'dollar' => new CurrencyDollar($this),
+            'won' => new CurrencyWon($this)
+        ];
 
-		$default = $this->getDefaultCurrency();
+		foreach ($currencies as $currencyName => $currencyClass) {
+		    $this->registerCurrency($currencyName, $currencyClass);
+        }
+
+		$default = $this->pluginConfig->getDefaultCurrency();
 		foreach($this->currencies as $key => $currency) {
 			if($key === $default) {
 				$this->defaultCurrency = $currency;
@@ -427,7 +419,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function checkUpdate() {
 		try {
-			$info = json_decode(Internet::getURL($this->getConfig()->get("update-host") . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
+			$info = json_decode(Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
 			if (!isset($info["status"]) or $info["status"] !== true) {
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;
@@ -437,7 +429,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			}
 			$this->getLogger()->notice($info["notice"]);
 			return true;
-		} catch (\Throwable $e) {
+		} catch (Throwable $e) {
 			$this->getLogger()->logException($e);
 			return false;
 		}
@@ -455,21 +447,27 @@ class EconomyAPI extends PluginBase implements Listener {
 	private function registerCommands() {
 		$map = $this->getServer()->getCommandMap();
 
-		$map->register("economyapi", new MyMoneyCommand($this));
-		$map->register("economyapi", new TopMoneyCommand($this));
-		$map->register("economyapi", new SetMoneyCommand($this));
-		$map->register("economyapi", new SeeMoneyCommand($this));
-		$map->register("economyapi", new GiveMoneyCommand($this));
-		$map->register("economyapi", new TakeMoneyCommand($this));
-		$map->register("economyapi", new PayCommand($this));
-		$map->register("economyapi", new SetLangCommand($this));
-		$map->register("economyapi", new MyStatusCommand($this));
+		$commands = [
+            new GiveMoneyCommand($this),
+            new MyMoneyCommand($this),
+            new MyStatusCommand($this),
+            new PayCommand($this),
+            new SeeMoneyCommand($this),
+            new SetLangCommand($this),
+            new SetMoneyCommand($this),
+            new TakeMoneyCommand($this),
+            new TopMoneyCommand($this)
+        ];
+
+		foreach ($commands as $command) {
+            $map->register("economyapi", $command);
+        }
 	}
 
 	private function parseCurrencies() {
 		$this->currencyConfig = [];
 
-		$currencies = $this->getconfig()->get('currencies', []);
+		$currencies = $this->pluginConfig->getCurrencies();
 		foreach($currencies as $key => $data) {
 			$exchange = $data['exchange'] ?? [];
 			foreach($exchange as $target => $value) {
@@ -506,4 +504,19 @@ class EconomyAPI extends PluginBase implements Listener {
 			$currency->save();
 		}
 	}
+
+    /**
+     * @return PluginConfig
+     */
+    public function getPluginConfig(): PluginConfig {
+        return $this->pluginConfig;
+    }
+
+    /**
+     * @return Currency
+     */
+    public function getDefaultCurrency(): Currency
+    {
+        return $this->defaultCurrency;
+    }
 }

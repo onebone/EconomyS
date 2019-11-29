@@ -71,7 +71,11 @@ class CurrencyDollar implements Currency {
 		return $this->provider;
 	}
 
-	public function save() {
+	public function setProvider(Provider $provider) {
+        $this->provider = $provider;
+    }
+
+    public function save() {
 		$this->provider->save();
 	}
 

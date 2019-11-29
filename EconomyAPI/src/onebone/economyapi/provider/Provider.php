@@ -38,25 +38,25 @@ namespace onebone\economyapi\provider;
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-use onebone\economyapi\EconomyAPI;
+use pocketmine\Player;
 
 // Provider is currency-related data provider
 interface Provider {
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
 	public function accountExists($player);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @param int $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
 	public function removeAccount($player);
@@ -68,21 +68,21 @@ interface Provider {
 	public function getMoney($player);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
 	public function setMoney($player, $amount);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
 	public function addMoney($player, $amount);
 
 	/**
-	 * @param \pocketmine\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */

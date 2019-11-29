@@ -70,6 +70,7 @@ interface Currency {
 	 */
 	public function stringify(float $money): string;
 	public function getProvider(): Provider;
+	public function setProvider(Provider $provider);
 
 	public function save();
 	public function close();

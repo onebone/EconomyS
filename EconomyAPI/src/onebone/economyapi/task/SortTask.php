@@ -80,7 +80,7 @@ class SortTask extends AsyncTask {
 		return $ret;
 	}
 
-	public function onCompletion(Server $server) {
+    public function onCompletion(Server $server) {
 		if ($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player) {
 			$plugin = EconomyAPI::getInstance();
 
@@ -95,7 +95,8 @@ class SortTask extends AsyncTask {
 			if ($this->sender === "CONSOLE") {
 				$plugin->getLogger()->info($output);
 			} else {
-				$player->sendMessage($output);
+                /** @var Player $player */
+                $player->sendMessage($output);
 			}
 		}
 	}

@@ -43,7 +43,7 @@ class PayCommand extends PluginCommand {
 			$player = $p->getName();
 		}
 
-		if (!$p instanceof Player and $plugin->getConfig()->get("allow-pay-offline", true) === false) {
+		if (!$p instanceof Player and $plugin->getPluginConfig()->getAllowPayOffline() === false) {
 			$sender->sendMessage($plugin->getMessage("player-not-connected", [$player], $sender->getName()));
 			return true;
 		}

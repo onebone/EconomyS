@@ -44,7 +44,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		}
 
 		$this->defaultSchema = [
-			'language' => $this->api->getDefaultLanguage()
+			'language' => $this->api->getPluginConfig()->getDefaultLanguage()
 		];
 
 		$api->getServer()->getPluginManager()->registerEvents($this, $api);
@@ -64,7 +64,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		$path = $base . $username . '.yml';
 		if(!is_file($path)) {
 			yaml_emit_file($path, [
-				'language' => $this->api->getDefaultLanguage()
+				'language' => $this->api->getPluginConfig()->getDefaultLanguage()
 			]);
 			return true;
 		}
@@ -109,7 +109,7 @@ class YamlUserProvider implements UserProvider, Listener {
 	}
 
 	public function getLanguage(string $username): string {
-		return $this->data[$username] ?? $this->api->getDefaultLanguage();
+		return $this->data[$username] ?? $this->api->getPluginConfig()->getDefaultLanguage();
 	}
 
 	public function save() {}
@@ -138,7 +138,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		$path = $base . $username . '.yml';
 		if(!is_file($path)) {
 			yaml_emit_file($path, [
-				'language' => $this->api->getDefaultLanguage()
+				'language' => $this->api->getPluginConfig()->getDefaultLanguage()
 			]);
 		}
 
@@ -147,7 +147,7 @@ class YamlUserProvider implements UserProvider, Listener {
 			$this->data[$username] = $data;
 		}else{
 			yaml_emit_file($path, [
-				'language' => $this->api->getDefaultLanguage()
+				'language' => $this->api->getPluginConfig()->getDefaultLanguage()
 			]);
 		}
 	}
@@ -158,7 +158,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		if(!is_string($data['language'])) return false;
 
 		if(!$this->api->hasLanguage($data['language'])) {
-			$data['language'] = $this->api->getDefaultLanguage();
+			$data['language'] = $this->api->getPluginConfig()->getDefaultLanguage();
 		}
 
 		return true;

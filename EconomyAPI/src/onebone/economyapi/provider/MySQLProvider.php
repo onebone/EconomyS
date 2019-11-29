@@ -20,13 +20,14 @@
 
 namespace onebone\economyapi\provider;
 
+use mysqli;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\MySQLPingTask;
 use pocketmine\Player;
 
 class MySQLProvider implements Provider {
 	/**
-	 * @var \mysqli
+	 * @var mysqli
 	 */
 	private $db;
 
@@ -36,9 +37,9 @@ class MySQLProvider implements Provider {
 	public function __construct(EconomyAPI $plugin) {
 		$this->plugin = $plugin;
 
-		$config = $this->plugin->getConfig()->get("provider-settings", []);
+		$config = $this->plugin->getPluginConfig()->getProviderSettings();
 
-		$this->db = new \mysqli(
+		$this->db = new mysqli(
 			$config["host"] ?? "127.0.0.1",
 			$config["user"] ?? "onebone",
 			$config["password"] ?? "hello_world",
@@ -196,7 +197,7 @@ class MySQLProvider implements Provider {
 	}
 
 	public function close() {
-		if ($this->db instanceof \mysqli) {
+		if ($this->db instanceof mysqli) {
 			$this->db->close();
 		}
 	}

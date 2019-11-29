@@ -35,7 +35,7 @@ class TopMoneyCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.topmoney");
 	}
 
-	public function _execute(CommandSender $sender, string $label, array $params): bool {
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if (!$this->testPermission($sender)) return false;
 
 		$page = (int) array_shift($params);
@@ -57,7 +57,7 @@ class TopMoneyCommand extends PluginCommand {
 			}
 		}
 
-		$task = new SortTask($sender->getName(), $plugin->getAllMoney(), $plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
+		$task = new SortTask($sender->getName(), $plugin->getAllMoney(), $plugin->getPluginConfig()->getAddOpAtRank(), $page, $ops, $banned);
 		$server->getAsyncPool()->submitTask($task);
 
 		return true;

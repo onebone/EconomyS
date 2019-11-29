@@ -67,6 +67,10 @@ class CurrencyWon implements Currency {
 		return $this->provider;
 	}
 
+    public function setProvider(Provider $provider) {
+        $this->provider = $provider;
+    }
+
 	public function save() {
 		$this->provider->save();
 	}
