@@ -25,14 +25,11 @@ namespace onebone\economyapi;
 class UserInfo {
 	/** @var string $username Username of player */
 	public $username;
-	/** @var string[] $wallet Type of currencies which player is possessing */
-	public $wallet;
 	/** @var string $language Language which is set to player */
 	public $language;
 
-	public function __construct(string $username, array $wallet, string $language) {
+	public function __construct(string $username, string $language) {
 		$this->username = $username;
-		$this->wallet = $wallet;
 		$this->language = $language;
 	}
 }

@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\defaults;
+namespace onebone\economyapi\currency;
 
 use onebone\economyapi\Currency;
 use onebone\economyapi\EconomyAPI;
@@ -26,25 +26,25 @@ use onebone\economyapi\provider\Provider;
 use onebone\economyapi\provider\YamlProvider;
 use pocketmine\Player;
 
-class CurrencyWon implements Currency {
-	/** @var $provider Provider */
+class CurrencyDollar implements Currency {
+	/** @var Provider $provider */
 	private $provider;
 
 	public function __construct(EconomyAPI $plugin) {
-		// TODO customizable
-		$this->provider = new YamlProvider($plugin, 'Won.yml');
+		// TODO make this customizable
+		$this->provider = new YamlProvider($plugin, 'Money.yml');
 	}
 
 	public function getName(): string {
-		return 'Won';
+		return 'Dollar';
 	}
 
 	public function isCurrencyAvailable(Player $player): bool {
-		return strtolower($player->getLevel()->getFolderName()) === 'korea';
+		return true;
 	}
 
 	public function getDefaultMoney(): float {
-		return 1000000;
+		return 1000;
 	}
 
 	public function getMoney(string $username): ?float {
@@ -52,15 +52,18 @@ class CurrencyWon implements Currency {
 	}
 
 	public function getUnit(): string {
-		return '\\';
+		return '$';
 	}
 
 	public function format(float $money): string {
-		return sprintf('\\%d', $money);
+		return sprintf('$%.2f', $money);
 	}
 
 	public function stringify(float $money): string {
-		return sprintf('%d Won', $money);
+		$digits = floor($money);
+		$decimal = floor(($money - $digits) * 100);
+
+		return $digits . (' dollar' . ($digits > 1 ? 's' : '')) . $decimal . (' cent' . ($decimal > 1 ? 's' : ''));
 	}
 
 	public function getProvider(): Provider {

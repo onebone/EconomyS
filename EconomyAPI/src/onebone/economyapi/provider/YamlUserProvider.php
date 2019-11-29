@@ -21,6 +21,7 @@
 namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\UserInfo;
 use pocketmine\event\HandlerList;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -155,6 +156,22 @@ class YamlUserProvider implements UserProvider, Listener {
 
 	public function getLanguage(string $username): string {
 		return $this->data[$username]['language'] ?? $this->api->getPluginConfig()->getDefaultLanguage();
+	}
+
+	public function getUserInfo(string $username): UserInfo {
+		$username = strtolower($username);
+
+		if(isset($this->data[$username])) {
+			$data = $this->data[$username];
+		}elseif($this->exists($username)) {
+			$this->loadPlayer($username);
+			$data = $this->data[$username];
+			$this->unloadPlayer($username);
+		}else{
+			$data = $this->defaultSchema;
+		}
+
+		return new UserInfo($username, $data['language']);
 	}
 
 	public function save() {

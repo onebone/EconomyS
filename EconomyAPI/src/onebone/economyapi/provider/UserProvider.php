@@ -23,6 +23,8 @@ namespace onebone\economyapi\provider;
 // UserProvider is data provider to manage user-related data.
 // It is instantiated once on EconomyAPI main class unlike
 // Provider that is created by each currencies.
+use onebone\economyapi\UserInfo;
+
 interface UserProvider {
 	public function getName(): string;
 
@@ -35,6 +37,8 @@ interface UserProvider {
 	public function setLanguage(string $username, string $lang): bool;
 
 	public function getLanguage(string $username): string;
+
+	public function getUserInfo(string $username): UserInfo;
 
 	public function save();
 
