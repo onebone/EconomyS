@@ -64,7 +64,7 @@ class YamlUserProvider implements UserProvider, Listener {
 
 		$path = $base . $username . '.yml';
 		if(!is_file($path)) {
-			yaml_emit_file($path, ['language' => $this->api->getPluginConfig()->getDefaultLanguage()]);
+			yaml_emit_file($path, $this->defaultSchema);
 			return true;
 		}
 
@@ -81,9 +81,11 @@ class YamlUserProvider implements UserProvider, Listener {
 		$path = $base . $username . '.yml';
 		if(is_file($path)) {
 			unlink($path);
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 
 	public function exists(string $username): bool {
