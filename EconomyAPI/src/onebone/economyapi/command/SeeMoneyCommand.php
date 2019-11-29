@@ -19,29 +19,29 @@ class SeeMoneyCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
 		$player = array_shift($params);
-		if (trim($player) === "") {
+		if(trim($player) === "") {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
-		if (($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
 		$money = $plugin->myMoney($player);
-		if ($money !== false) {
+		if($money !== false) {
 			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", [
 				$player,
 				$money
 			], $sender->getName()));
-		} else {
+		}else{
 			$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 		}
 		return true;

@@ -36,7 +36,7 @@ class TopMoneyCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) return false;
+		if(!$this->testPermission($sender)) return false;
 
 		$page = (int) array_shift($params);
 
@@ -45,14 +45,14 @@ class TopMoneyCommand extends PluginCommand {
 		$server = $plugin->getServer();
 
 		$banned = [];
-		foreach ($server->getNameBans()->getEntries() as $entry) {
-			if ($plugin->accountExists($entry->getName())) {
+		foreach($server->getNameBans()->getEntries() as $entry) {
+			if($plugin->accountExists($entry->getName())) {
 				$banned[] = $entry->getName();
 			}
 		}
 		$ops = [];
-		foreach ($server->getOps()->getAll() as $op) {
-			if ($plugin->accountExists($op)) {
+		foreach($server->getOps()->getAll() as $op) {
+			if($plugin->accountExists($op)) {
 				$ops[] = $op;
 			}
 		}

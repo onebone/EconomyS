@@ -37,7 +37,7 @@ class YamlDataProvider implements DataProvider {
 	}
 
 	public function addShop($x, $y = 0, $z = 0, $level = null, $data = []) {
-		if ($x instanceof Position) {
+		if($x instanceof Position) {
 			$data = $y;
 
 			$y = $x->getFloorY();
@@ -45,15 +45,15 @@ class YamlDataProvider implements DataProvider {
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if ($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
+		if($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
 
 		$this->config->set($x . ":" . $y . ":" . $z . ":" . $level, $data);
-		if ($this->save) {
+		if($this->save) {
 			$this->save();
 		}
 		return true;
@@ -64,16 +64,16 @@ class YamlDataProvider implements DataProvider {
 	}
 
 	public function getShop($x, $y = 0, $z = 0, $level = null) {
-		if ($x instanceof Position) {
+		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if (!$this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
+		if(!$this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
 		return $this->config->get($x . ":" . $y . ":" . $z . ":" . $level);
@@ -84,17 +84,17 @@ class YamlDataProvider implements DataProvider {
 	}
 
 	public function removeShop($x, $y = 0, $z = 0, $level = null) {
-		if ($x instanceof Position) {
+		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 
-		if ($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
+		if($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			$this->config->remove($x . ":" . $y . ":" . $z . ":" . $level);
 			return true;
 		}

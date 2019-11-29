@@ -35,7 +35,7 @@ class MySQLPingTask extends Task {
 	}
 
 	public function onRun(int $currentTick) {
-		if (!$this->mysql->ping()) {
+		if(!$this->mysql->ping()) {
 			$this->plugin->getDefaultCurrency()->setProvider(new MySQLProvider($this->plugin));
 		}
 	}

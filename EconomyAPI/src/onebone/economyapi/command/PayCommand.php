@@ -20,11 +20,11 @@ class PayCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
-		if (!$sender instanceof Player) {
+		if(!$sender instanceof Player) {
 			$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 			return true;
 		}
@@ -32,23 +32,23 @@ class PayCommand extends PluginCommand {
 		$player = array_shift($params);
 		$amount = array_shift($params);
 
-		if (!is_numeric($amount)) {
+		if(!is_numeric($amount)) {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
-		if (($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		if (!$p instanceof Player and $plugin->getPluginConfig()->getAllowPayOffline() === false) {
+		if(!$p instanceof Player and $plugin->getPluginConfig()->getAllowPayOffline() === false) {
 			$sender->sendMessage($plugin->getMessage("player-not-connected", [$player], $sender->getName()));
 			return true;
 		}
 
-		if (!$plugin->accountExists($player)) {
+		if(!$plugin->accountExists($player)) {
 			$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 			return true;
 		}
@@ -57,24 +57,24 @@ class PayCommand extends PluginCommand {
 		$ev->call();
 
 		$result = EconomyAPI::RET_CANCELLED;
-		if (!$ev->isCancelled()) {
+		if(!$ev->isCancelled()) {
 			$result = $plugin->reduceMoney($sender, $amount);
 		}
 
-		if ($result === EconomyAPI::RET_SUCCESS) {
+		if($result === EconomyAPI::RET_SUCCESS) {
 			$plugin->addMoney($player, $amount, true);
 
 			$sender->sendMessage($plugin->getMessage("pay-success", [
 				$amount,
 				$player
 			], $sender->getName()));
-			if ($p instanceof Player) {
+			if($p instanceof Player) {
 				$p->sendMessage($plugin->getMessage("money-paid", [
 					$sender->getName(),
 					$amount
 				], $sender->getName()));
 			}
-		} else {
+		}else{
 			$sender->sendMessage($plugin->getMessage("pay-failed", [
 				$player,
 				$amount

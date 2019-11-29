@@ -18,21 +18,21 @@ class SetLangCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
 		$lang = array_shift($params);
-		if (trim($lang) === "") {
+		if(trim($lang) === "") {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
-		if ($plugin->setPlayerLanguage($sender->getName(), $lang)) {
+		if($plugin->setPlayerLanguage($sender->getName(), $lang)) {
 			$sender->sendMessage($plugin->getMessage("language-set", [$lang], $sender->getName()));
-		} else {
+		}else{
 			$sender->sendMessage(TextFormat::RED . "There is no language such as $lang");
 		}
 		return true;

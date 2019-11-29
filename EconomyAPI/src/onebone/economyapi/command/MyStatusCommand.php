@@ -19,11 +19,11 @@ class MyStatusCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
-		if (!$sender instanceof Player) {
+		if(!$sender instanceof Player) {
 			$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 			return true;
 		}
@@ -34,11 +34,11 @@ class MyStatusCommand extends PluginCommand {
 		$money = $plugin->getAllMoney();
 
 		$allMoney = 0;
-		foreach ($money as $m) {
+		foreach($money as $m) {
 			$allMoney += $m;
 		}
 		$topMoney = 0;
-		if ($allMoney > 0) {
+		if($allMoney > 0) {
 			$topMoney = round((($money[strtolower($sender->getName())] / $allMoney) * 100), 2);
 		}
 

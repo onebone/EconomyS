@@ -46,7 +46,7 @@ class YamlProvider implements Provider {
 	}
 
 	public function accountExists($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -55,12 +55,12 @@ class YamlProvider implements Provider {
 	}
 
 	public function createAccount($player, $defaultMoney = 1000) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (!isset($this->money["money"][$player])) {
+		if(!isset($this->money["money"][$player])) {
 			$this->money["money"][$player] = $defaultMoney;
 			return true;
 		}
@@ -68,12 +68,12 @@ class YamlProvider implements Provider {
 	}
 
 	public function removeAccount($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (isset($this->money["money"][$player])) {
+		if(isset($this->money["money"][$player])) {
 			unset($this->money["money"][$player]);
 			return true;
 		}
@@ -81,24 +81,24 @@ class YamlProvider implements Provider {
 	}
 
 	public function getMoney($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (isset($this->money["money"][$player])) {
+		if(isset($this->money["money"][$player])) {
 			return $this->money["money"][$player];
 		}
 		return false;
 	}
 
 	public function setMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (isset($this->money["money"][$player])) {
+		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] = $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
@@ -107,12 +107,12 @@ class YamlProvider implements Provider {
 	}
 
 	public function addMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (isset($this->money["money"][$player])) {
+		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] += $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
@@ -121,12 +121,12 @@ class YamlProvider implements Provider {
 	}
 
 	public function reduceMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (isset($this->money["money"][$player])) {
+		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] -= $amount;
 			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;

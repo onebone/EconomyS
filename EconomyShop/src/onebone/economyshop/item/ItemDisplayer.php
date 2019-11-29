@@ -48,7 +48,7 @@ class ItemDisplayer {
 	}
 
 	public function spawnToAll(Level $level = null) {
-		foreach ($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
 			$this->spawnTo($player);
 		}
 	}
@@ -66,7 +66,7 @@ class ItemDisplayer {
 	}
 
 	public function despawnFromAll(Level $level = null) {
-		foreach ($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
 			$this->despawnFrom($player);
 		}
 	}

@@ -38,18 +38,18 @@ class YamlDatabase implements Database {
 	public function __construct($fileName, $config, $otherName) {
 		$this->path = $fileName;
 		$this->land = (new Config($fileName, Config::YAML))->getAll();
-		if (count($this->land) > 0) {
+		if(count($this->land) > 0) {
 			$land = $this->land;
 			$this->landNum = end($land)["ID"] + 1;
 		}
-		if (is_file($otherName)) {
+		if(is_file($otherName)) {
 			$sq = new \SQLite3($otherName);
 			$cnt = 0;
 			$query = $sq->query("SELECT * FROM land");
 			while (($d = $query->fetchArray(SQLITE3_ASSOC)) !== false) {
 				$invitee = [];
 				$tmp = explode(SQLiteDatabase::INVITEE_SEPERATOR, $d["invitee"]);
-				foreach ($tmp as $t) {
+				foreach($tmp as $t) {
 					$invitee[$t] = true;
 				}
 				/*	$this->land[$this->landNum] = [
@@ -75,10 +75,10 @@ class YamlDatabase implements Database {
 	}
 
 	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if ($this->checkOverlap($startX, $endX, $startZ, $endZ, $level)) {
+		if($this->checkOverlap($startX, $endX, $startZ, $endZ, $level)) {
 			return false;
 		}
 		$this->land[$this->landNum] = [
@@ -98,12 +98,12 @@ class YamlDatabase implements Database {
 	}
 
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		foreach ($this->land as $land) {
-			if ($level === $land["level"]) {
-				if (($startX <= $land["endX"] and $endX >= $land["startX"]
+		foreach($this->land as $land) {
+			if($level === $land["level"]) {
+				if(($startX <= $land["endX"] and $endX >= $land["startX"]
 						and $endZ >= $land["startZ"] and $startZ <= $land["endZ"])) {
 					return $land;
 				}
@@ -113,13 +113,13 @@ class YamlDatabase implements Database {
 	}
 
 	public function getByCoord($x, $z, $level) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 		$x = floor($x);
 		$z = floor($z);
-		foreach ($this->land as $land) {
-			if ($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z) {
+		foreach($this->land as $land) {
+			if($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z) {
 				return $land;
 			}
 		}
@@ -136,8 +136,8 @@ class YamlDatabase implements Database {
 
 	public function getLandsByOwner($owner) {
 		$ret = [];
-		foreach ($this->land as $land) {
-			if ($land["owner"] === $owner) {
+		foreach($this->land as $land) {
+			if($land["owner"] === $owner) {
 				$ret[] = $land;
 			}
 		}
@@ -146,8 +146,8 @@ class YamlDatabase implements Database {
 
 	public function getLandsByKeyword($keyword) {
 		$ret = [];
-		foreach ($this->land as $land) {
-			if (stripos($keyword, $land["owner"]) or stripos($land["owner"], $keyword)) {
+		foreach($this->land as $land) {
+			if(stripos($keyword, $land["owner"]) or stripos($land["owner"], $keyword)) {
 				$ret[] = $land;
 			}
 		}
@@ -155,14 +155,14 @@ class YamlDatabase implements Database {
 	}
 
 	public function getInviteeById($id) {
-		if (isset($this->land[$id])) {
+		if(isset($this->land[$id])) {
 			return array_keys($this->land[$id]["invitee"]);
 		}
 		return false;
 	}
 
 	public function addInviteeById($id, $name) {
-		if (isset($this->land[$id])) {
+		if(isset($this->land[$id])) {
 			$this->land[$id]["invitee"][$name] = true;
 			return true;
 		}
@@ -170,7 +170,7 @@ class YamlDatabase implements Database {
 	}
 
 	public function removeInviteeByid($id, $name) {
-		if (isset($this->land[$id]["invitee"][$name])) {
+		if(isset($this->land[$id]["invitee"][$name])) {
 			unset($this->land[$id]["invitee"][$name]);
 			return true;
 		}
@@ -178,7 +178,7 @@ class YamlDatabase implements Database {
 	}
 
 	public function setOwnerById($id, $owner) {
-		if (isset($this->land[$id])) {
+		if(isset($this->land[$id])) {
 			$this->land[$id]["owner"] = $owner;
 			return true;
 		}
@@ -186,10 +186,10 @@ class YamlDatabase implements Database {
 	}
 
 	public function removeLandById($id) {
-		if (isset($this->land[$id])) {
+		if(isset($this->land[$id])) {
 			$ev = new LandRemoveEvent($id);
 			$ev->call();
-			if (!$ev->isCancelled()) {
+			if(!$ev->isCancelled()) {
 				unset($this->land[$id]);
 				return true;
 			}
@@ -198,11 +198,11 @@ class YamlDatabase implements Database {
 	}
 
 	public function canTouch($x, $z, $level, Player $player) {
-		foreach ($this->land as $land) {
-			if ($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z) {
-				if ($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()]) or $player->hasPermission("economyland.land.modify.others")) { // If owner is correct
+		foreach($this->land as $land) {
+			if($level === $land["level"] and $land["startX"] <= $x and $land["endX"] >= $x and $land["startZ"] <= $z and $land["endZ"] >= $z) {
+				if($player->getName() === $land["owner"] or isset($land["invitee"][$player->getName()]) or $player->hasPermission("economyland.land.modify.others")) { // If owner is correct
 					return true;
-				} else { // If owner is not correct
+				}else{ // If owner is not correct
 					return $land;
 				}
 			}

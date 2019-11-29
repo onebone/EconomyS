@@ -65,17 +65,17 @@ class SortTask extends AsyncTask {
 		$this->max = ceil((count($money) - count($banList) - ($this->addOp ? 0 : count($ops))) / 5);
 		$this->page = (int) min($this->max, max(1, $this->page));
 
-		foreach ($money as $p => $m) {
+		foreach($money as $p => $m) {
 			$p = strtolower($p);
-			if (isset($banList[$p])) continue;
-			if (isset($this->ops[$p]) and $this->addOp === false) continue;
+			if(isset($banList[$p])) continue;
+			if(isset($this->ops[$p]) and $this->addOp === false) continue;
 			$current = (int) ceil($n / 5);
-			if ($current === $this->page) {
+			if($current === $this->page) {
 				$ret[$n] = [
 					$p,
 					$m
 				];
-			} else if ($current > $this->page) {
+			}elseif($current > $this->page) {
 				break;
 			}
 			++$n;
@@ -84,7 +84,7 @@ class SortTask extends AsyncTask {
 	}
 
 	public function onCompletion(Server $server) {
-		if ($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player) {
+		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player) {
 			$plugin = EconomyAPI::getInstance();
 
 			$output = ($plugin->getMessage("topmoney-tag", [
@@ -93,7 +93,7 @@ class SortTask extends AsyncTask {
 				], $this->sender) . "\n");
 			$message = ($plugin->getMessage("topmoney-format", [], $this->sender) . "\n");
 
-			foreach (unserialize($this->topList) as $n => $list) {
+			foreach(unserialize($this->topList) as $n => $list) {
 				$output .= str_replace([
 					"%1",
 					"%2",
@@ -106,9 +106,9 @@ class SortTask extends AsyncTask {
 			}
 			$output = substr($output, 0, -1);
 
-			if ($this->sender === "CONSOLE") {
+			if($this->sender === "CONSOLE") {
 				$plugin->getLogger()->info($output);
-			} else {
+			}else{
 				/** @var Player $player */
 				$player->sendMessage($output);
 			}

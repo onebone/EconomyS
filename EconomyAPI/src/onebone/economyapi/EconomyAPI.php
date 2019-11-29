@@ -109,13 +109,13 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return array
 	 */
 	public function getCommandMessage(string $command, $lang = false): array {
-		if ($lang === false) {
+		if($lang === false) {
 			$lang = $this->pluginConfig->getDefaultLanguage();
 		}
 		$command = strtolower($command);
-		if (isset($this->lang[$lang]["commands"][$command])) {
+		if(isset($this->lang[$lang]["commands"][$command])) {
 			return $this->lang[$lang]["commands"][$command];
-		} else {
+		}else{
 			return $this->lang["def"]["commands"][$command];
 		}
 	}
@@ -131,11 +131,11 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		$lang = $this->provider->getLanguage($player);
-		if (isset($this->lang[$lang][$key])) {
+		if(isset($this->lang[$lang][$key])) {
 			$lang = $this->provider->getLanguage($player);
 
 			return $this->replaceParameters($this->lang[$lang][$key], $params);
-		} else if (isset($this->lang["def"][$key])) {
+		}elseif(isset($this->lang["def"][$key])) {
 			return $this->replaceParameters($this->lang["def"][$key], $params);
 		}
 		return "Language matching key \"$key\" does not exist.";
@@ -143,7 +143,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function replaceParameters($message, $params = []) {
 		$search = ["%MONETARY_UNIT%"];
-		$replace = [$this->pluginConfig->getMonetaryUnit()];
+		$replace = [$this->defaultCurrency->getUnit()];
 
 		for ($i = 0; $i < count($params); $i++) {
 			$search[] = "%" . ($i + 1);
@@ -151,30 +151,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		$colors = [
-			"0",
-			"1",
-			"2",
-			"3",
-			"4",
-			"5",
-			"6",
-			"7",
-			"8",
-			"9",
-			"a",
-			"b",
-			"c",
-			"d",
-			"e",
-			"f",
-			"k",
-			"l",
-			"m",
-			"n",
-			"o",
-			"r"
+			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+			"a", "b", "c", "d", "e", "f", "k", "l", "m", "n", "o", "r"
 		];
-		foreach ($colors as $code) {
+		foreach($colors as $code) {
 			$search[] = "&" . $code;
 			$replace[] = TextFormat::ESCAPE . $code;
 		}
@@ -183,18 +163,20 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	/**
-	 * @deprecated No longer used by internal code.
-	 * @deprecated It will be removed in a future release.
-	 * @see PluginConfig::getMonetaryUnit() Use EconomyAPI::getInstance()->getPluginConfig()->getMonetaryUnit() instead of EconomyAPI::getInstance()->getMonetaryUnit().
+	 * @return PluginConfig
 	 */
+	public function getPluginConfig(): PluginConfig {
+		return $this->pluginConfig;
+	}
+
 	public function getMonetaryUnit(): string {
-		return $this->pluginConfig->getMonetaryUnit();
+		return $this->defaultCurrency->getUnit();
 	}
 
 	public function setPlayerLanguage(string $player, string $language): bool {
 		$player = strtolower($player);
 		$language = strtolower($language);
-		if (isset($this->lang[$language])) {
+		if(isset($this->lang[$language])) {
 			return $this->provider->setLanguage($player, $language);
 		}
 		return false;
@@ -238,23 +220,23 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function setMoney($player, $amount, bool $force = false, string $issuer = "none"): int {
-		if ($amount < 0) {
+		if($amount < 0) {
 			return self::RET_INVALID;
 		}
 
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if ($this->defaultCurrency->getProvider()->accountExists($player)) {
+		if($this->defaultCurrency->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
-			if ($amount > $this->pluginConfig->getMaxMoney()) {
+			if($amount > $this->pluginConfig->getMaxMoney()) {
 				return self::RET_INVALID;
 			}
 
 			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if (!$ev->isCancelled() or $force === true) {
+			if(!$ev->isCancelled() or $force === true) {
 				$this->defaultCurrency->getProvider()->setMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $amount, $issuer))->call();
 				return self::RET_SUCCESS;
@@ -273,22 +255,22 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function addMoney($player, $amount, bool $force = false, $issuer = "none"): int {
-		if ($amount < 0) {
+		if($amount < 0) {
 			return self::RET_INVALID;
 		}
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if (($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
+		if(($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			if ($money + $amount > $this->pluginConfig->getMaxMoney()) {
+			if($money + $amount > $this->pluginConfig->getMaxMoney()) {
 				return self::RET_INVALID;
 			}
 
 			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if (!$ev->isCancelled() or $force === true) {
+			if(!$ev->isCancelled() or $force === true) {
 				$this->defaultCurrency->getProvider()->addMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $amount + $money, $issuer))->call();
 				return self::RET_SUCCESS;
@@ -307,22 +289,22 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function reduceMoney($player, $amount, bool $force = false, $issuer = "none"): int {
-		if ($amount < 0) {
+		if($amount < 0) {
 			return self::RET_INVALID;
 		}
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if (($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
+		if(($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			if ($money - $amount < 0) {
+			if($money - $amount < 0) {
 				return self::RET_INVALID;
 			}
 
 			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if (!$ev->isCancelled() or $force === true) {
+			if(!$ev->isCancelled() or $force === true) {
 				$this->defaultCurrency->getProvider()->reduceMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $money - $amount, $issuer))->call();
 				return self::RET_SUCCESS;
@@ -330,6 +312,13 @@ class EconomyAPI extends PluginBase implements Listener {
 			return self::RET_CANCELLED;
 		}
 		return self::RET_NO_ACCOUNT;
+	}
+
+	/**
+	 * @return Currency
+	 */
+	public function getDefaultCurrency(): Currency {
+		return $this->defaultCurrency;
 	}
 
 	public function hasLanguage(string $lang): bool {
@@ -354,7 +343,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$this->initialize();
 
-		if ($this->pluginConfig->getAutoSaveInterval() > 0) {
+		if($this->pluginConfig->getAutoSaveInterval() > 0) {
 			$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->pluginConfig->getAutoSaveInterval() * 1200, $this->pluginConfig->getAutoSaveInterval() * 1200);
 		}
 
@@ -364,7 +353,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	private function initialize() {
 		$this->pluginConfig = new PluginConfig($this->getConfig());
 
-		if ($this->pluginConfig->getCheckUpdate()) {
+		if($this->pluginConfig->getCheckUpdate()) {
 			$this->checkUpdate();
 		}
 
@@ -385,13 +374,13 @@ class EconomyAPI extends PluginBase implements Listener {
 			'won'    => new CurrencyWon($this)
 		];
 
-		foreach ($currencies as $currencyName => $currencyClass) {
+		foreach($currencies as $currencyName => $currencyClass) {
 			$this->registerCurrency($currencyName, $currencyClass);
 		}
 
 		$default = $this->pluginConfig->getDefaultCurrency();
-		foreach ($this->currencies as $key => $currency) {
-			if ($key === $default) {
+		foreach($this->currencies as $key => $currency) {
+			if($key === $default) {
 				$this->defaultCurrency = $currency;
 
 				$this->getLogger()->info('Default currency is set to: ' . $currency->getName());
@@ -405,25 +394,25 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	private function checkUpdate() {
-		try {
+		try{
 			$info = json_decode(Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
-			if (!isset($info["status"]) or $info["status"] !== true) {
+			if(!isset($info["status"]) or $info["status"] !== true) {
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;
 			}
-			if ($info["update-available"] === true) {
+			if($info["update-available"] === true) {
 				$this->getLogger()->notice("Server says new version (" . $info["new-version"] . ") of EconomyS is out. Check it out at " . $info["download-address"]);
 			}
 			$this->getLogger()->notice($info["notice"]);
 			return true;
-		} catch (Throwable $e) {
+		}catch(Throwable $e) {
 			$this->getLogger()->logException($e);
 			return false;
 		}
 	}
 
 	public function registerCurrency(string $id, Currency $currency) {
-		if (isset($this->currencies[$id])) {
+		if(isset($this->currencies[$id])) {
 			return false;
 		}
 
@@ -435,10 +424,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->currencyConfig = [];
 
 		$currencies = $this->pluginConfig->getCurrencies();
-		foreach ($currencies as $key => $data) {
+		foreach($currencies as $key => $data) {
 			$exchange = $data['exchange'] ?? [];
-			foreach ($exchange as $target => $value) {
-				if (count($value) !== 2 or !is_float($value[0]) or !is_float($value[1])) {
+			foreach($exchange as $target => $value) {
+				if(count($value) !== 2 or !is_float($value[0]) or !is_float($value[1])) {
 					$this->getLogger()->warning("Currency exchange rate for $key to $target is not valid. It will be excluded.");
 					unset($exchange[$target]);
 				}
@@ -452,8 +441,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	private function initializeLanguage() {
-		foreach ($this->getResources() as $resource) {
-			if ($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_") {
+		foreach($this->getResources() as $resource) {
+			if($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_") {
 				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
 			}
 		}
@@ -475,7 +464,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			new TopMoneyCommand($this)
 		];
 
-		foreach ($commands as $command) {
+		foreach($commands as $command) {
 			$map->register("economyapi", $command);
 		}
 	}
@@ -483,7 +472,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function onJoin(PlayerJoinEvent $event) {
 		$player = $event->getPlayer();
 
-		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
+		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
 			$this->createAccount($player, false, true);
 		}
@@ -497,46 +486,33 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = false, bool $force = false): bool {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (!$this->defaultCurrency->getProvider()->accountExists($player)) {
+		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
 			$defaultMoney = ($defaultMoney === false) ? $this->pluginConfig->getDefaultMoney() : $defaultMoney;
 
 			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
 			$ev->call();
-			if (!$ev->isCancelled() or $force === true) {
+			if(!$ev->isCancelled() or $force === true) {
 				$this->defaultCurrency->getProvider()->createAccount($player, $ev->getDefaultMoney());
 			}
 		}
+
 		return false;
 	}
 
 	public function onDisable() {
-		foreach ($this->currencies as $currency) {
+		foreach($this->currencies as $currency) {
 			$currency->close();
 		}
 	}
 
 	public function saveAll() {
-		foreach ($this->currencies as $currency) {
+		foreach($this->currencies as $currency) {
 			$currency->save();
 		}
-	}
-
-	/**
-	 * @return PluginConfig
-	 */
-	public function getPluginConfig(): PluginConfig {
-		return $this->pluginConfig;
-	}
-
-	/**
-	 * @return Currency
-	 */
-	public function getDefaultCurrency(): Currency {
-		return $this->defaultCurrency;
 	}
 }

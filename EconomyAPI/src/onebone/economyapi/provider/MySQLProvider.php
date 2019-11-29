@@ -40,11 +40,11 @@ class MySQLProvider implements Provider {
 		$config = $this->plugin->getPluginConfig()->getProviderSettings();
 
 		$this->db = new mysqli($config["host"] ?? "127.0.0.1", $config["user"] ?? "onebone", $config["password"] ?? "hello_world", $config["db"] ?? "economyapi", $config["port"] ?? 3306);
-		if ($this->db->connect_error) {
+		if($this->db->connect_error) {
 			$this->plugin->getLogger()->critical("Could not connect to MySQL server: " . $this->db->connect_error);
 			return;
 		}
-		if (!$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
+		if(!$this->db->query("CREATE TABLE IF NOT EXISTS user_money(
 			username VARCHAR(20) PRIMARY KEY,
 			money FLOAT
 		);")) {
@@ -61,12 +61,12 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000.0) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if (!$this->accountExists($player)) {
+		if(!$this->accountExists($player)) {
 			$this->db->query("INSERT INTO user_money (username, money) VALUES ('" . $this->db->real_escape_string($player) . "', $defaultMoney);");
 			return true;
 		}
@@ -78,7 +78,7 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function accountExists($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -92,12 +92,12 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function removeAccount($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		if ($this->db->query("DELETE FROM user_money WHERE username='" . $this->db->real_escape_string($player) . "'") === true) return true;
+		if($this->db->query("DELETE FROM user_money WHERE username='" . $this->db->real_escape_string($player) . "'") === true) return true;
 		return false;
 	}
 
@@ -106,7 +106,7 @@ class MySQLProvider implements Provider {
 	 * @return float|bool
 	 */
 	public function getMoney($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -123,7 +123,7 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function setMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -139,7 +139,7 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function addMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -155,7 +155,7 @@ class MySQLProvider implements Provider {
 	 * @return bool
 	 */
 	public function reduceMoney($player, $amount) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -172,7 +172,7 @@ class MySQLProvider implements Provider {
 		$res = $this->db->query("SELECT * FROM user_money");
 
 		$ret = [];
-		foreach ($res->fetch_all() as $val) {
+		foreach($res->fetch_all() as $val) {
 			$ret[$val[0]] = $val[1];
 		}
 
@@ -192,7 +192,7 @@ class MySQLProvider implements Provider {
 	}
 
 	public function close() {
-		if ($this->db instanceof mysqli) {
+		if($this->db instanceof mysqli) {
 			$this->db->close();
 		}
 	}

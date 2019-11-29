@@ -19,25 +19,25 @@ class TakeMoneyCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
 		$player = array_shift($params);
 		$amount = array_shift($params);
 
-		if (!is_numeric($amount)) {
+		if(!is_numeric($amount)) {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
 		}
 
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
-		if (($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
-		if ($amount < 0) {
+		if($amount < 0) {
 			$sender->sendMessage($plugin->getMessage("takemoney-invalid-number", [$amount], $sender->getName()));
 			return true;
 		}
@@ -57,7 +57,7 @@ class TakeMoneyCommand extends PluginCommand {
 					$amount
 				], $sender->getName()));
 
-				if ($p instanceof Player) {
+				if($p instanceof Player) {
 					$p->sendMessage($plugin->getMessage("takemoney-money-taken", [$amount], $sender->getName()));
 				}
 				break;

@@ -50,9 +50,9 @@ class EconomyJob extends PluginBase implements Listener {
 
 	public function onEnable() {
 		@mkdir($this->getDataFolder());
-		if (!is_file($this->getDataFolder() . "jobs.yml")) {
+		if(!is_file($this->getDataFolder() . "jobs.yml")) {
 			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML, yaml_parse($this->readResource("jobs.yml")));
-		} else {
+		}else{
 			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML);
 		}
 		$this->player = new Config($this->getDataFolder() . "players.yml", Config::YAML);
@@ -66,7 +66,7 @@ class EconomyJob extends PluginBase implements Listener {
 	private function readResource($res) {
 		$path = $this->getFile() . "resources/" . $res;
 		$resource = $this->getResource($res);
-		if (!is_resource($resource)) {
+		if(!is_resource($resource)) {
 			$this->getLogger()->debug("Tried to load unknown resource " . TextFormat::AQUA . $res . TextFormat::RESET);
 			return false;
 		}
@@ -89,12 +89,12 @@ class EconomyJob extends PluginBase implements Listener {
 		$block = $event->getBlock();
 
 		$job = $this->jobs->get($this->player->get($player->getName()));
-		if ($job !== false) {
-			if (isset($job[$block->getID() . ":" . $block->getDamage() . ":break"])) {
+		if($job !== false) {
+			if(isset($job[$block->getID() . ":" . $block->getDamage() . ":break"])) {
 				$money = $job[$block->getID() . ":" . $block->getDamage() . ":break"];
-				if ($money > 0) {
+				if($money > 0) {
 					$this->api->addMoney($player, $money);
-				} else {
+				}else{
 					$this->api->reduceMoney($player, $money);
 				}
 			}
@@ -111,12 +111,12 @@ class EconomyJob extends PluginBase implements Listener {
 		$block = $event->getBlock();
 
 		$job = $this->jobs->get($this->player->get($player->getName()));
-		if ($job !== false) {
-			if (isset($job[$block->getID() . ":" . $block->getDamage() . ":place"])) {
+		if($job !== false) {
+			if(isset($job[$block->getID() . ":" . $block->getDamage() . ":place"])) {
 				$money = $job[$block->getID() . ":" . $block->getDamage() . ":place"];
-				if ($money > 0) {
+				if($money > 0) {
 					$this->api->addMoney($player, $money);
-				} else {
+				}else{
 					$this->api->reduceMoney($player, $money);
 				}
 			}
@@ -141,41 +141,41 @@ class EconomyJob extends PluginBase implements Listener {
 	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool {
 		switch (array_shift($params)) {
 			case "join":
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 				}
-				if ($this->player->exists($sender->getName())) {
+				if($this->player->exists($sender->getName())) {
 					$sender->sendMessage("You already have joined job.");
-				} else {
+				}else{
 					$job = array_shift($params);
-					if (trim($job) === "") {
+					if(trim($job) === "") {
 						$sender->sendMessage("Usage: /job join <name>");
 						break;
 					}
-					if ($this->jobs->exists($job)) {
+					if($this->jobs->exists($job)) {
 						$this->player->set($sender->getName(), $job);
 						$sender->sendMessage("You have joined to the job \"$job\"");
-					} else {
+					}else{
 						$sender->sendMessage("There's no job named \"$job\"");
 					}
 				}
 				break;
 			case "retire":
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 				}
-				if ($this->player->exists($sender->getName())) {
+				if($this->player->exists($sender->getName())) {
 					$job = $this->player->get($sender->getName());
 					$this->player->remove($sender->getName());
 					$sender->sendMessage("You have retired from the job \"$job\"");
-				} else {
+				}else{
 					$sender->sendMessage("You don't have job that you've joined");
 				}
 				break;
 			case "list":
 
 				$max = 0;
-				foreach ($this->jobs->getAll() as $d) {
+				foreach($this->jobs->getAll() as $d) {
 					$max += count($d);
 				}
 
@@ -191,13 +191,13 @@ class EconomyJob extends PluginBase implements Listener {
 				$n = 1;
 
 				$output = "Showing job list page $page of $max : \n";
-				foreach ($this->jobs->getAll() as $name => $job) {
+				foreach($this->jobs->getAll() as $name => $job) {
 					$info = "";
-					foreach ($job as $id => $money) {
+					foreach($job as $id => $money) {
 						$cur = (int) ceil(($n / 5));
-						if ($cur === $page) {
+						if($cur === $page) {
 							$info .= $name . " : " . $id . " | " . EconomyAPI::getInstance()->getMonetaryUnit() . "" . $money . "\n";
-						} elseif ($cur > $page) {
+						} elseif($cur > $page) {
 							break;
 						}
 						++$n;
@@ -207,12 +207,12 @@ class EconomyJob extends PluginBase implements Listener {
 				$sender->sendMessage($output);
 				break;
 			case "me":
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 				}
-				if ($this->player->exists($sender->getName())) {
+				if($this->player->exists($sender->getName())) {
 					$sender->sendMessage("Your job : " . $this->player->get($sender->getName()));
-				} else {
+				}else{
 					$sender->sendMessage("You don't have any jobs you've joined.");
 				}
 				break;

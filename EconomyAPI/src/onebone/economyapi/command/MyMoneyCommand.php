@@ -19,11 +19,11 @@ class MyMoneyCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->testPermission($sender)) {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
-		if ($sender instanceof Player) {
+		if($sender instanceof Player) {
 			/** @var EconomyAPI $plugin */
 			$plugin = $this->getPlugin();
 

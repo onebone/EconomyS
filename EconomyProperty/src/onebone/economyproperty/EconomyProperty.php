@@ -60,7 +60,7 @@ class EconomyProperty extends PluginBase implements Listener {
 	private $command;
 
 	public function onEnable() {
-		if (!file_exists($this->getDataFolder())) {
+		if(!file_exists($this->getDataFolder())) {
 			mkdir($this->getDataFolder());
 		}
 
@@ -82,7 +82,7 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	private function parseOldData() {
-		if (is_file($this->getDataFolder() . "Properties.sqlite3")) {
+		if(is_file($this->getDataFolder() . "Properties.sqlite3")) {
 			$cnt = 0;
 			$property = new SQLite3($this->getDataFolder() . "Properties.sqlite3");
 			$result = $property->query("SELECT * FROM Property");
@@ -101,50 +101,50 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event) {
-		if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			return;
 		}
 
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
 
-		if (isset($this->touch[$player->getName()])) {
+		if(isset($this->touch[$player->getName()])) {
 			//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
 			$this->command->mergePosition($player->getName(), 0, [(int) $block->getX(), (int) $block->getZ(), $block->getLevel()->getFolderName()]);
 			$player->sendMessage("[EconomyProperty] First position has been saved.");
 			$event->setCancelled(true);
-			if ($event->getItem()->canBePlaced()) {
+			if($event->getItem()->canBePlaced()) {
 				$this->placeQueue[$player->getName()] = true;
 			}
 			return;
 		}
 
 		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
-		if (!is_bool($info)) {
-			if (!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())) {
-				if ($player->hasPermission("economyproperty.property.modify") === false) {
+		if(!is_bool($info)) {
+			if(!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())) {
+				if($player->hasPermission("economyproperty.property.modify") === false) {
 					$event->setCancelled(true);
-					if ($event->getItem()->canBePlaced()) {
+					if($event->getItem()->canBePlaced()) {
 						$this->placeQueue[$player->getName()] = true;
 					}
 					$player->sendMessage("#" . $info["landNum"] . " You don't have permission to modify property area.");
 					return;
-				} else {
+				}else{
 					return;
 				}
 			}
 			$level = $block->getLevel();
 			$tile = $level->getTile($block);
-			if (!$tile instanceof Sign) {
+			if(!$tile instanceof Sign) {
 				$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 				return;
 			}
 			$now = time();
-			if (isset($this->tap[$player->getName()]) and $this->tap[$player->getName()][0] === $block->x . ":" . $block->y . ":" . $block->z and ($now - $this->tap[$player->getName()][1]) <= 2) {
-				if (EconomyAPI::getInstance()->myMoney($player) < $info["price"]) {
+			if(isset($this->tap[$player->getName()]) and $this->tap[$player->getName()][0] === $block->x . ":" . $block->y . ":" . $block->z and ($now - $this->tap[$player->getName()][1]) <= 2) {
+				if(EconomyAPI::getInstance()->myMoney($player) < $info["price"]) {
 					$player->sendMessage("You don't have enough money to buy here.");
 					return;
-				} else {
+				}else{
 					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"], $info["rentTime"]);
 					switch ($result) {
 						case EconomyLand::RET_SUCCESS:
@@ -163,11 +163,11 @@ class EconomyProperty extends PluginBase implements Listener {
 				$tile->close();
 				$level->setBlock($block, new Air());
 				unset($this->tap[$player->getName()]);
-			} else {
+			}else{
 				$this->tap[$player->getName()] = array($block->x . ":" . $block->y . ":" . $block->z, $now);
 				$player->sendMessage("#" . $info["landNum"] . " [EconomyProperty] Are you sure to buy here? Tap again to confirm.");
 				$event->setCancelled(true);
-				if ($event->getItem()->canBePlaced()) {
+				if($event->getItem()->canBePlaced()) {
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
@@ -176,7 +176,7 @@ class EconomyProperty extends PluginBase implements Listener {
 
 	public function onBlockPlace(BlockPlaceEvent $event) {
 		$username = $event->getPlayer()->getName();
-		if (isset($this->placeQueue[$username])) {
+		if(isset($this->placeQueue[$username])) {
 			$event->setCancelled(true);
 			// No message to send cuz it is already sent by InteractEvent
 			unset($this->placeQueue[$username]);
@@ -187,7 +187,7 @@ class EconomyProperty extends PluginBase implements Listener {
 		$block = $event->getBlock();
 		$player = $event->getPlayer();
 
-		if (isset($this->touch[$player->getName()])) {
+		if(isset($this->touch[$player->getName()])) {
 			//$mergeData[$player->getName()][1] = [(int)$block->getX(), (int)$block->getZ()];
 			$this->command->mergePosition($player->getName(), 1, [(int) $block->getX(), (int) $block->getZ()]);
 			$player->sendMessage("[EconomyProperty] Second position has been saved.");
@@ -196,17 +196,17 @@ class EconomyProperty extends PluginBase implements Listener {
 		}
 
 		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
-		if (is_bool($info) === false) {
-			if ($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ()) {
-				if ($player->hasPermission("economyproperty.property.remove")) {
+		if(is_bool($info) === false) {
+			if($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ()) {
+				if($player->hasPermission("economyproperty.property.remove")) {
 					$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 					$player->sendMessage("[EconomyProperty] You have removed property area #" . $info["landNum"]);
-				} else {
+				}else{
 					$event->setCancelled(true);
 					$player->sendMessage("#" . $info["landNum"] . " You don't have permission to modify property area.");
 				}
-			} else {
-				if ($player->hasPermission("economyproperty.property.modify") === false) {
+			}else{
+				if($player->hasPermission("economyproperty.property.modify") === false) {
 					$event->setCancelled(true);
 					$player->sendMessage("You don't have permission to modify property area.");
 				}
@@ -215,28 +215,28 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $rentTime = null, $expectedYaw = 0) {
-		if (!$level instanceof Level) {
+		if(!$level instanceof Level) {
 			$level = $this->getServer()->getLevelByName($level);
-			if (!$level instanceof Level) {
+			if(!$level instanceof Level) {
 				return false;
 			}
 		}
 		$expectedY = round($expectedY);
-		if ($first[0] > $sec[0]) {
+		if($first[0] > $sec[0]) {
 			$tmp = $first[0];
 			$first[0] = $sec[0];
 			$sec[0] = $tmp;
 		}
-		if ($first[1] > $sec[1]) {
+		if($first[1] > $sec[1]) {
 			$tmp = $first[1];
 			$first[1] = $sec[1];
 			$sec[1] = $tmp;
 		}
 
-		if ($this->checkOverlapping($first, $sec, $level)) {
+		if($this->checkOverlapping($first, $sec, $level)) {
 			return false;
 		}
-		if (EconomyLand::getInstance()->checkOverlap($first[0], $sec[0], $first[1], $sec[1], $level)) {
+		if(EconomyLand::getInstance()->checkOverlap($first[0], $sec[0], $first[1], $sec[1], $level)) {
 			return false;
 		}
 
@@ -253,18 +253,18 @@ class EconomyProperty extends PluginBase implements Listener {
 		for (; $y < 127; $y++) {
 			$b = $level->getBlock(new Vector3($centerx, $y, $centerz));
 			$difference = abs($expectedY - $y);
-			if ($difference > $diff) { // Finding the closest location with player or something
+			if($difference > $diff) { // Finding the closest location with player or something
 				$y = $tmpY;
 				break;
-			} else {
-				if (($b->getID() === 0 or $b->canBeReplaced()) and !$lastBlock->canBeReplaced()) {
+			}else{
+				if(($b->getID() === 0 or $b->canBeReplaced()) and !$lastBlock->canBeReplaced()) {
 					$tmpY = $y;
 					$diff = $difference;
 				}
 			}
 			$lastBlock = $b;
 		}
-		if ($y >= 126) {
+		if($y >= 126) {
 			$y = $expectedY;
 		}
 		$meta = floor((($expectedYaw + 180) * 16 / 360) + 0.5) & 0x0F;
@@ -287,7 +287,7 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	public function checkOverlapping($first, $sec, $level) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getName();
 		}
 		$d = $this->property->query("SELECT * FROM Property WHERE (((startX <= $first[0] AND landX >= $first[0]) AND (startZ <= $first[1] AND landZ >= $first[1])) OR ((startX <= $sec[0] AND landX >= $sec[0]) AND (startZ <= $first[1] AND landZ >= $sec[1]))) AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
@@ -299,20 +299,20 @@ class EconomyProperty extends PluginBase implements Listener {
 	 * @return bool
 	 */
 	public function switchTouchQueue($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
-		if (isset($this->touch[$player])) {
+		if(isset($this->touch[$player])) {
 			unset($this->touch[$player]);
 			return false;
-		} else {
+		}else{
 			$this->touch[$player] = true;
 			return true;
 		}
 	}
 
 	public function touchQueueExists($player) {
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		return isset($this->touch[$player]) === true;

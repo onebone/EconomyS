@@ -45,21 +45,21 @@ class EconomyAuction extends PluginBase {
 	private $auctions, $queue;
 
 	public function onEnable() {
-		if (!file_exists($this->getDataFolder())) {
+		if(!file_exists($this->getDataFolder())) {
 			mkdir($this->getDataFolder());
 		}
 		$this->saveDefaultConfig();
-		if (!is_file($this->getDataFolder() . "Auctions.dat")) {
+		if(!is_file($this->getDataFolder() . "Auctions.dat")) {
 			file_put_contents($this->getDataFolder() . "Auctions.dat", serialize(array()));
 		}
-		if (!is_file($this->getDataFolder() . "QuitQueue.dat")) {
+		if(!is_file($this->getDataFolder() . "QuitQueue.dat")) {
 			file_put_contents($this->getDataFolder() . "QuitQueue.dat", serialize(array()));
 		}
 		$this->auctions = unserialize(file_get_contents($this->getDataFolder() . "Auctions.dat"));
 		$this->queue = unserialize(file_get_contents($this->getDataFolder() . "QuitQueue.dat"));
 
-		foreach ($this->auctions as $player => $data) {
-			if (isset($this->auctions[$player][6])) {
+		foreach($this->auctions as $player => $data) {
+			if(isset($this->auctions[$player][6])) {
 				$id = $this->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $player), $this->auctions[$player][6])->getTaskId();
 				$this->auctions[$player][7] = time();
 				$this->auctions[$player][8] = $id;
@@ -69,8 +69,8 @@ class EconomyAuction extends PluginBase {
 
 	public function onDisable() {
 		$now = time();
-		foreach ($this->auctions as $player => $data) {
-			if (isset($this->auctions[$player][6])) {
+		foreach($this->auctions as $player => $data) {
+			if(isset($this->auctions[$player][6])) {
 				$this->auctions[$player][6] -= ($now - $this->auctions[$player][7]);
 			}
 		}
@@ -84,16 +84,16 @@ class EconomyAuction extends PluginBase {
 				$sub = array_shift($params);
 				switch ($sub) {
 					case "start":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage("Please run this command in-game.");
 							break;
 						}
-						if (isset($this->auctions[$sender->getName()])) {
+						if(isset($this->auctions[$sender->getName()])) {
 							$sender->sendMessage("You already have ongoing auction");
 							break;
 						}
 						$tax = $this->getConfig()->get("auction-tax");
-						if ($tax > EconomyAPI::getInstance()->myMoney($sender)) {
+						if($tax > EconomyAPI::getInstance()->myMoney($sender)) {
 							$sender->sendMessage("You don't have enough money to start auction. Auction tax : " . $tax);
 							break;
 						}
@@ -101,7 +101,7 @@ class EconomyAuction extends PluginBase {
 						$item = array_shift($params);
 						$count = array_shift($params);
 						$startPrice = array_shift($params);
-						if (trim($item) === "" or !is_numeric($count) or !is_numeric($count)) {
+						if(trim($item) === "" or !is_numeric($count) or !is_numeric($count)) {
 							$sender->sendMessage("Usage: /auction start <item> <count> <start price>");
 							break;
 						}
@@ -110,15 +110,15 @@ class EconomyAuction extends PluginBase {
 						$item = Item::fromString($item);
 
 						$cnt = 0;
-						foreach ($sender->getInventory()->getContents() as $i) {
-							if ($i->equals($item)) {
+						foreach($sender->getInventory()->getContents() as $i) {
+							if($i->equals($item)) {
 								$cnt += $i->getCount();
-								if ($count <= $cnt) {
+								if($count <= $cnt) {
 									break;
 								}
 							}
 						}
-						if ($count <= $cnt) {
+						if($count <= $cnt) {
 							$item->setCount($count);
 							$sender->getInventory()->removeItem($item);
 
@@ -127,25 +127,25 @@ class EconomyAuction extends PluginBase {
 							);
 							$this->getServer()->broadcastMessage(TextFormat::GREEN . $sender->getName() . TextFormat::RESET . "'s auction has just started.");
 							EconomyAPI::getInstance()->reduceMoney($sender, $tax);
-						} else {
+						}else{
 							$sender->sendMessage("You don't have enough items");
 						}
 						break;
 					case "stop":
 						$auction = array_shift($params);
-						if (trim($auction) === "" and !$sender instanceof Player) {
+						if(trim($auction) === "" and !$sender instanceof Player) {
 							$sender->sendMessage("Usage: /auction stop <player>");
 							break;
-						} elseif (trim($auction) === "" and $sender instanceof Player) {
+						} elseif(trim($auction) === "" and $sender instanceof Player) {
 							$auction = $sender->getName();
-						} else {
+						}else{
 							$player = $this->getServer()->getPlayer($auction);
-							if ($player instanceof Player) {
+							if($player instanceof Player) {
 								$auction = $player->getName();
 							}
 						}
 						$auction = strtolower($auction);
-						if (!isset($this->auctions[$auction])) {
+						if(!isset($this->auctions[$auction])) {
 							$sender->sendMessage((strtolower($sender->getName()) === $auction ? "You have" : "$auction has") . " no ongoing auction");
 							break;
 						}
@@ -153,7 +153,7 @@ class EconomyAuction extends PluginBase {
 						$sender->sendMessage((strtolower($sender->getName()) === $auction ? "Your" : "$auction's") . " auction has successfully stopped.");
 						break;
 					case "time":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage("Please run this command in-game.");
 							return true;
 						}
@@ -161,7 +161,7 @@ class EconomyAuction extends PluginBase {
 						$count = array_shift($params);
 						$startPrice = array_shift($params);
 						$time = array_shift($params);
-						if (trim($item) === "" or !is_numeric($count) or !is_numeric($startPrice) or !is_numeric($time)) {
+						if(trim($item) === "" or !is_numeric($count) or !is_numeric($startPrice) or !is_numeric($time)) {
 							$sender->sendMessage("Usage: /auction time <item> <count> <start price> <time>");
 							break;
 						}
@@ -169,16 +169,16 @@ class EconomyAuction extends PluginBase {
 						$count = (int) $count;
 
 						$cnt = 0;
-						foreach ($sender->getInventory()->getContents() as $i) {
-							if ($i->equals($item)) {
+						foreach($sender->getInventory()->getContents() as $i) {
+							if($i->equals($item)) {
 								$cnt += $i->getCount();
 							}
-							if ($count <= $cnt) {
+							if($count <= $cnt) {
 								break;
 							}
 						}
 
-						if ($count <= $cnt) {
+						if($count <= $cnt) {
 							$item->setCount($count);
 							$sender->getInventory()->removeItem($item);
 							$id = $this->getScheduler()->scheduleDelayedTask(new QuitAuctionTask($this, $sender->getName()), ($time * 20))->getTaskId();
@@ -186,36 +186,36 @@ class EconomyAuction extends PluginBase {
 									$item->getID(), $item->getDamage(), $count, (float) $startPrice, null, (float) $startPrice, $time, time(), $id
 							);
 							$this->getServer()->broadcastMessage($sender->getName() . "'s auction has just started.");
-						} else {
+						}else{
 							$sender->sendMessage("You don't have enough items");
 						}
 						break;
 					case "bid":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage("Please run this command in-game.");
 							break;
 						}
 						$player = array_shift($params);
 						$price = array_shift($params);
-						if (trim($player) === "" or !is_numeric($price)) {
+						if(trim($player) === "" or !is_numeric($price)) {
 							$sender->sendMessage("Usage: /auction bid <player> <price>");
 							break;
 						}
-						if (!isset($this->auctions[$player])) {
+						if(!isset($this->auctions[$player])) {
 							$sender->sendMessage("Auction by \"$player\" does not exist");
 							break;
 						}
-						if ($price > (int) $this->auctions[$player][5]) {
+						if($price > (int) $this->auctions[$player][5]) {
 							$this->auctions[$player][5] = $price;
 							$this->auctions[$player][4] = $sender->getName();
 							$sender->sendMessage("You have bid " . EconomyAPI::getInstance()->getMonetaryUnit() . "$price to auction by \"$player\"");
-						} else {
+						}else{
 							$sender->sendMessage("Current price is bigger than you have tried to bid");
 						}
 						break;
 					case "list":
 						$output = "Auctions list:\n";
-						foreach ($this->auctions as $player => $data) {
+						foreach($this->auctions as $player => $data) {
 							$price = $data[5] === null ? $data[3] : $data[5];
 							$p = $data[4] === null ? "No player" : $data[4];
 							$output .= "##" . $player . " | " . EconomyAPI::getInstance()->getMonetaryUnit() . "$price | " . $data[2] . " of " . $data[0] . ":" . $data[1] . " | $p\n";
@@ -234,33 +234,33 @@ class EconomyAuction extends PluginBase {
 	}
 
 	public function quitAuction($auction) {
-		if ($this->auctions[$auction][7] !== null) {
+		if($this->auctions[$auction][7] !== null) {
 			$this->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
-		if ($this->auctions[$auction][4] !== null) {
+		if($this->auctions[$auction][4] !== null) {
 			$p = $this->getServer()->getPlayerExact($this->auctions[$auction][4]);
-			if ($p instanceof Player) {
+			if($p instanceof Player) {
 				$p->getInventory()->addItem(new Item($this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]));
 				EconomyAPI::getInstance()->reduceMoney($p, $this->auctions[$auction][5], true, "EconomyAuction");
 				$p->sendMessage("You've got item from the auction");
-			} else {
+			}else{
 				$this->queue[$this->auctions[$auction][4]] = array(
 						$this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]
 				);
 			}
 			EconomyAPI::getInstance()->addMoney($auction, $this->auctions[$auction][5], true, "EconomyAuction");
-		} else {
+		}else{
 			$p = $this->getServer()->getPlayerExact($auction);
-			if ($p instanceof Player) {
+			if($p instanceof Player) {
 				$p->getInventory()->addItem(new Item($this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]));
 				$p->sendMessage("Your auction was finished without buyer.");
-			} else {
+			}else{
 				$this->queue[$auction] = array(
 						$this->auctions[$auction][0], $this->auctions[$auction][1], $this->auctions[$auction][2]
 				);
 			}
 		}
-		if (isset($this->auctions[$auction][7])) {
+		if(isset($this->auctions[$auction][7])) {
 			$this->getScheduler()->cancelTask($this->auctions[$auction][7]);
 		}
 		unset($this->auctions[$auction]);

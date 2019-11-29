@@ -65,21 +65,21 @@ class EconomyLand extends PluginBase implements Listener {
 
 	public function onEnable() {
 
-		if (!static::$instance instanceof EconomyLand) {
+		if(!static::$instance instanceof EconomyLand) {
 			static::$instance = $this;
 		}
 
 		$this->saveDefaultConfig();
 
-		if (!is_file($this->getDataFolder() . "Expire.dat")) {
+		if(!is_file($this->getDataFolder() . "Expire.dat")) {
 			file_put_contents($this->getDataFolder() . "Expire.dat", serialize(array()));
 		}
 		$this->expire = unserialize(file_get_contents($this->getDataFolder() . "Expire.dat"));
 
 		$this->createConfig();
 
-		if (is_numeric($interval = $this->getConfig()->get("auto-save-interval", 10))) {
-			if ($interval > 0) {
+		if(is_numeric($interval = $this->getConfig()->get("auto-save-interval", 10))) {
+			if($interval > 0) {
 				$interval = $interval * 1200;
 				$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $interval, $interval);
 			}
@@ -88,7 +88,7 @@ class EconomyLand extends PluginBase implements Listener {
 		$this->placeQueue = [];
 
 		$now = time();
-		foreach ($this->expire as $landId => &$time) {
+		foreach($this->expire as $landId => &$time) {
 			$time[1] = $now;
 			$this->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $landId), ($time[0] * 20));
 		}
@@ -157,13 +157,13 @@ class EconomyLand extends PluginBase implements Listener {
 	}
 
 	public function expireLand($landId) {
-		if (!isset($this->expire[$landId])) return;
+		if(!isset($this->expire[$landId])) return;
 		$landId = (int) $landId;
 
 		$info = $this->db->getLandById($landId);
-		if ($info === false) return;
+		if($info === false) return;
 		$player = $info["owner"];
-		if (($player = $this->getServer()->getPlayerExact($player)) instanceof Player) {
+		if(($player = $this->getServer()->getPlayerExact($player)) instanceof Player) {
 			$player->sendMessage("[EconomyLand] Your land #$landId has expired.");
 		}
 		$this->db->removeLandById($landId);
@@ -173,18 +173,18 @@ class EconomyLand extends PluginBase implements Listener {
 
 	public function onDisable() {
 		$this->save();
-		if ($this->db instanceof Database) {
+		if($this->db instanceof Database) {
 			$this->db->close();
 		}
 	}
 
 	public function save() {
 		$now = time();
-		foreach ($this->expire as $landId => $time) {
+		foreach($this->expire as $landId => $time) {
 			$this->expire[$landId][0] -= ($now - $time[1]);
 		}
 		file_put_contents($this->getDataFolder() . "Expire.dat", serialize($this->expire));
-		if ($this->db instanceof Database) {
+		if($this->db instanceof Database) {
 			$this->db->save();
 		}
 	}
@@ -192,7 +192,7 @@ class EconomyLand extends PluginBase implements Listener {
 	public function onCommand(CommandSender $sender, Command $cmd, string $label, array $param): bool {
 		switch ($cmd->getName()) {
 			case "startp":
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
@@ -203,15 +203,15 @@ class EconomyLand extends PluginBase implements Listener {
 				$sender->sendMessage($this->getMessage("first-position-saved"));
 				return true;
 			case "endp":
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
-				if (!isset($this->start[$sender->getName()])) {
+				if(!isset($this->start[$sender->getName()])) {
 					$sender->sendMessage($this->getMessage("set-first-position"));
 					return true;
 				}
-				if ($sender->getLevel()->getFolderName() !== $this->start[$sender->getName()]["level"]) {
+				if($sender->getLevel()->getFolderName() !== $this->start[$sender->getName()]["level"]) {
 					$sender->sendMessage($this->getMessage("cant-set-position-in-different-world"));
 					return true;
 				}
@@ -224,12 +224,12 @@ class EconomyLand extends PluginBase implements Listener {
 						"x" => $endX,
 						"z" => $endZ
 				);
-				if ($startX > $endX) {
+				if($startX > $endX) {
 					$temp = $endX;
 					$endX = $startX;
 					$startX = $temp;
 				}
-				if ($startZ > $endZ) {
+				if($startZ > $endZ) {
 					$temp = $endZ;
 					$endZ = $startZ;
 					$startZ = $temp;
@@ -241,7 +241,7 @@ class EconomyLand extends PluginBase implements Listener {
 				$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 				$sender->sendMessage($this->getMessage("confirm-buy-land", array($price, "%2", "%3")));
 
-				if (($land = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel())) !== false) {
+				if(($land = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel())) !== false) {
 					$sender->sendMessage($this->getMessage("confirm-warning", [$land["ID"], "%2", "%3"]));
 				}
 				return true;
@@ -249,32 +249,32 @@ class EconomyLand extends PluginBase implements Listener {
 				$sub = array_shift($param);
 				switch ($sub) {
 					case "buy":
-						if (!$sender->hasPermission("economyland.command.land.buy")) {
+						if(!$sender->hasPermission("economyland.command.land.buy")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
 
-						if (in_array($sender->getLevel()->getFolderName(), $this->getConfig()->get("buying-disallowed-worlds", []))) {
+						if(in_array($sender->getLevel()->getFolderName(), $this->getConfig()->get("buying-disallowed-worlds", []))) {
 							$sender->sendMessage($this->getMessage("not-allowed-to-buy"));
 							return true;
 						}
 
 						$cnt = count($this->db->getLandsByOwner($sender->getName()));
 
-						if (is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
-							if ($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
+						if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
+							if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
 								$sender->sendMessage($this->getMessage("land-limit", array($cnt, $this->getConfig()->get("player-land-limit", "NaN"), "%3", "%4")));
 								return true;
 							}
 						}
-						if (!isset($this->start[$sender->getName()])) {
+						if(!isset($this->start[$sender->getName()])) {
 							$sender->sendMessage($this->getMessage("set-first-position"));
 							return true;
-						} elseif (!isset($this->end[$sender->getName()])) {
+						} elseif(!isset($this->end[$sender->getName()])) {
 							$sender->sendMessage($this->getMessage("set-second-position"));
 							return true;
 						}
@@ -284,24 +284,24 @@ class EconomyLand extends PluginBase implements Listener {
 						$endX = floor($endp["x"]);
 						$startZ = floor($l["z"]);
 						$endZ = floor($endp["z"]);
-						if ($startX > $endX) {
+						if($startX > $endX) {
 							$backup = $startX;
 							$startX = $endX;
 							$endX = $backup;
 						}
-						if ($startZ > $endZ) {
+						if($startZ > $endZ) {
 							$backup = $startZ;
 							$startZ = $endZ;
 							$endZ = $backup;
 						}
 
 						$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $sender->getLevel()->getFolderName());
-						if ($result) {
+						if($result) {
 							$sender->sendMessage($this->getMessage("land-around-here", array($result["owner"], $result["ID"], "%3")));
 							return true;
 						}
 						$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
-						if (EconomyAPI::getInstance()->reduceMoney($sender, $price, true, "EconomyLand") === EconomyAPI::RET_INVALID) {
+						if(EconomyAPI::getInstance()->reduceMoney($sender, $price, true, "EconomyLand") === EconomyAPI::RET_INVALID) {
 							$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 							return true;
 						}
@@ -311,7 +311,7 @@ class EconomyLand extends PluginBase implements Listener {
 						$sender->sendMessage($this->getMessage("bought-land", array($price, "%2", "%3")));
 						break;
 					case "list":
-						if (!$sender->hasPermission("economyland.command.land.list")) {
+						if(!$sender->hasPermission("economyland.command.land.list")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
@@ -324,13 +324,13 @@ class EconomyLand extends PluginBase implements Listener {
 						$page = (int) $page;
 						$output .= $this->getMessage("land-list-top", array($page, $max, ""));
 						$current = 1;
-						foreach ($land as $l) {
+						foreach($land as $l) {
 							$cur = (int) ceil($current / 5);
-							if ($cur > $page)
+							if($cur > $page)
 								continue;
-							if ($pro == 6)
+							if($pro == 6)
 								break;
-							if ($page === $cur) {
+							if($page === $cur) {
 								$output .= $this->getMessage("land-list-format", array($l["ID"], (($l["endX"] + 1) - ($l["startX"] - 1) - 1) * (($l["endZ"] + 1) - ($l["startZ"] - 1) - 1), $l["owner"]));
 								$pro++;
 							}
@@ -339,58 +339,58 @@ class EconomyLand extends PluginBase implements Listener {
 						$sender->sendMessage($output);
 						break;
 					case "whose":
-						if (!$sender->hasPermission("economyland.command.land.whose")) {
+						if(!$sender->hasPermission("economyland.command.land.whose")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$player = array_shift($param);
 						$alike = true;
-						if (str_replace(" ", "", $player) === "") {
+						if(str_replace(" ", "", $player) === "") {
 							$player = $sender->getName();
 							$alike = false;
 						}
-						if ($alike) {
+						if($alike) {
 							$lands = $this->db->getLandsByKeyword($player);
-						} else {
+						}else{
 							$lands = $this->db->getLandsByOwner($player);
 						}
 						$sender->sendMessage("Results from query : $player\n");
-						foreach ($lands as $info)
+						foreach($lands as $info)
 							$sender->sendMessage($this->getMessage("land-list-format", array($info["ID"], (($info["endX"] + 1) - ($info["startX"] - 1) - 1) * (($info["endZ"] + 1) - ($info["startZ"] - 1) - 1), $info["owner"])));
 						break;
 					case "move":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
-						if (!$sender->hasPermission("economyland.command.land.move")) {
+						if(!$sender->hasPermission("economyland.command.land.move")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$num = array_shift($param);
-						if (trim($num) == "") {
+						if(trim($num) == "") {
 							$sender->sendMessage("Usage: /land move <land num>");
 							return true;
 						}
-						if (!is_numeric($num)) {
+						if(!is_numeric($num)) {
 							$sender->sendMessage("Usage: /land move <land num>");
 							return true;
 						}
 
 						$info = $this->db->getLandById($num);
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-land-found", array($num, "", "")));
 							return true;
 						}
 
-						if ($info["owner"] !== $sender->getName()) {
-							if (!$sender->hasPermission("economyland.land.move.others")) {
+						if($info["owner"] !== $sender->getName()) {
+							if(!$sender->hasPermission("economyland.land.move.others")) {
 								$sender->sendMessage($this->getMessage("no-permission-move", [$info["ID"], $info["owner"], "%3"]));
 								return true;
 							}
 						}
 						$level = $this->getServer()->getLevelByName($info["level"]);
-						if (!$level instanceof Level) {
+						if(!$level instanceof Level) {
 							$sender->sendMessage($this->getMessage("land-corrupted", array($num, $info["level"], "")));
 							return true;
 						}
@@ -399,14 +399,14 @@ class EconomyLand extends PluginBase implements Listener {
 						$cnt = 0;
 						for ($y = 128; ; $y--) {
 							$vec = new Vector3($x, $y, $z);
-							if ($level->getBlock($vec)->isSolid()) {
+							if($level->getBlock($vec)->isSolid()) {
 								$y++;
 								break;
 							}
-							if ($cnt === 5) {
+							if($cnt === 5) {
 								break;
 							}
-							if ($y <= 0) {
+							if($y <= 0) {
 								++$cnt;
 								++$x;
 								--$z;
@@ -418,41 +418,41 @@ class EconomyLand extends PluginBase implements Listener {
 						$sender->sendMessage($this->getMessage("success-moving", array($num, "", "")));
 						return true;
 					case "give":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
-						if (!$sender->hasPermission("economyland.command.land.give")) {
+						if(!$sender->hasPermission("economyland.command.land.give")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$player = array_shift($param);
 						$landnum = array_shift($param);
-						if (trim($player) == "" or trim($landnum) == "" or !is_numeric($landnum)) {
+						if(trim($player) == "" or trim($landnum) == "" or !is_numeric($landnum)) {
 							$sender->sendMessage("Usage: /$cmd give <player> <land number>");
 							return true;
 						}
 						$username = $player;
 						$player = $this->getServer()->getPlayer($username);
-						if (!$player instanceof Player) {
+						if(!$player instanceof Player) {
 							$sender->sendMessage($this->getMessage("player-not-connected", [$username, "%2", "%3"]));
 							return true;
 						}
 
 						$info = $this->db->getLandById($landnum);
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 							return true;
 						}
-						if ($sender->getName() !== $info["owner"] and !$sender->hasPermission("economyland.land.give.others")) {
+						if($sender->getName() !== $info["owner"] and !$sender->hasPermission("economyland.land.give.others")) {
 							$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
-						} else {
-							if ($sender->getName() === $player->getName()) {
+						}else{
+							if($sender->getName() === $player->getName()) {
 								$sender->sendMessage($this->getMessage("cannot-give-land-myself"));
-							} else {
-								if (is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
+							}else{
+								if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
 									$cnt = count($this->db->getLandsByOwner($player->getName()));
-									if ($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
+									if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
 										$sender->sendMessage($this->getMessage("give-land-limit", array($player->getName(), $cnt, $this->getConfig()->get("player-land-limit", "NaN"), "%4")));
 										return true;
 									}
@@ -465,34 +465,34 @@ class EconomyLand extends PluginBase implements Listener {
 						}
 						return true;
 					case "invite":
-						if (!$sender->hasPermission("economyland.command.land.invite")) {
+						if(!$sender->hasPermission("economyland.command.land.invite")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$landnum = array_shift($param);
 						$player = array_shift($param);
-						if (trim($player) == "" or trim($landnum) == "") {
+						if(trim($player) == "" or trim($landnum) == "") {
 							$sender->sendMessage("Usage : /land <invite> <land number> <[r:]player>");
 							return true;
 						}
-						if (!is_numeric($landnum)) {
+						if(!is_numeric($landnum)) {
 							$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
 							return true;
 						}
 						$info = $this->db->getLandById($landnum);
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 							return true;
-						} elseif ($info["owner"] !== $sender->getName()) {
+						} elseif($info["owner"] !== $sender->getName()) {
 							$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 							return true;
-						} else {
-							if (preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0) {
+						}else{
+							if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0) {
 								$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "%2", "%3"]));
 								return true;
 							}
 							$result = $this->db->addInviteeById($landnum, $player);
-							if ($result === false) {
+							if($result === false) {
 								$sender->sendMessage($this->getMessage("already-invitee", array($player, "%2", "%3")));
 								return true;
 							}
@@ -500,32 +500,32 @@ class EconomyLand extends PluginBase implements Listener {
 						}
 						return true;
 					case "kick":
-						if (!$sender->hasPermission("economyland.command.land.invite.remove")) {
+						if(!$sender->hasPermission("economyland.command.land.invite.remove")) {
 							$sender->sendMessage($this->getMessage("no-permission-command"));
 							return true;
 						}
 						$landnum = array_shift($param);
 						$player = array_shift($param);
 
-						if (trim($player) === "") {
+						if(trim($player) === "") {
 							$sender->sendMessage("Usage: /land kick <land number> <player>");
 							return true;
 						}
-						if (!is_numeric($landnum)) {
+						if(!is_numeric($landnum)) {
 							$sender->sendMessage($this->getMessage("land-num-must-numeric", array($landnum, "%2", "%3")));
 							return true;
 						}
 
 						$info = $this->db->getLandById($landnum);
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 							return true;
 						}
 
-						if ($sender->hasPermission("economyland.command.land.invite.remove.others") and $info["owner"] !== $sender->getName()
+						if($sender->hasPermission("economyland.command.land.invite.remove.others") and $info["owner"] !== $sender->getName()
 								or $info["owner"] === $sender->getName()) {
 							$result = $this->db->removeInviteeById($landnum, $player);
-							if ($result === false) {
+							if($result === false) {
 								$sender->sendMessage($this->getMessage("not-invitee", array($player, $landnum, "%3")));
 								return true;
 							}
@@ -534,13 +534,13 @@ class EconomyLand extends PluginBase implements Listener {
 						return true;
 					case "invitee":
 						$landnum = array_shift($param);
-						if (trim($landnum) == "" or !is_numeric($landnum)) {
+						if(trim($landnum) == "" or !is_numeric($landnum)) {
 							$sender->sendMessage("Usage: /land invitee <land number>");
 							return true;
 						}
 
 						$info = $this->db->getInviteeById($landnum);
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-land-found", array($landnum, "%2", "%3")));
 							return true;
 						}
@@ -549,7 +549,7 @@ class EconomyLand extends PluginBase implements Listener {
 						$sender->sendMessage($output);
 						return true;
 					case "here":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
@@ -557,7 +557,7 @@ class EconomyLand extends PluginBase implements Listener {
 						$z = $sender->z;
 
 						$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-one-owned"));
 							return true;
 						}
@@ -571,7 +571,7 @@ class EconomyLand extends PluginBase implements Listener {
 				$id = array_shift($param);
 				switch ($id) {
 					case "here":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
@@ -579,13 +579,13 @@ class EconomyLand extends PluginBase implements Listener {
 						$z = $sender->getZ();
 
 						$info = $this->db->getByCoord($x, $z, $sender->getLevel()->getFolderName());
-						if ($info === false) {
+						if($info === false) {
 							$sender->sendMessage($this->getMessage("no-one-owned"));
 							return true;
 						}
-						if ($info["owner"] !== $sender->getName() and !$sender->hasPermission("economyland.landsell.others")) {
+						if($info["owner"] !== $sender->getName() and !$sender->hasPermission("economyland.landsell.others")) {
 							$sender->sendMessage($this->getMessage("not-my-land"));
-						} else {
+						}else{
 							EconomyAPI::getInstance()->addMoney($sender, $info["price"] / 2);
 							$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "%2", "%3")));
 							//$this->land->exec("DELETE FROM land WHERE ID = {$info["ID"]}");
@@ -594,21 +594,21 @@ class EconomyLand extends PluginBase implements Listener {
 						return true;
 					default:
 						$p = $id;
-						if (is_numeric($p)) {
+						if(is_numeric($p)) {
 							$info = $this->db->getLandById($p);
-							if ($info === false) {
+							if($info === false) {
 								$sender->sendMessage($this->getMessage("no-land-found", array($p, "%2", "%3")));
 								return true;
 							}
-							if ($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")) {
+							if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")) {
 								EconomyAPI::getInstance()->addMoney($sender, ($info["price"] / 2), true, "EconomyLand");
 								$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
 
 								$this->db->removeLandById($p);
-							} else {
+							}else{
 								$sender->sendMessage($this->getMessage("not-your-land", array($p, $info["owner"], "%3")));
 							}
-						} else {
+						}else{
 							$sender->sendMessage("Usage: /landsell <here|land number>");
 						}
 				}
@@ -618,14 +618,14 @@ class EconomyLand extends PluginBase implements Listener {
 	}
 
 	public function getMessage($key, $value = array("%1", "%2", "%3")) {
-		if ($this->lang->exists($key)) {
+		if($this->lang->exists($key)) {
 			return str_replace(array("%MONETARY_UNIT%", "%1", "%2", "%3", "\\n"), array(EconomyAPI::getInstance()->getMonetaryUnit(), $value[0], $value[1], $value[2], "\n"), $this->lang->get($key));
 		}
 		return "Couldn't find message \"$key\"";
 	}
 
 	public function onPlayerInteract(PlayerInteractEvent $event) {
-		if ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+		if($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			$this->permissionCheck($event);
 		}
 	}
@@ -633,9 +633,9 @@ class EconomyLand extends PluginBase implements Listener {
 	public function permissionCheck(Event $event) {
 		/** @var $player Player */
 		$player = $event->getPlayer();
-		if ($event instanceof PlayerInteractEvent) {
+		if($event instanceof PlayerInteractEvent) {
 			$block = $event->getBlock()->getSide($event->getFace());
-		} else {
+		}else{
 			$block = $event->getBlock();
 		}
 
@@ -643,27 +643,27 @@ class EconomyLand extends PluginBase implements Listener {
 		$z = $block->getZ();
 		$level = $block->getLevel()->getFolderName();
 
-		if (in_array($level, $this->getConfig()->get("non-check-worlds", []))) {
+		if(in_array($level, $this->getConfig()->get("non-check-worlds", []))) {
 			return false;
 		}
 
 		$info = $this->db->canTouch($x, $z, $level, $player);
-		if ($info === -1) {
-			if ($this->getConfig()->get("white-world-protection", [])) {
-				if (in_array($level, $this->getConfig()->get("white-world-protection", [])) and !$player->hasPermission("economyland.land.modify.whiteland")) {
+		if($info === -1) {
+			if($this->getConfig()->get("white-world-protection", [])) {
+				if(in_array($level, $this->getConfig()->get("white-world-protection", [])) and !$player->hasPermission("economyland.land.modify.whiteland")) {
 					$player->sendMessage($this->getMessage("not-owned"));
 					$event->setCancelled();
-					if ($event->getItem()->canBePlaced()) {
+					if($event->getItem()->canBePlaced()) {
 						$this->placeQueue[$player->getName()] = true;
 					}
 					return false;
 				}
 			}
-		} elseif ($info !== true) {
+		} elseif($info !== true) {
 			$player->sendMessage($this->getMessage("no-permission", array($info["owner"], "", "")));
 			$event->setCancelled();
-			if ($event instanceof PlayerInteractEvent) {
-				if ($event->getItem()->canBePlaced()) {
+			if($event instanceof PlayerInteractEvent) {
+				if($event->getItem()->canBePlaced()) {
 					$this->placeQueue[$player->getName()] = true;
 				}
 			}
@@ -674,7 +674,7 @@ class EconomyLand extends PluginBase implements Listener {
 
 	public function onPlaceEvent(BlockPlaceEvent $event) {
 		$name = $event->getPlayer()->getName();
-		if (isset($this->placeQueue[$name])) {
+		if(isset($this->placeQueue[$name])) {
 			$event->setCancelled();
 			unset($this->placeQueue[$name]);
 		}
@@ -698,26 +698,26 @@ class EconomyLand extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function addLand($player, $startX, $startZ, $endX, $endZ, $level, $expires = null, &$id = null) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if ($player instanceof Player) {
+		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 
-		if (is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
+		if(is_numeric($this->getConfig()->get("player-land-limit", "NaN"))) {
 			$cnt = count($this->db->getLandsByOwner($player));
-			if ($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
+			if($cnt >= $this->getConfig()->get("player-land-limit", "NaN")) {
 				return self::RET_LAND_LIMIT;
 			}
 		}
 
-		if ($startX > $endX) {
+		if($startX > $endX) {
 			$tmp = $startX;
 			$startX = $endX;
 			$endX = $tmp;
 		}
-		if ($startZ > $endZ) {
+		if($startZ > $endZ) {
 			$tmp = $startZ;
 			$startZ = $endZ;
 			$endZ = $tmp;
@@ -729,12 +729,12 @@ class EconomyLand extends PluginBase implements Listener {
 
 		$result = $this->db->checkOverlap($startX, $endX, $startZ, $endZ, $level);
 
-		if ($result !== false and $this->getConfig()->get("allow-overlap", false) === false) {
+		if($result !== false and $this->getConfig()->get("allow-overlap", false) === false) {
 			return self::RET_LAND_OVERLAP;
 		}
 		$price = (($endX - $startX) - 1) * (($endZ - $startZ) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
 		$id = $this->db->addLand($startX, $endX, $startZ, $endZ, $level, $price, $player, $expires);
-		if ($expires !== null) {
+		if($expires !== null) {
 			$this->getScheduler()->scheduleDelayedTask(new ExpireTask($this, $id), $expires * 1200);
 			$this->expire[$id] = array(
 					$expires * 60,

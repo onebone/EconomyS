@@ -57,7 +57,7 @@ class EconomySell extends PluginBase implements Listener {
 	public function onEnable() {
 		$this->saveDefaultConfig();
 
-		if (!$this->selectLang()) {
+		if(!$this->selectLang()) {
 			$this->getLogger()->warning("Invalid language option was given.");
 		}
 
@@ -73,14 +73,14 @@ class EconomySell extends PluginBase implements Listener {
 		$this->getLogger()->notice("Data provider was set to: " . $this->provider->getProviderName());
 
 		$levels = [];
-		foreach ($this->provider->getAll() as $sell) {
-			if ($sell[9] !== -2) {
-				if (!isset($levels[$sell[3]])) {
+		foreach($this->provider->getAll() as $sell) {
+			if($sell[9] !== -2) {
+				if(!isset($levels[$sell[3]])) {
 					$levels[$sell[3]] = $this->getServer()->getLevelByName($sell[3]);
 				}
 				$pos = new Position($sell[0], $sell[1], $sell[2], $levels[$sell[3]]);
 				$display = $pos;
-				if ($sell[9] !== -1) {
+				if($sell[9] !== -1) {
 					$display = $pos->getSide($sell[9]);
 				}
 				$this->items[$sell[3]][] = new ItemDisplayer($display, Item::get($sell[4], $sell[5]), $pos);
@@ -91,9 +91,9 @@ class EconomySell extends PluginBase implements Listener {
 	}
 
 	private function selectLang() {
-		foreach (preg_grep("/.*lang_.{2}\\.json$/", $this->getResources()) as $resource) {
+		foreach(preg_grep("/.*lang_.{2}\\.json$/", $this->getResources()) as $resource) {
 			$lang = substr($resource, -7, -5);
-			if ($this->getConfig()->get("lang", "en") === $lang) {
+			if($this->getConfig()->get("lang", "en") === $lang) {
 				$this->lang = json_decode((stream_get_contents($rsc = $this->getResource("lang_" . $lang . ".json"))), true);
 				@fclose($rsc);
 				return true;
@@ -111,15 +111,15 @@ class EconomySell extends PluginBase implements Listener {
 					case "create":
 					case "cr":
 					case "c":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 							return true;
 						}
-						if (!$sender->hasPermission("economysell.command.sell.create")) {
+						if(!$sender->hasPermission("economysell.command.sell.create")) {
 							$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
 							return true;
 						}
-						if (isset($this->queue[strtolower($sender->getName())])) {
+						if(isset($this->queue[strtolower($sender->getName())])) {
 							unset($this->queue[strtolower($sender->getName())]);
 							$sender->sendMessage($this->getMessage("removed-queue"));
 							return true;
@@ -129,14 +129,14 @@ class EconomySell extends PluginBase implements Listener {
 						$price = array_shift($params);
 						$side = array_shift($params);
 
-						if (trim($item) === "" or trim($amount) === "" or trim($price) === "" or !is_numeric($amount) or !is_numeric($price)) {
+						if(trim($item) === "" or trim($amount) === "" or trim($price) === "" or !is_numeric($amount) or !is_numeric($price)) {
 							$sender->sendMessage("Usage: /sell create <item[:damage]> <amount> <price> [side]");
 							return true;
 						}
 
-						if (trim($side) === "") {
+						if(trim($side) === "") {
 							$side = Vector3::SIDE_UP;
-						} else {
+						}else{
 							switch (strtolower($side)) {
 								case "up":
 								case Vector3::SIDE_UP:
@@ -186,15 +186,15 @@ class EconomySell extends PluginBase implements Listener {
 					case "delete":
 					case "del":
 					case "d":
-						if (!$sender instanceof Player) {
+						if(!$sender instanceof Player) {
 							$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 							return true;
 						}
-						if (!$sender->hasPermission("economysell.command.sell.remove")) {
+						if(!$sender->hasPermission("economysell.command.sell.remove")) {
 							$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
 							return true;
 						}
-						if (isset($this->removeQueue[strtolower($sender->getName())])) {
+						if(isset($this->removeQueue[strtolower($sender->getName())])) {
 							unset($this->removeQueue[strtolower($sender->getName())]);
 							$sender->sendMessage($this->getMessage("removed-rm-queue"));
 							return true;
@@ -213,7 +213,7 @@ class EconomySell extends PluginBase implements Listener {
 
 	public function getMessage($key, $replacement = []) {
 		$key = strtolower($key);
-		if (isset($this->lang[$key])) {
+		if(isset($this->lang[$key])) {
 			$search = [];
 			$replace = [];
 			$this->replaceColors($search, $replace);
@@ -255,7 +255,7 @@ class EconomySell extends PluginBase implements Listener {
 				"ITALIC" => "o",
 				"RESET" => "r"
 		];
-		foreach ($colors as $color => $code) {
+		foreach($colors as $color => $code) {
 			$search[] = "%%" . $color . "%%";
 			$search[] = "&" . $code;
 
@@ -268,8 +268,8 @@ class EconomySell extends PluginBase implements Listener {
 		$player = $event->getPlayer();
 		$level = $player->getLevel()->getFolderName();
 
-		if (isset($this->items[$level])) {
-			foreach ($this->items[$level] as $displayer) {
+		if(isset($this->items[$level])) {
+			foreach($this->items[$level] as $displayer) {
 				$displayer->spawnTo($player);
 			}
 		}
@@ -277,15 +277,15 @@ class EconomySell extends PluginBase implements Listener {
 
 	public function onPlayerTeleport(EntityTeleportEvent $event) {
 		$player = $event->getEntity();
-		if ($player instanceof Player) {
-			if (($from = $event->getFrom()->getLevel()) !== ($to = $event->getTo()->getLevel())) {
-				if ($from !== null and isset($this->items[$from->getFolderName()])) {
-					foreach ($this->items[$from->getFolderName()] as $displayer) {
+		if($player instanceof Player) {
+			if(($from = $event->getFrom()->getLevel()) !== ($to = $event->getTo()->getLevel())) {
+				if($from !== null and isset($this->items[$from->getFolderName()])) {
+					foreach($this->items[$from->getFolderName()] as $displayer) {
 						$displayer->despawnFrom($player);
 					}
 				}
-				if ($to !== null and isset($this->items[$to->getFolderName()])) {
-					foreach ($this->items[$to->getFolderName()] as $displayer) {
+				if($to !== null and isset($this->items[$to->getFolderName()])) {
+					foreach($this->items[$to->getFolderName()] as $displayer) {
 						$displayer->spawnTo($player);
 					}
 				}
@@ -294,7 +294,7 @@ class EconomySell extends PluginBase implements Listener {
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event) {
-		if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			return;
 		}
 
@@ -303,7 +303,7 @@ class EconomySell extends PluginBase implements Listener {
 
 		$iusername = strtolower($player->getName());
 
-		if (isset($this->queue[$iusername])) {
+		if(isset($this->queue[$iusername])) {
 			$queue = $this->queue[$iusername];
 			$item = Item::fromString($queue[0]);
 			$item->setCount($queue[1]);
@@ -311,7 +311,7 @@ class EconomySell extends PluginBase implements Listener {
 			$ev = new SellCreationEvent($block, $item, $queue[2], $queue[3]);
 			$ev->call();
 
-			if ($ev->isCancelled()) {
+			if($ev->isCancelled()) {
 				$player->sendMessage($this->getMessage("sell-create-failed"));
 				unset($this->queue[$iusername]);
 				return;
@@ -321,10 +321,10 @@ class EconomySell extends PluginBase implements Listener {
 					$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
 			]);
 
-			if ($result) {
-				if ($queue[3] !== -2) {
+			if($result) {
+				if($queue[3] !== -2) {
 					$pos = $block;
-					if ($queue[3] !== -1) {
+					if($queue[3] !== -1) {
 						$pos = $block->getSide($queue[3]);
 					}
 
@@ -333,22 +333,22 @@ class EconomySell extends PluginBase implements Listener {
 				}
 
 				$player->sendMessage($this->getMessage("sell-created"));
-			} else {
+			}else{
 				$player->sendMessage($this->getMessage("sell-already-exist"));
 			}
 
-			if ($event->getItem()->canBePlaced()) {
+			if($event->getItem()->canBePlaced()) {
 				$this->placeQueue[$iusername] = true;
 			}
 
 			unset($this->queue[$iusername]);
 			return;
-		} elseif (isset($this->removeQueue[$iusername])) {
+		} elseif(isset($this->removeQueue[$iusername])) {
 			$sell = $this->provider->getSell($block);
-			foreach ($this->items as $level => $arr) {
-				foreach ($arr as $key => $displayer) {
+			foreach($this->items as $level => $arr) {
+				foreach($arr as $key => $displayer) {
 					$link = $displayer->getLinked();
-					if ($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getLevel()->getFolderName() === $sell[3]) {
+					if($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getLevel()->getFolderName() === $sell[3]) {
 						$displayer->despawnFromAll();
 						unset($this->items[$key]);
 						break 2;
@@ -361,52 +361,52 @@ class EconomySell extends PluginBase implements Listener {
 			unset($this->removeQueue[$iusername]);
 			$player->sendMessage($this->getMessage("sell-removed"));
 
-			if ($event->getItem()->canBePlaced()) {
+			if($event->getItem()->canBePlaced()) {
 				$this->placeQueue[$iusername] = true;
 			}
 			return;
 		}
 
-		if (($sell = $this->provider->getSell($block)) !== false) {
-			if ($this->getConfig()->get("enable-double-tap")) {
+		if(($sell = $this->provider->getSell($block)) !== false) {
+			if($this->getConfig()->get("enable-double-tap")) {
 				$now = time();
-				if (isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1) {
+				if(isset($this->tap[$iusername]) and $now - $this->tap[$iusername] < 1) {
 					$this->sellItem($player, $sell);
 					unset($this->tap[$iusername]);
-				} else {
+				}else{
 					$this->tap[$iusername] = $now;
 					$player->sendMessage($this->getMessage("tap-again", [$sell[6], $sell[7], $sell[8]]));
 				}
-			} else {
+			}else{
 				$this->sellItem($player, $sell);
 			}
 
-			if ($event->getItem()->canBePlaced()) {
+			if($event->getItem()->canBePlaced()) {
 				$this->placeQueue[$iusername] = true;
 			}
 		}
 	}
 
 	private function sellItem(Player $player, $sell) {
-		if (!$player instanceof Player) {
+		if(!$player instanceof Player) {
 			return false;
 		}
-		if (!$player->hasPermission("economysell.sell.sell")) {
+		if(!$player->hasPermission("economysell.sell.sell")) {
 			$player->sendMessage($this->getMessage("no-permission-sell"));
 			return false;
 		}
 		$item = Item::get($sell[4], $sell[5], $sell[7]);
-		if ($player->getInventory()->contains($item)) {
+		if($player->getInventory()->contains($item)) {
 			$ev = new SellTransactionEvent($player, new Position($sell[0], $sell[1], $sell[2], $this->getServer()->getLevelByName($sell[3])), $item, $sell[8]);
 			$ev->call();
-			if ($ev->isCancelled()) {
+			if($ev->isCancelled()) {
 				$player->sendMessage($this->getMessage("failed-sell"));
 				return true;
 			}
 			$player->getInventory()->removeItem($item);
 			$player->sendMessage($this->getMessage("sold-item", [$sell[6], $sell[7], $sell[8]]));
 			EconomyAPI::getInstance()->addMoney($player, $sell[8]);
-		} else {
+		}else{
 			$player->sendMessage($this->getMessage("no-item", [$sell[6]]));
 		}
 		return true;
@@ -414,7 +414,7 @@ class EconomySell extends PluginBase implements Listener {
 
 	public function onBlockPlace(BlockPlaceEvent $event) {
 		$iusername = strtolower($event->getPlayer()->getName());
-		if (isset($this->placeQueue[$iusername])) {
+		if(isset($this->placeQueue[$iusername])) {
 			$event->setCancelled();
 			unset($this->placeQueue[$iusername]);
 		}
@@ -422,7 +422,7 @@ class EconomySell extends PluginBase implements Listener {
 
 	public function onBlockBreak(BlockBreakEvent $event) {
 		$block = $event->getBlock();
-		if ($this->provider->getSell($block) !== false) {
+		if($this->provider->getSell($block) !== false) {
 			$player = $event->getPlayer();
 
 			$event->setCancelled(true);
@@ -431,7 +431,7 @@ class EconomySell extends PluginBase implements Listener {
 	}
 
 	public function onDisable() {
-		if ($this->provider instanceof DataProvider) {
+		if($this->provider instanceof DataProvider) {
 			$this->provider->close();
 		}
 	}

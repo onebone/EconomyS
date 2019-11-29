@@ -42,16 +42,16 @@ class DueTask extends Task {
 	public function removeItem() {
 		$owner = $this->plugin;
 
-		if (($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player) {
+		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player) {
 			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));
-		} else {
+		}else{
 			$owner->queueMessage($this->playerName, $owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}
 
-		if (($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player) {
+		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player) {
 			$player->getInventory()->addItem($this->guarantee);
 			$player->sendMessage($owner->getMessage("usury-expired", [$this->playerName]));
-		} else {
+		}else{
 			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
 			$c = $this->guarantee->getCount();
 			$owner->addItem($this->hostOwner, $this->guarantee);

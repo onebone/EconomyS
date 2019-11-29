@@ -52,12 +52,8 @@ final class PluginConfig {
 		return $this->config->get('update-host', 'onebone.me/plugins/economys/api');
 	}
 
-	public function getMonetaryUnit(): string {
-		return $this->config->get("monetary-unit", "");
-	}
-
 	public function getMaxMoney() {
-		return $this->config->get("max-money");
+		return $this->config->get("max-money", );
 	}
 
 	public function getDefaultMoney() {

@@ -38,7 +38,7 @@ class EconomyTax extends PluginBase {
 	private $config;
 
 	public function onEnable() {
-		if (!file_exists($this->getDataFolder())) {
+		if(!file_exists($this->getDataFolder())) {
 			mkdir($this->getDataFolder());
 		}
 
@@ -52,10 +52,10 @@ class EconomyTax extends PluginBase {
 	}
 
 	public function payTax() {
-		if (($percent = $this->config->get("tax-as-percentage")) !== "") {
+		if(($percent = $this->config->get("tax-as-percentage")) !== "") {
 			$players = $this->getServer()->getOnlinePlayers();
-			foreach ($players as $player) {
-				if ($player->hasPermission("economytax.tax.avoid")) {
+			foreach($players as $player) {
+				if($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
 				$money = $this->api->myMoney($player);
@@ -63,11 +63,11 @@ class EconomyTax extends PluginBase {
 				$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
 				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$taking has taken by tax.");
 			}
-		} else {
+		}else{
 			$money = $this->config->get("tax-as-money");
 			$players = $this->getServer()->getOnlinePlayers();
-			foreach ($players as $player) {
-				if ($player->hasPermission("economytax.tax.avoid")) {
+			foreach($players as $player) {
+				if($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
 				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");

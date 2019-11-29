@@ -54,22 +54,22 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if (!$this->plugin->isEnabled() or !$this->testPermission($sender)) {
+		if(!$this->plugin->isEnabled() or !$this->testPermission($sender)) {
 			return false;
 		}
 
-		if (!$sender instanceof Player) {
+		if(!$sender instanceof Player) {
 			$sender->sendMessage("Please run this command in-game.");
 			return true;
 		}
 
 		switch (array_shift($params)) {
 			case $this->pos1:
-				if (!$sender->hasPermission("economyproperty.command.property.pos1")) {
+				if(!$sender->hasPermission("economyproperty.command.property.pos1")) {
 					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 					break;
 				}
@@ -81,15 +81,15 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 				$sender->sendMessage("[EconomyProperty] First position has been saved.");
 				break;
 			case $this->pos2:
-				if (!$sender->hasPermission("economyproperty.command.property.pos2")) {
+				if(!$sender->hasPermission("economyproperty.command.property.pos2")) {
 					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 					break;
 				}
-				if (!isset($this->pos[$sender->getName()][0])) {
+				if(!isset($this->pos[$sender->getName()][0])) {
 					$sender->sendMessage("[EconomyProperty] Please set your first position.");
 					break;
 				}
@@ -100,25 +100,25 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 				$sender->sendMessage("[EconomyProperty] Second position has been saved.");
 				break;
 			case $this->make:
-				if (!$sender->hasPermission("economyproperty.command.property.make")) {
+				if(!$sender->hasPermission("economyproperty.command.property.make")) {
 					$sender->sendMessage("[EconomyProperty] You don't have permission to use this command.");
 					return false;
 				}
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 					break;
 				}
 				$price = array_shift($params);
-				if (!is_numeric($price) and (isset($params[0]) and !is_numeric($params[0]))) {
+				if(!is_numeric($price) and (isset($params[0]) and !is_numeric($params[0]))) {
 					$sender->sendMessage("Usage: /{$this->command} {$this->make} <price> [rent time]");
 					break;
 				}
-				if (!isset($this->pos[$sender->getName()][1])) {
+				if(!isset($this->pos[$sender->getName()][1])) {
 					$sender->sendMessage("Please check if your positions are all set.");
 					break;
 				}
 				$level = Server::getInstance()->getLevelByName($this->pos[$sender->getName()][0][2]);
-				if (!$level instanceof Level) {
+				if(!$level instanceof Level) {
 					$sender->sendMessage("The property area where you are trying to make is corrupted.");
 					break;
 				}
@@ -131,14 +131,14 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 						$this->pos[$sender->getName()][1][1]
 				);
 				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY(), (isset($params[0]) ? $params[0] : null), $sender->getYaw());
-				if ($result) {
+				if($result) {
 					$sender->sendMessage("[EconomyProperty] Property has successfully created.");
-				} else {
+				}else{
 					$sender->sendMessage("[EconomyProperty] You are trying to overlap with other property area.");
 				}
 				break;
 			case $this->touchPos:
-				if (!$sender instanceof Player) {
+				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
 					break;
 				}
@@ -148,15 +148,15 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 			case "rm":
 				$id = array_shift($params);
 
-				if (!is_numeric($id)) {
+				if(!is_numeric($id)) {
 					$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 					return true;
 				}
 
-				if ($this->plugin->propertyExists($id)) {
+				if($this->plugin->propertyExists($id)) {
 					$this->plugin->removeProperty($id);
 					$sender->sendMessage("[EconomyProperty] Removed property #" . $id);
-				} else {
+				}else{
 					$sender->sendMessage("[EconomyProperty] There is no property with id #" . $id);
 				}
 				return true;

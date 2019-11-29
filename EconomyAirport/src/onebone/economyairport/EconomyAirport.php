@@ -41,7 +41,7 @@ class EconomyAirport extends PluginBase implements Listener {
 	private $lang, $tag;
 
 	public function onEnable() {
-		if (!file_exists($this->getDataFolder())) {
+		if(!file_exists($this->getDataFolder())) {
 			mkdir($this->getDataFolder());
 		}
 
@@ -65,26 +65,26 @@ class EconomyAirport extends PluginBase implements Listener {
 	}
 
 	public function onSignChange(SignChangeEvent $event) {
-		if (($data = $this->checkTag($event->getLine(0), $event->getLine(1))) !== false) {
+		if(($data = $this->checkTag($event->getLine(0), $event->getLine(1))) !== false) {
 			$player = $event->getPlayer();
-			if (!$player->hasPermission("economyairport.create")) {
+			if(!$player->hasPermission("economyairport.create")) {
 				$player->sendMessage($this->getMessage("no-permission-create"));
 				return;
 			}
 			$block = $event->getBlock();
 			switch ($event->getLine(1)) {
 				case "departure":
-					if (!is_numeric($event->getLine(2))) {
+					if(!is_numeric($event->getLine(2))) {
 						$player->sendMessage($this->getMessage("cost-must-be-numeric"));
 						break;
 					}
-					if (trim($event->getLine(3)) === "") {
+					if(trim($event->getLine(3)) === "") {
 						$player->sendMessage($this->getMessage("no-target-airport"));
 						break;
 					}
 
-					foreach ($this->airport as $d) {
-						if ($d["type"] === 1 and $d["name"] === $event->getLine(3)) {
+					foreach($this->airport as $d) {
+						if($d["type"] === 1 and $d["name"] === $event->getLine(3)) {
 							$targetX = $d[0];
 							$targetY = $d[1];
 							$targetZ = $d[2];
@@ -92,7 +92,7 @@ class EconomyAirport extends PluginBase implements Listener {
 							break;
 						}
 					}
-					if (!isset($targetX)) {
+					if(!isset($targetX)) {
 						$player->sendMessage($this->getMessage("no-arrival"));
 						break;
 					}
@@ -114,11 +114,11 @@ class EconomyAirport extends PluginBase implements Listener {
 					$player->sendMessage($this->getMessage("departure-created", [$event->getLine(3), $cost]));
 					break;
 				case "arrival":
-					if (trim($event->getLine(2)) === "") {
+					if(trim($event->getLine(2)) === "") {
 						$player->sendMessage($this->getMessage("no-airport-name"));
 						break;
 					}
-					if (strpos($event->getLine(2), ":")) {
+					if(strpos($event->getLine(2), ":")) {
 						$player->sendMessage($this->getMessage("invalid-airport-name"));
 						break;
 					}
@@ -140,11 +140,11 @@ class EconomyAirport extends PluginBase implements Listener {
 	}
 
 	public function checkTag($firstLine, $secondLine) {
-		if (!$this->tag->exists($secondLine)) {
+		if(!$this->tag->exists($secondLine)) {
 			return false;
 		}
-		foreach ($this->tag->get($secondLine) as $key => $data) {
-			if ($firstLine === $key) {
+		foreach($this->tag->get($secondLine) as $key => $data) {
+			if($firstLine === $key) {
 				return $data;
 			}
 		}
@@ -152,34 +152,34 @@ class EconomyAirport extends PluginBase implements Listener {
 	}
 
 	public function getMessage($key, $value = ["%1", "%2"]) {
-		if ($this->lang->exists($key)) {
+		if($this->lang->exists($key)) {
 			return str_replace(["%1", "%2"], [$value[0], $value[1]], $this->lang->get($key));
-		} else {
+		}else{
 			return "Language with key \"$key\" does not exist";
 		}
 	}
 
 	public function onBlockTouch(PlayerInteractEvent $event) {
-		if ($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
+		if($event->getAction() !== PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
 			return;
 		}
 		$block = $event->getBlock();
-		if (isset($this->airport[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()])) {
+		if(isset($this->airport[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()])) {
 			$airport = $this->airport[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()];
-			if ($airport["type"] === 1)
+			if($airport["type"] === 1)
 				return;
 
 			$player = $event->getPlayer();
-			if (isset($this->airport[$airport["targetX"] . ":" . $airport["targetY"] . ":" . $airport["targetZ"] . ":" . $airport["targetLevel"]]) and $this->airport[$airport["targetX"] . ":" . $airport["targetY"] . ":" . $airport["targetZ"] . ":" . $airport["targetLevel"]]["type"] === 1) {
+			if(isset($this->airport[$airport["targetX"] . ":" . $airport["targetY"] . ":" . $airport["targetZ"] . ":" . $airport["targetLevel"]]) and $this->airport[$airport["targetX"] . ":" . $airport["targetY"] . ":" . $airport["targetZ"] . ":" . $airport["targetLevel"]]["type"] === 1) {
 				$money = EconomyAPI::getInstance()->myMoney($player);
-				if (!$block->getLevel()->getTile(new Vector3($airport["targetX"], $airport["targetY"], $airport["targetZ"])) instanceof Sign) {
+				if(!$block->getLevel()->getTile(new Vector3($airport["targetX"], $airport["targetY"], $airport["targetZ"])) instanceof Sign) {
 					$player->sendMessage($this->getMessage("no-airport", [$airport["target"], "%2"]));
 					unset($this->airport[$airport["target"]]);
 					return;
 				}
-				if ($money < $airport["cost"]) {
+				if($money < $airport["cost"]) {
 					$player->sendMessage($this->getMessage("no-money", [$airport["cost"], $money]));
-				} else {
+				}else{
 					EconomyAPI::getInstance()->reduceMoney($player, $airport["cost"], true, "EconomyAirport");
 					$level = $this->getServer()->getLevelByName($airport["targetLevel"]);
 					$player->teleport(new Position($airport["targetX"], $airport["targetY"], $airport["targetZ"], $level));
@@ -187,16 +187,16 @@ class EconomyAirport extends PluginBase implements Listener {
 					$day = (int) ($time / Level::TIME_FULL);
 					$time -= ($day * Level::TIME_FULL);
 					$phrase = "sunrise";
-					if ($time < 1200) {
+					if($time < 1200) {
 						$phrase = "day";
-					} elseif ($time % Level::TIME_SUNSET < 2000) {
+					} elseif($time % Level::TIME_SUNSET < 2000) {
 						$phrase = "sunset";
-					} elseif ($time % Level::TIME_NIGHT < 9000) {
+					} elseif($time % Level::TIME_NIGHT < 9000) {
 						$phrase = "night";
 					}
 					$player->sendMessage($this->getMessage("thank-you", [$airport["target"], $level->getTime() . " (" . $phrase . ")"]));
 				}
-			} else {
+			}else{
 				$player->sendMessage($this->getMessage("no-airport", [$airport["target"], "%2"]));
 			}
 		}
@@ -204,9 +204,9 @@ class EconomyAirport extends PluginBase implements Listener {
 
 	public function onBlockBreak(BlockBreakEvent $event) {
 		$block = $event->getBlock();
-		if (isset($this->airport[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()])) {
+		if(isset($this->airport[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()])) {
 			$player = $event->getPlayer();
-			if (!$player->hasPermission("economyairport.remove")) {
+			if(!$player->hasPermission("economyairport.remove")) {
 				$player->sendMessage($this->getMessage("no-permission-break"));
 				return;
 			}

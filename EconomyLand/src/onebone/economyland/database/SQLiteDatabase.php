@@ -49,7 +49,7 @@ class SQLiteDatabase implements Database {
 	}
 
 	public function getByCoord($x, $z, $level) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 		return $this->land->query("SELECT * FROM land WHERE (startX <= $x AND endX >= $x) AND (startZ <= $z AND endZ >= $z) AND $level")->fetchArray(SQLITE3_ASSOC);
@@ -83,7 +83,7 @@ class SQLiteDatabase implements Database {
 
 	public function addInviteeById($id, $name) {
 		$invitee = $this->getInviteeById($id);
-		if (!in_array($name, $invitee)) {
+		if(!in_array($name, $invitee)) {
 			$invitee[] = strtolower(str_replace("'", "", $name));
 			$this->land->exec("UPDATE land SET invitee = '" . serialize($invitee) . "' WHERE ID = $id");
 			return true;
@@ -106,8 +106,8 @@ class SQLiteDatabase implements Database {
 		$name = strtolower($name);
 
 		$invitee = $this->getInviteeById($id);
-		foreach ($invitee as $key => $i) {
-			if ($i === $name) {
+		foreach($invitee as $key => $i) {
+			if($i === $name) {
 				unset($invitee[$key]);
 				$this->land->exec("UPDATE land SET invitee = '" . serialize($invitee) . "' WHERE ID = $id");
 				return true;
@@ -117,7 +117,7 @@ class SQLiteDatabase implements Database {
 	}
 
 	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 
@@ -134,10 +134,10 @@ class SQLiteDatabase implements Database {
 	}
 
 	public function canTouch($x, $z, $level, Player $player) {
-		if (!is_bool($land = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX >= $x AND endZ >= $z AND startX <= $x AND startZ <= $z")->fetchArray(SQLITE3_ASSOC))) {
-			if ($player->getName() === $land["owner"] or stripos($player->getName() . self::INVITEE_SEPERATOR, $land["invitee"]) or $player->hasPermission("economyland.land.modify.others")) {
+		if(!is_bool($land = $this->land->query("SELECT owner,invitee FROM land WHERE level = '$level' AND endX >= $x AND endZ >= $z AND startX <= $x AND startZ <= $z")->fetchArray(SQLITE3_ASSOC))) {
+			if($player->getName() === $land["owner"] or stripos($player->getName() . self::INVITEE_SEPERATOR, $land["invitee"]) or $player->hasPermission("economyland.land.modify.others")) {
 				return true;
-			} else {
+			}else{
 				return $land;
 			}
 		}
@@ -146,7 +146,7 @@ class SQLiteDatabase implements Database {
 	}
 
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level) {
-		if ($level instanceof Level) {
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 		$result = $this->land->query("SELECT * FROM land WHERE startX <= $endX AND endX >= $endX AND startZ <= $endZ AND endZ >= $endZ AND level = '$level'")->fetchArray(SQLITE3_ASSOC);
