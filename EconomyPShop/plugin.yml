@@ -6,10 +6,10 @@ main: onebone\economypshop\EconomyPShop
 api: 3.9.0
 
 permissions:
- economypshop.*:
+ economypshop:
   description: Allows all permissions to the player
   children:
-   economypshop.shop.*:
+   economypshop.shop:
     description: Allows player all permissions related to shop
     children:
      economypshop.shop.create:

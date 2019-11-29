@@ -13,11 +13,11 @@ commands:
   permission: economyauction.command.auction
 
 permissions:
- economyauction.*:
+ economyauction:
   description: Allows player to use all functions in EconomyAuction
   default: op
   children:
-   economyauction.command.*:
+   economyauction.command:
     description: Allows player to use all of commands in EconomyAuction
     default: op
     children:

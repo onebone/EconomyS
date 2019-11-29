@@ -7,7 +7,7 @@ main: onebone\economyairport\EconomyAirport
 depend: [EconomyAPI]
 
 permissions:
- economyairport.*:
+ economyairport:
   description: Includes all permissions related to EconomyAirport
   children:
    economyairport.create:

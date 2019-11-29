@@ -13,7 +13,7 @@ commands:
   permission: economyshop.command.shop;economyshop.command.shop.create;economyshop.command.shop.remove;economyshop.command.shop.list;
 
 permissions:
- economyshop.*:
+ economyshop:
   description: Allows all functions in EconomyShop
   default: op
   children:
@@ -27,7 +27,7 @@ permissions:
      economyshop.command.shop.list:
       description: Allows player to use /shop list
       default: true
-   economyshop.shop.*:
+   economyshop.shop:
     description: Allows all functions about shops
     default: op
     children:

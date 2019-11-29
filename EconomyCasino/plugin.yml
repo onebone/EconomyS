@@ -7,7 +7,7 @@ api: 3.9.0
 depend: [EconomyAPI]
 
 permissions:
- economycasino.command.*:
+ economycasino.command:
   description: Allows player to use all commands of EconomyCasino
   default: op
   children:

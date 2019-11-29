@@ -5,11 +5,11 @@ author: onebone
 api: 3.9.0
 
 permissions:
-  economyapi.*:
+  economyapi:
     default: op
     description: Allows to control all of functions in EconomyAPI
     children:
-      economyapi.command.*:
+      economyapi.command:
         default: op
         description: Allows to use all of commands in EconomyAPI
         children:

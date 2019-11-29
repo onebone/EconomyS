@@ -7,10 +7,10 @@ main: onebone\economyusury\EconomyUsury
 depend: [EconomyAPI]
 
 permissions:
- economyusury.*:
+ economyusury:
   description: Gives player all access permissions to EconomyUsury
   children:
-   economyusury.command.*:
+   economyusury.command:
     description: Gives player all access permissions of commands
     children:
      economyusury.command.usury:

@@ -12,7 +12,7 @@ commands:
   usage: /job <join|retire|list|me>
   permission: economyjob.command.job
 permissions:
- economyjob.command.*:
+ economyjob.command:
   description: Allows player to use all of job command
   default: op
   children:

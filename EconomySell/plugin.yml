@@ -13,7 +13,7 @@ commands:
   permission: economysell.command.sell;economysell.command.sell.create;economysell.command.sell.remove;economysell.command.sell.list;
 
 permissions:
- economysell.*:
+ economysell:
   description: Allows all functions in EconomySell
   default: op
   children:
@@ -27,7 +27,7 @@ permissions:
      economysell.command.sell.list:
       description: Allows player to use /sell list
       default: true
-   economysell.sell.*:
+   economysell.sell:
     description: Allows all functions about sells
     default: op
     children:
