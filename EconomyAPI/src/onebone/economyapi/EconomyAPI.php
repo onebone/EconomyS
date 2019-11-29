@@ -64,6 +64,10 @@ class EconomyAPI extends PluginBase implements Listener {
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
+	const CURRENCY_CONFIG_DEFAULT = 0;
+	const CURRENCY_CONFIG_EXCHANGE = 1;
+	const CURRENCY_CONFIG_MAX = 2;
+
 	private static $instance = null;
 
 	/** @var PluginConfig $pluginConfig */
@@ -230,9 +234,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 		if($this->defaultCurrency->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
-			if($amount > $this->pluginConfig->getMaxMoney()) {
+			// TODO configuration for max money of each currency
+			/*if($amount > $this->defaultCurrency->getMaxMoney()) {
 				return self::RET_INVALID;
-			}
+			}*/
 
 			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
@@ -264,9 +269,9 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 		if(($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			if($money + $amount > $this->pluginConfig->getMaxMoney()) {
+			/*if($money + $amount > $this->pluginConfig->getMaxMoney()) {
 				return self::RET_INVALID;
-			}
+			}*/
 
 			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
@@ -434,8 +439,9 @@ class EconomyAPI extends PluginBase implements Listener {
 			}
 
 			$this->currencyConfig[$key] = [
-				'default'  => $data['default'] ?? null,
-				'exchange' => $data['exchange'] ?? []
+				self::CURRENCY_CONFIG_DEFAULT   => $data['default'] ?? null,
+				self::CURRENCY_CONFIG_EXCHANGE  => $data['exchange'] ?? [],
+				self::CURRENCY_CONFIG_MAX       => $data['max'] ?? 0
 			];
 		}
 	}
@@ -492,7 +498,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
-			$defaultMoney = ($defaultMoney === false) ? $this->pluginConfig->getDefaultMoney() : $defaultMoney;
+			$defaultMoney = ($defaultMoney === false) ? $this->defaultCurrency->getDefaultMoney() : $defaultMoney;
 
 			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
 			$ev->call();

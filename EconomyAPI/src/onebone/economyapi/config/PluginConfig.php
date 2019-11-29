@@ -51,12 +51,4 @@ final class PluginConfig {
 	public function getUpdateHost(): string {
 		return $this->config->get('update-host', 'onebone.me/plugins/economys/api');
 	}
-
-	public function getMaxMoney() {
-		return $this->config->get("max-money", );
-	}
-
-	public function getDefaultMoney() {
-		return $this->config->get("default-money");
-	}
 }
