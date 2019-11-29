@@ -64,12 +64,21 @@ class PayCommand extends PluginCommand {
 		if ($result === EconomyAPI::RET_SUCCESS) {
 			$plugin->addMoney($player, $amount, true);
 
-			$sender->sendMessage($plugin->getMessage("pay-success", [$amount, $player], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("pay-success", [
+				$amount,
+				$player
+			], $sender->getName()));
 			if ($p instanceof Player) {
-				$p->sendMessage($plugin->getMessage("money-paid", [$sender->getName(), $amount], $sender->getName()));
+				$p->sendMessage($plugin->getMessage("money-paid", [
+					$sender->getName(),
+					$amount
+				], $sender->getName()));
 			}
 		} else {
-			$sender->sendMessage($plugin->getMessage("pay-failed", [$player, $amount], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("pay-failed", [
+				$player,
+				$amount
+			], $sender->getName()));
 		}
 		return true;
 	}

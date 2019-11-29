@@ -37,7 +37,10 @@ class SeeMoneyCommand extends PluginCommand {
 
 		$money = $plugin->myMoney($player);
 		if ($money !== false) {
-			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", [$player, $money], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", [
+				$player,
+				$money
+			], $sender->getName()));
 		} else {
 			$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 		}

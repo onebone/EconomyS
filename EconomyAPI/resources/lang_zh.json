@@ -1,67 +1,67 @@
 {
-    "language": "zh",
-	"commands": {
-		"mymoney": {
-			"usage": "/mymoney",
-			"description": "查看您的金錢"
-		},
-		"topmoney": {
-			"usage": "/topmoney [頁數]",
-			"description": "查看此伺服器的金錢排行"
-		},
-		"setmoney": {
-			"usage": "/setmoney <玩家名稱> <數值>",
-			"description": "設定玩家的金錢"
-		},
-		"seemoney": {
-			"usage": "/seemoney <玩家名稱>",
-			"description": "查看玩家的金錢"
-		},
-		"givemoney": {
-			"usage": "/givemoney <玩家名稱> <數值>",
-			"description": "給玩家金錢"
-		},
-		"takemoney": {
-			"usage": "/takemoney <玩家名稱> <數值>",
-			"description": "拿走玩家的金錢"
-		},
-		"pay": {
-			"usage": "/pay <玩家名稱> <數值>",
-			"description": "付款給玩家"
-		},
-		"setlang": {
-			"usage": "/setlang <語言>",
-			"description": "設定您的語言"
-		},
-		"mystatus": {
-			"usage": "/mystatus",
-			"description": "查看您的金錢狀態"
-		}
-	},
-    "language-set": "語言被設定為 %1",
-    "request-cancelled": "您的請求已被取消",
-    "player-not-connected": "玩家 %1 目前不在伺服器上",
-    "player-never-connected": "伺服器中不存在玩家 %1",
-    "topmoney-tag": "- 查看伺服器金錢排行 (%1 of %2) -",
-    "topmoney-format": "[%1] %2: %3",
-    "pay-failed": "付款失敗",
-    "pay-success": "付款 %1 %MONETARY_UNIT% 給 %2",
-    "money-paid": "%1 付款給你 %2 %MONETARY_UNIT%",
-    "takemoney-must-be-number": "金額必須是有效數字",
-    "takemoney-invalid-number": "無效的數字",
-    "takemoney-player-lack-of-money": "%1 沒有 %2 %MONETARY_UNIT% . %1 剩餘金額: %3 %MONETARY_UNIT%",
-    "takemoney-money-taken": "您的 %1 %MONETARY_UNIT% 已經被管理員拿走~ ",
-    "takemoney-took-money": "已經拿走 %1 的 %2 %MONETARY_UNIT%",
-    "takemoney-failed": "拿錢失敗",
-    "givemoney-must-be-number": "金額必須是有效數字",
-    "givemoney-invalid-number": "無效的數字",
-    "givemoney-money-given": "有人給您了 %1 %MONETARY_UNIT%",
-    "givemoney-gave-money": "已經給 %2 了%1 %MONETARY_UNIT%",
-    "seemoney-seemoney": "玩家 %1 的金錢: %2",
-    "setmoney-setmoney": "玩家 %1 的金錢已經被設定為 %2 %MONETARY_UNIT%",
-    "setmoney-set": "您被設定成 %1 %MONETARY_UNIT%",
-    "setmoney-failed": "設定失敗~未知錯誤~",
-    "setmoney-invalid-number": "%1 %MONETARY_UNIT% 是無效的金額",
-    "mymoney-mymoney": "您身上的錢: %1 %MONETARY_UNIT%",
-    "mystatus-show": "您錢的狀態 : %1%"
+  "language": "zh",
+  "commands": {
+    "mymoney": {
+      "usage": "/mymoney",
+      "description": "查看您的金錢"
+    },
+    "topmoney": {
+      "usage": "/topmoney [頁數]",
+      "description": "查看此伺服器的金錢排行"
+    },
+    "setmoney": {
+      "usage": "/setmoney <玩家名稱> <數值>",
+      "description": "設定玩家的金錢"
+    },
+    "seemoney": {
+      "usage": "/seemoney <玩家名稱>",
+      "description": "查看玩家的金錢"
+    },
+    "givemoney": {
+      "usage": "/givemoney <玩家名稱> <數值>",
+      "description": "給玩家金錢"
+    },
+    "takemoney": {
+      "usage": "/takemoney <玩家名稱> <數值>",
+      "description": "拿走玩家的金錢"
+    },
+    "pay": {
+      "usage": "/pay <玩家名稱> <數值>",
+      "description": "付款給玩家"
+    },
+    "setlang": {
+      "usage": "/setlang <語言>",
+      "description": "設定您的語言"
+    },
+    "mystatus": {
+      "usage": "/mystatus",
+      "description": "查看您的金錢狀態"
+    }
+  },
+  "language-set": "語言被設定為 %1",
+  "request-cancelled": "您的請求已被取消",
+  "player-not-connected": "玩家 %1 目前不在伺服器上",
+  "player-never-connected": "伺服器中不存在玩家 %1",
+  "topmoney-tag": "- 查看伺服器金錢排行 (%1 of %2) -",
+  "topmoney-format": "[%1] %2: %3",
+  "pay-failed": "付款失敗",
+  "pay-success": "付款 %1 %MONETARY_UNIT% 給 %2",
+  "money-paid": "%1 付款給你 %2 %MONETARY_UNIT%",
+  "takemoney-must-be-number": "金額必須是有效數字",
+  "takemoney-invalid-number": "無效的數字",
+  "takemoney-player-lack-of-money": "%1 沒有 %2 %MONETARY_UNIT% . %1 剩餘金額: %3 %MONETARY_UNIT%",
+  "takemoney-money-taken": "您的 %1 %MONETARY_UNIT% 已經被管理員拿走~ ",
+  "takemoney-took-money": "已經拿走 %1 的 %2 %MONETARY_UNIT%",
+  "takemoney-failed": "拿錢失敗",
+  "givemoney-must-be-number": "金額必須是有效數字",
+  "givemoney-invalid-number": "無效的數字",
+  "givemoney-money-given": "有人給您了 %1 %MONETARY_UNIT%",
+  "givemoney-gave-money": "已經給 %2 了%1 %MONETARY_UNIT%",
+  "seemoney-seemoney": "玩家 %1 的金錢: %2",
+  "setmoney-setmoney": "玩家 %1 的金錢已經被設定為 %2 %MONETARY_UNIT%",
+  "setmoney-set": "您被設定成 %1 %MONETARY_UNIT%",
+  "setmoney-failed": "設定失敗~未知錯誤~",
+  "setmoney-invalid-number": "%1 %MONETARY_UNIT% 是無效的金額",
+  "mymoney-mymoney": "您身上的錢: %1 %MONETARY_UNIT%",
+  "mystatus-show": "您錢的狀態 : %1%"
 }

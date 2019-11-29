@@ -23,11 +23,11 @@ namespace onebone\economyapi;
 // UserInfo is a data class for delivering user information
 // of player
 class UserInfo {
-	/** @var string     $username Username of player */
+	/** @var string $username Username of player */
 	public $username;
-	/** @var string[]   $wallet Type of currencies which player is possessing */
+	/** @var string[] $wallet Type of currencies which player is possessing */
 	public $wallet;
-	/** @var string     $language Language which is set to player */
+	/** @var string $language Language which is set to player */
 	public $language;
 
 	public function __construct(string $username, array $wallet, string $language) {

@@ -44,7 +44,10 @@ class GiveMoneyCommand extends PluginCommand {
 				$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", [$amount], $sender->getName()));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($plugin->getMessage("givemoney-gave-money", [$amount, $player], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("givemoney-gave-money", [
+					$amount,
+					$player
+				], $sender->getName()));
 
 				if ($p instanceof Player) {
 					$p->sendMessage($plugin->getMessage("givemoney-money-given", [$amount], $sender->getName()));

@@ -49,7 +49,10 @@ class SetMoneyCommand extends PluginCommand {
 				$sender->sendMessage($plugin->getMessage("setmoney-failed", [], $sender->getName()));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($plugin->getMessage("setmoney-setmoney", [$player, $amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-setmoney", [
+					$player,
+					$amount
+				], $sender->getName()));
 
 				if ($p instanceof Player) {
 					$p->sendMessage($plugin->getMessage("setmoney-set", [$amount], $p->getName()));

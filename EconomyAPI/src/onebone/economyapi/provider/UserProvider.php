@@ -27,12 +27,16 @@ interface UserProvider {
 	public function getName(): string;
 
 	public function create(string $username): bool;
+
 	public function delete(string $username): bool;
 
 	public function exists(string $username): bool;
+
 	public function setLanguage(string $username, string $lang): bool;
+
 	public function getLanguage(string $username): string;
 
 	public function save();
+
 	public function close();
 }

@@ -38,7 +38,10 @@ class YamlProvider implements Provider {
 	public function __construct(EconomyAPI $plugin, string $fileName) {
 		$this->plugin = $plugin;
 
-		$this->config = new Config($this->plugin->getDataFolder() . $fileName, Config::YAML, ["version" => 2, "money" => []]);
+		$this->config = new Config($this->plugin->getDataFolder() . $fileName, Config::YAML, [
+			"version" => 2,
+			"money"   => []
+		]);
 		$this->money = $this->config->getAll();
 	}
 

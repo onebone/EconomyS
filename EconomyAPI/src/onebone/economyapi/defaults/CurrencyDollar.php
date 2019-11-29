@@ -63,8 +63,7 @@ class CurrencyDollar implements Currency {
 		$digits = floor($money);
 		$decimal = floor(($money - $digits) * 100);
 
-		return $digits . (' dollar' . ($digits > 1 ? 's' : ''))
-			. $decimal . (' cent' . ($decimal > 1 ? 's' : ''));
+		return $digits . (' dollar' . ($digits > 1 ? 's' : '')) . $decimal . (' cent' . ($decimal > 1 ? 's' : ''));
 	}
 
 	public function getProvider(): Provider {
@@ -72,10 +71,10 @@ class CurrencyDollar implements Currency {
 	}
 
 	public function setProvider(Provider $provider) {
-        $this->provider = $provider;
-    }
+		$this->provider = $provider;
+	}
 
-    public function save() {
+	public function save() {
 		$this->provider->save();
 	}
 

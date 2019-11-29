@@ -39,12 +39,7 @@ class MySQLProvider implements Provider {
 
 		$config = $this->plugin->getPluginConfig()->getProviderSettings();
 
-		$this->db = new mysqli(
-			$config["host"] ?? "127.0.0.1",
-			$config["user"] ?? "onebone",
-			$config["password"] ?? "hello_world",
-			$config["db"] ?? "economyapi",
-			$config["port"] ?? 3306);
+		$this->db = new mysqli($config["host"] ?? "127.0.0.1", $config["user"] ?? "onebone", $config["password"] ?? "hello_world", $config["db"] ?? "economyapi", $config["port"] ?? 3306);
 		if ($this->db->connect_error) {
 			$this->plugin->getLogger()->critical("Could not connect to MySQL server: " . $this->db->connect_error);
 			return;
@@ -62,7 +57,7 @@ class MySQLProvider implements Provider {
 
 	/**
 	 * @param Player|string $player
-	 * @param float         $defaultMoney
+	 * @param float $defaultMoney
 	 * @return bool
 	 */
 	public function createAccount($player, $defaultMoney = 1000.0) {
@@ -124,7 +119,7 @@ class MySQLProvider implements Provider {
 
 	/**
 	 * @param Player|string $player
-	 * @param float         $amount
+	 * @param float $amount
 	 * @return bool
 	 */
 	public function setMoney($player, $amount) {
@@ -140,7 +135,7 @@ class MySQLProvider implements Provider {
 
 	/**
 	 * @param Player|string $player
-	 * @param float         $amount
+	 * @param float $amount
 	 * @return bool
 	 */
 	public function addMoney($player, $amount) {
@@ -156,7 +151,7 @@ class MySQLProvider implements Provider {
 
 	/**
 	 * @param Player|string $player
-	 * @param float         $amount
+	 * @param float $amount
 	 * @return bool
 	 */
 	public function reduceMoney($player, $amount) {

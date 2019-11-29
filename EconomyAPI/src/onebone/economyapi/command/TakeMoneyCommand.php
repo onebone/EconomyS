@@ -45,10 +45,17 @@ class TakeMoneyCommand extends PluginCommand {
 		$result = $plugin->reduceMoney($player, $amount);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
-				$sender->sendMessage($plugin->getMessage("takemoney-player-lack-of-money", [$player, $amount, $plugin->myMoney($player)], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("takemoney-player-lack-of-money", [
+					$player,
+					$amount,
+					$plugin->myMoney($player)
+				], $sender->getName()));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($plugin->getMessage("takemoney-took-money", [$player, $amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("takemoney-took-money", [
+					$player,
+					$amount
+				], $sender->getName()));
 
 				if ($p instanceof Player) {
 					$p->sendMessage($plugin->getMessage("takemoney-money-taken", [$amount], $sender->getName()));
