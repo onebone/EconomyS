@@ -208,11 +208,14 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param Player|string $player
+	 * @param string|Currency
 	 *
 	 * @return float|bool
 	 */
-	public function myMoney($player) {
-		return $this->defaultCurrency->getProvider()->getMoney($player);
+	public function myMoney($player, $currency = null) {
+		$currency = $this->validateCurrency($currency);
+
+		return $currency->getProvider()->getMoney($player);
 	}
 
 	/**
@@ -220,10 +223,11 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param string $issuer
+	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, float $amount, bool $force = false, string $issuer = "none"): int {
+	public function setMoney($player, float $amount, bool $force = false, string $issuer = "none", $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -232,7 +236,9 @@ class EconomyAPI extends PluginBase implements Listener {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if($this->defaultCurrency->getProvider()->accountExists($player)) {
+
+		$currency = $this->validateCurrency($currency);
+		if($currency->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
 			// TODO configuration for max money of each currency
 			/*if($amount > $this->defaultCurrency->getMaxMoney()) {
@@ -242,7 +248,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
 			if(!$ev->isCancelled() or $force === true) {
-				$this->defaultCurrency->getProvider()->setMoney($player, $amount);
+				$currency->getProvider()->setMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $amount, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
@@ -256,10 +262,11 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param string $issuer
+	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
-	public function addMoney($player, float $amount, bool $force = false, $issuer = "none"): int {
+	public function addMoney($player, float $amount, bool $force = false, $issuer = "none", $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -267,16 +274,18 @@ class EconomyAPI extends PluginBase implements Listener {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if(($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
+
+		$currency = $this->validateCurrency($currency);
+		if(($money = $currency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			/*if($money + $amount > $this->pluginConfig->getMaxMoney()) {
+			if($money + $amount > $currency->getMaxMoney()) {
 				return self::RET_INVALID;
-			}*/
+			}
 
 			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
 			if(!$ev->isCancelled() or $force === true) {
-				$this->defaultCurrency->getProvider()->addMoney($player, $amount);
+				$currency->getProvider()->addMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $amount + $money, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
@@ -293,7 +302,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 *
 	 * @return int
 	 */
-	public function reduceMoney($player, float $amount, bool $force = false, $issuer = "none"): int {
+	public function reduceMoney($player, float $amount, bool $force = false, $issuer = "none", $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -301,7 +310,9 @@ class EconomyAPI extends PluginBase implements Listener {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-		if(($money = $this->defaultCurrency->getProvider()->getMoney($player)) !== false) {
+
+		$currency = $this->validateCurrency($currency);
+		if(($money = $currency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
 			if($money - $amount < 0) {
 				return self::RET_INVALID;
@@ -310,7 +321,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
 			if(!$ev->isCancelled() or $force === true) {
-				$this->defaultCurrency->getProvider()->reduceMoney($player, $amount);
+				$currency->getProvider()->reduceMoney($player, $amount);
 				(new MoneyChangedEvent($this, $player, $money - $amount, $issuer))->call();
 				return self::RET_SUCCESS;
 			}
