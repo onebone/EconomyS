@@ -51,6 +51,18 @@ class CurrencyDollar implements Currency {
 		return $this->provider->getMoney($username);
 	}
 
+	public function setMoney(string $username, float $value): bool {
+		return $this->provider->setMoney($username, $value);
+	}
+
+	public function addMoney(string $username, float $value): bool {
+		return $this->provider->addMoney($username, $value);
+	}
+
+	public function reduceMoney(string $username, float $value): bool {
+		return $this->provider->reduceMoney($username, $value);
+	}
+
 	public function getUnit(): string {
 		return '$';
 	}

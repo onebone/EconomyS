@@ -319,9 +319,6 @@ class EconomyAPI extends PluginBase implements Listener {
 		return self::RET_NO_ACCOUNT;
 	}
 
-	/**
-	 * @return Currency
-	 */
 	public function getDefaultCurrency(): Currency {
 		return $this->defaultCurrency;
 	}

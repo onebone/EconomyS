@@ -51,6 +51,30 @@ interface Currency {
 	public function getMoney(string $username): ?float;
 
 	/**
+	 * Sets balance of player
+	 * @param string $username
+	 * @param float  $value
+	 * @return bool
+	 */
+	public function setMoney(string $username, float $value): bool;
+
+	/**
+	 * Adds balance of player
+	 * @param string $username
+	 * @param float  $value
+	 * @return bool
+	 */
+	public function addMoney(string $username, float $value): bool;
+
+	/**
+	 * Reduces balance of player
+	 * @param string $username
+	 * @param float  $value
+	 * @return bool
+	 */
+	public function reduceMoney(string $username, float $value): bool;
+
+	/**
 	 * Returns the unit of currency
 	 * @return string
 	 */
