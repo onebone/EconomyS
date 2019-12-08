@@ -223,7 +223,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, $amount, bool $force = false, string $issuer = "none"): int {
+	public function setMoney($player, float $amount, bool $force = false, string $issuer = "none"): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -259,7 +259,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 *
 	 * @return int
 	 */
-	public function addMoney($player, $amount, bool $force = false, $issuer = "none"): int {
+	public function addMoney($player, float $amount, bool $force = false, $issuer = "none"): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -293,7 +293,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 *
 	 * @return int
 	 */
-	public function reduceMoney($player, $amount, bool $force = false, $issuer = "none"): int {
+	public function reduceMoney($player, float $amount, bool $force = false, $issuer = "none"): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -323,8 +323,48 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->defaultCurrency;
 	}
 
+	/**
+	 * @param string|Player $player
+	 * @param float|bool $defaultMoney
+	 * @param bool $force
+	 * @param string|Currency $currency
+	 *
+	 * @return bool
+	 */
+	public function createAccount($player, $defaultMoney = false, bool $force = false, $currency = null): bool {
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		$currency = $this->validateCurrency($currency);
+
+		if(!$currency->getProvider()->accountExists($player)) {
+			$defaultMoney = ($defaultMoney === false) ? $currency->getDefaultMoney() : $defaultMoney;
+
+			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
+			$ev->call();
+			if(!$ev->isCancelled() or $force === true) {
+				$currency->getProvider()->createAccount($player, $ev->getDefaultMoney());
+			}
+		}
+
+		return false;
+	}
+
 	public function hasLanguage(string $lang): bool {
 		return isset($this->langList[$lang]);
+	}
+
+	private function validateCurrency($currency): Currency {
+		if(is_string($currency)) {
+			$currency = strtolower($currency);
+			return $this->currencies[$currency] ?? $this->defaultCurrency;
+		}elseif($currency instanceof Currency) {
+			return $currency;
+		}
+
+		return $this->defaultCurrency;
 	}
 
 	public function onLoad() {
@@ -414,12 +454,18 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	public function registerCurrency(string $id, Currency $currency) {
+		$id = strtolower($id);
+
 		if(isset($this->currencies[$id])) {
 			return false;
 		}
 
 		$this->currencies[$id] = $currency;
 		return true;
+	}
+
+	public function getCurrency(string $id): ?Currency {
+		return $this->currencies[$id] ?? null;
 	}
 
 	private function parseCurrencies() {
@@ -479,32 +525,6 @@ class EconomyAPI extends PluginBase implements Listener {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
 			$this->createAccount($player, false, true);
 		}
-	}
-
-	/**
-	 * @param string|Player $player
-	 * @param float|bool $defaultMoney
-	 * @param bool $force
-	 *
-	 * @return bool
-	 */
-	public function createAccount($player, $defaultMoney = false, bool $force = false): bool {
-		if($player instanceof Player) {
-			$player = $player->getName();
-		}
-		$player = strtolower($player);
-
-		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
-			$defaultMoney = ($defaultMoney === false) ? $this->defaultCurrency->getDefaultMoney() : $defaultMoney;
-
-			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
-			$ev->call();
-			if(!$ev->isCancelled() or $force === true) {
-				$this->defaultCurrency->getProvider()->createAccount($player, $ev->getDefaultMoney());
-			}
-		}
-
-		return false;
 	}
 
 	public function onDisable() {
