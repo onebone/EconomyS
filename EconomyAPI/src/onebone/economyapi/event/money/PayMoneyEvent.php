@@ -24,7 +24,6 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 
 class PayMoneyEvent extends EconomyAPIEvent {
-	public static $handlerList;
 	private $payer, $target, $amount;
 
 	public function __construct(EconomyAPI $plugin, $payer, $target, $amount) {
