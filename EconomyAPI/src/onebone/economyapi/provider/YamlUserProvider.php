@@ -100,6 +100,8 @@ class YamlUserProvider implements UserProvider, Listener {
 
 		if(isset($this->data[$username])) {
 			$this->data[$username]['language'] = $lang;
+
+			$this->savePlayer($username);
 		}else{
 			$this->loadPlayer($username);
 			$this->data[$username]['language'] = $lang;
@@ -144,6 +146,14 @@ class YamlUserProvider implements UserProvider, Listener {
 	}
 
 	public function unloadPlayer(string $username) {
+		$this->savePlayer($username);
+
+		if(isset($this->data[$username])) {
+			unset($this->data[$username]);
+		}
+	}
+
+	public function savePlayer(string $username) {
 		$username = strtolower($username);
 		if(!isset($this->data[$username])) return;
 
@@ -157,7 +167,9 @@ class YamlUserProvider implements UserProvider, Listener {
 	}
 
 	public function getLanguage(string $username): string {
-		return $this->data[$username]['language'] ?? $this->api->getPluginConfig()->getDefaultLanguage();
+		$info = $this->getUserInfo($username);
+
+		return $info->language;
 	}
 
 	public function getUserInfo(string $username): UserInfo {
