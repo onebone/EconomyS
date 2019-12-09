@@ -29,10 +29,6 @@
       "usage": "/pay <玩家名稱> <數值>",
       "description": "付款給玩家"
     },
-    "setlang": {
-      "usage": "/setlang <語言>",
-      "description": "設定您的語言"
-    },
     "mystatus": {
       "usage": "/mystatus",
       "description": "查看您的金錢狀態"

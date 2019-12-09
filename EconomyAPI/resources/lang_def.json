@@ -29,13 +29,13 @@
       "usage": "/pay <player> <amount>",
       "description": "Pays money to player"
     },
-    "setlang": {
-      "usage": "/setlang <language>",
-      "description": "Set your language"
-    },
     "mystatus": {
       "usage": "/mystatus",
       "description": "Shows your status of money"
+    },
+    "economy": {
+      "usage": "/economy <lang|currency> <value>",
+      "description": "Sets own configuration for EconomyAPI"
     }
   },
   "language-set": "Language set to %1 by onebone",

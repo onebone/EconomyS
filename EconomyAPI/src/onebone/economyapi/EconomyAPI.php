@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi;
 
+use onebone\economyapi\command\EconomyCommand;
 use onebone\economyapi\command\GiveMoneyCommand;
 use onebone\economyapi\command\MyMoneyCommand;
 use onebone\economyapi\command\MyStatusCommand;
@@ -553,10 +554,10 @@ class EconomyAPI extends PluginBase implements Listener {
 			new MyStatusCommand($this),
 			new PayCommand($this),
 			new SeeMoneyCommand($this),
-			new SetLangCommand($this),
 			new SetMoneyCommand($this),
 			new TakeMoneyCommand($this),
-			new TopMoneyCommand($this)
+			new TopMoneyCommand($this),
+			new EconomyCommand($this)
 		];
 
 		foreach($commands as $command) {

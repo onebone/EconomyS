@@ -29,10 +29,6 @@
       "usage": "/pay <Spieler> <Betrag>",
       "description": "Überweis einem Spieler Geld"
     },
-    "setlang": {
-      "usage": "/setlang <Sprache>",
-      "description": "Wähle eine Sprache"
-    },
     "mystatus": {
       "usage": "/mystatus",
       "description": "Schau deinen Geldstatus an"

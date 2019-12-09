@@ -40,3 +40,6 @@ permissions:
           economyapi.command.takemoney:
             description: Allows player to take money from others
             default: op
+          economyapi.command.economy:
+            description: Command for player to control own configuration
+            default: true
