@@ -26,7 +26,6 @@ use onebone\economyapi\command\MyMoneyCommand;
 use onebone\economyapi\command\MyStatusCommand;
 use onebone\economyapi\command\PayCommand;
 use onebone\economyapi\command\SeeMoneyCommand;
-use onebone\economyapi\command\SetLangCommand;
 use onebone\economyapi\command\SetMoneyCommand;
 use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
@@ -67,10 +66,6 @@ class EconomyAPI extends PluginBase implements Listener {
 	const RET_UNAVAILABLE = -1;
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
-
-	const CURRENCY_CONFIG_DEFAULT = 0;
-	const CURRENCY_CONFIG_EXCHANGE = 1;
-	const CURRENCY_CONFIG_MAX = 2;
 
 	private static $instance = null;
 

@@ -2,6 +2,9 @@
 
 namespace onebone\economyapi\provider;
 
+use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\UserInfo;
+
 class DummyUserProvider implements UserProvider {
 	public function getName(): string {
 		return 'Dummy';
@@ -31,5 +34,9 @@ class DummyUserProvider implements UserProvider {
 
 	public function delete(string $username): bool {
 		return false;
+	}
+
+	public function getUserInfo(string $username): UserInfo {
+		return new UserInfo($username, EconomyAPI::getInstance()->getPluginConfig()->getDefaultLanguage());
 	}
 }
