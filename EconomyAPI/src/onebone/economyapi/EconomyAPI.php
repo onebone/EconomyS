@@ -88,7 +88,6 @@ class EconomyAPI extends PluginBase implements Listener {
 	private $provider;
 
 	private $langList = [
-		"def"         => "Default",
 		"user-define" => "User Defined",
 		"ch"          => "简体中文",
 		"cs"          => "Čeština",
@@ -125,7 +124,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(isset($this->lang[$lang]["commands"][$command])) {
 			return $this->lang[$lang]["commands"][$command];
 		}else{
-			return $this->lang["def"]["commands"][$command];
+			return $this->lang["en"]["commands"][$command];
 		}
 	}
 
@@ -144,8 +143,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			$lang = $this->provider->getLanguage($player);
 
 			return $this->replaceParameters($this->lang[$lang][$key], $params);
-		}elseif(isset($this->lang["def"][$key])) {
-			return $this->replaceParameters($this->lang["def"][$key], $params);
+		}elseif(isset($this->lang["en"][$key])) {
+			return $this->replaceParameters($this->lang["en"][$key], $params);
 		}
 		return "Language matching key \"$key\" does not exist.";
 	}
@@ -542,7 +541,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
 			}
 		}
-		$this->lang["user-define"] = (new Config($this->getDataFolder() . "messages.yml", Config::YAML, $this->lang["def"]))->getAll();
+		$this->lang["user-define"] = (new Config($this->getDataFolder() . "messages.yml", Config::YAML, $this->lang["en"]))->getAll();
 	}
 
 	private function registerCommands() {

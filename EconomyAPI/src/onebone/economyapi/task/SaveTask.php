@@ -35,4 +35,3 @@ class SaveTask extends Task {
 		$this->plugin->saveAll();
 	}
 }
-
