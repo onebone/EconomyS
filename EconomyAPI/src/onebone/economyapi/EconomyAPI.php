@@ -29,7 +29,8 @@ use onebone\economyapi\command\SetLangCommand;
 use onebone\economyapi\command\SetMoneyCommand;
 use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
-use onebone\economyapi\config\PluginConfig;
+use onebone\economyapi\currency\Currency;
+use onebone\economyapi\internal\PluginConfig;
 use onebone\economyapi\currency\CurrencyDollar;
 use onebone\economyapi\currency\CurrencyWon;
 use onebone\economyapi\event\account\CreateAccountEvent;
@@ -37,6 +38,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\internal\CurrencyConfig;
 use onebone\economyapi\provider\DummyUserProvider;
 use onebone\economyapi\provider\UserProvider;
 use onebone\economyapi\provider\YamlUserProvider;
@@ -77,6 +79,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	private $currencies = [];
 	/** @var Currency */
 	private $defaultCurrency;
+	/** @var CurrencyConfig[] */
 	private $currencyConfig;
 
 	/** @var UserProvider */
@@ -186,8 +189,16 @@ class EconomyAPI extends PluginBase implements Listener {
 		return false;
 	}
 
-	public function hasCurrency(string $id) {
-		return isset($this->currencies[$id]);
+	public function hasCurrency($val): bool {
+		if(is_string($val)) {
+			return isset($this->currencies[$val]);
+		}elseif($val instanceof Currency) {
+			foreach($this->currencies as $id => $cur) {
+				if($cur === $val) return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -240,10 +251,13 @@ class EconomyAPI extends PluginBase implements Listener {
 		$currency = $this->validateCurrency($currency);
 		if($currency->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
-			// TODO configuration for max money of each currency
-			/*if($amount > $this->defaultCurrency->getMaxMoney()) {
-				return self::RET_INVALID;
-			}*/
+
+			$config = $this->getCurrencyConfig($currency);
+			if($config instanceof CurrencyConfig) {
+				if($amount > $config->getMaxMoney()) {
+					return self::RET_INVALID;
+				}
+			}
 
 			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
@@ -278,8 +292,12 @@ class EconomyAPI extends PluginBase implements Listener {
 		$currency = $this->validateCurrency($currency);
 		if(($money = $currency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
-			if($money + $amount > $currency->getMaxMoney()) {
-				return self::RET_INVALID;
+
+			$config = $this->getCurrencyConfig($currency);
+			if($config instanceof CurrencyConfig) {
+				if($money + $amount > $config->getMaxMoney()) {
+					return self::RET_INVALID;
+				}
 			}
 
 			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
@@ -299,6 +317,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param string $issuer
+	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
@@ -365,6 +384,18 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	public function hasLanguage(string $lang): bool {
 		return isset($this->langList[$lang]);
+	}
+
+	public function getCurrencyConfig(Currency $currency): ?CurrencyConfig {
+		foreach($this->currencyConfig as $config) {
+			if($config->getCurrency() === $currency) {
+				return $config;
+			}
+		}
+
+		// 'null' is returned when given $currency is not registered to API
+		// or registered too late
+		return null;
 	}
 
 	private function validateCurrency($currency): Currency {
@@ -476,7 +507,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	public function getCurrency(string $id): ?Currency {
-		return $this->currencies[$id] ?? null;
+		return $this->currencies[strtolower($id)] ?? null;
 	}
 
 	private function parseCurrencies() {
@@ -484,19 +515,22 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$currencies = $this->pluginConfig->getCurrencies();
 		foreach($currencies as $key => $data) {
+			$key = strtolower($key);
+
+			$currency = $this->getCurrency($key);
+			if($currency === null) continue;
+
 			$exchange = $data['exchange'] ?? [];
 			foreach($exchange as $target => $value) {
-				if(count($value) !== 2 or !is_float($value[0]) or !is_float($value[1])) {
+				if(count($value) !== 2 or
+					(!is_float($value[0]) and !is_int($value[0])) or
+					(!is_float($value[1]) and !is_int($value[1]))) {
 					$this->getLogger()->warning("Currency exchange rate for $key to $target is not valid. It will be excluded.");
 					unset($exchange[$target]);
 				}
 			}
 
-			$this->currencyConfig[$key] = [
-				self::CURRENCY_CONFIG_DEFAULT   => $data['default'] ?? null,
-				self::CURRENCY_CONFIG_EXCHANGE  => $data['exchange'] ?? [],
-				self::CURRENCY_CONFIG_MAX       => $data['max'] ?? 0
-			];
+			$this->currencyConfig[$key] = new CurrencyConfig($currency, $data['max'] ?? 0, $data['default'] ?? null, $data['exchange']);
 		}
 	}
 

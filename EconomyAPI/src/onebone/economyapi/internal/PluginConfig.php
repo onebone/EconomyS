@@ -1,6 +1,6 @@
 <?php
 
-namespace onebone\economyapi\config;
+namespace onebone\economyapi\internal;
 
 use pocketmine\utils\Config;
 

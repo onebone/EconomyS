@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi;
+namespace onebone\economyapi\currency;
 
 use onebone\economyapi\provider\Provider;
 use pocketmine\Player;

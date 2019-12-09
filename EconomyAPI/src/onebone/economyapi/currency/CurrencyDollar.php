@@ -20,7 +20,7 @@
 
 namespace onebone\economyapi\currency;
 
-use onebone\economyapi\Currency;
+use onebone\economyapi\currency\Currency;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\provider\Provider;
 use onebone\economyapi\provider\YamlProvider;
