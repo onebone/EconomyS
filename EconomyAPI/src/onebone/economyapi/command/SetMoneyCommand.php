@@ -45,6 +45,9 @@ class SetMoneyCommand extends PluginCommand {
 			case EconomyAPI::RET_NO_ACCOUNT:
 				$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 				break;
+			case EconomyAPI::RET_UNAVAILABLE:
+				$sender->sendMessage($plugin->getMessage("setmoney-unavailable", [], $sender->getName()));
+				break;
 			case EconomyAPI::RET_CANCELLED:
 				$sender->sendMessage($plugin->getMessage("setmoney-failed", [], $sender->getName()));
 				break;

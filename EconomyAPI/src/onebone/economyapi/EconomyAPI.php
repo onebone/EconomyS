@@ -63,6 +63,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @deprecated It will be removed in a future release.
 	 */
 	const RET_NOT_FOUND = -1;
+	const RET_UNAVAILABLE = -1;
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
@@ -255,7 +256,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$config = $this->getCurrencyConfig($currency);
 			if($config instanceof CurrencyConfig) {
 				if($amount > $config->getMaxMoney()) {
-					return self::RET_INVALID;
+					return self::RET_UNAVAILABLE;
 				}
 			}
 
@@ -296,7 +297,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$config = $this->getCurrencyConfig($currency);
 			if($config instanceof CurrencyConfig) {
 				if($money + $amount > $config->getMaxMoney()) {
-					return self::RET_INVALID;
+					return self::RET_UNAVAILABLE;
 				}
 			}
 
@@ -334,7 +335,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(($money = $currency->getProvider()->getMoney($player)) !== false) {
 			$amount = round($amount, 2);
 			if($money - $amount < 0) {
-				return self::RET_INVALID;
+				return self::RET_UNAVAILABLE;
 			}
 
 			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);

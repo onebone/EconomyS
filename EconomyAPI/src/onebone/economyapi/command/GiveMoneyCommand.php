@@ -56,6 +56,9 @@ class GiveMoneyCommand extends PluginCommand {
 			case EconomyAPI::RET_CANCELLED:
 				$sender->sendMessage($plugin->getMessage("request-cancelled", [], $sender->getName()));
 				break;
+			case EconomyAPI::RET_UNAVAILABLE:
+				$sender->sendMessage($plugin->getMessage("givemoney-unavailable", [], $sender->getName()));
+				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
 				$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
 				break;
