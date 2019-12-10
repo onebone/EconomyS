@@ -30,6 +30,7 @@ use onebone\economyapi\command\SetMoneyCommand;
 use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
 use onebone\economyapi\currency\Currency;
+use onebone\economyapi\event\Issuer;
 use onebone\economyapi\internal\PluginConfig;
 use onebone\economyapi\currency\CurrencyDollar;
 use onebone\economyapi\currency\CurrencyWon;
@@ -229,12 +230,12 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param string|Player $player
 	 * @param float $amount
 	 * @param bool $force
-	 * @param string $issuer
+	 * @param Issuer $issuer
 	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, float $amount, bool $force = false, string $issuer = "none", $currency = null): int {
+	public function setMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -271,12 +272,12 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param string|Player $player
 	 * @param float $amount
 	 * @param bool $force
-	 * @param string $issuer
+	 * @param Issuer $issuer
 	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
-	public function addMoney($player, float $amount, bool $force = false, $issuer = "none", $currency = null): int {
+	public function addMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -312,12 +313,12 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param string|Player $player
 	 * @param float $amount
 	 * @param bool $force
-	 * @param string $issuer
+	 * @param Issuer $issuer
 	 * @param string|Currency $currency
 	 *
 	 * @return int
 	 */
-	public function reduceMoney($player, float $amount, bool $force = false, $issuer = "none", $currency = null): int {
+	public function reduceMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -353,11 +354,12 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param string|Player $player
 	 * @param float|bool $defaultMoney
 	 * @param bool $force
+	 * @param Issuer $issuer
 	 * @param string|Currency $currency
 	 *
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = false, bool $force = false, $currency = null): bool {
+	public function createAccount($player, $defaultMoney = false, bool $force = false, ?Issuer $issuer = null, $currency = null): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -368,7 +370,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(!$currency->getProvider()->accountExists($player)) {
 			$defaultMoney = ($defaultMoney === false) ? $currency->getDefaultMoney() : $defaultMoney;
 
-			$ev = new CreateAccountEvent($this, $player, $defaultMoney, "none");
+			$ev = new CreateAccountEvent($this, $player, $defaultMoney, $issuer);
 			$ev->call();
 			if(!$ev->isCancelled() or $force === true) {
 				$currency->getProvider()->createAccount($player, $ev->getDefaultMoney());

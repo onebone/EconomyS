@@ -27,12 +27,12 @@ use pocketmine\event\plugin\PluginEvent;
 class EconomyAPIEvent extends PluginEvent implements Cancellable {
 	private $issuer;
 
-	public function __construct(EconomyAPI $plugin, $issuer) {
+	public function __construct(EconomyAPI $plugin, ?Issuer $issuer) {
 		parent::__construct($plugin);
 		$this->issuer = $issuer;
 	}
 
-	public function getIssuer() {
+	public function getIssuer(): ?Issuer {
 		return $this->issuer;
 	}
 }

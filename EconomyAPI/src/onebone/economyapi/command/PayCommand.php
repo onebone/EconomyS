@@ -3,6 +3,7 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\event\CommandIssuer;
 use onebone\economyapi\event\money\PayMoneyEvent;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
@@ -53,7 +54,8 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		$ev = new PayMoneyEvent($plugin, $sender->getName(), $player, $amount);
+		$ev = new PayMoneyEvent($plugin, $sender->getName(), $player, $amount,
+			new CommandIssuer($sender, $label, $label . ' ' . implode(' ', $params)));
 		$ev->call();
 
 		$result = EconomyAPI::RET_CANCELLED;

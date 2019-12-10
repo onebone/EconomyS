@@ -22,12 +22,13 @@ namespace onebone\economyapi\event\money;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
+use onebone\economyapi\event\Issuer;
 
 class PayMoneyEvent extends EconomyAPIEvent {
 	private $payer, $target, $amount;
 
-	public function __construct(EconomyAPI $plugin, $payer, $target, $amount) {
-		parent::__construct($plugin, "PayCommand");
+	public function __construct(EconomyAPI $plugin, $payer, $target, $amount, ?Issuer $issuer) {
+		parent::__construct($plugin, $issuer);
 
 		$this->payer = $payer;
 		$this->target = $target;
