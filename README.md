@@ -1,7 +1,50 @@
 # EconomyS
+The economy plugin for PocketMine-MP.
 
 ## Download
 [Jenkins](https://jenkins.onebone.me/job/EconomyS/)
+
+## Upcoming
+The new version of EconomyS will include new features with better
+performance and extensibility. My goal is to complete the update
+before Feb 02, 2020 when [GitHub Archive Program](https://archiveprogram.github.com/)
+takes snapshot for all public repositories. So let's take a brief
+look at what I'm planning to do in this update.
+
+### General
+* Multi currency. You can handle more than one currency
+with EconomyAPI. You can configure your players to use
+different currency as per the world where the player is in,
+or any other custom factors.
+* Logging the transactions. If server administrators needs
+to check the transaction which happened in the past for some
+reason, abusing, for example, EconomyAPI will help arrest the
+abusers.
+* `/pay` command will ask once again before executing transaction.
+* `/givemoney`, `/takemoney`, `/setmoney` will support `asterisk(*)`
+player selection which selects all players online.
+* EconomyShop and EconomySell will become one as it has almost
+same code base except for the direction where transaction is done.
+To improve code quality and fully use the new multi-currency system,
+the plugin will be fully rewritten. My goal is to meet the standard
+of Korean Minecraft: BE servers and make most of our server administrators
+use EconomyShop.
+* EconomyLand will be fully rewritten to have better code quality.
+
+
+### Developers
+* `myMoney()`, `addMoney()`, `reduceMoney()`, `setMoney()` will have its
+last parameter `string|Currency $currency` which selects the currency
+to transact with.
+* It will be able to get ranking of the balance from EconomyAPI. Sorting
+the balance will be done from database provider as each database can have
+its own optimal method to sort values.
+* `$issuer` parameter on API will receive `Issuer` class instead of string.
+The data is used on logging the transactions and event calling.
+* `Transaction` will be implemented. API will allow executing multiple
+actions at once. For example, `/pay` command will give and take balance at
+once instead of giving after taking money from the payer.
+
 
 ## EconomyAPI commands
 
@@ -14,7 +57,6 @@
 | /takemoney | `<player>` `<money>` | Takes $`<money>` from `<player>` | `OP` `Console` |
 | /seemoney | `<player>` | Shows `<player>`'s money | `All` |
 | /mystatus | | Shows your money status | `All` |
-
 
 ## EconomyAPI configuration
 
