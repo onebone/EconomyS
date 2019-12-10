@@ -85,4 +85,3 @@ class PayCommand extends PluginCommand {
 		return true;
 	}
 }
-

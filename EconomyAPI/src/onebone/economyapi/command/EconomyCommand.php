@@ -18,6 +18,10 @@ class EconomyCommand extends PluginCommand {
 	}
 
 	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+		if(!$this->testPermission($sender)) {
+			return false;
+		}
+
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
 
@@ -40,6 +44,7 @@ class EconomyCommand extends PluginCommand {
 				return true;
 		}
 
+		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 		return false;
 	}
 }
