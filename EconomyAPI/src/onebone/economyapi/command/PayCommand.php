@@ -5,6 +5,7 @@ namespace onebone\economyapi\command;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\CommandIssuer;
 use onebone\economyapi\event\money\PayMoneyEvent;
+use onebone\economyapi\form\AskPayForm;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
@@ -54,34 +55,7 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		$ev = new PayMoneyEvent($plugin, $sender->getName(), $player, $amount,
-			new CommandIssuer($sender, $label, $label . ' ' . implode(' ', $params)));
-		$ev->call();
-
-		$result = EconomyAPI::RET_CANCELLED;
-		if(!$ev->isCancelled()) {
-			$result = $plugin->reduceMoney($sender, $amount);
-		}
-
-		if($result === EconomyAPI::RET_SUCCESS) {
-			$plugin->addMoney($player, $amount, true);
-
-			$sender->sendMessage($plugin->getMessage("pay-success", [
-				$amount,
-				$player
-			], $sender->getName()));
-			if($p instanceof Player) {
-				$p->sendMessage($plugin->getMessage("money-paid", [
-					$sender->getName(),
-					$amount
-				], $sender->getName()));
-			}
-		}else{
-			$sender->sendMessage($plugin->getMessage("pay-failed", [
-				$player,
-				$amount
-			], $sender->getName()));
-		}
+		$sender->sendForm(new AskPayForm($plugin, $sender, $p->getName(), $amount, $label, $params));
 		return true;
 	}
 }
