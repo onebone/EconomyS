@@ -3,8 +3,6 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\event\CommandIssuer;
-use onebone\economyapi\event\money\PayMoneyEvent;
 use onebone\economyapi\form\AskPayForm;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;

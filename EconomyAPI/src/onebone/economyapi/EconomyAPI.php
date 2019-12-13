@@ -147,7 +147,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function replaceParameters($message, $params = []) {
 		$search = ["%MONETARY_UNIT%"];
-		$replace = [$this->defaultCurrency->getUnit()];
+		$replace = [$this->defaultCurrency->getSymbol()];
 
 		for ($i = 0; $i < count($params); $i++) {
 			$search[] = "%" . ($i + 1);
@@ -174,7 +174,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	public function getMonetaryUnit(): string {
-		return $this->defaultCurrency->getUnit();
+		return $this->defaultCurrency->getSymbol();
 	}
 
 	public function setPlayerLanguage(string $player, string $language): bool {

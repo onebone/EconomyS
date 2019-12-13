@@ -75,10 +75,10 @@ interface Currency {
 	public function reduceMoney(string $username, float $value): bool;
 
 	/**
-	 * Returns the unit of currency
+	 * Returns the symbol of currency
 	 * @return string
 	 */
-	public function getUnit(): string;
+	public function getSymbol(): string;
 
 	/**
 	 * Formats money into string

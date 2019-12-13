@@ -62,7 +62,7 @@ class CurrencyWon implements Currency {
 		return $this->provider->reduceMoney($username, $value);
 	}
 
-	public function getUnit(): string {
+	public function getSymbol(): string {
 		return '\\';
 	}
 
