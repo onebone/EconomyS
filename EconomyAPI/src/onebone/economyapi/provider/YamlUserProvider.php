@@ -81,7 +81,6 @@ class YamlUserProvider implements UserProvider, Listener {
 		$path = $base . $username . '.yml';
 		if(is_file($path)) {
 			unlink($path);
-
 			return true;
 		}
 
@@ -98,39 +97,27 @@ class YamlUserProvider implements UserProvider, Listener {
 		$username = strtolower($username);
 		if(!$this->api->hasLanguage($lang)) return false;
 
-		if(isset($this->data[$username])) {
-			$this->data[$username]['language'] = $lang;
-
-			$this->savePlayer($username);
-		}else{
-			$this->loadPlayer($username);
-			$this->data[$username]['language'] = $lang;
-			$this->unloadPlayer($username);
-		}
-
+		$this->setProperty($username, 'language', $lang);
 		return true;
 	}
 
-	public function loadPlayer(string $username) {
+	public function setProperty(string $username, string $key, $val) {
 		$username = strtolower($username);
-		if(isset($this->data[$username])) return;
 
-		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
-		if(!file_exists($base)) {
-			mkdir($base);
-		}
+		if(isset($this->data[$username])) {
+			$this->data[$username][$key] = $val;
 
-		$path = $base . $username . '.yml';
-		if(!is_file($path)) {
-			yaml_emit_file($path, ['language' => $this->api->getPluginConfig()->getDefaultLanguage()]);
-		}
-
-		$data = yaml_parse_file($path);
-		if($this->validate($data)) {
-			$this->data[$username] = $data;
+			$this->savePlayer($username);
 		}else{
-			yaml_emit_file($path, ['language' => $this->api->getPluginConfig()->getDefaultLanguage()]);
+			$data = $this->readPlayer($username);
+			$data[$key] = $val;
+
+			$this->savePlayer($username, $data);
 		}
+	}
+
+	private function loadPlayer(string $username) {
+		$this->data[$username] = $this->readPlayer($username);
 	}
 
 	private function validate(&$data): bool {
@@ -145,17 +132,14 @@ class YamlUserProvider implements UserProvider, Listener {
 		return true;
 	}
 
-	public function unloadPlayer(string $username) {
-		$this->savePlayer($username);
-
+	private function unloadPlayer(string $username) {
 		if(isset($this->data[$username])) {
 			unset($this->data[$username]);
 		}
 	}
 
-	public function savePlayer(string $username) {
+	private function readPlayer(string $username): array {
 		$username = strtolower($username);
-		if(!isset($this->data[$username])) return;
 
 		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
 		if(!file_exists($base)) {
@@ -163,7 +147,34 @@ class YamlUserProvider implements UserProvider, Listener {
 		}
 
 		$path = $base . $username . '.yml';
-		yaml_emit_file($path, $this->data[$username]);
+		if(!is_file($path)) {
+			yaml_emit_file($path, ['language' => $this->api->getPluginConfig()->getDefaultLanguage()]);
+		}
+
+		$data = yaml_parse_file($path);
+		$this->validate($data);
+
+		return $data;
+	}
+
+	private function savePlayer(string $username, $data = null) {
+		$username = strtolower($username);
+
+		if($data === null) {
+			if(isset($this->data[$username])) {
+				$data = $this->data[$username];
+			}else{
+				return;
+			}
+		}
+
+		$base = $this->root . $username[0] . DIRECTORY_SEPARATOR;
+		if(!file_exists($base)) {
+			mkdir($base);
+		}
+
+		$path = $base . $username . '.yml';
+		yaml_emit_file($path, $data);
 	}
 
 	public function getLanguage(string $username): string {
@@ -178,9 +189,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		if(isset($this->data[$username])) {
 			$data = $this->data[$username];
 		}elseif($this->exists($username)) {
-			$this->loadPlayer($username);
-			$data = $this->data[$username];
-			$this->unloadPlayer($username);
+			$data = $this->readPlayer($username);
 		}else{
 			$data = $this->defaultSchema;
 		}
