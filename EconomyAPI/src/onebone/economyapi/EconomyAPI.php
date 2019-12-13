@@ -542,9 +542,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	private function registerCommands() {
-		$map = $this->getServer()->getCommandMap();
-
-		$commands = [
+		$this->getServer()->getCommandMap()->registerAll("economyapi", [
 			new GiveMoneyCommand($this),
 			new MyMoneyCommand($this),
 			new MyStatusCommand($this),
@@ -554,11 +552,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			new TakeMoneyCommand($this),
 			new TopMoneyCommand($this),
 			new EconomyCommand($this)
-		];
-
-		foreach($commands as $command) {
-			$map->register("economyapi", $command);
-		}
+		]);
 	}
 
 	public function onJoin(PlayerJoinEvent $event) {
