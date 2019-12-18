@@ -68,6 +68,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
+	const FALLBACK_LANGUAGE = "en";
+
 	private static $instance = null;
 
 	/** @var PluginConfig $pluginConfig */
@@ -120,7 +122,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(isset($this->lang[$lang]["commands"][$command])) {
 			return $this->lang[$lang]["commands"][$command];
 		}else{
-			return $this->lang["en"]["commands"][$command];
+			return $this->lang[self::FALLBACK_LANGUAGE]["commands"][$command];
 		}
 	}
 
@@ -139,8 +141,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			$lang = $this->provider->getLanguage($player);
 
 			return $this->replaceParameters($this->lang[$lang][$key], $params);
-		}elseif(isset($this->lang["en"][$key])) {
-			return $this->replaceParameters($this->lang["en"][$key], $params);
+		}elseif(isset($this->lang[self::FALLBACK_LANGUAGE][$key])) {
+			return $this->replaceParameters($this->lang[self::FALLBACK_LANGUAGE][$key], $params);
 		}
 		return "Language matching key \"$key\" does not exist.";
 	}
@@ -528,7 +530,8 @@ class EconomyAPI extends PluginBase implements Listener {
 				}
 			}
 
-			$this->currencyConfig[$key] = new CurrencyConfig($currency, $data['max'] ?? 0, $data['default'] ?? null, $data['exchange']);
+			$this->currencyConfig[$key] =
+				new CurrencyConfig($currency, $data['max'] ?? 0, $data['default'] ?? null, $exchange);
 		}
 	}
 
@@ -538,7 +541,9 @@ class EconomyAPI extends PluginBase implements Listener {
 				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
 			}
 		}
-		$this->lang["user-define"] = (new Config($this->getDataFolder() . "messages.yml", Config::YAML, $this->lang["en"]))->getAll();
+		$this->lang["user-define"] = (new Config(
+			$this->getDataFolder() . "messages.yml", Config::YAML, $this->lang[self::FALLBACK_LANGUAGE]
+		))->getAll();
 	}
 
 	private function registerCommands() {
