@@ -45,7 +45,7 @@ class YamlProvider implements Provider {
 		$this->money = $this->config->getAll();
 	}
 
-	public function accountExists($player) {
+	public function accountExists($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -54,7 +54,7 @@ class YamlProvider implements Provider {
 		return isset($this->money["money"][$player]);
 	}
 
-	public function createAccount($player, $defaultMoney = 1000) {
+	public function createAccount($player, $defaultMoney = 1000): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -67,7 +67,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function removeAccount($player) {
+	public function removeAccount($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -92,7 +92,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, $amount) {
+	public function setMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -106,7 +106,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function addMoney($player, $amount) {
+	public function addMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -120,7 +120,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function reduceMoney($player, $amount) {
+	public function reduceMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -134,8 +134,12 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function getAll() {
+	public function getAll(): array {
 		return isset($this->money["money"]) ? $this->money["money"] : [];
+	}
+
+	public function getName(): string {
+		return "Yaml";
 	}
 
 	public function close() {
@@ -145,9 +149,5 @@ class YamlProvider implements Provider {
 	public function save() {
 		$this->config->setAll($this->money);
 		$this->config->save();
-	}
-
-	public function getName() {
-		return "Yaml";
 	}
 }

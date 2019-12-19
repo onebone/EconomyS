@@ -60,7 +60,7 @@ class MySQLProvider implements Provider {
 	 * @param float $defaultMoney
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = 1000.0) {
+	public function createAccount($player, $defaultMoney = 1000.0): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -77,7 +77,7 @@ class MySQLProvider implements Provider {
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function accountExists($player) {
+	public function accountExists($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -91,7 +91,7 @@ class MySQLProvider implements Provider {
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function removeAccount($player) {
+	public function removeAccount($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -122,7 +122,7 @@ class MySQLProvider implements Provider {
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function setMoney($player, $amount) {
+	public function setMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -138,7 +138,7 @@ class MySQLProvider implements Provider {
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function addMoney($player, $amount) {
+	public function addMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -154,7 +154,7 @@ class MySQLProvider implements Provider {
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function reduceMoney($player, $amount) {
+	public function reduceMoney($player, $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -168,7 +168,7 @@ class MySQLProvider implements Provider {
 	/**
 	 * @return array
 	 */
-	public function getAll() {
+	public function getAll(): array {
 		$res = $this->db->query("SELECT * FROM user_money");
 
 		$ret = [];
@@ -184,7 +184,7 @@ class MySQLProvider implements Provider {
 	/**
 	 * @return string
 	 */
-	public function getName() {
+	public function getName(): string {
 		return "MySQL";
 	}
 

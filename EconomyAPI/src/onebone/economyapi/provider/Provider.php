@@ -46,20 +46,20 @@ interface Provider {
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function accountExists($player);
+	public function accountExists($player): bool;
 
 	/**
 	 * @param Player|string $player
 	 * @param int $defaultMoney
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = 1000);
+	public function createAccount($player, $defaultMoney = 1000): bool;
 
 	/**
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function removeAccount($player);
+	public function removeAccount($player): bool;
 
 	/**
 	 * @param string $player
@@ -72,31 +72,31 @@ interface Provider {
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function setMoney($player, $amount);
+	public function setMoney($player, $amount): bool;
 
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function addMoney($player, $amount);
+	public function addMoney($player, $amount): bool;
 
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function reduceMoney($player, $amount);
+	public function reduceMoney($player, $amount): bool;
 
 	/**
 	 * @return array
 	 */
-	public function getAll();
+	public function getAll(): array;
 
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
 
 	public function save();
 

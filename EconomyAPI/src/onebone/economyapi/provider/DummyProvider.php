@@ -3,15 +3,15 @@
 namespace onebone\economyapi\provider;
 
 class DummyProvider implements Provider {
-	public function accountExists($player) {
+	public function accountExists($player): bool {
 		return false;
 	}
 
-	public function createAccount($player, $defaultMoney = 1000) {
+	public function createAccount($player, $defaultMoney = 1000): bool {
 		return false;
 	}
 
-	public function removeAccount($player) {
+	public function removeAccount($player): bool {
 		return false;
 	}
 
@@ -19,23 +19,23 @@ class DummyProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, $amount) {
+	public function setMoney($player, $amount): bool {
 		return false;
 	}
 
-	public function addMoney($player, $amount) {
+	public function addMoney($player, $amount): bool {
 		return false;
 	}
 
-	public function reduceMoney($player, $amount) {
+	public function reduceMoney($player, $amount): bool {
 		return false;
 	}
 
-	public function getAll() {
+	public function getAll(): array {
 		return [];
 	}
 
-	public function getName() {
+	public function getName(): string {
 		return "Dummy";
 	}
 
