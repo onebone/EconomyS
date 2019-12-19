@@ -54,7 +54,7 @@ class YamlProvider implements Provider {
 		return isset($this->money["money"][$player]);
 	}
 
-	public function createAccount($player, $defaultMoney = 1000): bool {
+	public function createAccount($player, float $defaultMoney = 1000): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -92,7 +92,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, $amount): bool {
+	public function setMoney($player, float $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -106,7 +106,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function addMoney($player, $amount): bool {
+	public function addMoney($player, float $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -120,7 +120,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function reduceMoney($player, $amount): bool {
+	public function reduceMoney($player, float $amount): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
