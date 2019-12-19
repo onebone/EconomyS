@@ -20,20 +20,9 @@
 
 namespace onebone\economyapi\currency;
 
-use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\provider\Provider;
-use onebone\economyapi\provider\YamlProvider;
 use pocketmine\Player;
 
 class CurrencyDollar implements Currency {
-	/** @var Provider $provider */
-	private $provider;
-
-	public function __construct(EconomyAPI $plugin) {
-		// TODO make this customizable
-		$this->provider = new YamlProvider($plugin, 'Money.yml');
-	}
-
 	public function getName(): string {
 		return 'Dollar';
 	}
@@ -44,22 +33,6 @@ class CurrencyDollar implements Currency {
 
 	public function getDefaultMoney(): float {
 		return 1000;
-	}
-
-	public function getMoney(string $username): ?float {
-		return $this->provider->getMoney($username);
-	}
-
-	public function setMoney(string $username, float $value): bool {
-		return $this->provider->setMoney($username, $value);
-	}
-
-	public function addMoney(string $username, float $value): bool {
-		return $this->provider->addMoney($username, $value);
-	}
-
-	public function reduceMoney(string $username, float $value): bool {
-		return $this->provider->reduceMoney($username, $value);
 	}
 
 	public function getSymbol(): string {
@@ -75,21 +48,5 @@ class CurrencyDollar implements Currency {
 		$decimal = floor(($money - $digits) * 100);
 
 		return $digits . (' dollar' . ($digits > 1 ? 's' : '')) . $decimal . (' cent' . ($decimal > 1 ? 's' : ''));
-	}
-
-	public function getProvider(): Provider {
-		return $this->provider;
-	}
-
-	public function setProvider(Provider $provider) {
-		$this->provider = $provider;
-	}
-
-	public function save() {
-		$this->provider->save();
-	}
-
-	public function close() {
-		$this->provider->close();
 	}
 }

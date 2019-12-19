@@ -20,7 +20,6 @@
 
 namespace onebone\economyapi\currency;
 
-use onebone\economyapi\provider\Provider;
 use pocketmine\Player;
 
 interface Currency {
@@ -44,37 +43,6 @@ interface Currency {
 	public function getDefaultMoney(): float;
 
 	/**
-	 * Returns balance of the player.
-	 * @param string $username
-	 * @return float|null
-	 */
-	public function getMoney(string $username): ?float;
-
-	/**
-	 * Sets balance of player
-	 * @param string $username
-	 * @param float  $value
-	 * @return bool
-	 */
-	public function setMoney(string $username, float $value): bool;
-
-	/**
-	 * Adds balance of player
-	 * @param string $username
-	 * @param float  $value
-	 * @return bool
-	 */
-	public function addMoney(string $username, float $value): bool;
-
-	/**
-	 * Reduces balance of player
-	 * @param string $username
-	 * @param float  $value
-	 * @return bool
-	 */
-	public function reduceMoney(string $username, float $value): bool;
-
-	/**
 	 * Returns the symbol of currency
 	 * @return string
 	 */
@@ -93,12 +61,4 @@ interface Currency {
 	 * @return string
 	 */
 	public function stringify(float $money): string;
-
-	public function getProvider(): Provider;
-
-	public function setProvider(Provider $provider);
-
-	public function save();
-
-	public function close();
 }

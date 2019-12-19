@@ -1,8 +1,6 @@
 <?php
 
-namespace onebone\economyapi\internal;
-
-use onebone\economyapi\currency\Currency;
+namespace onebone\economyapi\currency;
 
 class CurrencyConfig {
 	/** @var Currency */
