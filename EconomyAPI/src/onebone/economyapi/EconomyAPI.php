@@ -73,6 +73,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	const RET_INVALID = 0;
 	const RET_SUCCESS = 1;
 
+	private const RET_VALID = 1;
+
 	const FALLBACK_LANGUAGE = "en";
 
 	private static $instance = null;
@@ -191,6 +193,11 @@ class EconomyAPI extends PluginBase implements Listener {
 		return false;
 	}
 
+	/**
+	 * Checks if currency is registered to EconomyAPI by ID or Currency instance
+	 * @param string|Currency $val
+	 * @return bool
+	 */
 	public function hasCurrency($val): bool {
 		if(is_string($val)) {
 			return isset($this->currencies[$val]);
@@ -226,9 +233,9 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return float|bool
 	 */
 	public function myMoney($player, $currency = null) {
-		$currency = $this->findCurrencyHolder($currency);
+		$holder = $this->findCurrencyHolder($currency);
 
-		return $currency->getProvider()->getMoney($player);
+		return $holder->getProvider()->getMoney($player);
 	}
 
 	/**
@@ -241,16 +248,30 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function setMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
-		if($amount < 0) {
-			return self::RET_INVALID;
-		}
-
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		$holder = $this->findCurrencyHolder($currency);
+
+		$ret = $this->canSetMoney($player, $amount, $force, $issuer, $holder);
+		if($ret === self::RET_VALID) {
+			$money = $holder->getProvider()->getMoney($player);
+
+			$holder->getProvider()->setMoney($player, $amount);
+			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			return self::RET_SUCCESS;
+		}
+
+		return $ret;
+	}
+
+	private function canSetMoney($player, float $amount, bool $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+		if($amount < 0) {
+			return self::RET_INVALID;
+		}
+
 		if($holder->getProvider()->accountExists($player)) {
 			$amount = round($amount, 2);
 
@@ -263,13 +284,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if(!$ev->isCancelled() or $force === true) {
-				$holder->getProvider()->setMoney($player, $amount);
-				(new MoneyChangedEvent($this, $player, $amount, $issuer))->call();
-				return self::RET_SUCCESS;
+			if($ev->isCancelled() and $force === false) {
+				return self::RET_CANCELLED;
 			}
-			return self::RET_CANCELLED;
+
+			return self::RET_VALID;
 		}
+
 		return self::RET_NO_ACCOUNT;
 	}
 
@@ -283,18 +304,33 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function addMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
-		if($amount < 0) {
-			return self::RET_INVALID;
-		}
+		$amount = round($amount, 2);
+
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		$holder = $this->findCurrencyHolder($currency);
-		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
-			$amount = round($amount, 2);
 
+		$ret = $this->canAddMoney($player, $amount, $force, $issuer, $holder);
+		if($ret === self::RET_VALID) {
+			$money = $holder->getProvider()->getMoney($player);
+
+			$holder->getProvider()->addMoney($player, $amount);
+			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			return self::RET_SUCCESS;
+		}
+
+		return $ret;
+	}
+
+	private function canAddMoney($player, float $amount, bool $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+		if($amount < 0) {
+			return self::RET_INVALID;
+		}
+
+		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
 				if($money + $amount > $config->getMaxMoney()) {
@@ -304,14 +340,15 @@ class EconomyAPI extends PluginBase implements Listener {
 
 			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if(!$ev->isCancelled() or $force === true) {
-				$holder->getProvider()->addMoney($player, $amount);
-				(new MoneyChangedEvent($this, $player, $amount + $money, $issuer))->call();
-				return self::RET_SUCCESS;
+
+			if($ev->setCancelled() and $force === false) {
+				return self::RET_CANCELLED;
 			}
-			return self::RET_CANCELLED;
+
+			return self::RET_VALID;
+		}else{
+			return self::RET_NO_ACCOUNT;
 		}
-		return self::RET_NO_ACCOUNT;
 	}
 
 	/**
@@ -324,30 +361,46 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return int
 	 */
 	public function reduceMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
-		if($amount < 0) {
-			return self::RET_INVALID;
-		}
+		$amount = round($amount, 2);
+
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
-		$currency = $this->findCurrencyHolder($currency);
-		if(($money = $currency->getProvider()->getMoney($player)) !== false) {
-			$amount = round($amount, 2);
+		$holder = $this->findCurrencyHolder($currency);
+
+		$ret = $this->canReduceMoney($player, $amount, $force, $issuer, $holder);
+		if($ret === self::RET_VALID) {
+			$money = $holder->getProvider()->getMoney($player);
+
+			$holder->getProvider()->reduceMoney($player, $amount);
+			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			return self::RET_SUCCESS;
+		}
+
+		return $ret;
+	}
+
+	private function canReduceMoney($player, float $amount, $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+		if($amount < 0) {
+			return self::RET_INVALID;
+		}
+
+		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
 			if($money - $amount < 0) {
 				return self::RET_UNAVAILABLE;
 			}
 
 			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);
 			$ev->call();
-			if(!$ev->isCancelled() or $force === true) {
-				$currency->getProvider()->reduceMoney($player, $amount);
-				(new MoneyChangedEvent($this, $player, $money - $amount, $issuer))->call();
-				return self::RET_SUCCESS;
+			if($ev->isCancelled() and $force === false) {
+				return self::RET_CANCELLED;
 			}
-			return self::RET_CANCELLED;
+
+			return self::RET_VALID;
 		}
+
 		return self::RET_NO_ACCOUNT;
 	}
 
