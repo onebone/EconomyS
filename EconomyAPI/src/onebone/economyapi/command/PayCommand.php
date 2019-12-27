@@ -40,7 +40,7 @@ class PayCommand extends PluginCommand {
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
 
-		$money = $plugin->myMoney($player);
+		$money = $plugin->myMoney($sender);
 		if($money < $amount) {
 			$sender->sendMessage($plugin->getMessage("pay-no-money", [$amount], $sender->getName()));
 			return true;

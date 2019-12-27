@@ -477,17 +477,17 @@ class EconomyAPI extends PluginBase implements Listener {
 		foreach($transaction->getActions() as $action) {
 			switch($action->getType()) {
 				case Transaction::ACTION_SET:
-					if(!$this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+					if($this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
 						return false;
 					}
 					break;
 				case Transaction::ACTION_ADD:
-					if(!$this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+					if($this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
 						return false;
 					}
 					break;
 				case Transaction::ACTION_REDUCE:
-					if(!$this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+					if($this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
 						return false;
 					}
 					break;
