@@ -49,6 +49,8 @@ use onebone\economyapi\provider\UserProvider;
 use onebone\economyapi\provider\YamlProvider;
 use onebone\economyapi\provider\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
+use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionAction;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
@@ -442,6 +444,57 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		return false;
+	}
+
+	public function executeTransaction(Transaction $transaction, ?Issuer $issuer = null, $currency = null): bool {
+		$holder = $this->findCurrencyHolder($currency);
+
+		if(!$this->validateTransaction($transaction, $issuer, $holder)) {
+			return false;
+		}
+
+		foreach($transaction->getActions() as $action) {
+			$money = $holder->getProvider()->getMoney($action->getPlayer());
+			switch($action->getType()) {
+				case Transaction::ACTION_SET:
+					$holder->getProvider()->setMoney($action->getPlayer(), $action->getAmount());
+					break;
+				case Transaction::ACTION_ADD:
+					$holder->getProvider()->addMoney($action->getPlayer(), $action->getAmount());
+					break;
+				case Transaction::ACTION_REDUCE:
+					$holder->getProvider()->reduceMoney($action->getPlayer(), $action->getAmount());
+					break;
+			}
+
+			(new MoneyChangedEvent($this, $action->getPlayer(), $money, $issuer))->call();
+		}
+
+		return true;
+	}
+
+	private function validateTransaction(Transaction $transaction, ?Issuer $issuer, CurrencyHolder $holder) {
+		foreach($transaction->getActions() as $action) {
+			switch($action->getType()) {
+				case Transaction::ACTION_SET:
+					if(!$this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+						return false;
+					}
+					break;
+				case Transaction::ACTION_ADD:
+					if(!$this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+						return false;
+					}
+					break;
+				case Transaction::ACTION_REDUCE:
+					if(!$this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder)) {
+						return false;
+					}
+					break;
+			}
+		}
+
+		return true;
 	}
 
 	public function hasLanguage(string $lang): bool {

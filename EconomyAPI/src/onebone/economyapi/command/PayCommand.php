@@ -39,8 +39,20 @@ class PayCommand extends PluginCommand {
 
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
+
+		$money = $plugin->myMoney($player);
+		if($money < $amount) {
+			$sender->sendMessage($plugin->getMessage("pay-no-money", [$amount], $sender->getName()));
+			return true;
+		}
+
 		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
 			$player = $p->getName();
+		}
+
+		if($player === $sender->getName()) {
+			$sender->sendMessage($plugin->getMessage("pay-no-self", [], $sender->getName()));
+			return true;
 		}
 
 		if(!$p instanceof Player and $plugin->getPluginConfig()->getAllowPayOffline() === false) {
@@ -53,7 +65,7 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		$sender->sendForm(new AskPayForm($plugin, $sender, $p->getName(), $amount, $label, $params));
+		$sender->sendForm(new AskPayForm($plugin, $sender, $player, $amount, $label, $params));
 		return true;
 	}
 }

@@ -5,6 +5,8 @@ namespace onebone\economyapi\form;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\CommandIssuer;
 use onebone\economyapi\event\money\PayMoneyEvent;
+use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionAction;
 use pocketmine\form\Form;
 use pocketmine\Player;
 
@@ -46,14 +48,18 @@ class AskPayForm implements Form {
 			new CommandIssuer($this->player, $this->label, $this->label . ' ' . implode(' ', $this->params)));
 		$ev->call();
 
-		$result = EconomyAPI::RET_CANCELLED;
-		if(!$ev->isCancelled()) {
-			$result = $this->plugin->reduceMoney($this->player, $this->amount);
+		if($ev->isCancelled()) {
+			$player->sendMessage($this->plugin->getMessage("pay-failed", [
+				$this->target,
+				$this->amount
+			], $player->getName()));
+			return;
 		}
 
-		if($result === EconomyAPI::RET_SUCCESS) {
-			$this->plugin->addMoney($this->target, $this->amount, true);
-
+		if($this->plugin->executeTransaction(new Transaction([
+			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount),
+			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount)
+		]))) {
 			$player->sendMessage($this->plugin->getMessage("pay-success", [
 				$this->amount,
 				$this->target

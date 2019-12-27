@@ -50,6 +50,8 @@
   "pay-cancel": "취소",
   "pay-failed": "돈을 지불할 수 없습니다.",
   "pay-cancelled": "송금을 취소했습니다.",
+  "pay-no-self": "자신에게는 송금할 수 없습니다.",
+  "pay-no-money": "돈이 부족하여 %MONETARY_UNIT%%1을(를) 지불할 수 없습니다.",
   "pay-success": "%2님에게 %MONETARY_UNIT%%1을(를) 지불하였습니다.",
   "money-paid": "%1님이 %MONETARY_UNIT%%2을(를) 지불하였습니다.",
   "takemoney-must-be-number": "수량은 숫자여야 합니다.",
