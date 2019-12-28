@@ -50,7 +50,6 @@ use onebone\economyapi\provider\YamlProvider;
 use onebone\economyapi\provider\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
 use onebone\economyapi\util\Transaction;
-use onebone\economyapi\util\TransactionAction;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
@@ -159,10 +158,10 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		$len = strlen($message);
 
-		$isEscape = false;
 		$isReplace = false;
-		$isMoney = false;
 		$index = '';
+		$isEscape = false;
+		$isMoney = false;
 		$chunk = '';
 
 		for($i = 0; $i < $len; $i++) {
@@ -181,8 +180,19 @@ class EconomyAPI extends PluginBase implements Listener {
 					$isReplace = false;
 				}
 			}elseif($c === '%') {
-				if($isReplace and $index === '') {
-					$ret .= '%';
+				if($isReplace) {
+					if($index === '') {
+						$ret .= '%';
+					}else{
+						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
+
+						if($isMoney) {
+							// TODO format parameter with Currency
+							$ret .= $this->getMonetaryUnit() . $replace;
+						}else{
+							$ret .= $replace;
+						}
+					}
 				}
 
 				$index = '';
@@ -234,7 +244,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			}
 		}
 
-		return $ret;
+		return TextFormat::colorize($ret);
 	}
 
 	/**
