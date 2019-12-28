@@ -41,7 +41,7 @@
   "topmoney-tag": "> Topliste (%1/%2) <",
   "topmoney-format": "[%1] %2: %3",
   "pay-failed": "Oops bei der Überweisung ist ein Fehler aufgetreten",
-  "pay-success": "Du hast 1%%MONETARY_UNIT% an %2 überwiesen.",
+  "pay-success": "Du hast %$1 an %2 überwiesen.",
   "money-paid": "%1 hat dir %2%MONETARY_UNIT% überwiesen.",
   "takemoney-must-be-number": "Du kannst einem Spieler keine Buchstaben oder Sonderzeichen wegnehmen",
   "takemoney-invalid-number": "Ungültige Zahl",

@@ -155,24 +155,86 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	private function replaceParameters($message, $params = []) {
-		$search = ["%MONETARY_UNIT%"];
-		$replace = [$this->defaultCurrency->getCurrency()->getSymbol()];
+		$ret = '';
 
-		for ($i = 0; $i < count($params); $i++) {
-			$search[] = "%" . ($i + 1);
-			$replace[] = $params[$i];
+		$len = strlen($message);
+
+		$isEscape = false;
+		$isReplace = false;
+		$isMoney = false;
+		$index = '';
+		$chunk = '';
+
+		for($i = 0; $i < $len; $i++) {
+			$c = $message[$i];
+
+			if($c === '\\') {
+				$isEscape = true;
+				continue;
+			}
+
+			if($isEscape) {
+				$isEscape = false;
+
+				if($isReplace) {
+					$ret .= $chunk;
+					$isReplace = false;
+				}
+			}elseif($c === '%') {
+				if($isReplace and $index === '') {
+					$ret .= '%';
+				}
+
+				$index = '';
+				$isReplace = true;
+				$chunk = $c;
+				continue;
+			}
+
+			if($isReplace) {
+				$chunk .= $c;
+
+				if(is_numeric($c)) {
+					$index .= $c;
+				}else{
+					if($c === '$' and $index === '') {
+						$isMoney = true;
+					}else{
+						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
+
+						if($isMoney) {
+							// TODO format parameter with Currency
+							$ret .= $this->getMonetaryUnit() . $replace;
+						}else{
+							$ret .= $replace;
+						}
+
+						$isReplace = false;
+						$isMoney = false;
+						$chunk = '';
+
+						$ret .= $c;
+					}
+				}
+
+				continue;
+			}
+
+			$ret .= $c;
 		}
 
-		$colors = [
-			"0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
-			"a", "b", "c", "d", "e", "f", "k", "l", "m", "n", "o", "r"
-		];
-		foreach($colors as $code) {
-			$search[] = "&" . $code;
-			$replace[] = TextFormat::ESCAPE . $code;
+		if($isReplace) {
+			$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
+
+			if($isMoney) {
+				// TODO format parameter with Currency
+				$ret .= $this->getMonetaryUnit() . $replace;
+			}else{
+				$ret .= $replace;
+			}
 		}
 
-		return str_replace($search, $replace, $message);
+		return $ret;
 	}
 
 	/**
