@@ -24,7 +24,12 @@ use onebone\economyapi\currency\Currency;
 use onebone\economyapi\currency\CurrencyConfig;
 use onebone\economyapi\provider\Provider;
 
-class CurrencyHolder {
+// All class in `internal` namespace must be used only
+// for internal purposes of EconomyAPI, thus it is subject
+// to change any time without any notice. Do not use this
+// class anyway.
+/** @internal */
+final class CurrencyHolder {
 	/** @var Currency */
 	private $currency;
 	/** @var Provider */
