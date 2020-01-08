@@ -75,8 +75,9 @@ class AskPayForm implements Form {
 		}
 
 		if($this->plugin->executeTransaction(new Transaction([
-			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount),
-			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount)
+			// TODO change currency by its configuration
+			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount, $this->plugin->getDefaultCurrency()),
+			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount, $this->plugin->getDefaultCurrency())
 		]))) {
 			$player->sendMessage($this->plugin->getMessage("pay-success", [
 				$this->amount,

@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi\util;
 
+use onebone\economyapi\currency\Currency;
 use pocketmine\Player;
 
 class TransactionAction {
@@ -29,6 +30,8 @@ class TransactionAction {
 	private $player;
 	/** @var float */
 	private $amount;
+	/** @var Currency */
+	private $currency;
 
 	/**
 	 * TransactionAction constructor.
@@ -36,7 +39,7 @@ class TransactionAction {
 	 * @param string|Player $player
 	 * @param float $amount
 	 */
-	public function __construct(int $type, $player, float $amount) {
+	public function __construct(int $type, $player, float $amount, Currency $currency) {
 		if($type > 2) {
 			throw new \InvalidArgumentException("Invalid transaction type given: $type");
 		}
@@ -48,6 +51,7 @@ class TransactionAction {
 		$this->type = $type;
 		$this->player = $player;
 		$this->amount = $amount;
+		$this->currency = $currency;
 	}
 
 	public function getType(): int {
@@ -60,5 +64,9 @@ class TransactionAction {
 
 	public function getAmount(): float {
 		return $this->amount;
+	}
+
+	public function getCurrency(): Currency {
+		return $this->currency;
 	}
 }
