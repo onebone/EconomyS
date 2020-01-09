@@ -34,10 +34,10 @@ class TransactionAction {
 	private $currency;
 
 	/**
-	 * TransactionAction constructor.
 	 * @param int $type
 	 * @param string|Player $player
 	 * @param float $amount
+	 * @param Currency $currency
 	 */
 	public function __construct(int $type, $player, float $amount, Currency $currency) {
 		if($type > 2) {

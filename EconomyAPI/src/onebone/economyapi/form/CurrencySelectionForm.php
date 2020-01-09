@@ -45,7 +45,7 @@ class CurrencySelectionForm implements Form {
 	public function jsonSerialize() {
 		$buttons = [];
 		foreach($this->currencies as $currency) {
-			if($currency->isCurrencyAvailable($this->player)) {
+			if($currency->isAvailableTo($this->player)) {
 				$buttons[] = ['text' => sprintf("%s (%s)", $currency->getName(), $currency->getSymbol())];
 			}
 		}

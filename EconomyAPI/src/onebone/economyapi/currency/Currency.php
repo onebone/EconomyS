@@ -32,7 +32,7 @@ interface Currency {
 	 * @param Player $player
 	 * @return bool
 	 */
-	public function isCurrencyAvailable(Player $player): bool;
+	public function isAvailableTo(Player $player): bool;
 
 	/**
 	 * Returns default money which is given to player for the first

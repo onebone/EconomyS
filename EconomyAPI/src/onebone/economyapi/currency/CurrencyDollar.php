@@ -27,7 +27,7 @@ class CurrencyDollar implements Currency {
 		return 'Dollar';
 	}
 
-	public function isCurrencyAvailable(Player $player): bool {
+	public function isAvailableTo(Player $player): bool {
 		return true;
 	}
 

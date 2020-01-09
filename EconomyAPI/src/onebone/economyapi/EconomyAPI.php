@@ -306,7 +306,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if($inst === null) return false;
 
 		if($player instanceof Player) {
-			if(!$inst->isCurrencyAvailable($player)) {
+			if(!$inst->isAvailableTo($player)) {
 				return false;
 			}
 
@@ -314,6 +314,20 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		return $this->provider->setPreferredCurrency($player, $currency);
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @return Currency|null
+	 */
+	public function getPlayerPreferredCurrency($player): ?Currency {
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		$id = $this->provider->getPreferredCurrency($player);
+		return $this->getCurrency($id);
 	}
 
 	/**
@@ -397,7 +411,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isCurrencyAvailable($player)) {
+			if(!$holder->getCurrency()->isAvailableTo($player)) {
 				return self::RET_INVALID_CURRENCY;
 			}
 		}
@@ -467,7 +481,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isCurrencyAvailable($player)) {
+			if(!$holder->getCurrency()->isAvailableTo($player)) {
 				return self::RET_INVALID_CURRENCY;
 			}
 		}
@@ -536,7 +550,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isCurrencyAvailable($player)) {
+			if(!$holder->getCurrency()->isAvailableTo($player)) {
 				return self::RET_INVALID_CURRENCY;
 			}
 		}
@@ -675,7 +689,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return null;
 	}
 
-	private function findCurrencyHolder($currency, $player): CurrencyHolder {
+	private function findCurrencyHolder($currency, ?Player $player): CurrencyHolder {
 		// $player argument is only used for finding default currency that player could use if $currency is null
 		if(is_string($currency)) {
 			$currency = strtolower($currency);

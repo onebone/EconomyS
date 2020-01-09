@@ -27,7 +27,7 @@ class CurrencyWon implements Currency {
 		return 'Won';
 	}
 
-	public function isCurrencyAvailable(Player $player): bool {
+	public function isAvailableTo(Player $player): bool {
 		return strtolower($player->getLevel()->getFolderName()) === 'korea';
 	}
 
