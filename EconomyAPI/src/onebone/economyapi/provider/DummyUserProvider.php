@@ -24,6 +24,10 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\UserInfo;
 
 class DummyUserProvider implements UserProvider {
+	public function init() {
+
+	}
+
 	public function getName(): string {
 		return 'Dummy';
 	}
@@ -38,6 +42,14 @@ class DummyUserProvider implements UserProvider {
 
 	public function getLanguage(string $username): string {
 		return null;
+	}
+
+	public function getPreferredCurrency(string $username): string {
+		return null;
+	}
+
+	public function setPreferredCurrency(string $username, string $currency): bool {
+		return false;
 	}
 
 	public function save() {
@@ -55,6 +67,7 @@ class DummyUserProvider implements UserProvider {
 	}
 
 	public function getUserInfo(string $username): UserInfo {
-		return new UserInfo($username, EconomyAPI::getInstance()->getPluginConfig()->getDefaultLanguage());
+		$plugin = EconomyAPI::getInstance();
+		return new UserInfo($username, $plugin->getPluginConfig()->getDefaultLanguage(), $plugin->getDefaultCurrency());
 	}
 }

@@ -38,17 +38,20 @@ class YamlUserProvider implements UserProvider, Listener {
 
 	public function __construct(EconomyAPI $api) {
 		$this->api = $api;
+	}
 
+	public function init() {
 		$this->root = $this->api->getDataFolder() . 'users' . DIRECTORY_SEPARATOR;
 		if(!file_exists($this->root)) {
 			mkdir($this->root);
 		}
 
 		$this->defaultSchema = [
-			'language' => $this->api->getPluginConfig()->getDefaultLanguage()
+			'language' => $this->api->getPluginConfig()->getDefaultLanguage(),
+			'currency' => $this->api->getDefaultCurrencyId()
 		];
 
-		$api->getServer()->getPluginManager()->registerEvents($this, $api);
+		$this->api->getServer()->getPluginManager()->registerEvents($this, $this->api);
 	}
 
 	public function getName(): string {
@@ -120,16 +123,18 @@ class YamlUserProvider implements UserProvider, Listener {
 		$this->data[$username] = $this->readPlayer($username);
 	}
 
-	private function validate(&$data): bool {
-		if(!isset($data['language'])) return false;
-
-		if(!is_string($data['language'])) return false;
-
-		if(!$this->api->hasLanguage($data['language'])) {
+	private function validate(&$data) {
+		if(!isset($data['language'])
+			or !is_string($data['language'])
+			or !$this->api->hasLanguage($data['language'])) {
 			$data['language'] = $this->api->getPluginConfig()->getDefaultLanguage();
 		}
 
-		return true;
+		if(!isset($data['currency'])
+			or !is_string($data['currency'])
+			or !$this->api->hasLanguage($data['currency'])) {
+			$data['currency'] = $this->api->getDefaultCurrencyId();
+		}
 	}
 
 	private function unloadPlayer(string $username) {
@@ -183,6 +188,22 @@ class YamlUserProvider implements UserProvider, Listener {
 		return $info->language;
 	}
 
+	public function getPreferredCurrency(string $username): string {
+		$info = $this->getUserInfo($username);
+		return $info->currency;
+	}
+
+	public function setPreferredCurrency(string $username, string $currency): bool {
+		$username = strtolower($username);
+
+		if(!$this->api->hasCurrency($currency)) {
+			return false;
+		}
+
+		$this->setProperty($username, 'currency', $currency);
+		return true;
+	}
+
 	public function getUserInfo(string $username): UserInfo {
 		$username = strtolower($username);
 
@@ -194,7 +215,7 @@ class YamlUserProvider implements UserProvider, Listener {
 			$data = $this->defaultSchema;
 		}
 
-		return new UserInfo($username, $data['language']);
+		return new UserInfo($username, $data['language'], $data['currency']);
 	}
 
 	public function save() {

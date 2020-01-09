@@ -73,5 +73,10 @@
   "setmoney-failed": "Failed to set money due to unknown error",
   "setmoney-invalid-number": "%$1 must be a numeric value",
   "mymoney-mymoney": "Your money : %$1",
-  "mystatus-show": "My money status : %1%"
+  "mystatus-show": "My money status : %1%",
+  "economy-currency-form-title": "Preferred Currency",
+  "economy-currency-form-content": "Select your preferred currency to use default",
+  "economy-currency-form-invalid": "Invalid form response received.",
+  "economy-currency-set": "Set your preferred currency to: %1 (%2)",
+  "economy-currency-failed": "Cannot set your preferred currency to: %1 (%2)"
 }

@@ -21,8 +21,10 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\form\CurrencySelectionForm;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class EconomyCommand extends PluginCommand {
@@ -60,6 +62,19 @@ class EconomyCommand extends PluginCommand {
 					$sender->sendMessage(TextFormat::RED . "There is no language such as $val");
 				}
 				return true;
+			case 'currency':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
+					return true;
+				}
+
+				/** @var EconomyAPI $plugin */
+				$plugin = $this->getPlugin();
+
+				if(trim($val) === '') {
+					$sender->sendForm(new CurrencySelectionForm($plugin, $plugin->getCurrencies(), $sender));
+					return true;
+				}
 		}
 
 		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());

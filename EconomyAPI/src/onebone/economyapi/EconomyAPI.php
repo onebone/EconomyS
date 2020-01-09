@@ -135,11 +135,14 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string $key
 	 * @param array $params
-	 * @param string $player
+	 * @param Player|string $player
 	 *
 	 * @return string
 	 */
-	public function getMessage(string $key, array $params = [], string $player = "console"): string {
+	public function getMessage(string $key, array $params = [], $player = "console"): string {
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
 		$player = strtolower($player);
 
 		$lang = $this->provider->getLanguage($player);
@@ -265,6 +268,35 @@ class EconomyAPI extends PluginBase implements Listener {
 			return $this->provider->setLanguage($player, $language);
 		}
 		return false;
+	}
+
+	/**
+	 * Checks if currency is available to player if $player is instance of Player
+	 *
+	 * @param Player|string $player
+	 * @param Currency|string $currency
+	 * @return bool
+	 */
+	public function setPlayerPreferredCurrency($player, $currency): bool {
+		if($currency instanceof Currency) {
+			$currency = $this->getCurrencyId($currency);
+			if($currency === null) return false;
+		}
+
+		$currency = strtolower($currency);
+
+		$inst = $this->getCurrency($currency);
+		if($inst === null) return false;
+
+		if($player instanceof Player) {
+			if(!$inst->isCurrencyAvailable($player)) {
+				return false;
+			}
+
+			$player = $player->getName();
+		}
+
+		return $this->provider->setPreferredCurrency($player, $currency);
 	}
 
 	/**
@@ -482,6 +514,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->defaultCurrency->getCurrency();
 	}
 
+	public function getDefaultCurrencyId(): string {
+		return $this->defaultCurrency->getId();
+	}
+
 	/**
 	 * @param string|Player $player
 	 * @param float|bool $defaultMoney
@@ -659,6 +695,8 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->parseCurrencies();
 		$this->initializeLanguage();
 		$this->registerCommands();
+
+		$this->provider->init();
 	}
 
 	private function checkUpdate() {
@@ -686,7 +724,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			return false;
 		}
 
-		$this->currencies[$id] = new CurrencyHolder($currency, $provider);
+		$this->currencies[$id] = new CurrencyHolder($id, $currency, $provider);
 		return true;
 	}
 
@@ -695,6 +733,24 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(isset($this->currencies[$id])) {
 			return $this->currencies[$id]->getCurrency();
+		}
+
+		return null;
+	}
+
+	public function getCurrencies(): array {
+		$ret = [];
+
+		foreach($this->currencies as $key => $holder) {
+			$ret[] = $holder->getCurrency();
+		}
+
+		return $ret;
+	}
+
+	public function getCurrencyId(Currency $currency): ?string {
+		foreach($this->currencies as $id => $holder) {
+			if($holder->getCurrency() === $currency) return $id;
 		}
 
 		return null;

@@ -30,6 +30,8 @@ use onebone\economyapi\provider\Provider;
 // class anyway.
 /** @internal */
 final class CurrencyHolder {
+	/** @var string */
+	private $id;
 	/** @var Currency */
 	private $currency;
 	/** @var Provider */
@@ -37,9 +39,14 @@ final class CurrencyHolder {
 	/** @var CurrencyConfig */
 	private $config = null;
 
-	public function __construct(Currency $currency, Provider $provider) {
+	public function __construct(string $id, Currency $currency, Provider $provider) {
+		$this->id = $id;
 		$this->currency = $currency;
 		$this->provider = $provider;
+	}
+
+	public function getId(): string {
+		return $this->id;
 	}
 
 	public function getCurrency(): Currency {

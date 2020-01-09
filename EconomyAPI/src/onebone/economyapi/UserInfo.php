@@ -27,9 +27,12 @@ class UserInfo {
 	public $username;
 	/** @var string $language Language which is set to player */
 	public $language;
+	/** @var string $currency Preferred currency to use for default */
+	public $currency;
 
-	public function __construct(string $username, string $language) {
+	public function __construct(string $username, string $language, string $currency) {
 		$this->username = $username;
 		$this->language = $language;
+		$this->currency = $currency;
 	}
 }

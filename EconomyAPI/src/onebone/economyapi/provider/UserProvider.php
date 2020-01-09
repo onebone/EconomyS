@@ -26,6 +26,8 @@ namespace onebone\economyapi\provider;
 use onebone\economyapi\UserInfo;
 
 interface UserProvider {
+	public function init();
+
 	public function getName(): string;
 
 	public function create(string $username): bool;
@@ -37,6 +39,10 @@ interface UserProvider {
 	public function setLanguage(string $username, string $lang): bool;
 
 	public function getLanguage(string $username): string;
+
+	public function setPreferredCurrency(string $username, string $currency): bool;
+
+	public function getPreferredCurrency(string $username): string;
 
 	public function getUserInfo(string $username): UserInfo;
 
