@@ -380,14 +380,14 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param Issuer $issuer
-	 * @param string|Currency $currency
+	 * @param Currency $currency
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
+	public function setMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
-		$ret = $this->canSetMoney($player, $amount, $force, $issuer, $holder);
+		$ret = $this->canSetMoney($player, $amount, $force, $issuer, $holder->getCurrency());
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -405,9 +405,14 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $ret;
 	}
 
-	private function canSetMoney($player, float $amount, bool $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+	private function canSetMoney($player, float $amount, bool $force, ?Issuer $issuer, Currency $currency): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
+		}
+
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) {
+			return self::RET_INVALID_CURRENCY;
 		}
 
 		if($player instanceof Player) {
@@ -448,14 +453,14 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param Issuer $issuer
-	 * @param string|Currency $currency
+	 * @param Currency $currency
 	 *
 	 * @return int
 	 */
-	public function addMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
+	public function addMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
-		$ret = $this->canAddMoney($player, $amount, $force, $issuer, $holder);
+		$ret = $this->canAddMoney($player, $amount, $force, $issuer, $holder->getCurrency());
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -475,9 +480,14 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $ret;
 	}
 
-	private function canAddMoney($player, float $amount, bool $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+	private function canAddMoney($player, float $amount, bool $force, ?Issuer $issuer, Currency $currency): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
+		}
+
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) {
+			return self::RET_INVALID_CURRENCY;
 		}
 
 		if($player instanceof Player) {
@@ -517,14 +527,14 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param float $amount
 	 * @param bool $force
 	 * @param Issuer $issuer
-	 * @param string|Currency $currency
+	 * @param Currency $currency
 	 *
 	 * @return int
 	 */
-	public function reduceMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, $currency = null): int {
+	public function reduceMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
-		$ret = $this->canReduceMoney($player, $amount, $force, $issuer, $holder);
+		$ret = $this->canReduceMoney($player, $amount, $force, $issuer, $holder->getCurrency());
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -544,9 +554,14 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $ret;
 	}
 
-	private function canReduceMoney($player, float $amount, $force, ?Issuer $issuer, CurrencyHolder $holder): int {
+	private function canReduceMoney($player, float $amount, $force, ?Issuer $issuer, Currency $currency): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
+		}
+
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) {
+			return self::RET_INVALID_CURRENCY;
 		}
 
 		if($player instanceof Player) {
@@ -649,21 +664,19 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function validateTransaction(Transaction $transaction, ?Issuer $issuer) {
 		foreach($transaction->getActions() as $action) {
-			$holder = $this->findCurrencyHolder($action->getCurrency(), null);
-
 			switch($action->getType()) {
 				case Transaction::ACTION_SET:
-					if($this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
+					if($this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
 						return false;
 					}
 					break;
 				case Transaction::ACTION_ADD:
-					if($this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
+					if($this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
 						return false;
 					}
 					break;
 				case Transaction::ACTION_REDUCE:
-					if($this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $holder) !== self::RET_VALID) {
+					if($this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
 						return false;
 					}
 					break;
@@ -689,22 +702,21 @@ class EconomyAPI extends PluginBase implements Listener {
 		return null;
 	}
 
-	private function findCurrencyHolder($currency, ?Player $player): CurrencyHolder {
+	private function getCurrencyHolder(Currency $currency): ?CurrencyHolder {
+		foreach($this->currencies as $holder) {
+			if($holder->getCurrency() === $currency) return $holder;
+		}
+
+		return null;
+	}
+
+	private function findCurrencyHolder(?Currency $currency, $player): CurrencyHolder {
 		// $player argument is only used for finding default currency that player could use if $currency is null
-		if(is_string($currency)) {
-			$currency = strtolower($currency);
-			return $this->currencies[$currency] ?? $this->defaultCurrency;
-		}elseif($currency instanceof Currency) {
-			foreach($this->currencies as $holder) {
-				if($holder->getCurrency() === $currency) {
-					return $holder;
-				}
-			}
+		if($currency instanceof Currency) {
+			return $this->getCurrencyHolder($currency);
 		}else{
 			if($player instanceof Player) {
-				$currency = $this->currencyDeterminer->getDefaultCurrency($player);
-				// $currency is now Currency, the max depth this line can go is only one level
-				return $this->findCurrencyHolder($currency, $player);
+				return $this->getCurrencyHolder($this->currencyDeterminer->getDefaultCurrency($player));
 			}
 		}
 
