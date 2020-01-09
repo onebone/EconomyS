@@ -83,7 +83,12 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		$sender->sendForm(new AskPayForm($plugin, $sender, $player, $amount, $label, $params));
+		$currency = $plugin->getPlayerPreferredCurrency($sender);
+		if($currency === null) {
+			$currency = $plugin->getCurrencyDeterminer()->getDefaultCurrency($sender);
+		}
+
+		$sender->sendForm(new AskPayForm($plugin, $sender, $currency, $player, $amount, $label, $params));
 		return true;
 	}
 }

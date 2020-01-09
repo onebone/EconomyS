@@ -274,6 +274,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->currencyDeterminer = $determiner;
 	}
 
+	public function getCurrencyDeterminer(): CurrencyDeterminer {
+		return $this->currencyDeterminer;
+	}
+
 	public function getMonetaryUnit(): string {
 		return $this->defaultCurrency->getCurrency()->getSymbol();
 	}
@@ -642,7 +646,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		foreach($transaction->getActions() as $action) {
-			$holder = $this->findCurrencyHolder($action->getCurrency(), null);
+			$holder = $this->getCurrencyHolder($action->getCurrency());
 			$money = $holder->getProvider()->getMoney($action->getPlayer());
 			switch($action->getType()) {
 				case Transaction::ACTION_SET:

@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi\form;
 
+use onebone\economyapi\currency\Currency;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\CommandIssuer;
 use onebone\economyapi\event\money\PayMoneyEvent;
@@ -33,6 +34,8 @@ class AskPayForm implements Form {
 	private $plugin;
 	/** @var Player */
 	private $player;
+	/** @var Currency */
+	private $currency;
 	/** @var string */
 	private $target;
 	/** @var float */
@@ -41,9 +44,11 @@ class AskPayForm implements Form {
 	private $label;
 	private $params;
 
-	public function __construct(EconomyAPI $plugin, Player $player, string $target, float $amount, $label, $params) {
+	public function __construct(EconomyAPI $plugin, Player $player, Currency $currency,
+	                            string $target, float $amount, $label, $params) {
 		$this->plugin = $plugin;
 		$this->player = $player;
+		$this->currency = $currency;
 		$this->target = $target;
 		$this->amount = $amount;
 
@@ -75,9 +80,8 @@ class AskPayForm implements Form {
 		}
 
 		if($this->plugin->executeTransaction(new Transaction([
-			// TODO change currency by its configuration
-			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount, $this->plugin->getDefaultCurrency()),
-			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount, $this->plugin->getDefaultCurrency())
+			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount, $this->currency),
+			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount, $this->currency)
 		]))) {
 			$player->sendMessage($this->plugin->getMessage("pay-success", [
 				$this->amount,
@@ -104,7 +108,7 @@ class AskPayForm implements Form {
 			'type' => 'modal',
 			'title' => $this->plugin->getMessage("pay-ask-title", [], $this->player->getName()),
 			'content' => $this->plugin->getMessage("pay-ask-content", [
-				$this->target, $this->amount
+				$this->target, $this->amount // TODO format amount with currency
 			], $this->player->getName()),
 			'button1' => $this->plugin->getMessage("pay-confirm", [], $this->player->getName()),
 			'button2' => $this->plugin->getMessage("pay-cancel", [], $this->player->getName())
