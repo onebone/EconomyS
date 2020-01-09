@@ -1,4 +1,5 @@
 # default-currency: Sets default currency
+# This configuration could be overridden by external plugin
 default-currency: dollar
 # add-op-at-rank: Set whether to show OPs at top money rank
 add-op-at-rank: false
