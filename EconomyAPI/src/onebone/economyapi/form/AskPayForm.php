@@ -58,12 +58,12 @@ class AskPayForm implements Form {
 
 	public function handleResponse(Player $player, $data): void {
 		if(!is_bool($data)) {
-			$player->sendMessage($this->plugin->getMessage("pay-failed", [], $player->getName()));
+			$player->sendMessage($this->plugin->getMessage("pay-failed", $player));
 			return;
 		}
 
 		if(!$data) {
-			$player->sendMessage($this->plugin->getMessage("pay-cancelled", [], $player->getName()));
+			$player->sendMessage($this->plugin->getMessage("pay-cancelled", $player));
 			return;
 		}
 
@@ -72,10 +72,10 @@ class AskPayForm implements Form {
 		$ev->call();
 
 		if($ev->isCancelled()) {
-			$player->sendMessage($this->plugin->getMessage("pay-failed", [
+			$player->sendMessage($this->plugin->getMessage("pay-failed", $player, [
 				$this->target,
 				$this->amount
-			], $player->getName()));
+			]));
 			return;
 		}
 
@@ -83,35 +83,35 @@ class AskPayForm implements Form {
 			new TransactionAction(Transaction::ACTION_REDUCE, $player, $this->amount, $this->currency),
 			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount, $this->currency)
 		]))) {
-			$player->sendMessage($this->plugin->getMessage("pay-success", [
+			$player->sendMessage($this->plugin->getMessage("pay-success", $player, [
 				$this->amount,
 				$this->target
-			], $player->getName()));
+			]));
 
 			$p = $this->plugin->getServer()->getPlayerExact($this->target);
 			if($p instanceof Player) {
-				$p->sendMessage($this->plugin->getMessage("money-paid", [
+				$p->sendMessage($this->plugin->getMessage("money-paid", $this->target, [
 					$player->getName(),
 					$this->amount
-				], $this->target));
+				]));
 			}
 		}else{
-			$player->sendMessage($this->plugin->getMessage("pay-failed", [
+			$player->sendMessage($this->plugin->getMessage("pay-failed", $player, [
 				$this->target,
 				$this->amount
-			], $player->getName()));
+			]));
 		}
 	}
 
 	public function jsonSerialize() {
 		return [
 			'type' => 'modal',
-			'title' => $this->plugin->getMessage("pay-ask-title", [], $this->player->getName()),
-			'content' => $this->plugin->getMessage("pay-ask-content", [
+			'title' => $this->plugin->getMessage("pay-ask-title", $this->player),
+			'content' => $this->plugin->getMessage("pay-ask-content", $this->player, [
 				$this->target, $this->amount // TODO format amount with currency
-			], $this->player->getName()),
-			'button1' => $this->plugin->getMessage("pay-confirm", [], $this->player->getName()),
-			'button2' => $this->plugin->getMessage("pay-cancel", [], $this->player->getName())
+			]),
+			'button1' => $this->plugin->getMessage("pay-confirm", $this->player),
+			'button2' => $this->plugin->getMessage("pay-cancel", $this->player)
 		];
 	}
 }

@@ -52,6 +52,7 @@ use onebone\economyapi\provider\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
 use onebone\economyapi\util\PluginConfig;
 use onebone\economyapi\util\Transaction;
+use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\Player;
@@ -148,19 +149,19 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string $key
 	 * @param array $params
-	 * @param Player|string $player
+	 * @param CommandSender|string $sender
 	 *
 	 * @return string
 	 */
-	public function getMessage(string $key, array $params = [], $player = "console"): string {
-		if($player instanceof Player) {
-			$player = $player->getName();
+	public function getMessage(string $key, $sender, array $params = []): string {
+		if($sender instanceof CommandSender) {
+			$sender = $sender->getName();
 		}
-		$player = strtolower($player);
+		$sender = strtolower($sender);
 
-		$lang = $this->provider->getLanguage($player);
+		$lang = $this->provider->getLanguage($sender);
 		if(isset($this->lang[$lang][$key])) {
-			$lang = $this->provider->getLanguage($player);
+			$lang = $this->provider->getLanguage($sender);
 
 			return $this->replaceParameters($this->lang[$lang][$key], $params);
 		}elseif(isset($this->lang[self::FALLBACK_LANGUAGE][$key])) {

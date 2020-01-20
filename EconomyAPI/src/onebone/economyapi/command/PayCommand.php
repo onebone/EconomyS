@@ -60,7 +60,7 @@ class PayCommand extends PluginCommand {
 
 		$money = $plugin->myMoney($sender);
 		if($money < $amount) {
-			$sender->sendMessage($plugin->getMessage("pay-no-money", [$amount], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [$amount]));
 			return true;
 		}
 
@@ -69,17 +69,17 @@ class PayCommand extends PluginCommand {
 		}
 
 		if($player === $sender->getName()) {
-			$sender->sendMessage($plugin->getMessage("pay-no-self", [], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("pay-no-self", $sender));
 			return true;
 		}
 
 		if(!$p instanceof Player and $plugin->getPluginConfig()->getAllowPayOffline() === false) {
-			$sender->sendMessage($plugin->getMessage("player-not-connected", [$player], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("player-not-connected", $sender, [$player]));
 			return true;
 		}
 
 		if(!$plugin->accountExists($player)) {
-			$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+			$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 			return true;
 		}
 

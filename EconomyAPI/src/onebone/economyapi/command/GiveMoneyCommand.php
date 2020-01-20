@@ -59,26 +59,26 @@ class GiveMoneyCommand extends PluginCommand {
 		$result = $plugin->addMoney($player, $amount);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
-				$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", [$amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", $sender, [$amount]));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($plugin->getMessage("givemoney-gave-money", [
+				$sender->sendMessage($plugin->getMessage("givemoney-gave-money", $sender, [
 					$amount,
 					$player
-				], $sender->getName()));
+				]));
 
 				if($p instanceof Player) {
-					$p->sendMessage($plugin->getMessage("givemoney-money-given", [$amount], $sender->getName()));
+					$p->sendMessage($plugin->getMessage("givemoney-money-given", $sender, [$amount]));
 				}
 				break;
 			case EconomyAPI::RET_CANCELLED:
-				$sender->sendMessage($plugin->getMessage("request-cancelled", [], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("request-cancelled", $sender));
 				break;
 			case EconomyAPI::RET_UNAVAILABLE:
-				$sender->sendMessage($plugin->getMessage("givemoney-unavailable", [], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("givemoney-unavailable", $sender));
 				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
-				$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 				break;
 		}
 

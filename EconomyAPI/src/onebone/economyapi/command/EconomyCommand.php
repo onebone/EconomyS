@@ -57,7 +57,7 @@ class EconomyCommand extends PluginCommand {
 				}
 
 				if($plugin->setPlayerLanguage($sender->getName(), $val)) {
-					$sender->sendMessage($plugin->getMessage("language-set", [$val], $sender->getName()));
+					$sender->sendMessage($plugin->getMessage("language-set", $sender, [$val]));
 				}else{
 					$sender->sendMessage(TextFormat::RED . "There is no language such as $val");
 				}

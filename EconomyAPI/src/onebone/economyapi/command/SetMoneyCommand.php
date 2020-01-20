@@ -58,25 +58,25 @@ class SetMoneyCommand extends PluginCommand {
 		$result = $plugin->setMoney($player, $amount);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
-				$sender->sendMessage($plugin->getMessage("setmoney-invalid-number", [$amount], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-invalid-number", $sender, [$amount]));
 				break;
 			case EconomyAPI::RET_NO_ACCOUNT:
-				$sender->sendMessage($plugin->getMessage("player-never-connected", [$player], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 				break;
 			case EconomyAPI::RET_UNAVAILABLE:
-				$sender->sendMessage($plugin->getMessage("setmoney-unavailable", [], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-unavailable", $sender));
 				break;
 			case EconomyAPI::RET_CANCELLED:
-				$sender->sendMessage($plugin->getMessage("setmoney-failed", [], $sender->getName()));
+				$sender->sendMessage($plugin->getMessage("setmoney-failed", $sender));
 				break;
 			case EconomyAPI::RET_SUCCESS:
-				$sender->sendMessage($plugin->getMessage("setmoney-setmoney", [
+				$sender->sendMessage($plugin->getMessage("setmoney-setmoney", $sender, [
 					$player,
 					$amount
-				], $sender->getName()));
+				]));
 
 				if($p instanceof Player) {
-					$p->sendMessage($plugin->getMessage("setmoney-set", [$amount], $p->getName()));
+					$p->sendMessage($plugin->getMessage("setmoney-set", $p, [$amount]));
 				}
 				break;
 			default:

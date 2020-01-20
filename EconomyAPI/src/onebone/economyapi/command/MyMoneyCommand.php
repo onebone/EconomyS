@@ -46,7 +46,7 @@ class MyMoneyCommand extends PluginCommand {
 			$plugin = $this->getPlugin();
 
 			$money = $plugin->myMoney($sender);
-			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", [$money]));
+			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", $sender, [$money]));
 			return true;
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");

@@ -60,7 +60,7 @@ class MyStatusCommand extends PluginCommand {
 			$topMoney = round((($money[strtolower($sender->getName())] / $allMoney) * 100), 2);
 		}
 
-		$sender->sendMessage($plugin->getMessage("mystatus-show", [$topMoney], $sender->getName()));
+		$sender->sendMessage($plugin->getMessage("mystatus-show", $sender, [$topMoney]));
 		return true;
 	}
 }
