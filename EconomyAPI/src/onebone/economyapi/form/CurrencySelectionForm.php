@@ -25,12 +25,12 @@ class CurrencySelectionForm implements Form {
 
 	public function handleResponse(Player $player, $data): void {
 		if(!is_int($data)) {
-			$player->sendMessage($this->plugin->getMessage('economy-currency-form-invalid', $player, []));
+			$player->sendMessage($this->plugin->getMessage('economy-currency-form-invalid', $player));
 			return;
 		}
 
 		if(!isset($this->currencies[$data])) {
-			$player->sendMessage($this->plugin->getMessage('economy-currency-form-invalid', $player, []));
+			$player->sendMessage($this->plugin->getMessage('economy-currency-form-invalid', $player));
 			return;
 		}
 
@@ -52,8 +52,8 @@ class CurrencySelectionForm implements Form {
 
 		return [
 			'type' => 'form',
-			'title' => $this->plugin->getMessage('economy-currency-form-title', $this->player->getName(), []),
-			'content' => $this->plugin->getMessage('economy-currency-form-content', $this->player->getName(), []),
+			'title' => $this->plugin->getMessage('economy-currency-form-title', $this->player),
+			'content' => $this->plugin->getMessage('economy-currency-form-content', $this->player),
 			'buttons' => $buttons
 		];
 	}
