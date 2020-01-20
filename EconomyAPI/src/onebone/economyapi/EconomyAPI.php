@@ -130,14 +130,12 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string $command
-	 * @param string|bool $lang
 	 *
 	 * @return array
 	 */
-	public function getCommandMessage(string $command, $lang = false): array {
-		if($lang === false) {
-			$lang = $this->pluginConfig->getDefaultLanguage();
-		}
+	public function getCommandMessage(string $command): array {
+		$lang = $this->pluginConfig->getDefaultLanguage();
+
 		$command = strtolower($command);
 		if(isset($this->lang[$lang]["commands"][$command])) {
 			return $this->lang[$lang]["commands"][$command];
