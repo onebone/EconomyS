@@ -44,6 +44,7 @@ class GiveMoneyCommand extends PluginCommand {
 
 		$player = array_shift($params);
 		$amount = array_shift($params);
+		$currencyId = array_shift($params);
 
 		if(!is_numeric($amount)) {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
@@ -57,7 +58,16 @@ class GiveMoneyCommand extends PluginCommand {
 			$player = $p->getName();
 		}
 
-		$currency = $plugin->getPlayerPreferredCurrency($player, false);
+		if($currencyId === null) {
+			$currency = $plugin->getPlayerPreferredCurrency($player, false);
+		}else{
+			$currencyId = trim($currencyId);
+			$currency = $plugin->getCurrency($currencyId);
+			if($currency === null) {
+				$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$currencyId]));
+				return true;
+			}
+		}
 
 		$result = $plugin->addMoney($player, $amount, false, null, $currency); // TODO issuer
 		switch ($result) {

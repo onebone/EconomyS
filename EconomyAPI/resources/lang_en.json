@@ -10,23 +10,23 @@
       "description": "Shows top money of this server"
     },
     "setmoney": {
-      "usage": "/setmoney <player> <amount>",
+      "usage": "/setmoney <player> <amount> [currency]",
       "description": "Set money of player"
     },
     "seemoney": {
-      "usage": "/seemoney <player>",
+      "usage": "/seemoney <player> [currency]",
       "description": "Shows money of player"
     },
     "givemoney": {
-      "usage": "/givemoney <player> <amount>",
+      "usage": "/givemoney <player> <amount> [currency]",
       "description": "Gives money to player"
     },
     "takemoney": {
-      "usage": "/takemoney <player> <amount>",
+      "usage": "/takemoney <player> <amount> [currency]",
       "description": "Takes money from player"
     },
     "pay": {
-      "usage": "/pay <player> <amount>",
+      "usage": "/pay <player> <amount> [currency]",
       "description": "Pays money to player"
     },
     "mystatus": {
@@ -42,6 +42,7 @@
   "request-cancelled": "Your request was cancelled",
   "player-not-connected": "Player %1 is not online.",
   "player-never-connected": "Player %1 was never connected.",
+  "currency-unavailable": "Currency %1 is not available.",
   "topmoney-tag": "- Showing top money list (%1 of %2) -",
   "topmoney-format": "[%1] %2: %3",
   "pay-ask-title": "Payment",

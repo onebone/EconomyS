@@ -43,6 +43,7 @@ class SeeMoneyCommand extends PluginCommand {
 		}
 
 		$player = array_shift($params);
+		$currencyId = array_shift($params);
 		if(trim($player) === "") {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 			return true;
@@ -54,7 +55,16 @@ class SeeMoneyCommand extends PluginCommand {
 			$player = $p->getName();
 		}
 
-		$currency = $plugin->getPlayerPreferredCurrency($player, false);
+		if($currencyId === null) {
+			$currency = $plugin->getPlayerPreferredCurrency($player, false);
+		}else{
+			$currencyId = trim($currencyId);
+			$currency = $plugin->getCurrency($currencyId);
+			if($currency === null) {
+				$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$currencyId]));
+				return true;
+			}
+		}
 
 		$money = $plugin->myMoney($player, $currency);
 		if($money !== false) {

@@ -49,6 +49,7 @@ class PayCommand extends PluginCommand {
 
 		$player = array_shift($params);
 		$amount = array_shift($params);
+		$currencyId = array_shift($params);
 
 		if(!is_numeric($amount)) {
 			$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
@@ -58,7 +59,18 @@ class PayCommand extends PluginCommand {
 		/** @var EconomyAPI $plugin */
 		$plugin = $this->getPlugin();
 
-		$money = $plugin->myMoney($sender);
+		if($currencyId === null) {
+			$currency = $plugin->getPlayerPreferredCurrency($player, false);
+		}else{
+			$currencyId = trim($currencyId);
+			$currency = $plugin->getCurrency($currencyId);
+			if($currency === null) {
+				$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$currencyId]));
+				return true;
+			}
+		}
+
+		$money = $plugin->myMoney($sender, $currency);
 		if($money < $amount) {
 			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [$amount]));
 			return true;
@@ -78,12 +90,10 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		if(!$plugin->accountExists($player)) {
+		if(!$plugin->accountExists($player, $currency)) {
 			$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 			return true;
 		}
-
-		$currency = $plugin->getPlayerPreferredCurrency($sender, false);
 
 		$sender->sendForm(new AskPayForm($plugin, $sender, $currency, $player, $amount, $label, $params));
 		return true;

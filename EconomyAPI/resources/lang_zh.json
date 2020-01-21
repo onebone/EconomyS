@@ -10,23 +10,23 @@
       "description": "查看此伺服器的金錢排行"
     },
     "setmoney": {
-      "usage": "/setmoney <玩家名稱> <數值>",
+      "usage": "/setmoney <玩家名稱> <數值> [货币]",
       "description": "設定玩家的金錢"
     },
     "seemoney": {
-      "usage": "/seemoney <玩家名稱>",
+      "usage": "/seemoney <玩家名稱> [货币]",
       "description": "查看玩家的金錢"
     },
     "givemoney": {
-      "usage": "/givemoney <玩家名稱> <數值>",
+      "usage": "/givemoney <玩家名稱> <數值> [货币]",
       "description": "給玩家金錢"
     },
     "takemoney": {
-      "usage": "/takemoney <玩家名稱> <數值>",
+      "usage": "/takemoney <玩家名稱> <數值> [货币]",
       "description": "拿走玩家的金錢"
     },
     "pay": {
-      "usage": "/pay <玩家名稱> <數值>",
+      "usage": "/pay <玩家名稱> <數值> [货币]",
       "description": "付款給玩家"
     },
     "mystatus": {

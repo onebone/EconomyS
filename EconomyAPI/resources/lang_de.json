@@ -10,23 +10,23 @@
       "description": "Schau die Topliste des Geldes an"
     },
     "setmoney": {
-      "usage": "/setmoney <Spieler> <Betrag>",
+      "usage": "/setmoney <Spieler> <Betrag> [monnaie]",
       "description": "Setzt den Kontostand eines Spielers"
     },
     "seemoney": {
-      "usage": "/seemoney <Spieler>",
+      "usage": "/seemoney <Spieler> [monnaie]",
       "description": "Schau dir den Kontostand eines Spielers an"
     },
     "givemoney": {
-      "usage": "/givemoney <Spieler> <Betrag>",
+      "usage": "/givemoney <Spieler> <Betrag> [monnaie]",
       "description": "Schenk einem Spieler Geld"
     },
     "takemoney": {
-      "usage": "/takemoney <Spieler> <Betrag>",
+      "usage": "/takemoney <Spieler> <Betrag> [monnaie]",
       "description": "Nimm einem Spieler Geld weg"
     },
     "pay": {
-      "usage": "/pay <Spieler> <Betrag>",
+      "usage": "/pay <Spieler> <Betrag> [monnaie]",
       "description": "Überweis einem Spieler Geld"
     },
     "mystatus": {

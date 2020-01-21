@@ -10,23 +10,23 @@
       "description": "このサーバーのプレーヤー所持金ランキングを表示します"
     },
     "setmoney": {
-      "usage": "/setmoney <プレーヤー> <数値>",
+      "usage": "/setmoney <プレーヤー> <数値> [貨幣]",
       "description": "プレーヤーの所持金を設定します"
     },
     "seemoney": {
-      "usage": "/seemoney <プレーヤー>",
+      "usage": "/seemoney <プレーヤー> [貨幣]",
       "description": "プレーヤーの所持金を表示します"
     },
     "givemoney": {
-      "usage": "/givemoney <プレーヤー> <数値>",
+      "usage": "/givemoney <プレーヤー> <数値> [貨幣]",
       "description": "プレーヤーにお金を支給します"
     },
     "takemoney": {
-      "usage": "/takemoney <プレーヤー> <数値>",
+      "usage": "/takemoney <プレーヤー> <数値> [貨幣]",
       "description": "プレーヤーからお金を奪います"
     },
     "pay": {
-      "usage": "/pay <プレーヤー> <数値>",
+      "usage": "/pay <プレーヤー> <数値> [貨幣]",
       "description": "プレーヤーに支払いします"
     },
     "mystatus": {

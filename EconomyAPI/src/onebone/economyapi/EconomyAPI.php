@@ -400,11 +400,11 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param Player|string $player
-	 * @param string|Currency
+	 * @param Currency $currency
 	 *
 	 * @return float|bool
 	 */
-	public function myMoney($player, $currency = null) {
+	public function myMoney($player, ?Currency $currency = null) {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		return $holder->getProvider()->getMoney($player);
