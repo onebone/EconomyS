@@ -21,6 +21,7 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\internal\CurrencyReplacer;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
@@ -45,8 +46,10 @@ class MyMoneyCommand extends PluginCommand {
 			/** @var EconomyAPI $plugin */
 			$plugin = $this->getPlugin();
 
+			$currency = $plugin->getPlayerPreferredCurrency($sender, false);
+
 			$money = $plugin->myMoney($sender);
-			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", $sender, [$money]));
+			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", $sender, [new CurrencyReplacer($currency, $money)]));
 			return true;
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");

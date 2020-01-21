@@ -21,6 +21,7 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\internal\CurrencyReplacer;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
@@ -53,9 +54,11 @@ class SeeMoneyCommand extends PluginCommand {
 			$player = $p->getName();
 		}
 
-		$money = $plugin->myMoney($player);
+		$currency = $plugin->getPlayerPreferredCurrency($player, false);
+
+		$money = $plugin->myMoney($player, $currency);
 		if($money !== false) {
-			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", $sender, [$player, $money]));
+			$sender->sendMessage($plugin->getMessage("seemoney-seemoney", $sender, [$player, new CurrencyReplacer($currency, $money)]));
 		}else{
 			$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 		}

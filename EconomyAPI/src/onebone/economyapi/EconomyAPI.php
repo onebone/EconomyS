@@ -42,6 +42,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\internal\Replacer;
 use onebone\economyapi\provider\DummyProvider;
 use onebone\economyapi\provider\DummyUserProvider;
 use onebone\economyapi\provider\MySQLProvider;
@@ -168,7 +169,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return "Language matching key \"$key\" does not exist.";
 	}
 
-	private function replaceParameters($message, $params = []) {
+	public function replaceParameters($message, $params = []) {
 		$ret = '';
 
 		$len = strlen($message);
@@ -202,10 +203,17 @@ class EconomyAPI extends PluginBase implements Listener {
 						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
 
 						if($isMoney) {
-							// TODO format parameter with Currency
-							$ret .= $this->getMonetaryUnit() . $replace;
+							if($replace instanceof Replacer) {
+								$ret .= $replace->getText();
+							}else{
+								$ret .= $this->getMonetaryUnit() . $replace;
+							}
 						}else{
-							$ret .= $replace;
+							if($replace instanceof Replacer) {
+								$ret .= $replace->getRawText();
+							}else{
+								$ret .= $replace;
+							}
 						}
 					}
 				}
@@ -228,10 +236,17 @@ class EconomyAPI extends PluginBase implements Listener {
 						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
 
 						if($isMoney) {
-							// TODO format parameter with Currency
-							$ret .= $this->getMonetaryUnit() . $replace;
+							if($replace instanceof Replacer) {
+								$ret .= $replace->getText();
+							}else{
+								$ret .= $this->getMonetaryUnit() . $replace;
+							}
 						}else{
-							$ret .= $replace;
+							if($replace instanceof Replacer) {
+								$ret .= $replace->getRawText();
+							}else{
+								$ret .= $replace;
+							}
 						}
 
 						$isReplace = false;
@@ -252,10 +267,17 @@ class EconomyAPI extends PluginBase implements Listener {
 			$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
 
 			if($isMoney) {
-				// TODO format parameter with Currency
-				$ret .= $this->getMonetaryUnit() . $replace;
+				if($replace instanceof Replacer) { // TODO generalize usage of replacers
+					$ret .= $replace->getText();
+				}else{
+					$ret .= $this->getMonetaryUnit() . $replace;
+				}
 			}else{
-				$ret .= $replace;
+				if($replace instanceof Replacer) {
+					$ret .= $replace->getRawText();
+				}else{
+					$ret .= $replace;
+				}
 			}
 		}
 
@@ -321,16 +343,22 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param Player|string $player
+	 * @param bool $allowNull Allows null on return value. If set false, it will return default currency by default.
 	 * @return Currency|null
 	 */
-	public function getPlayerPreferredCurrency($player): ?Currency {
+	public function getPlayerPreferredCurrency($player, bool $allowNull = true): ?Currency {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		$id = $this->provider->getPreferredCurrency($player);
-		return $this->getCurrency($id);
+		$currency = $this->getCurrency($id);
+
+		if($currency === null) {
+			return $allowNull ? $currency : $this->defaultCurrency->getCurrency();
+		}
+		return $currency;
 	}
 
 	/**

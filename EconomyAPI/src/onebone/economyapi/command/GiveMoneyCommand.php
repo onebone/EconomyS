@@ -21,6 +21,7 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\internal\CurrencyReplacer;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 use pocketmine\Player;
@@ -56,19 +57,21 @@ class GiveMoneyCommand extends PluginCommand {
 			$player = $p->getName();
 		}
 
-		$result = $plugin->addMoney($player, $amount);
+		$currency = $plugin->getPlayerPreferredCurrency($player, false);
+
+		$result = $plugin->addMoney($player, $amount, false, null, $currency); // TODO issuer
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
 				$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", $sender, [$amount]));
 				break;
 			case EconomyAPI::RET_SUCCESS:
 				$sender->sendMessage($plugin->getMessage("givemoney-gave-money", $sender, [
-					$amount,
+					new CurrencyReplacer($currency, $amount),
 					$player
 				]));
 
 				if($p instanceof Player) {
-					$p->sendMessage($plugin->getMessage("givemoney-money-given", $sender, [$amount]));
+					$p->sendMessage($plugin->getMessage("givemoney-money-given", $sender, [new CurrencyReplacer($currency, $amount)]));
 				}
 				break;
 			case EconomyAPI::RET_CANCELLED:
