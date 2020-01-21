@@ -169,7 +169,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return "Language matching key \"$key\" does not exist.";
 	}
 
-	public function replaceParameters($message, $params = []) {
+	private function replaceParameters($message, $params = []) {
 		$ret = '';
 
 		$len = strlen($message);
@@ -387,11 +387,15 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
+	 * @param Currency $currency
 	 *
 	 * @return bool
 	 */
-	public function accountExists($player): bool {
-		return $this->defaultCurrency->getProvider()->accountExists($player);
+	public function accountExists($player, ?Currency $currency = null): bool {
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) return false;
+
+		return $holder->getProvider()->accountExists($player);
 	}
 
 	/**
