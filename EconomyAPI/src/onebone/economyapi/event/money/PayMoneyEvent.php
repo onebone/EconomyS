@@ -23,8 +23,9 @@ namespace onebone\economyapi\event\money;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\event\Issuer;
+use pocketmine\event\Cancellable;
 
-class PayMoneyEvent extends EconomyAPIEvent {
+class PayMoneyEvent extends EconomyAPIEvent implements Cancellable {
 	private $payer, $target, $amount;
 
 	public function __construct(EconomyAPI $plugin, $payer, $target, $amount, ?Issuer $issuer) {

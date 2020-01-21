@@ -24,7 +24,7 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
-class EconomyAPIEvent extends PluginEvent implements Cancellable {
+class EconomyAPIEvent extends PluginEvent {
 	private $issuer;
 
 	public function __construct(EconomyAPI $plugin, ?Issuer $issuer) {
