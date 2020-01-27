@@ -21,7 +21,6 @@
 namespace onebone\economyapi\event;
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
 class EconomyAPIEvent extends PluginEvent {

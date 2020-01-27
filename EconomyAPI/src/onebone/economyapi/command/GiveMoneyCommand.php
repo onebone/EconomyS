@@ -69,7 +69,7 @@ class GiveMoneyCommand extends PluginCommand {
 			}
 		}
 
-		$result = $plugin->addMoney($player, $amount, false, null, $currency); // TODO issuer
+		$result = $plugin->addMoney($player, $amount, $currency, null, false); // TODO issuer
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
 				$sender->sendMessage($plugin->getMessage("givemoney-invalid-number", $sender, [$amount]));

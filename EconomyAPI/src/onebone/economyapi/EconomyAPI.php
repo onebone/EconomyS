@@ -413,13 +413,13 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param bool $force
-	 * @param Issuer $issuer
 	 * @param Currency $currency
+	 * @param Issuer $issuer
+	 * @param bool $force
 	 *
 	 * @return int
 	 */
-	public function setMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
+	public function setMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canSetMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -484,13 +484,13 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param bool $force
-	 * @param Issuer $issuer
 	 * @param Currency $currency
+	 * @param Issuer $issuer
+	 * @param bool $force
 	 *
 	 * @return int
 	 */
-	public function addMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
+	public function addMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canAddMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -556,13 +556,13 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param bool $force
-	 * @param Issuer $issuer
 	 * @param Currency $currency
+	 * @param Issuer $issuer
+	 * @param bool $force
 	 *
 	 * @return int
 	 */
-	public function reduceMoney($player, float $amount, bool $force = false, ?Issuer $issuer = null, ?Currency $currency = null): int {
+	public function reduceMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canReduceMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -631,13 +631,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
+	 * @param string|Currency $currency
 	 * @param float|bool $defaultMoney
 	 * @param Issuer $issuer
-	 * @param string|Currency $currency
 	 *
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = false, ?Issuer $issuer = null, $currency = null): bool {
+	public function createAccount($player, $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		if($player instanceof Player) {

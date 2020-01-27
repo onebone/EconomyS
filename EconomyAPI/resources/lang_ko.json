@@ -43,7 +43,7 @@
   "player-not-connected": "%1님은 서버에 접속하지 않았습니다.",
   "player-never-connected": "%1님은 서버에 접속한 적이 없습니다.",
   "currency-unavailable": "화폐 %1은(는) 사용이 불가능합니다.",
-  "topmoney-tag",: "- 돈 순위를 표시합니다 (%1 / %2 페이지) -",
+  "topmoney-tag": "- 돈 순위를 표시합니다 (%1 / %2 페이지) -",
   "topmoney-format": "[%1] %2: %3",
   "pay-ask-title": "송금",
   "pay-ask-content": "수취인: &l&b%1&r&f\n금액: &l&6%$2&r&f\n\n정말로 송금하시겠습니까?",
