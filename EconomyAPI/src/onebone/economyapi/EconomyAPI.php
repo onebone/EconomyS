@@ -631,13 +631,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param string|Currency $currency
+	 * @param Currency $currency
 	 * @param float|bool $defaultMoney
 	 * @param Issuer $issuer
 	 *
 	 * @return bool
 	 */
-	public function createAccount($player, $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
+	public function createAccount($player, ?Currency $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		if($player instanceof Player) {
@@ -955,7 +955,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
-			$this->createAccount($player, false);
+			$this->createAccount($player, $this->defaultCurrency->getCurrency());
 		}
 	}
 
