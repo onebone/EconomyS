@@ -31,16 +31,20 @@ class CurrencyWon implements Currency {
 		return strtolower($player->getLevel()->getFolderName()) === 'korea';
 	}
 
+	public function isExposed(): bool {
+		return true;
+	}
+
 	public function getDefaultMoney(): float {
 		return 1000000;
 	}
 
 	public function getSymbol(): string {
-		return '\\';
+		return "\xef\xbf\xa6"; // ￦
 	}
 
 	public function format(float $money): string {
-		return sprintf('\\%d', $money);
+		return sprintf("\xef\xbf\xa6%d", $money);
 	}
 
 	public function stringify(float $money): string {

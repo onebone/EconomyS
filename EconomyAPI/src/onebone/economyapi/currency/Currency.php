@@ -35,6 +35,17 @@ interface Currency {
 	public function isAvailableTo(Player $player): bool;
 
 	/**
+	 * Returns if the currency wants to be exposed to information
+	 * shown by EconomyAPI such as /mymoney command or currency
+	 * preference selector. If false, the currency will not be exposed
+	 * unless a player manually orders. This makes 3rd party plugin
+	 * available to make players access currency information via only
+	 * their plugin.
+	 * @return bool
+	 */
+	public function isExposed(): bool;
+
+	/**
 	 * Returns default money which is given to player for the first
 	 * time in forever. It may be overridden when server administrator
 	 * sets the default value.

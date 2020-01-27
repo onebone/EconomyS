@@ -862,6 +862,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		return null;
 	}
 
+	/**
+	 * Returns all currencies registered to EconomyAPI
+	 * @return Currency[]
+	 */
 	public function getCurrencies(): array {
 		$ret = [];
 
@@ -915,9 +919,14 @@ class EconomyAPI extends PluginBase implements Listener {
 				}
 			}
 
+			$isExposed = $data['exposed'] ?? true;
+			if(!is_bool($isExposed)) {
+				$isExposed = true;
+			}
+
 			$holder = $this->currencies[$key];
 			$holder->setConfig(
-				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? 0, $data['default'] ?? null, $exchange)
+				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? 0, $data['default'] ?? null, $exchange, $isExposed)
 			);
 		}
 	}

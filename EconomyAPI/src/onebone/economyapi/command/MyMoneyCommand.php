@@ -46,10 +46,33 @@ class MyMoneyCommand extends PluginCommand {
 			/** @var EconomyAPI $plugin */
 			$plugin = $this->getPlugin();
 
-			$currency = $plugin->getPlayerPreferredCurrency($sender, false);
+			$currencyId = array_shift($params);
+			if($currencyId !== null) {
+				$currency = $plugin->getCurrency($currencyId);
 
-			$money = $plugin->myMoney($sender);
+				if($currency === null) {
+					$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$currencyId]));
+					return true;
+				}
+			}else{
+				$currency = $plugin->getPlayerPreferredCurrency($sender, false);
+			}
+
+			$money = $plugin->myMoney($sender, $currency);
 			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", $sender, [new CurrencyReplacer($currency, $money)]));
+
+			if($currencyId === null) { // show all balance of each currency when currency is not specified
+				foreach($plugin->getCurrencies() as $val) {
+					if($val->isExposed() and $val !== $currency) {
+						$money = $plugin->myMoney($sender, $val);
+						if($money === false or $money === 0) continue;
+
+						$sender->sendMessage($plugin->getMessage("mymoney-multiline", $sender, [
+							$val->getName(), $val->getSymbol(), new CurrencyReplacer($val, $money)
+						]));
+					}
+				}
+			}
 			return true;
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");

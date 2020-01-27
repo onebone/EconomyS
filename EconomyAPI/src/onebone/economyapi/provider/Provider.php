@@ -62,7 +62,7 @@ interface Provider {
 	public function removeAccount($player): bool;
 
 	/**
-	 * @param string $player
+	 * @param Player|string $player
 	 * @return float|bool
 	 */
 	public function getMoney($player);

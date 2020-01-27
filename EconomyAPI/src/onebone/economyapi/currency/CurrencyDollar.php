@@ -31,6 +31,10 @@ class CurrencyDollar implements Currency {
 		return true;
 	}
 
+	public function isExposed(): bool {
+		return true;
+	}
+
 	public function getDefaultMoney(): float {
 		return 1000;
 	}
