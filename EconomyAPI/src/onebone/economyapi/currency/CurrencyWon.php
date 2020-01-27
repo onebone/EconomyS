@@ -44,10 +44,10 @@ class CurrencyWon implements Currency {
 	}
 
 	public function format(float $money): string {
-		return sprintf("\xef\xbf\xa6%d", $money);
+		return sprintf("\xef\xbf\xa6%d", floor($money));
 	}
 
 	public function stringify(float $money): string {
-		return sprintf('%d Won', $money);
+		return sprintf('%d Won', floor($money));
 	}
 }

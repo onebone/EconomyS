@@ -100,7 +100,6 @@ class YamlProvider implements Provider {
 
 		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] = $amount;
-			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
 		}
 		return false;
@@ -114,7 +113,6 @@ class YamlProvider implements Provider {
 
 		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] += $amount;
-			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
 		}
 		return false;
@@ -128,7 +126,6 @@ class YamlProvider implements Provider {
 
 		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] -= $amount;
-			$this->money["money"][$player] = round($this->money["money"][$player], 2);
 			return true;
 		}
 		return false;

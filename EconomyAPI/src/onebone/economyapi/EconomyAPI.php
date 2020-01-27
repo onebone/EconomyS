@@ -462,8 +462,6 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if($holder->getProvider()->accountExists($player)) {
-			$amount = round($amount, 2);
-
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
 				if($amount > $config->getMaxMoney()) {
@@ -501,8 +499,6 @@ class EconomyAPI extends PluginBase implements Listener {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-
-		$amount = round($amount, 2);
 
 		if($ret === self::RET_VALID) {
 			$money = $holder->getProvider()->getMoney($player);
@@ -575,8 +571,6 @@ class EconomyAPI extends PluginBase implements Listener {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
-
-		$amount = round($amount, 2);
 
 		if($ret === self::RET_VALID) {
 			$money = $holder->getProvider()->getMoney($player);

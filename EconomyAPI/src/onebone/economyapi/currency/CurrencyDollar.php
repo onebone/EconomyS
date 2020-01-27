@@ -44,10 +44,13 @@ class CurrencyDollar implements Currency {
 	}
 
 	public function format(float $money): string {
+		$money = floor($money * 100) / 100;
 		return sprintf('$%.2f', $money);
 	}
 
 	public function stringify(float $money): string {
+		$money = floor($money * 100) / 100;
+
 		$digits = floor($money);
 		$decimal = floor(($money - $digits) * 100);
 
