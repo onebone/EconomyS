@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,17 @@
 namespace onebone\economysell\event;
 
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 use pocketmine\event\Event;
 use pocketmine\item\Item;
-use pocketmine\level\Position;
+use pocketmine\world\Position;
 
-class SellCreationEvent extends Event implements Cancellable{
-	public static $handlerList = null;
+class SellCreationEvent extends Event implements Cancellable {
+	use CancellableTrait;
 
 	private $position, $item, $price, $side;
 
-	public function __construct(Position $position, Item $item, $price, $side){
+	public function __construct(Position $position, Item $item, $price, $side) {
 		$this->position = $position;
 		$this->item = $item;
 		$this->price = $price;
@@ -40,28 +41,28 @@ class SellCreationEvent extends Event implements Cancellable{
 	/**
 	 * @return Position
 	 */
-	public function getPosition(){
+	public function getPosition() {
 		return $this->position;
 	}
 
 	/**
 	 * @return Item
 	 */
-	public function getItem(){
+	public function getItem() {
 		return $this->item;
 	}
 
 	/**
 	 * @return float
 	 */
-	public function getPrice(){
+	public function getPrice() {
 		return $this->price;
 	}
 
 	/**
 	 * @return int
 	 */
-	public function getSide(){
+	public function getSide() {
 		return $this->side;
 	}
 }

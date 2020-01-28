@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,13 +20,12 @@
 
 namespace onebone\economyapi\task;
 
+use onebone\economyapi\EconomyAPI;
+use pocketmine\player\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
-use pocketmine\player\Player;
 
-use onebone\economyapi\EconomyAPI;
-
-class SortTask extends AsyncTask{
+class SortTask extends AsyncTask {
 	private $sender, $moneyData, $addOp, $page, $ops, $banList;
 
 	private $max = 0;
@@ -41,7 +40,7 @@ class SortTask extends AsyncTask{
 	 * @param array				$ops
 	 * @param array				$banList
 	 */
-	public function __construct(string $sender, array $moneyData, bool $addOp, int $page, array $ops, array $banList){
+	public function __construct(string $sender, array $moneyData, bool $addOp, int $page, array $ops, array $banList) {
 		$this->sender = $sender;
 		$this->moneyData = $moneyData;
 		$this->addOp = $addOp;
@@ -54,26 +53,29 @@ class SortTask extends AsyncTask{
 		$this->topList = serialize((array)$this->getTopList());
 	}
 
-	private function getTopList(){
-		$money = (array)$this->moneyData;
-		$banList = (array)$this->banList;
-		$ops = (array)$this->ops;
+	private function getTopList() {
+		$money = (array) $this->moneyData;
+		$banList = (array) $this->banList;
+		$ops = (array) $this->ops;
 		arsort($money);
 
 		$ret = [];
 
 		$n = 1;
 		$this->max = ceil((count($money) - count($banList) - ($this->addOp ? 0 : count($ops))) / 5);
-		$this->page = (int)min($this->max, max(1, $this->page));
+		$this->page = (int) min($this->max, max(1, $this->page));
 
-		foreach($money as $p => $m){
+		foreach($money as $p => $m) {
 			$p = strtolower($p);
 			if(isset($banList[$p])) continue;
 			if(isset($this->ops[$p]) and $this->addOp === false) continue;
 			$current = (int) ceil($n / 5);
-			if($current === $this->page){
-				$ret[$n] = [$p, $m];
-			}elseif($current > $this->page){
+			if($current === $this->page) {
+				$ret[$n] = [
+					$p,
+					$m
+				];
+			}elseif($current > $this->page) {
 				break;
 			}
 			++$n;
@@ -86,17 +88,29 @@ class SortTask extends AsyncTask{
 		if($this->sender === "CONSOLE" or ($player = $server->getPlayerExact($this->sender)) instanceof Player){ // TODO: Rcon
 			$plugin = EconomyAPI::getInstance();
 
-			$output = ($plugin->getMessage("topmoney-tag", [$this->page, $this->max], $this->sender)."\n");
-			$message = ($plugin->getMessage("topmoney-format", [], $this->sender)."\n");
+			$output = ($plugin->getMessage("topmoney-tag", $this->sender, [
+					$this->page,
+					$this->max
+				]) . "\n");
+			$message = ($plugin->getMessage("topmoney-format", $this->sender) . "\n");
 
-			foreach(unserialize($this->topList) as $n => $list){
-				$output .= str_replace(["%1", "%2", "%3"], [$n, $list[0], $list[1]], $message);
+			foreach(unserialize($this->topList) as $n => $list) {
+				$output .= str_replace([
+					"%1",
+					"%2",
+					"%3"
+				], [
+					$n,
+					$list[0],
+					$list[1]
+				], $message);
 			}
 			$output = substr($output, 0, -1);
 
-			if($this->sender === "CONSOLE"){
+			if($this->sender === "CONSOLE") {
 				$plugin->getLogger()->info($output);
 			}else{
+				/** @var Player $player */
 				$player->sendMessage($output);
 			}
 		}

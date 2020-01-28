@@ -1,47 +1,62 @@
 # EconomyS
-
-Currently, the maintainer of the plugin is preparing for [Korean CSAT](https://en.wikipedia.org/wiki/College_Scholastic_Ability_Test) on Nov 14, 2019. Issue or PR handling is unavailable for this time. Please contact [@nnnlog](https://github.com/nnnlog) for temporal maintenance.
-
-## FAQ
-**Q>** Why did you try support API 4.0 with some crazy hacks?<br>
-**A>** In South Korea, servers were trying to use API 4.0. Don't ask me why they wanted to use a dev branch for production. Really, literally I don't know.
-
-**Q>** Then why did you drop support for the stable API and only support API 4.0?<br>
-**A>** I have asked @nnnlog to create a branch for API 3.x. Sorry! It was fully my mistake to drop support for the stable version.
-
-**Q>** Are you going to maintain after Nov 14?<br>
-**A>** Probably, with new features and code improvements for EconomyAPI and other Economy* plugins.
-
-**Q>** Your plugin sucks!<br>
-**A>** ㅠㅠ
-
+The economy plugin for PocketMine-MP.
 
 ## Download
 [Jenkins](https://jenkins.onebone.me/job/EconomyS/)
+
+## Upcoming
+The new version of EconomyS will include new features with better
+performance and extensibility. My goal is to complete the update
+before Feb 02, 2020 when [GitHub Archive Program](https://archiveprogram.github.com/)
+takes snapshot for all public repositories. So let's take a brief
+look at what I'm planning to do in this update.
+
+### General
+* Multi currency. You can handle more than one currency
+with EconomyAPI. You can configure your players to use
+different currency as per the world where the player is in,
+or any other custom factors.
+* Logging the transactions. If server administrators needs
+to check the transaction which happened in the past for some
+reason, abusing, for example, EconomyAPI will help arrest the
+abusers.
+* `/pay` command will ask once again before executing transaction.
+* `/givemoney`, `/takemoney`, `/setmoney` will support `asterisk(*)`
+player selection which selects all players online.
+* EconomyShop and EconomySell will become one as it has almost
+same code base except for the direction where transaction is done.
+To improve code quality and fully use the new multi-currency system,
+the plugin will be fully rewritten. My goal is to meet the standard
+of Korean Minecraft: BE servers and make most of our server administrators
+use EconomyShop.
+* EconomyLand will be fully rewritten to have better code quality.
+
+
+### Developers
+* `myMoney()`, `addMoney()`, `reduceMoney()`, `setMoney()` will have its
+last parameter `string|Currency $currency` which selects the currency
+to transact with.
+* It will be able to get ranking of the balance from EconomyAPI. Sorting
+the balance will be done from database provider as each database can have
+its own optimal method to sort values.
+* `$issuer` parameter on API will receive `Issuer` class instead of string.
+The data is used on logging the transactions and event calling.
+* `Transaction` will be implemented. API will allow executing multiple
+actions at once. For example, `/pay` command will give and take balance at
+once instead of giving after taking money from the payer.
+
 
 ## EconomyAPI commands
 
 | Default command | Parameter | Description | Default Permission |
 | :-----: | :-------: | :---------: | :-------: |
 | /mymoney | | Shows your money | All |
-| /mydebt | | Shows your debt | All |
-| /takedebt | `<money>` | Borrows $`<money>` from plugin | `All` |
-| /returndebt | `<money>` | Returns $`<money>` to plugin | `All` |
 | /topmoney | `<page>` | Shows server's top money | `All` |
-| /moneysave | | Saves data to your hardware | `Console` |
-| /moneyload | | Loads data from your hardware | `Console` |
 | /setmoney | `<player>` `<money>` | Sets `<player>`'s money to $`<money>` | `OP` `Console` |
-| /economys | | Shows plugin which are using EconomyAPI | `All` |
 | /givemoney | `<player>` `<money>` | Gives $`<money>` `<player>` | `OP` `Console` |
 | /takemoney | `<player>` `<money>` | Takes $`<money>` from `<player>` | `OP` `Console` |
 | /seemoney | `<player>` | Shows `<player>`'s money | `All` |
-| /bank deposit | `<money>` | Deposit $`<money>` to your account | `All` |
-| /bank withdraw | `<money>` | Withdraw $`<money>` from your account | `All` |
-| /bank mymoney | | Shows your money from your account | `All` |
 | /mystatus | | Shows your money status | `All` |
-| /bankadmin takemoney | `<player>` `<money>` | Takes $`<money>` from `<player>`'s account | `OP` `Console` |
-| /bankadmin givemoney | `<player>` `<money>` | Gives $`<money>` for `<player>`'s account | `OP` `Console` |
-
 
 ## EconomyAPI configuration
 
@@ -49,71 +64,16 @@ Currently, the maintainer of the plugin is preparing for [Korean CSAT](https://e
 
 | Key | Description | Available Value | Default Value |
 | :-: | :---------: | :---------------: | :---------: |
-| show-using-economy | Changes server name to `[EconomyS] SERVER NAME`   `on : Change` `off : Don't change` | `on` `off` | on | 
-| once-debt-limit | Limits borrowing debt at once | `All integers` | 100 |
-| debt-limit | Limits available debt | `All integers` | 500 |
-| add-op-at-rank | Shows OP at top money rank    `on : Shows OP` `off : Don't shows OP` | `on` `off` | off |
+| add-op-at-rank | Shows OP at top money rank    `on : Shows OP` `off : Don't shows OP` | `true` or `false` | false |
 | default-money | Sets default money | `All integers` | 1000 |
-| default-debt | Sets default debt | `All integers` | 0 |
-| time-for-increase-debt | Sets how long will take for debt increase | `All integers` | 10 |
-| percent-of-increase-debt | Sets percentage of increasing debt | `All integers` | 5 |
-| default-bank-money | Sets default bank money | `All integers` | 0 |
-| time-for-increase-money | Sets how long will take for credit increase | `All integers` | 10 |
-| bank-increase=money-rate | Sets percentage of increasing credit | `All integers` | 5 |
-| debug | Money debugging preferences  `on : yes` `off : no` | `on` `off` | on |
-
-## EconomyShop configuration
-
-> File : `plugins/EconomyShop/shop.properties`
-
-| Key | Description | Available Value | Default Value |
-| :-: | :---------: | :-------------: | :-----------: |
-| handler-priority | The priority of handling shop touches | Integer | 5 |
-
-## How to create shop in EconomyShop
-
-> File : `plugins/EconomyShop/ShopSign.yml`
-
-This documentation is focused on default configuration.
-
-| Line1 | Line2 | Line3 | Line4 |
-| :---: | :---: | :---: | :---: |
-| shop | `<price>` | `<item id or name>` | `<amount>` |
-
-You must write all the parameters `integer` except for line 3.
-The shop will created if the parameters are valid.
-
-`Sell Center` in `EconomySell` can be created in same way. And also `Player's Shop` in `EconomyPShop`
-
-## EconomyAirport and EconomyAirportPlus
-
-> File : `%CONFIG_PATH%/DepartureSign.yml`
-> File : `%CONFIG_PATH%/ArrivalSign.yml`
-> File : `%CONFIG_PATH%/Identifier.yml`
-
-This documentation is focused on default configuration.
-
-| Line1 | Line2 | Line3 | Line4 |
-| :---: | :---: | :---: | :---: |
-| `<international | airport>` | `<arrival | departure>` | `<arrival:`Airport name` departure:`price`>` | `<arrival:`none` departure:`<target>`>` |
-
-Example:
-
-Line1: airport
-Line2: departure
-Line3: 10
-Line4: onebone
-
-Takes $10 to go to `onebone` airport
-
-Line1: airport
-Line2: arrival
-Line3: onebone
-Line4: 
-
-Arrival sign : `onebone` airport
-
-If there's no target airport to fly, it aborts riding a flight.
+| max-money | Limits maximum balance each player may possess | `All integers` | 9999999999 |
+| allow-pay-offline | Whether to allow player to pay when target player is offline | `true` or `false` | false |
+| default-lang | Sets default language for the plugin | `Available languages` | `def` |
+| auto-save-interval | Set interval of auto-save by minutes | `number` | 10 |
+| provider | Sets provider for database | `yaml` or `mysql` | `yaml` |
+| check-update | Sets whether to check update from server | `true` or `false` | true
+| update-host | Sets host where to check update | `Any available URIs` | onebone.me/plugins/economys/api |
+| provider-settings | Data which will be given to database provider | `mixed` | mixed |
 
 ## For Developers
 
@@ -127,7 +87,7 @@ EconomyAPI::getInstance()->addMoney($player, $amount);
 ## License
 ```
 EconomyS, the massive economy plugin with many features for PocketMine-MP
-Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+Copyright (C) 2013-2020  onebone <me@onebone.me>
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,23 +21,23 @@
 namespace onebone\economysell\provider;
 
 use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\Position;
 use pocketmine\utils\Config;
 
-class YamlDataProvider implements DataProvider{
+class YamlDataProvider implements DataProvider {
 	/** @var Config */
 	private $config;
 
 	private $save;
 
-	public function __construct($file, $save){
+	public function __construct($file, $save) {
 		$this->config = new Config($file, Config::YAML);
 
 		$this->save = $save;
 	}
 
-	public function addSell($x, $y = 0, $z = 0, $level = null, $data = []){
-		if($x instanceof Position){
+	public function addSell($x, $y = 0, $z = 0, $level = null, $data = []) {
+		if($x instanceof Position) {
 			$data = $y;
 
 			$y = $x->getFloorY();
@@ -45,67 +45,67 @@ class YamlDataProvider implements DataProvider{
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if($this->config->exists($x.":".$y.":".$z.":".$level)){
+		if($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
 
-		$this->config->set($x.":".$y.":".$z.":".$level, $data);
-		if($this->save){
+		$this->config->set($x . ":" . $y . ":" . $z . ":" . $level, $data);
+		if($this->save) {
 			$this->save();
 		}
 		return true;
 	}
 
-	public function getSell($x, $y = 0, $z = 0, $level = null){
-		if($x instanceof Position){
+	public function save() {
+		$this->config->save();
+	}
+
+	public function getSell($x, $y = 0, $z = 0, $level = null) {
+		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
-		if(!$this->config->exists($x.":".$y.":".$z.":".$level)){
+		if(!$this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
 			return false;
 		}
-		return $this->config->get($x.":".$y.":".$z.":".$level);
+		return $this->config->get($x . ":" . $y . ":" . $z . ":" . $level);
 	}
 
-	public function getAll(){
+	public function getAll() {
 		return $this->config->getAll();
 	}
 
-	public function removeSell($x, $y = 0, $z = 0, $level = null){
-		if($x instanceof Position){
+	public function removeSell($x, $y = 0, $z = 0, $level = null) {
+		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
 			$level = $x->getLevel();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level){
+		if($level instanceof Level) {
 			$level = $level->getFolderName();
 		}
 
-		if($this->config->exists($x.":".$y.":".$z.":".$level)){
-			$this->config->remove($x.":".$y.":".$z.":".$level);
+		if($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
+			$this->config->remove($x . ":" . $y . ":" . $z . ":" . $level);
 			return true;
 		}
 		return false;
 	}
 
-	public function save(){
-		$this->config->save();
-	}
-
-	public function close(){
+	public function close() {
 		$this->save();
 	}
 
-	public function getProviderName(){
+	public function getProviderName() {
 		return "Yaml";
 	}
 }

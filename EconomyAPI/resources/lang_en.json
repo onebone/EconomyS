@@ -1,0 +1,84 @@
+{
+	"language": "en",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Shows your money"
+		},
+		"topmoney": {
+			"usage": "/topmoney [page]",
+			"description": "Shows top money of this server"
+		},
+		"setmoney": {
+			"usage": "/setmoney <player> <amount> [currency]",
+			"description": "Set money of player"
+		},
+		"seemoney": {
+			"usage": "/seemoney <player> [currency]",
+			"description": "Shows money of player"
+		},
+		"givemoney": {
+			"usage": "/givemoney <player> <amount> [currency]",
+			"description": "Gives money to player"
+		},
+		"takemoney": {
+			"usage": "/takemoney <player> <amount> [currency]",
+			"description": "Takes money from player"
+		},
+		"pay": {
+			"usage": "/pay <player> <amount> [currency]",
+			"description": "Pays money to player"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Shows your status of money"
+		},
+		"economy": {
+			"usage": "/economy <lang|currency> <value>",
+			"description": "Sets own configuration for EconomyAPI"
+		}
+	},
+	"language-set": "Language set to %1 by onebone",
+	"request-cancelled": "Your request was cancelled",
+	"player-not-connected": "Player %1 is not online.",
+	"player-never-connected": "Player %1 was never connected.",
+	"currency-unavailable": "Currency %1 is not available.",
+	"topmoney-tag": "- Showing top money list (%1 of %2) -",
+	"topmoney-format": "[%1] %2: %3",
+	"pay-ask-title": "Payment",
+	"pay-ask-content": "Payee: &l&b%1&r&f\nAmount: &l&6%$2&r&f\n\nAre you really sure you want to pay?",
+	"pay-cancel": "Cancel",
+	"pay-confirm": "OK",
+	"pay-no-self": "Could not pay yourself.",
+	"pay-no-money": "You don't have enough money to pay %$1.",
+	"pay-failed": "Failed to pay.",
+	"pay-cancelled": "Payment cancelled.",
+	"pay-success": "Paid %$1 to %2.",
+	"money-paid": "%1 gave you %$2.",
+	"takemoney-must-be-number": "Amount must be numeric",
+	"takemoney-invalid-number": "Invalid number",
+	"takemoney-unavailable": "Cannot take money that results in negative balance.",
+	"takemoney-player-lack-of-money": "%1 does not have enough %$2. %1's money : %$3",
+	"takemoney-money-taken": "Your %$1 have been taken",
+	"takemoney-took-money": "Taken %$2 from %1",
+	"takemoney-failed": "You have failed to take money",
+	"givemoney-must-be-number": "Amount must be numeric",
+	"givemoney-unavailable": "Cannot give money that results in excess of balance over configured maximum balance limit.",
+	"givemoney-invalid-number": "Invalid number",
+	"givemoney-money-given": "You have earned %$1",
+	"givemoney-gave-money": "Gave %$1 to %2",
+	"seemoney-seemoney": "Player %1's money : %$2",
+	"setmoney-unavailable": "Cannot set balance to negative value or value that is above configured maximum balance limit.",
+	"setmoney-setmoney": "Player %1's money was set to %$2",
+	"setmoney-set": "Your money was set to %$1",
+	"setmoney-failed": "Failed to set money due to unknown error",
+	"setmoney-invalid-number": "%$1 must be a numeric value",
+	"mymoney-mymoney": "Your money : &6%$1",
+	"mymoney-multiline": "* &b%1(%2)&f : &6%$3",
+	"mystatus-show": "My money status : %1%",
+	"economy-currency-form-title": "Preferred Currency",
+	"economy-currency-form-content": "Select your preferred currency to use default",
+	"economy-currency-form-invalid": "Invalid form response received.",
+	"economy-currency-set": "Set your preferred currency to: %1 (%2)",
+	"economy-currency-failed": "Cannot set your preferred currency to: %1 (%2)"
+}

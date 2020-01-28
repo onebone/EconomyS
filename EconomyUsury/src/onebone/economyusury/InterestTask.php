@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,24 +17,22 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 namespace onebone\economyusury;
 
-use pocketmine\scheduler\PluginTask;
-use pocketmine\item\Item;
-use pocketmine\utils\TextFormat;
-use pocketmine\Player;
+use pocketmine\scheduler\Task;
 
-class InterestTask extends PluginTask{
+class InterestTask extends Task {
+	private $plugin;
 	private $host, $player;
-	
-	public function __construct(EconomyUsury $plugin, $host, $player){
-		parent::__construct($plugin);
+
+	public function __construct(EconomyUsury $plugin, $host, $player) {
+		$this->plugin = $plugin;
 		$this->host = $host;
 		$this->player = $player;
 	}
-	
-	public function onRun(int $currentTick){
-		$this->getOwner()->handleInterest($this->host, $this->player);
+
+	public function onRun(int $currentTick) {
+		$this->plugin->handleInterest($this->host, $this->player);
 	}
 }

@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,49 +20,58 @@
 
 namespace onebone\economyapi\command;
 
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
-
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\SortTask;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
+use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\plugin\Plugin;
 
-class TopMoneyCommand extends Command{
+class TopMoneyCommand extends Command implements PluginIdentifiableCommand {
 	/** @var EconomyAPI */
 	private $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin) {
+		$this->plugin = $plugin;
+
 		$desc = $plugin->getCommandMessage("topmoney");
-		parent::__construct("topmoney", $desc["description"], $desc["usage"]);
+		parent::__construct("topmoney", $plugin);
+		$this->setDescription($desc["description"]);
+		$this->setUsage($desc["usage"]);
 
 		$this->setPermission("economyapi.command.topmoney");
-
-		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
+	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if(!$this->testPermission($sender)) return false;
 
-		$page = (int)array_shift($params);
+		$page = (int) array_shift($params);
 
-		$server = $this->plugin->getServer();
+		/** @var EconomyAPI $plugin */
+		$plugin = $this->getPlugin();
+		$server = $plugin->getServer();
 
 		$banned = [];
-		foreach($server->getNameBans()->getEntries() as $entry){
-			if($this->plugin->accountExists($entry->getName())){
+		foreach($server->getNameBans()->getEntries() as $entry) {
+			if($plugin->accountExists($entry->getName())) {
 				$banned[] = $entry->getName();
 			}
 		}
 		$ops = [];
-		foreach($server->getOps()->getAll() as $op){
-			if($this->plugin->accountExists($op)){
+		foreach($server->getOps()->getAll() as $op) {
+			if($plugin->accountExists($op)) {
 				$ops[] = $op;
 			}
 		}
 
-		$task = new SortTask($sender->getName(), $this->plugin->getAllMoney(), $this->plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
+		$task = new SortTask($sender->getName(), $plugin->getAllMoney(), $plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
+
 		$server->getAsyncPool()->submitTask($task);
 
 		return true;
+	}
+
+	public function getPlugin(): Plugin {
+		return $this->plugin;
 	}
 }

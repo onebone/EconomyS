@@ -1,40 +1,93 @@
 <?php
 
+/*
+ * EconomyS, the massive economy plugin with many features for PocketMine-MP
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 namespace onebone\economyapi\command;
 
-use pocketmine\event\TranslationContainer;
+use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\internal\CurrencyReplacer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
+use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\utils\TextFormat;
 
-use onebone\economyapi\EconomyAPI;
-
-class MyMoneyCommand extends Command{
+class MyMoneyCommand extends Command implements PluginIdentifiableCommand {
+	/** @var EconomyAPI */
 	private $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin) {
+		$this->plugin = $plugin;
+
 		$desc = $plugin->getCommandMessage("mymoney");
-		parent::__construct("mymoney", $desc["description"], $desc["usage"]);
+		parent::__construct("mymoney", $plugin);
+		$this->setDescription($desc["description"]);
+		$this->setUsage($desc["usage"]);
 
 		$this->setPermission("economyapi.command.mymoney");
-
-		$this->plugin = $plugin;
 	}
 
-	public function execute(CommandSender $sender, string $label, array $params): bool{
-		if(!$this->plugin->isEnabled()) return false;
-		if(!$this->testPermission($sender)){
+	public function execute(CommandSender $sender, string $label, array $params): bool {
+		if(!$this->testPermission($sender)) {
 			return false;
 		}
 
-		if($sender instanceof Player){
-			$money = $this->plugin->myMoney($sender);
-			$sender->sendMessage($this->plugin->getMessage("mymoney-mymoney", [$money]));
+		if($sender instanceof Player) {
+			/** @var EconomyAPI $plugin */
+			$plugin = $this->getPlugin();
+
+			$currencyId = array_shift($params);
+			if($currencyId !== null) {
+				$currency = $plugin->getCurrency($currencyId);
+
+				if($currency === null) {
+					$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$currencyId]));
+					return true;
+				}
+			}else{
+				$currency = $plugin->getPlayerPreferredCurrency($sender, false);
+			}
+
+			$money = $plugin->myMoney($sender, $currency);
+			$sender->sendMessage($plugin->getMessage("mymoney-mymoney", $sender, [new CurrencyReplacer($currency, $money)]));
+
+			if($currencyId === null) { // show all balance of each currency when currency is not specified
+				foreach($plugin->getCurrencies() as $val) {
+					if($val->isExposed() and $val !== $currency) {
+						$money = $plugin->myMoney($sender, $val);
+						if($money === false or $money === 0) continue;
+
+						$sender->sendMessage($plugin->getMessage("mymoney-multiline", $sender, [
+							$val->getName(), $val->getSymbol(), new CurrencyReplacer($val, $money)
+						]));
+					}
+				}
+			}
 			return true;
 		}
-		$sender->sendMessage(TextFormat::RED."Please run this command in-game.");
+		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 		return true;
+	}
+
+	public function getPlugin(): Plugin {
+		return $this->plugin;
 	}
 }
 

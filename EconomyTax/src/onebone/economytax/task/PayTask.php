@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,18 +20,17 @@
 
 namespace onebone\economytax\task;
 
+use onebone\economytax\EconomyTax;
 use pocketmine\scheduler\Task;
 
-use onebone\economytax\EconomyTax;
-
-class PayTask extends Task{
+class PayTask extends Task {
 	private $plugin;
 
-	public function __construct(EconomyTax $plugin){
+	public function __construct(EconomyTax $plugin) {
 		$this->plugin = $plugin;
 	}
-	
-	public function onRun(int $currentTick){
+
+	public function onRun(int $currentTick) {
 		$this->plugin->payTax();
 	}
 }

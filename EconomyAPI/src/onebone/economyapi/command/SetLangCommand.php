@@ -33,7 +33,7 @@ class SetLangCommand extends Command{
 		}
 
 		if($this->plugin->setPlayerLanguage($sender->getName(), $lang)){
-			$sender->sendMessage($this->plugin->getMessage("language-set", [$lang], $sender->getName()));
+			$sender->sendMessage($this->plugin->getMessage("language-set", $sender->getName(), [$lang]));
 		}else{
 			$sender->sendMessage(TextFormat::RED . "There is no language such as $lang");
 		}

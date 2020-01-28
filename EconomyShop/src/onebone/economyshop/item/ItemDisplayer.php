@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,13 +23,13 @@ namespace onebone\economyshop\item;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
-use pocketmine\level\Position;
+use pocketmine\world\Position;
 use pocketmine\network\mcpe\protocol\AddItemEntityPacket;
 use pocketmine\network\mcpe\protocol\RemoveEntityPacket;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\Server;
 
-class ItemDisplayer{
+class ItemDisplayer {
 	/** @var Position */
 	private $pos;
 	/** @var Item */
@@ -39,7 +39,7 @@ class ItemDisplayer{
 
 	private $eid;
 
-	public function __construct(Position $pos, Item $item, Position $linked){
+	public function __construct(Position $pos, Item $item, Position $linked) {
 		$this->pos = $pos;
 		$this->item = $item;
 		$this->linked = $linked;
@@ -47,7 +47,13 @@ class ItemDisplayer{
 		$this->eid = Entity::$entityCount++;
 	}
 
-	public function spawnTo(Player $player){
+	public function spawnToAll(Level $level = null) {
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+			$this->spawnTo($player);
+		}
+	}
+
+	public function spawnTo(Player $player) {
 		$pk = new AddItemEntityPacket;
 		$pk->eid = $this->eid;
 		$pk->item = $this->item;
@@ -59,28 +65,22 @@ class ItemDisplayer{
 		$player->dataPacket($pk);
 	}
 
-	public function spawnToAll(Level $level = null){
-		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
-			$this->spawnTo($player);
+	public function despawnFromAll(Level $level = null) {
+		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+			$this->despawnFrom($player);
 		}
 	}
 
-	public function despawnFrom(Player $player){
+	public function despawnFrom(Player $player) {
 		$pk = new RemoveEntityPacket;
 		$pk->eid = $this->eid;
 		$player->dataPacket($pk);
 	}
 
-	public function despawnFromAll(Level $level = null){
-		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player){
-			$this->despawnFrom($player);
-		}
-	}
-
 	/**
 	 * @return Position
 	 */
-	public function getLinked(){
+	public function getLinked() {
 		return $this->linked;
 	}
 }

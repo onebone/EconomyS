@@ -1,8 +1,8 @@
-<?php 
+<?php
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,47 +17,43 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
- 
+
 namespace onebone\economyusury;
 
-use pocketmine\scheduler\PluginTask;
 use pocketmine\item\Item;
-use pocketmine\utils\TextFormat;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\scheduler\Task;
 
-class DueTask extends PluginTask{
+class DueTask extends Task {
+	private $plugin;
 	private $guarantee, $playerName, $hostOwner;
-	
-	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner){
-		parent::__construct($plugin);
-		
+
+	public function __construct(EconomyUsury $plugin, Item $guarantee, $playerName, $hostOwner) {
+		$this->plugin = $plugin;
 		$this->guarantee = $guarantee;
 		$this->playerName = $playerName;
 		$this->hostOwner = $hostOwner;
 	}
-	
-	public function onRun(int $currentTick){
+
+	public function onRun(int $currentTick) {
 		$this->removeItem();
 	}
-	
-	public function removeItem(){
-		/** @var $owner EconomyUsury */
-		$owner = $this->getOwner();
 
-		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player){
+	public function removeItem() {
+		$owner = $this->plugin;
+
+		if(($player = $owner->getServer()->getPlayerExact($this->playerName)) instanceof Player) {
 			$player->sendMessage($owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}else{
 			$owner->queueMessage($this->playerName, $owner->getMessage("client-usury-expired", [$this->hostOwner]));
 		}
-		
-		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player){
+
+		if(($player = $owner->getServer()->getPlayerExact($this->hostOwner)) instanceof Player) {
 			$player->getInventory()->addItem($this->guarantee);
 			$player->sendMessage($owner->getMessage("usury-expired", [$this->playerName]));
 		}else{
-			$data = $owner->getServer()->getOfflinePlayerData($this->hostOwner);
-			$c = $this->guarantee->getCount();
 			$owner->addItem($this->hostOwner, $this->guarantee);
-			$owner->queueMessage($this->hostOwner, $owner->getMessage("usury-expired", [$this->playerName], false));
+			$owner->queueMessage($this->hostOwner, $owner->getMessage("usury-expired", [$this->playerName]));
 		}
 		$owner->removePlayerFromHost($this->playerName, $this->hostOwner);
 	}

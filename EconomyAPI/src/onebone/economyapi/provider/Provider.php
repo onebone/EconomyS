@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,69 +20,85 @@
 
 namespace onebone\economyapi\provider;
 
-use onebone\economyapi\EconomyAPI;
+/*
+ * EconomyS, the massive economy plugin with many features for PocketMine-MP
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-interface Provider{
-	public function __construct(EconomyAPI $plugin);
+use pocketmine\player\Player;
 
-	public function open();
-
+// Provider is currency-related data provider
+interface Provider {
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function accountExists($player);
+	public function accountExists($player): bool;
 
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @param float $defaultMoney
 	 * @return bool
 	 */
-	public function createAccount($player, $defaultMoney = 1000);
+	public function createAccount($player, float $defaultMoney = 1000): bool;
 
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function removeAccount($player);
+	public function removeAccount($player): bool;
 
 	/**
-	 * @param string $player
+	 * @param Player|string $player
 	 * @return float|bool
 	 */
 	public function getMoney($player);
 
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function setMoney($player, $amount);
+	public function setMoney($player, float $amount): bool;
 
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function addMoney($player, $amount);
+	public function addMoney($player, float $amount): bool;
 
 	/**
-	 * @param \pocketmine\player\Player|string $player
+	 * @param Player|string $player
 	 * @param float $amount
 	 * @return bool
 	 */
-	public function reduceMoney($player, $amount);
+	public function reduceMoney($player, float $amount): bool;
 
 	/**
 	 * @return array
 	 */
-	public function getAll();
+	public function getAll(): array;
 
 	/**
 	 * @return string
 	 */
-	public function getName();
+	public function getName(): string;
 
 	public function save();
+
 	public function close();
 }

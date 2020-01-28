@@ -1,5 +1,5 @@
 {
-    "language": "ch",
+	"language": "ch",
 	"commands": {
 		"mymoney": {
 			"usage": "/mymoney",
@@ -10,58 +10,54 @@
 			"description": "查看此服务器的金钱排行"
 		},
 		"setmoney": {
-			"usage": "/setmoney <玩家名称> <数值>",
+			"usage": "/setmoney <玩家名称> <数值> [货币]",
 			"description": "设置玩家的金钱"
 		},
 		"seemoney": {
-			"usage": "/seemoney <玩家名称>",
+			"usage": "/seemoney <玩家名称> [货币]",
 			"description": "查看玩家的金钱"
 		},
 		"givemoney": {
-			"usage": "/givemoney <玩家名称> <数值>",
+			"usage": "/givemoney <玩家名称> <数值> [货币]",
 			"description": "给玩家金钱"
 		},
 		"takemoney": {
-			"usage": "/takemoney <玩家名称> <数值>",
+			"usage": "/takemoney <玩家名称> <数值> [货币]",
 			"description": "拿走玩家的金钱"
 		},
 		"pay": {
-			"usage": "/pay <玩家名称> <数值>",
+			"usage": "/pay <玩家名称> <数值> [货币]",
 			"description": "付款给玩家"
-		},
-		"setlang": {
-			"usage": "/setlang <语言>",
-			"description": "设置您的语言"
 		},
 		"mystatus": {
 			"usage": "/mystatus",
 			"description": "查看您的金钱状态"
 		}
 	},
-    "language-set": "语言被设置为 %1",
-    "request-cancelled": "你的请求已被取消",
-    "player-not-connected": "玩家 %1 当前不在服务器上",
-    "player-never-connected": "服务器中不存在玩家 %1",
-    "topmoney-tag": "- 查看服务器金钱排行 (%1 of %2) -",
-    "topmoney-format": "[%1] %2: %3",
-    "pay-failed": "付款失败",
-    "pay-success": "付款 %1 %MONETARY_UNIT% 给 %2",
-    "money-paid": "%1 付款给你 %2 %MONETARY_UNIT%",
-    "takemoney-must-be-number": "金额必须是有效数字",
-    "takemoney-invalid-number": "无效的数字",
-    "takemoney-player-lack-of-money": "%1 没有 %MONETARY_UNIT%%2 元钱. %1 剩余金额: %MONETARY_UNIT%%3",
-    "takemoney-money-taken": "你的 %MONETARY_UNIT%%1 元钱已经被管理员偷走~ TAT",
-    "takemoney-took-money": "已经拿走 %1 的 %MONETARY_UNIT%%2 元钱",
-    "takemoney-failed": "偷钱失败~ TAT",
-    "givemoney-must-be-number": "金额必须是有效数字",
-    "givemoney-invalid-number": "无效的数字",
-    "givemoney-money-given": "有人给你了 %MONETARY_UNIT%%1 元钱",
-    "givemoney-gave-money": "已经给 %2 了%MONETARY_UNIT%%1 元钱",
-    "seemoney-seemoney": "玩家 %1 的金钱: %2",
-    "setmoney-setmoney": "玩家 %1 的金钱已经被设定为 %MONETARY_UNIT%%2 元钱",
-    "setmoney-set": "您被设置成 %1 %MONETARY_UNIT%",
-    "setmoney-failed": "设定失败~未知错误~ TAT",
-    "setmoney-invalid-number": "%MONETARY_UNIT%%1 是无效的金额",
-    "mymoney-mymoney": "你身上的钱: %MONETARY_UNIT%%1",
-    "mystatus-show": "你的储蓄状态: %1%"
+	"language-set": "语言被设置为 %1",
+	"request-cancelled": "你的请求已被取消",
+	"player-not-connected": "玩家 %1 当前不在服务器上",
+	"player-never-connected": "服务器中不存在玩家 %1",
+	"topmoney-tag": "- 查看服务器金钱排行 (%1 of %2) -",
+	"topmoney-format": "[%1] %2: %3",
+	"pay-failed": "付款失败",
+	"pay-success": "付款 %$1 给 %2",
+	"money-paid": "%1 付款给你 %$2",
+	"takemoney-must-be-number": "金额必须是有效数字",
+	"takemoney-invalid-number": "无效的数字",
+	"takemoney-player-lack-of-money": "%1 没有 %$2 元钱. %1 剩余金额: %$3",
+	"takemoney-money-taken": "你的 %$1 元钱已经被管理员偷走~ TAT",
+	"takemoney-took-money": "已经拿走 %1 的 %$2 元钱",
+	"takemoney-failed": "偷钱失败~ TAT",
+	"givemoney-must-be-number": "金额必须是有效数字",
+	"givemoney-invalid-number": "无效的数字",
+	"givemoney-money-given": "有人给你了 %$1 元钱",
+	"givemoney-gave-money": "已经给 %2 了%$1 元钱",
+	"seemoney-seemoney": "玩家 %1 的金钱: %2",
+	"setmoney-setmoney": "玩家 %1 的金钱已经被设定为 %$2 元钱",
+	"setmoney-set": "您被设置成 %$1",
+	"setmoney-failed": "设定失败~未知错误~ TAT",
+	"setmoney-invalid-number": "%$1 是无效的金额",
+	"mymoney-mymoney": "你身上的钱: %$1",
+	"mystatus-show": "你的储蓄状态: %1%"
 }

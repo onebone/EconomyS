@@ -1,8 +1,8 @@
-<?php
+<?
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,18 +21,17 @@
 namespace onebone\economyapi\task;
 
 use onebone\economyapi\EconomyAPI;
-
 use pocketmine\scheduler\Task;
 
-class SaveTask extends Task{
-	private $plugin;
+class SaveTask extends Task {
+	/** @var EconomyAPI */
+	protected $plugin;
 
-	public function __construct(EconomyAPI $plugin){
+	public function __construct(EconomyAPI $plugin) {
 		$this->plugin = $plugin;
 	}
 
-	public function onRun(int $currentTick){
+	public function onRun(int $currentTick) {
 		$this->plugin->saveAll();
 	}
 }
-

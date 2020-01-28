@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,12 +22,12 @@ namespace onebone\economyland\event;
 
 use pocketmine\event\Event;
 
-class LandAddedEvent extends  Event{
+class LandAddedEvent extends Event {
 	public static $handlerList = null;
 
 	private $id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires;
 
-	public function __construct($id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires){
+	public function __construct($id, $startX, $startZ, $endX, $endZ, $level, $price, $player, $expires) {
 		$this->startX = $startX;
 		$this->startZ = $startZ;
 		$this->endX = $endX;
@@ -39,39 +39,39 @@ class LandAddedEvent extends  Event{
 		$this->expires = $expires;
 	}
 
-	public function getId(){
+	public function getId() {
 		return $this->id;
 	}
 
-	public function getStartX(){
+	public function getStartX() {
 		return $this->startX;
 	}
 
-	public function getStartZ(){
+	public function getStartZ() {
 		return $this->startZ;
 	}
 
-	public function getEndX(){
+	public function getEndX() {
 		return $this->endX;
 	}
 
-	public function getEndZ(){
+	public function getEndZ() {
 		return $this->endZ;
 	}
 
-	public function getLevel(){
+	public function getLevel() {
 		return $this->level;
 	}
 
-	public function getPrice(){
+	public function getPrice() {
 		return $this->price;
 	}
 
-	public function getExpires(){
+	public function getExpires() {
 		return $this->expires;
 	}
 
-	public function getPlayer(){
+	public function getPlayer() {
 		return $this->player;
 	}
 }

@@ -8,11 +8,11 @@ author: onebone
 depend: [EconomyAPI]
 
 permissions:
- economyland.*:
+ economyland:
   description: Allows player to use all functions in EconomyLand
   default: op
   children:
-   economyland.land.*:
+   economyland.land:
     description: Allows player to access all lands
     default: op
     children:
@@ -25,14 +25,14 @@ permissions:
      economyland.land.give.others:
       description: Allows player to give others' land to others'
       default: op
-     economyland.land.move.*:
+     economyland.land.move:
       description: Allows player move to land
       default: op
       children:
        economyland.land.move.others:
         description: Allows player move to others' land
         default: true
-     economyland.landsell.*:
+     economyland.landsell:
       description: Gives permission player to access all land selling function
       default: op
       children:
@@ -40,7 +40,7 @@ permissions:
         description: Allows player to sell others' land
         default: op
 
-   economyland.command.*:
+   economyland.command:
     description: Allows player to use all commands in EconomyLand
     default: op
     children:

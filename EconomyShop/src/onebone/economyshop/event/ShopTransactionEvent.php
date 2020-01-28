@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,17 +22,18 @@ namespace onebone\economyshop\event;
 
 
 use pocketmine\event\Cancellable;
-use pocketmine\item\Item;
+use pocketmine\event\CancellableTrait;
 use pocketmine\event\Event;
-use pocketmine\level\Position;
-use pocketmine\Player;
+use pocketmine\item\Item;
+use pocketmine\world\Position;
+use pocketmine\player\Player;
 
-class ShopTransactionEvent extends Event implements Cancellable{
-	public static $handlerList;
+class ShopTransactionEvent extends Event implements Cancellable {
+	use CancellableTrait;
 
 	private $player, $position, $item, $price;
 
-	public function __construct(Player $player, Position $position, Item $item, $price){
+	public function __construct(Player $player, Position $position, Item $item, $price) {
 		$this->player = $player;
 		$this->position = $position;
 		$this->item = $item;
@@ -42,28 +43,28 @@ class ShopTransactionEvent extends Event implements Cancellable{
 	/**
 	 * @return Player
 	 */
-	public function getPlayer(){
+	public function getPlayer() {
 		return $this->player;
 	}
 
 	/**
 	 * @return Position
 	 */
-	public function getPosition(){
+	public function getPosition() {
 		return $this->position;
 	}
 
 	/**
 	 * @return Item
 	 */
-	public function getItem(){
+	public function getItem() {
 		return $this->item;
 	}
 
 	/**
 	 * @return float
 	 */
-	public function getPrice(){
+	public function getPrice() {
 		return $this->price;
 	}
 }

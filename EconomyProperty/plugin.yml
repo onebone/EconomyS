@@ -9,11 +9,11 @@ depend:
 - EconomyLand
 - EconomyAPI
 permissions:
- economyproperty.*:
+ economyproperty:
   description: Includes all permissions related to EconomyProperty
   default: op
   children:
-   economyproperty.property.*:
+   economyproperty.property:
     description: Includes all permission related to property area
     default: op
     children:

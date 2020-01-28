@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2017  onebone <jyc00410@gmail.com>
+ * Copyright (C) 2013-2020  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,23 +20,38 @@
 
 namespace onebone\economyland\database;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
-interface Database{
+interface Database {
 	public function __construct($fileName, $config, $otherName);
+
 	public function getByCoord($x, $z, $level);
+
 	public function getAll();
+
 	public function getLandById($id);
+
 	public function getLandsByOwner($owner);
+
 	public function getLandsByKeyword($keyword);
+
 	public function getInviteeById($id);
+
 	public function addInviteeById($id, $name);
+
 	public function removeInviteeById($id, $name);
-	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null,  $invitee = []);
+
+	public function addLand($startX, $endX, $startZ, $endZ, $level, $price, $owner, $expires = null, $invitee = []);
+
 	public function setOwnerById($id, $owner);
+
 	public function removeLandById($id);
+
 	public function canTouch($x, $z, $level, Player $player);
+
 	public function checkOverlap($startX, $endX, $startZ, $endZ, $level);
+
 	public function close();
+
 	public function save();
 }

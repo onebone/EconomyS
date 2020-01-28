@@ -1,12 +1,9 @@
-# monetary-unit: Set what monetary unit you want to use
-monetary-unit: "$"
+# default-currency: Sets default currency
+# This configuration could be overridden by external plugin
+default-currency: dollar
 # add-op-at-rank: Set whether to show OPs at top money rank
 add-op-at-rank: false
-# default-money: Set default money when player joined the server first
-default-money: 1000
-# max-money: Set max money that player can have
-max-money: 9999999999
-# Whether to allow player to pay when taret player is offline
+# Whether to allow player to pay when target player is offline
 allow-pay-offline: true
 
 # default-lang: Set default language
@@ -14,7 +11,19 @@ default-lang: def
 # auto-save-interval: Set interval of auto-save
 auto-save-interval: 10
 
-# provider: Set provider of database (Available: yaml, mysql)
+# List of enabled currencies
+currencies:
+  dollar:
+    # Default money given to player who joined the server first time
+    default: 1000
+    exchange: # Exchange rate for the currency. format: [own currency, target currency]
+      won: [1, 1000]
+  won:
+    default: 0
+    exchange:
+      dollar: [1000, 1]
+
+# provider: Set user-provider type of database (Available: yaml, mysql)
 provider: yaml
 
 # check-update: Set whether to check update from server
