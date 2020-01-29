@@ -66,7 +66,7 @@ class MySQLProvider implements Provider {
 		}
 		$player = strtolower($player);
 
-		if(!$this->accountExists($player)) {
+		if(!$this->hasAccount($player)) {
 			$this->db->query("INSERT INTO user_money (username, money) VALUES ('" . $this->db->real_escape_string($player) . "', $defaultMoney);");
 			return true;
 		}
@@ -77,7 +77,7 @@ class MySQLProvider implements Provider {
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function accountExists($player): bool {
+	public function hasAccount($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}

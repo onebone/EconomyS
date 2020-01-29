@@ -43,6 +43,7 @@
   "player-not-connected": "Player %1 is not online.",
   "player-never-connected": "Player %1 was never connected.",
   "currency-unavailable": "Currency %1 is not available.",
+  "account-created": "Account created for player %1 with currency %2(%3)",
   "topmoney-tag": "- Showing top money list (%1 of %2) -",
   "topmoney-format": "[%1] %2: %3",
   "pay-ask-title": "Payment",

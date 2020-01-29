@@ -68,7 +68,19 @@ class SetMoneyCommand extends PluginCommand {
 			}
 		}
 
-		$result = $plugin->setMoney($player, $amount, $currency, null, false);
+		if(!$plugin->hasAccount($player, $currency)) {
+			if($plugin->hasAccount($player, $plugin->getDefaultCurrency())) {
+				$plugin->createAccount($player, $currency);
+				$sender->sendMessage($plugin->getMessage('account-created', $sender, [
+					$player, $currency->getName(), $currency->getSymbol()
+				]));
+			}else{
+				$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
+				return true;
+			}
+		}
+
+		$result = $plugin->setMoney($player, $amount, $currency, null);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
 				$sender->sendMessage($plugin->getMessage("setmoney-invalid-number", $sender, [$amount]));
