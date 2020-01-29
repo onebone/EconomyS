@@ -79,5 +79,6 @@
 	"economy-currency-form-content": "기본으로 사용할 화폐를 선택하십시오",
 	"economy-currency-form-invalid": "올바르지 않은 양식 응답입니다.",
 	"economy-currency-set": "선호 화폐를 %1 (%2)로 설정했습니다.",
-	"economy-currency-failed": "선호 화폐를 %1 (%2)로 설정할 수 없습니다."
+	"economy-currency-failed": "선호 화폐를 %1 (%2)로 설정할 수 없습니다.",
+	"economy-currency-specify": "선호 화폐를 지정하십시오."
 }

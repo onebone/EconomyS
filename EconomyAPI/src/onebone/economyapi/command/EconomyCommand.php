@@ -70,18 +70,35 @@ class EconomyCommand extends Command implements PluginIdentifiableCommand {
 				}
 				return true;
 			case 'currency':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
-					return true;
-				}
-
 				/** @var EconomyAPI $plugin */
 				$plugin = $this->getPlugin();
 
 				if(trim($val) === '') {
+					if(!$sender instanceof Player) {
+						$sender->sendMessage($plugin->getMessage('economy-currency-specify', $sender));
+						return true;
+					}
+
 					$sender->sendForm(new CurrencySelectionForm($plugin, $plugin->getCurrencies(), $sender));
 					return true;
 				}
+
+				$currency = $plugin->getCurrency($val);
+				if($currency === null) {
+					$sender->sendMessage($plugin->getMessage('currency-unavailable', $sender, [$val]));
+					return true;
+				}
+
+				if($plugin->setPlayerPreferredCurrency($sender, $currency)) {
+					$sender->sendMessage($plugin->getMessage('economy-currency-set', $sender, [
+						$currency->getName(), $currency->getSymbol()
+					]));
+				}else{
+					$sender->sendMessage($plugin->getMessage('economy-currency-failed', $sender, [$currency->getName()]));
+				}
+				return true;
+			default:
+				$sender->sendMessage($this->getUsage());
 		}
 
 		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
