@@ -45,7 +45,7 @@ class YamlProvider implements Provider {
 		$this->money = $this->config->getAll();
 	}
 
-	public function accountExists($player): bool {
+	public function hasAccount($player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}

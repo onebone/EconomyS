@@ -97,7 +97,7 @@ class PayCommand extends Command implements PluginIdentifiableCommand {
 			return true;
 		}
 
-		if(!$plugin->accountExists($player, $currency)) {
+		if(!$plugin->hasAccount($player, $currency)) {
 			$sender->sendMessage($plugin->getMessage("player-never-connected", $sender, [$player]));
 			return true;
 		}

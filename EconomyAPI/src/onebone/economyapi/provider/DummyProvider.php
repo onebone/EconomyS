@@ -21,7 +21,7 @@
 namespace onebone\economyapi\provider;
 
 class DummyProvider implements Provider {
-	public function accountExists($player): bool {
+	public function hasAccount($player): bool {
 		return false;
 	}
 

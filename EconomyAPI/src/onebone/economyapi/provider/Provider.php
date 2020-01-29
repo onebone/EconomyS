@@ -46,7 +46,7 @@ interface Provider {
 	 * @param Player|string $player
 	 * @return bool
 	 */
-	public function accountExists($player): bool;
+	public function hasAccount($player): bool;
 
 	/**
 	 * @param Player|string $player

@@ -53,13 +53,13 @@ class TopMoneyCommand extends Command implements PluginIdentifiableCommand {
 
 		$banned = [];
 		foreach($server->getNameBans()->getEntries() as $entry) {
-			if($plugin->accountExists($entry->getName())) {
+			if($plugin->hasAccount($entry->getName())) {
 				$banned[] = $entry->getName();
 			}
 		}
 		$ops = [];
 		foreach($server->getOps()->getAll() as $op) {
-			if($plugin->accountExists($op)) {
+			if($plugin->hasAccount($op)) {
 				$ops[] = $op;
 			}
 		}

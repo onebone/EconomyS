@@ -43,6 +43,7 @@
 	"player-not-connected": "Player %1 is not online.",
 	"player-never-connected": "Player %1 was never connected.",
 	"currency-unavailable": "Currency %1 is not available.",
+	"account-created": "Account created for player %1 with currency %2(%3)",
 	"topmoney-tag": "- Showing top money list (%1 of %2) -",
 	"topmoney-format": "[%1] %2: %3",
 	"pay-ask-title": "Payment",
@@ -80,5 +81,6 @@
 	"economy-currency-form-content": "Select your preferred currency to use default",
 	"economy-currency-form-invalid": "Invalid form response received.",
 	"economy-currency-set": "Set your preferred currency to: %1 (%2)",
-	"economy-currency-failed": "Cannot set your preferred currency to: %1 (%2)"
+	"economy-currency-failed": "Cannot set your preferred currency to: %1 (%2)",
+	"economy-currency-specify": "Please specify the currency you are going to set."
 }

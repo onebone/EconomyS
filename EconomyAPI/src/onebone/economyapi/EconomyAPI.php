@@ -386,16 +386,26 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	/**
+	 * @deprecated This method is deprecated. Use hasAccount() instead.
+	 * @param $player
+	 * @param Currency|null $currency
+	 * @return bool
+	 */
+	public function accountExists($player, ?Currency $currency = null): bool {
+		return $this->hasAccount($player, $currency);
+	}
+
+	/**
 	 * @param string|Player $player
 	 * @param Currency $currency
 	 *
 	 * @return bool
 	 */
-	public function accountExists($player, ?Currency $currency = null): bool {
+	public function hasAccount($player, ?Currency $currency = null): bool {
 		$holder = $this->getCurrencyHolder($currency);
 		if($holder === null) return false;
 
-		return $holder->getProvider()->accountExists($player);
+		return $holder->getProvider()->hasAccount($player);
 	}
 
 	/**
@@ -461,7 +471,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if($holder->getProvider()->accountExists($player)) {
+		if($holder->getProvider()->hasAccount($player)) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
 				if($amount > $config->getMaxMoney()) {
@@ -645,7 +655,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if(!$holder->getProvider()->accountExists($player)) {
+		if(!$holder->getProvider()->hasAccount($player)) {
 			if($defaultMoney === false) {
 				if($holder->getConfig() instanceof CurrencyConfig) {
 					$defaultMoney = $holder->getConfig()->getDefaultMoney();
@@ -658,6 +668,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev->call();
 
 			$holder->getProvider()->createAccount($player, $ev->getDefaultMoney());
+			return true;
 		}
 
 		return false;
@@ -953,7 +964,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function onJoin(PlayerJoinEvent $event) {
 		$player = $event->getPlayer();
 
-		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
+		if(!$this->defaultCurrency->getProvider()->hasAccount($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
 			$this->createAccount($player, $this->defaultCurrency->getCurrency());
 		}
