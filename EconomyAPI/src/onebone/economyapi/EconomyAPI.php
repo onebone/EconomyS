@@ -315,39 +315,43 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * Checks if currency is available to player if $player is instance of Player
 	 *
-	 * @param Player|string $player
+	 * @param CommandSender|string $player
 	 * @param Currency|string $currency
 	 * @return bool
 	 */
 	public function setPlayerPreferredCurrency($player, $currency): bool {
 		if($currency instanceof Currency) {
-			$currency = $this->getCurrencyId($currency);
-			if($currency === null) return false;
+			$id = $this->getCurrencyId($currency);
+			if($id === null) return false;
+
+			$inst = $currency;
+		}else{
+			$id = $currency;
+			$inst = $this->getCurrency($id);
+			if($inst === null) return false;
 		}
-
-		$currency = strtolower($currency);
-
-		$inst = $this->getCurrency($currency);
-		if($inst === null) return false;
+		$id = strtolower($id);
 
 		if($player instanceof Player) {
 			if(!$inst->isAvailableTo($player)) {
 				return false;
 			}
+		}
 
+		if($player instanceof CommandSender) {
 			$player = $player->getName();
 		}
 
-		return $this->provider->setPreferredCurrency($player, $currency);
+		return $this->provider->setPreferredCurrency($player, $id);
 	}
 
 	/**
-	 * @param Player|string $player
+	 * @param CommandSender|string $player
 	 * @param bool $allowNull Allows null on return value. If set false, it will return default currency by default.
 	 * @return Currency|null
 	 */
 	public function getPlayerPreferredCurrency($player, bool $allowNull = true): ?Currency {
-		if($player instanceof Player) {
+		if($player instanceof CommandSender) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
@@ -631,13 +635,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param Currency $currency
+	 * @param string|Currency $currency
 	 * @param float|bool $defaultMoney
 	 * @param Issuer $issuer
 	 *
 	 * @return bool
 	 */
-	public function createAccount($player, ?Currency $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
+	public function createAccount($player, $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		if($player instanceof Player) {
@@ -955,7 +959,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$this->defaultCurrency->getProvider()->accountExists($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
-			$this->createAccount($player, $this->defaultCurrency->getCurrency());
+			$this->createAccount($player, false);
 		}
 	}
 
