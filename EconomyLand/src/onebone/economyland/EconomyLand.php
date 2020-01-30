@@ -32,9 +32,13 @@ use pocketmine\utils\TextFormat;
 final class EconomyLand extends PluginBase implements Listener {
 	public const API_VERSION = 2;
 
+	const FALLBACK_LANGUAGE = 'en';
+
+	private $lang, $fallbackLang;
+	/** @var EconomyAPI */
+	private $api;
 	/** @var PluginConfiguration */
 	private $pluginConfig;
-
 	/** @var Vector2[][] */
 	private $pos = [];
 
@@ -48,11 +52,44 @@ final class EconomyLand extends PluginBase implements Listener {
 			return;
 		}
 
+		$this->api = $api;
+
 		if(EconomyAPI::API_VERSION < 4) {
 			$this->getLogger()->warning('Current applied version of EconomyAPI is outdated. Please update EconomyAPI.');
 			$this->getLogger()->warning('Expected minimum API version: 4, got ' . EconomyAPI::API_VERSION);
 			return;
 		}
+
+		$this->loadLanguages();
+	}
+
+	public function getMessage(string $key, array $params = []): string {
+		if(isset($this->lang[$key])) {
+			return $this->api->replaceParameters($this->lang[$key], $params);
+		}elseif(isset($this->fallbackLang[$key])) {
+			return $this->api->replaceParameters($this->fallbackLang[$key], $params);
+		}
+
+		return "There is no key named \"$key\"";
+	}
+
+	private function loadLanguages() {
+		$lang = strtolower($this->pluginConfig->getLanguage());
+		if(!in_array($lang, ['en'])) {
+			$lang = self::FALLBACK_LANGUAGE;
+		}
+
+		$resource = $this->getResource('lang_' . $lang . '.json');
+		if($resource === null) {
+			$resource = $this->getResource('lang_en.json');
+		}
+
+		$this->lang = json_decode(stream_get_contents($resource), true);
+		fclose($resource);
+
+		$resource = $this->getResource('lang_en.json');
+		$this->fallbackLang = json_decode(stream_get_contents($resource), true);
+		fclose($resource);
 	}
 
 	public function getPluginConfiguration(): PluginConfiguration {
@@ -73,6 +110,7 @@ final class EconomyLand extends PluginBase implements Listener {
 				}
 
 				$this->pos[$sender->getName()][0] = new Vector2($sender->x, $sender->z);
+				$sender->sendMessage($this->getMessage('pos1-set'));
 				return true;
 			case 'pos2':
 				if(!$sender instanceof Player) {
@@ -86,6 +124,7 @@ final class EconomyLand extends PluginBase implements Listener {
 				}
 
 				$this->pos[$sender->getName()][1] = new Vector2($sender->x, $sender->z);
+				$sender->sendMessage($this->getMessage('pos2-set'));
 				return true;
 		}
 		return true;

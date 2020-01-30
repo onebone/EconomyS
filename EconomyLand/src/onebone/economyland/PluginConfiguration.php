@@ -28,6 +28,10 @@ class PluginConfiguration {
 		$this->plugin = $plugin;
 	}
 
+	public function getLanguage(): string {
+		return $this->plugin->getConfig()->get('language', 'en');
+	}
+
 	public function getLandUnloadTaskPeriod(): int {
 		return $this->plugin->getConfig()->get('land-unload-task-period', 200);
 	}
