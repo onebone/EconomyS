@@ -100,12 +100,12 @@ final class EconomyLand extends PluginBase implements Listener {
 		switch(array_shift($args)) {
 			case 'pos1':
 				if(!$sender instanceof Player) {
-					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
+					$sender->sendMessage($this->getMessage('in-game-command'));
 					return true;
 				}
 
 				if(!$sender->hasPermission('economyland.command.land.pos')) {
-					$sender->sendMessage(TextFormat::RED . 'You don\'t have permission to run this command.');
+					$sender->sendMessage($this->getMessage('no-permission'));
 					return true;
 				}
 
@@ -114,12 +114,12 @@ final class EconomyLand extends PluginBase implements Listener {
 				return true;
 			case 'pos2':
 				if(!$sender instanceof Player) {
-					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
+					$sender->sendMessage($this->getMessage('in-game-command'));
 					return true;
 				}
 
 				if(!$sender->hasPermission('economyland.command.land.pos')) {
-					$sender->sendMessage(TextFormat::RED . 'You don\'t have permission to run this command.');
+					$sender->sendMessage($this->getMessage('no-permission'));
 					return true;
 				}
 
