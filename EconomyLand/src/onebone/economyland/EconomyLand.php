@@ -20,11 +20,52 @@
 
 namespace onebone\economyland;
 
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
+use pocketmine\utils\TextFormat;
 
-class EconomyLand extends PluginBase implements Listener {
+final class EconomyLand extends PluginBase implements Listener {
+	/** @var PluginConfiguration */
+	private $pluginConfig;
+
 	public function onEnable() {
+		$this->pluginConfig = new PluginConfiguration($this);
+	}
 
+	public function getPluginConfiguration(): PluginConfiguration {
+		return $this->pluginConfig;
+	}
+
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
+		switch(array_shift($args)) {
+			case 'pos1':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
+					return true;
+				}
+
+				if(!$sender->hasPermission('economyland.command.land.pos')) {
+					$sender->sendMessage(TextFormat::RED . 'You don\'t have permission to run this command.');
+					return true;
+				}
+				return true;
+			case 'pos2':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage(TextFormat::RED . 'Please run this command in-game.');
+					return true;
+				}
+
+				if(!$sender->hasPermission('economyland.command.land.pos')) {
+					$sender->sendMessage(TextFormat::RED . 'You don\'t have permission to run this command.');
+					return true;
+				}
+
+
+				return true;
+		}
+		return true;
 	}
 }
