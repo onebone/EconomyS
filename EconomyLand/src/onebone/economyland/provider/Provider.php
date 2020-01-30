@@ -23,7 +23,9 @@ namespace onebone\economyland\provider;
 use onebone\economyland\land\Land;
 
 interface Provider {
+	public function getNewId(): string;
 	public function addLand(Land $land): void;
 	public function getLand(string $id): ?Land;
+	public function setLand(Land $land): void;
 	public function getLandByPosition(int $x, int $z, string $worldName): ?Land;
 }

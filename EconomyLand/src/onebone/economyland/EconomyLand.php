@@ -20,19 +20,39 @@
 
 namespace onebone\economyland;
 
+use onebone\economyapi\EconomyAPI;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
+use pocketmine\math\Vector2;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
 final class EconomyLand extends PluginBase implements Listener {
+	public const API_VERSION = 2;
+
 	/** @var PluginConfiguration */
 	private $pluginConfig;
 
+	/** @var Vector2[][] */
+	private $pos = [];
+
 	public function onEnable() {
+		$this->saveDefaultConfig();
 		$this->pluginConfig = new PluginConfiguration($this);
+
+		$api = $this->getServer()->getPluginManager()->getPlugin('EconomyAPI');
+		if(!$api instanceof EconomyAPI) {
+			$this->getLogger()->warning('EconomyAPI is not loaded. EconomyLand will not be enabled because required plugin is not loaded.');
+			return;
+		}
+
+		if(EconomyAPI::API_VERSION < 4) {
+			$this->getLogger()->warning('Current applied version of EconomyAPI is outdated. Please update EconomyAPI.');
+			$this->getLogger()->warning('Expected minimum API version: 4, got ' . EconomyAPI::API_VERSION);
+			return;
+		}
 	}
 
 	public function getPluginConfiguration(): PluginConfiguration {
@@ -51,6 +71,8 @@ final class EconomyLand extends PluginBase implements Listener {
 					$sender->sendMessage(TextFormat::RED . 'You don\'t have permission to run this command.');
 					return true;
 				}
+
+				$this->pos[$sender->getName()][0] = new Vector2($sender->x, $sender->z);
 				return true;
 			case 'pos2':
 				if(!$sender instanceof Player) {
@@ -63,7 +85,7 @@ final class EconomyLand extends PluginBase implements Listener {
 					return true;
 				}
 
-
+				$this->pos[$sender->getName()][1] = new Vector2($sender->x, $sender->z);
 				return true;
 		}
 		return true;
