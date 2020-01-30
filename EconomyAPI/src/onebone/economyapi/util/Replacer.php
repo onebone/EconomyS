@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\internal;
+namespace onebone\economyapi\util;
 
 interface Replacer {
 	public function getRawText(): string;

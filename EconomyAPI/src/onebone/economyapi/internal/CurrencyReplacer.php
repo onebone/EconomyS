@@ -21,6 +21,7 @@
 namespace onebone\economyapi\internal;
 
 use onebone\economyapi\currency\Currency;
+use onebone\economyapi\util\Replacer;
 
 class CurrencyReplacer implements Replacer {
 	/** @var Currency */
