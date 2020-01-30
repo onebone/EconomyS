@@ -2,5 +2,7 @@
 	"in-game-command": "&cPlease use this command in-game.",
 	"no-permission": "&cYou don't have permission to use this command.",
 	"pos1-set": "Position 1 set.",
-	"pos2-set": "Position 2 set."
+	"pos2-set": "Position 2 set.",
+	"set-position": "Please set position both 1 and 2 before buying land with &a/land pos1&f and &a/land pos2&f.",
+	"bought-land": "You have bought land (ID: &b%1&f) size &6%2&f."
 }

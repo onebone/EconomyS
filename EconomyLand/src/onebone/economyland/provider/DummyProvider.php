@@ -22,13 +22,36 @@ namespace onebone\economyland\provider;
 
 use onebone\economyland\land\Land;
 
-interface Provider {
-	public function getNewId(): string;
-	public function addLand(Land $land): void;
-	public function getLand(string $id): ?Land;
-	public function hasLand(string $id): bool;
-	public function setLand(Land $land): void;
-	public function getLandByPosition(int $x, int $z, string $worldName): ?Land;
-	public function save(): void;
-	public function close(): void;
+class DummyProvider implements Provider {
+	public function getNewId(): string {
+		return '';
+	}
+
+	public function addLand(Land $land): void {
+
+	}
+
+	public function getLand(string $id): ?Land {
+		return null;
+	}
+
+	public function hasLand(string $id): bool {
+		return false;
+	}
+
+	public function setLand(Land $land): void {
+
+	}
+
+	public function getLandByPosition(int $x, int $z, string $worldName): ?Land {
+		return null;
+	}
+
+	public function save(): void {
+
+	}
+
+	public function close(): void {
+
+	}
 }

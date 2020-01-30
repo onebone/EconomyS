@@ -21,13 +21,16 @@
 namespace onebone\economyland;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyland\land\Land;
+use onebone\economyland\land\LandManager;
+use onebone\economyland\land\LandOption;
+use onebone\economyland\provider\DummyProvider;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\math\Vector2;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\utils\TextFormat;
 
 final class EconomyLand extends PluginBase implements Listener {
 	public const API_VERSION = 2;
@@ -41,6 +44,8 @@ final class EconomyLand extends PluginBase implements Listener {
 	private $pluginConfig;
 	/** @var Vector2[][] */
 	private $pos = [];
+	/** @var LandManager */
+	private $landManager = null;
 
 	public function onEnable() {
 		$this->saveDefaultConfig();
@@ -61,6 +66,10 @@ final class EconomyLand extends PluginBase implements Listener {
 		}
 
 		$this->loadLanguages();
+
+		if($this->landManager === null) {
+			$this->landManager = new LandManager($this, new DummyProvider());
+		}
 	}
 
 	public function getMessage(string $key, array $params = []): string {
@@ -109,7 +118,8 @@ final class EconomyLand extends PluginBase implements Listener {
 					return true;
 				}
 
-				$this->pos[$sender->getName()][0] = new Vector2($sender->x, $sender->z);
+				$vec = $sender->floor();
+				$this->pos[$sender->getName()][0] = new Vector2($vec->x, $vec->z);
 				$sender->sendMessage($this->getMessage('pos1-set'));
 				return true;
 			case 'pos2':
@@ -123,10 +133,42 @@ final class EconomyLand extends PluginBase implements Listener {
 					return true;
 				}
 
-				$this->pos[$sender->getName()][1] = new Vector2($sender->x, $sender->z);
+				$vec = $sender->floor();
+				$this->pos[$sender->getName()][1] = new Vector2($vec->x, $vec->z);
 				$sender->sendMessage($this->getMessage('pos2-set'));
 				return true;
+			case 'buy':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage($this->getMessage('in-game-command'));
+					return true;
+				}
+
+				if(!$sender->hasPermission('economyland.command.land.buy')) {
+					$sender->sendMessage($this->getMessage('no-permission'));
+					return true;
+				}
+
+				$username = $sender->getName();
+				if(isset($this->pos[$username][0]) and isset($this->pos[$username][1])) {
+					$start = $this->pos[$username][0];
+					$end = $this->pos[$username][1];
+
+					$land = $this->landManager->createLand($start, $end, $sender->getLevel(), $sender,
+						new LandOption([], false, true, false));
+					$this->landManager->addLand($land);
+
+					$size = $land->getEnd()->subtract($land->getStart());
+
+					$sender->sendMessage($this->getMessage('bought-land', [
+						$land->getId(), ($size->x + 1) * ($size->y + 1)
+					]));
+				}else{
+					$sender->sendMessage($this->getMessage('set-position'));
+				}
+				return true;
+			default:
+				$sender->sendMessage($command->getUsage());
+				return true;
 		}
-		return true;
 	}
 }

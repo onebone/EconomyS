@@ -23,6 +23,9 @@ namespace onebone\economyland\land;
 use onebone\economyland\EconomyLand;
 use onebone\economyland\provider\Provider;
 use onebone\economyland\task\LandUnloadTask;
+use pocketmine\level\Level;
+use pocketmine\math\Vector2;
+use pocketmine\Player;
 
 class LandManager {
 	/** @var EconomyLand */
@@ -39,6 +42,15 @@ class LandManager {
 		$plugin->getScheduler()->scheduleDelayedRepeatingTask(new LandUnloadTask($this),
 			$plugin->getPluginConfiguration()->getLandUnloadTaskPeriod(),
 			$plugin->getPluginConfiguration()->getLandUnloadTaskPeriod());
+	}
+
+	public function createLand(Vector2 $start, Vector2 $end, Level $world, Player $owner, LandOption $option): Land {
+		return new Land($this->plugin, $this->provider->getNewId(),
+			$start, $end, $world, $owner->getName(), $option);
+	}
+
+	public function addLand(Land $land): void {
+		$this->provider->addLand($land);
 	}
 
 	public function getLandAt(int $x, int $z, string $worldName): ?Land {
