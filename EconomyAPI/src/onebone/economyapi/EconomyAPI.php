@@ -42,14 +42,14 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
-use onebone\economyapi\internal\Replacer;
+use onebone\economyapi\util\Replacer;
 use onebone\economyapi\provider\DummyProvider;
-use onebone\economyapi\provider\DummyUserProvider;
+use onebone\economyapi\provider\user\DummyUserProvider;
 use onebone\economyapi\provider\MySQLProvider;
 use onebone\economyapi\provider\Provider;
-use onebone\economyapi\provider\UserProvider;
+use onebone\economyapi\provider\user\UserProvider;
 use onebone\economyapi\provider\YamlProvider;
-use onebone\economyapi\provider\YamlUserProvider;
+use onebone\economyapi\provider\user\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
 use onebone\economyapi\util\PluginConfig;
 use onebone\economyapi\util\Transaction;
@@ -169,7 +169,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return "Language matching key \"$key\" does not exist.";
 	}
 
-	private function replaceParameters($message, $params = []) {
+	public function replaceParameters($message, $params = []) {
 		$ret = '';
 
 		$len = strlen($message);

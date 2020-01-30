@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\provider;
+namespace onebone\economyapi\provider\user;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\UserInfo;
