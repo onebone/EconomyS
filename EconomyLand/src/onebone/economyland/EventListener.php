@@ -129,7 +129,7 @@ class EventListener implements Listener {
 				$it->isOptional = false;
 				$it->enum = self::also(new CommandEnum(), function($enum) {
 					/** @var CommandEnum $enum */
-					$enum->enumName = 'pos';
+					$enum->enumName = 'pos1|pos2';
 					$enum->enumValues = ['pos1', 'pos2'];
 				});
 			})
@@ -140,7 +140,7 @@ class EventListener implements Listener {
 			self::also(new CommandParameter(), function($it) {
 				/** @var CommandParameter $it */
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
-				$it->paramType = 'buy';
+				$it->paramName = 'buy';
 				$it->isOptional = false;
 				$it->enum = self::also(new CommandEnum(), function($enum) {
 					/** @var CommandEnum $enum */
