@@ -51,6 +51,10 @@ class DummyProvider implements Provider {
 		return null;
 	}
 
+	public function getLandsByOwner(string $owner): array {
+		return [];
+	}
+
 	public function save(): void {
 
 	}

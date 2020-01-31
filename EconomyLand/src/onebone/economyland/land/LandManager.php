@@ -67,6 +67,14 @@ class LandManager {
 		return $this->provider->getMatches($id);
 	}
 
+	/**
+	 * @param string $owner
+	 * @return Land[]
+	 */
+	public function getLandsByOwner(string $owner): array {
+		return $this->provider->getLandsByOwner($owner);
+	}
+
 	public function getLandAt(int $x, int $z, string $worldName): ?Land {
 		foreach($this->lands as $land) {
 			if($land->isInside($x, $z, $worldName)) {

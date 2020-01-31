@@ -31,6 +31,12 @@ interface Provider {
 	 * @return Land[]
 	 */
 	public function getMatches(string $id): array;
+
+	/**
+	 * @param string $owner
+	 * @return Land[]
+	 */
+	public function getLandsByOwner(string $owner): array;
 	public function hasLand(string $id): bool;
 	public function setLand(Land $land): void;
 	public function getLandByPosition(int $x, int $z, string $worldName): ?Land;

@@ -137,6 +137,19 @@ class YamlProvider implements Provider {
 		return null;
 	}
 
+	public function getLandsByOwner(string $owner): array {
+		$lands = [];
+
+		$owner = strtolower($owner);
+		foreach($this->lands as $land) {
+			if($land['owner'] === $owner) {
+				$lands[] = $this->buildLand($land);
+			}
+		}
+
+		return $lands;
+	}
+
 	public function save(): void {
 		yaml_emit_file($this->file, $this->lands, YAML_UTF8_ENCODING);
 	}
