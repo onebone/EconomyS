@@ -112,10 +112,10 @@ class YamlProvider implements Provider {
 
 		$this->lands[$land->getId()] = [
 			'id' => $land->getId(),
-			'startX' => $start->getX(),
-			'endX' => $end->getX(),
-			'startZ' => $start->getY(),
-			'endZ' => $end->getY(),
+			'startX' => (int) $start->getX(),
+			'endX' => (int) $end->getX(),
+			'startZ' => (int) $start->getY(),
+			'endZ' => (int) $end->getY(),
 			'world' => $land->getWorldName(),
 			'owner' => $land->getOwner(),
 			'allowIn' => $option->getAllowIn(),

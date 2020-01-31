@@ -53,6 +53,9 @@ class EventListener implements Listener {
 	}
 
 	public function onPlayerInteract(PlayerInteractEvent $event) {
+		if($event->getAction() === PlayerInteractEvent::LEFT_CLICK_AIR
+		or $event->getAction() === PlayerInteractEvent::RIGHT_CLICK_AIR) return;
+
 		$pos = $event->getBlock()->floor();
 		$player = $event->getPlayer();
 
@@ -61,14 +64,21 @@ class EventListener implements Listener {
 		if($land === null) return;
 
 		$name = strtolower($player->getName());
-		if($land->getOwner() === $name) return;
+		$owner = $land->getOwner();
+		if($owner === $name) return;
 
 		$option = $land->getOption();
 		$invitee = $option->getInvitee($player);
 		if($invitee === null) {
-			$event->setCancelled(!$option->getAllowTouch());
+			if(!$option->getAllowTouch()) {
+				$player->sendMessage($this->plugin->getMessage('land-no-permission-touch', [$owner]));
+				$event->setCancelled();
+			}
 		}else{
-			$event->setCancelled(!$invitee->getAllowTouch());
+			if(!$invitee->getAllowTouch()) {
+				$player->sendMessage($this->plugin->getMessage('land-no-permission-touch', [$owner]));
+				$event->setCancelled();
+			}
 		}
 	}
 

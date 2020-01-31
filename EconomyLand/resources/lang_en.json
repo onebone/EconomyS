@@ -2,6 +2,7 @@
 	"command-usage": "Usage: &e%1",
 	"in-game-command": "&cPlease use this command in-game.",
 	"no-permission": "&cYou don't have permission to use this command.",
+	"land-no-permission-touch": "You have&c no permission&f to touch this land. Owner: &a%1",
 	"pos1-set": "Position 1 set.",
 	"pos2-set": "Position 2 set.",
 	"set-position": "Please set position both 1 and 2 before buying land with &a/land pos1&f and &a/land pos2&f.",
