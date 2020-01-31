@@ -28,12 +28,11 @@ use onebone\economyland\land\LandOption;
 use onebone\economyland\provider\YamlProvider;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\event\Listener;
 use pocketmine\math\Vector2;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 
-final class EconomyLand extends PluginBase implements Listener {
+final class EconomyLand extends PluginBase {
 	public const API_VERSION = 2;
 
 	const FALLBACK_LANGUAGE = 'en';
@@ -71,6 +70,8 @@ final class EconomyLand extends PluginBase implements Listener {
 		if($this->landManager === null) {
 			$this->landManager = new LandManager($this, new YamlProvider($this));
 		}
+
+		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 	}
 
 	public function getMessage(string $key, array $params = []): string {

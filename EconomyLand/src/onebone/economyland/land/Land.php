@@ -111,6 +111,11 @@ final class Land {
 		return $this->option;
 	}
 
+	public function setOption(LandOption $option) {
+		$this->lastAccess = microtime(true);
+		$this->option = $option;
+	}
+
 	public function isInside(int $x, int $z, string $worldName): bool {
 		return $this->start->x <= $x and $x <= $this->end->x
 			and $this->start->y <= $z and $z <= $this->end->y

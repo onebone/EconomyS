@@ -100,7 +100,7 @@ class YamlProvider implements Provider {
 		$end = $land->getEnd();
 		$option = $land->getOption();
 
-		$invitee = $option->getInvitee();
+		$invitee = $option->getAllInvitee();
 		$inviteeSave = [];
 		foreach($invitee as $item) {
 			$inviteeSave[] = [

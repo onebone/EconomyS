@@ -45,8 +45,24 @@ class LandOption {
 	/**
 	 * @return Invitee[]
 	 */
-	public function getInvitee(): array {
+	public function getAllInvitee(): array {
 		return $this->invitee;
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @return Invitee
+	 */
+	public function getInvitee($player): ?Invitee {
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		foreach($this->invitee as $val) {
+			if($val->getName() === $player) return $val;
+		}
+		return null;
 	}
 
 	public function isInvitee($player): bool {
