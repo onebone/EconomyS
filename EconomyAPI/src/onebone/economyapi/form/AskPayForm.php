@@ -67,7 +67,7 @@ class AskPayForm implements Form {
 			return;
 		}
 
-		$ev = new PayMoneyEvent($this->plugin, $this->player->getName(), $this->target, $this->amount,
+		$ev = new PayMoneyEvent($this->plugin, $this->player->getName(), $this->target, $this->currency, $this->amount,
 			new CommandIssuer($this->player, $this->label, $this->label . ' ' . implode(' ', $this->params)));
 		$ev->call();
 

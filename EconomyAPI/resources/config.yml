@@ -11,6 +11,9 @@ default-lang: def
 # auto-save-interval: Set interval of auto-save
 auto-save-interval: 10
 
+# Whether to send command usages of EconomyAPI to client
+send-command-usages: true
+
 # List of enabled currencies
 currencies:
   dollar:
