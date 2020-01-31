@@ -102,6 +102,10 @@ final class EconomyLand extends PluginBase implements Listener {
 		fclose($resource);
 	}
 
+	public function onDisable() {
+		$this->landManager->close();
+	}
+
 	public function getPluginConfiguration(): PluginConfiguration {
 		return $this->pluginConfig;
 	}
@@ -195,10 +199,10 @@ final class EconomyLand extends PluginBase implements Listener {
 
 				$count = count($lands);
 				if($count > 1) {
-					 $sender->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function($val) {
-					 	/** @var Land $val */
-						 return $val->getId();
-					 }, $lands))]));
+					$sender->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function($val) {
+						/** @var Land $val */
+						return $val->getId();
+					}, $lands))]));
 				}elseif($count === 1) {
 					$sender->sendForm(new LandOptionForm($this, $lands[0]));
 				}else{

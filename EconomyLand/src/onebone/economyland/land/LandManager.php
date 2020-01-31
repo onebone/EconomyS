@@ -89,4 +89,12 @@ class LandManager {
 			return $now - $val->getLastAccess() < $boundary;
 		});
 	}
+
+	public function save() {
+		$this->provider->save();
+	}
+
+	public function close() {
+		$this->provider->close();
+	}
 }
