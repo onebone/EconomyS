@@ -26,6 +26,11 @@ interface Provider {
 	public function getNewId(): string;
 	public function addLand(Land $land): void;
 	public function getLand(string $id): ?Land;
+	/**
+	 * @param string $id
+	 * @return Land[]
+	 */
+	public function getMatches(string $id): array;
 	public function hasLand(string $id): bool;
 	public function setLand(Land $land): void;
 	public function getLandByPosition(int $x, int $z, string $worldName): ?Land;

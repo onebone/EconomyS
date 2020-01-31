@@ -53,6 +53,18 @@ class LandManager {
 		$this->provider->addLand($land);
 	}
 
+	public function setLand(Land $land): void {
+		$this->provider->setLand($land);
+	}
+
+	/**
+	 * @param string $id
+	 * @return Land[]
+	 */
+	public function matchLands(string $id): array {
+		return $this->provider->getMatches($id);
+	}
+
 	public function getLandAt(int $x, int $z, string $worldName): ?Land {
 		foreach($this->lands as $land) {
 			if($land->isInside($x, $z, $worldName)) {

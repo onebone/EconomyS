@@ -35,6 +35,10 @@ class DummyProvider implements Provider {
 		return null;
 	}
 
+	public function getMatches(string $id): array {
+		return [];
+	}
+
 	public function hasLand(string $id): bool {
 		return false;
 	}

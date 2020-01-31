@@ -42,6 +42,9 @@ class LandOption {
 		$this->allowPickup = $allowPickup;
 	}
 
+	/**
+	 * @return Invitee[]
+	 */
 	public function getInvitee(): array {
 		return $this->invitee;
 	}
