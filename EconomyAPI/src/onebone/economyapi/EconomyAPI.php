@@ -970,7 +970,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$this->defaultCurrency->getProvider()->hasAccount($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
-			$this->createAccount($player, false);
+			$this->createAccount($player, $this->defaultCurrency->getCurrency());
 		}
 	}
 
