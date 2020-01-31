@@ -12,5 +12,11 @@
 	"option-form-allow-pickup": "Allow unapproved players pickup item inside land",
 	"multiple-land-matches": "You have multiple lands matching your input ID: &b%1",
 	"no-land-match": "There are no land matching ID &c%1",
-	"land-option-updated": "Your land(ID: &b%1&f) option was updated."
+	"land-option-updated": "Your land(ID: &b%1&f) option was updated.",
+	"no-land-here": "There is no land here.",
+	"land-info-line1": "Land(ID: &b%1&f) owned by &a%2&f:",
+	"land-info-line2": "* &7Invitee&f: %1",
+	"land-info-line3": "* &7Options&f: {allowIn: %1, allowPickup: %2, allowTouch: %3}",
+	"true": "&atrue&f",
+	"false": "&cfalse&f"
 }

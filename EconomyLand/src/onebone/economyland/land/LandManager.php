@@ -54,6 +54,8 @@ class LandManager {
 	}
 
 	public function setLand(Land $land): void {
+		$this->lands[$land->getId()] = $land;
+
 		$this->provider->setLand($land);
 	}
 

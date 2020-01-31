@@ -22,6 +22,7 @@ namespace onebone\economyland;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\form\LandOptionForm;
+use onebone\economyland\land\Invitee;
 use onebone\economyland\land\Land;
 use onebone\economyland\land\LandManager;
 use onebone\economyland\land\LandOption;
@@ -209,6 +210,39 @@ final class EconomyLand extends PluginBase {
 				}else{
 					$sender->sendMessage($this->getMessage('no-land-match', [$id]));
 				}
+				return true;
+			case 'here':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage($this->getMessage('in-game-command'));
+					return true;
+				}
+
+				if(!$sender->hasPermission('economyland.command.land.here')) {
+					$sender->sendMessage($this->getMessage('no-permission'));
+					return true;
+				}
+
+				$vec = $sender->floor();
+				$land = $this->landManager->getLandAt($vec->getX(), $vec->getZ(), $sender->getLevel()->getFolderName());
+				if($land === null) {
+					$sender->sendMessage($this->getMessage('no-land-here'));
+					return true;
+				}
+
+				$true = $this->getMessage('true');
+				$false = $this->getMessage('false');
+
+				$option = $land->getOption();
+				$sender->sendMessage($this->getMessage('land-info-line1', [$land->getId(), $land->getOwner()]));
+				$sender->sendMessage($this->getMessage('land-info-line2', [implode(', ', array_map(function($val) {
+					/** @var Invitee $val */
+					return $val->getName();
+				}, $option->getAllInvitee()))]));
+				$sender->sendMessage($this->getMessage('land-info-line3', [
+					$option->getAllowIn() ? $true:$false,
+					$option->getAllowPickup() ? $true:$false,
+					$option->getAllowTouch() ? $true:$false
+				]));
 				return true;
 			default:
 				$sender->sendMessage($command->getUsage());
