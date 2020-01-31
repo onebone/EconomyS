@@ -447,7 +447,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$money = $holder->getProvider()->getMoney($player);
 
 			$holder->getProvider()->setMoney($player, $amount);
-			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
 
@@ -483,7 +483,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				}
 			}
 
-			$ev = new SetMoneyEvent($this, $player, $amount, $issuer);
+			$ev = new SetMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 			if($ev->isCancelled() and $force === false) {
 				return self::RET_CANCELLED;
@@ -518,7 +518,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$money = $holder->getProvider()->getMoney($player);
 
 			$holder->getProvider()->addMoney($player, $amount);
-			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
 
@@ -554,7 +554,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				}
 			}
 
-			$ev = new AddMoneyEvent($this, $player, $amount, $issuer);
+			$ev = new AddMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 
 			if($ev->setCancelled() and $force === false) {
@@ -590,7 +590,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$money = $holder->getProvider()->getMoney($player);
 
 			$holder->getProvider()->reduceMoney($player, $amount);
-			(new MoneyChangedEvent($this, $player, $money, $issuer))->call();
+			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
 
@@ -623,7 +623,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				return self::RET_UNAVAILABLE;
 			}
 
-			$ev = new ReduceMoneyEvent($this, $player, $amount, $issuer);
+			$ev = new ReduceMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 			if($ev->isCancelled() and $force === false) {
 				return self::RET_CANCELLED;
@@ -668,7 +668,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				}
 			}
 
-			$ev = new CreateAccountEvent($this, $player, $defaultMoney, $issuer);
+			$ev = new CreateAccountEvent($this, $player, $holder->getCurrency(), $defaultMoney, $issuer);
 			$ev->call();
 
 			$holder->getProvider()->createAccount($player, $ev->getDefaultMoney());
@@ -698,7 +698,7 @@ class EconomyAPI extends PluginBase implements Listener {
 					break;
 			}
 
-			(new MoneyChangedEvent($this, $action->getPlayer(), $money, $issuer))->call();
+			(new MoneyChangedEvent($this, $action->getPlayer(), $action->getCurrency(), $money, $issuer))->call();
 		}
 
 		return true;
