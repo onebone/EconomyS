@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi\event\money;
 
+use onebone\economyapi\currency\Currency;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\event\Issuer;
@@ -29,16 +30,21 @@ use pocketmine\event\CancellableTrait;
 class AddMoneyEvent extends EconomyAPIEvent implements Cancellable {
 	use CancellableTrait;
 
-	private $username, $amount;
+	private $username, $currency, $amount;
 
-	public function __construct(EconomyAPI $plugin, $username, $amount, ?Issuer $issuer) {
+	public function __construct(EconomyAPI $plugin, $username, Currency $currency, float $amount, ?Issuer $issuer) {
 		parent::__construct($plugin, $issuer);
 		$this->username = $username;
+		$this->currency = $currency;
 		$this->amount = $amount;
 	}
 
 	public function getUsername() {
 		return $this->username;
+	}
+
+	public function getCurrency(): Currency {
+		return $this->currency;
 	}
 
 	public function getAmount() {
