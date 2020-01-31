@@ -22,7 +22,7 @@ namespace onebone\economyshop\item;
 
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
-use pocketmine\level\Level;
+use pocketmine\world\World;
 use pocketmine\world\Position;
 use pocketmine\network\mcpe\protocol\AddItemEntityPacket;
 use pocketmine\network\mcpe\protocol\RemoveEntityPacket;
@@ -48,7 +48,7 @@ class ItemDisplayer {
 	}
 
 	public function spawnToAll(Level $level = null) {
-		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+		foreach($level instanceof World ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
 			$this->spawnTo($player);
 		}
 	}
@@ -66,7 +66,7 @@ class ItemDisplayer {
 	}
 
 	public function despawnFromAll(Level $level = null) {
-		foreach($level instanceof Level ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
+		foreach($level instanceof World ? $level->getPlayers() : Server::getInstance()->getOnlinePlayers() as $player) {
 			$this->despawnFrom($player);
 		}
 	}

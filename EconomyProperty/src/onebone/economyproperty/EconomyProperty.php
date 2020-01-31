@@ -29,7 +29,7 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
-use pocketmine\level\Level;
+use pocketmine\world\World;
 use pocketmine\world\Position;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
@@ -109,8 +109,8 @@ class EconomyProperty extends PluginBase implements Listener {
 		$player = $event->getPlayer();
 
 		if(isset($this->touch[$player->getName()])) {
-			//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getLevel()->getName()];
-			$this->command->mergePosition($player->getName(), 0, [(int) $block->getX(), (int) $block->getZ(), $block->getLevel()->getFolderName()]);
+			//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getWorld()->getName()];
+			$this->command->mergePosition($player->getName(), 0, [(int) $block->getX(), (int) $block->getZ(), $block->getWorld()->getFolderName()]);
 			$player->sendMessage("[EconomyProperty] First position has been saved.");
 			$event->setCancelled(true);
 			if($event->getItem()->canBePlaced()) {
@@ -119,7 +119,7 @@ class EconomyProperty extends PluginBase implements Listener {
 			return;
 		}
 
-		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
+		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getWorld()->getName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(!is_bool($info)) {
 			if(!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())) {
 				if($player->hasPermission("economyproperty.property.modify") === false) {
@@ -133,7 +133,7 @@ class EconomyProperty extends PluginBase implements Listener {
 					return;
 				}
 			}
-			$level = $block->getLevel();
+			$level = $block->getWorld();
 			$tile = $level->getTile($block);
 			if(!$tile instanceof Sign) {
 				$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
@@ -195,7 +195,7 @@ class EconomyProperty extends PluginBase implements Listener {
 			return;
 		}
 
-		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getLevel()->getName()}'")->fetchArray(SQLITE3_ASSOC);
+		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getWorld()->getName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(is_bool($info) === false) {
 			if($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ()) {
 				if($player->hasPermission("economyproperty.property.remove")) {
@@ -215,9 +215,9 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $rentTime = null, $expectedYaw = 0){
-		if(!$level instanceof Level){
+		if(!$level instanceof World){
 			$level = $this->getServer()->getLevelManager()->getLevelByName($level);
-			if(!$level instanceof Level){
+			if(!$level instanceof World){
 
 				return false;
 			}
@@ -288,7 +288,7 @@ class EconomyProperty extends PluginBase implements Listener {
 	}
 
 	public function checkOverlapping($first, $sec, $level){
-		if($level instanceof Level){
+		if($level instanceof World){
 			$level = $level->getFolderName();
 		}
 		$d = $this->property->query("SELECT * FROM Property WHERE (((startX <= $first[0] AND landX >= $first[0]) AND (startZ <= $first[1] AND landZ >= $first[1])) OR ((startX <= $sec[0] AND landX >= $sec[0]) AND (startZ <= $first[1] AND landZ >= $sec[1]))) AND level = '$level'")->fetchArray(SQLITE3_ASSOC);

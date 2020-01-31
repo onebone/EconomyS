@@ -37,9 +37,7 @@ class PayCommand extends Command implements PluginIdentifiableCommand {
 		$this->plugin = $plugin;
 
 		$desc = $plugin->getCommandMessage("pay");
-		parent::__construct("pay", $plugin);
-		$this->setDescription($desc["description"]);
-		$this->setUsage($desc["usage"]);
+		parent::__construct("pay", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.pay");
 	}

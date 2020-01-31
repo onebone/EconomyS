@@ -37,9 +37,7 @@ class GiveMoneyCommand extends Command implements PluginIdentifiableCommand {
 		$this->plugin = $plugin;
 
 		$desc = $plugin->getCommandMessage("givemoney");
-		parent::__construct("givemoney", $plugin);
-		$this->setDescription($desc["description"]);
-		$this->setUsage($desc["usage"]);
+		parent::__construct("givemoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.givemoney");
 	}

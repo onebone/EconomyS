@@ -37,9 +37,7 @@ class SetMoneyCommand extends Command implements PluginIdentifiableCommand {
 		$this->plugin = $plugin;
 
 		$desc = $plugin->getCommandMessage("setmoney");
-		parent::__construct("setmoney", $plugin);
-		$this->setDescription($desc["description"]);
-		$this->setUsage($desc["usage"]);
+		parent::__construct("setmoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.setmoney");
 	}

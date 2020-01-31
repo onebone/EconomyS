@@ -37,9 +37,7 @@ class EconomyCommand extends Command implements PluginIdentifiableCommand {
 		$this->plugin = $plugin;
 
 		$desc = $plugin->getCommandMessage("economy");
-		parent::__construct("economy", $plugin);
-		$this->setDescription($desc["description"]);
-		$this->setUsage($desc["usage"]);
+		parent::__construct("economy", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.economy");
 	}

@@ -76,7 +76,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 				$this->pos[$sender->getName()][0] = array(
 						(int) $sender->getX(),
 						(int) $sender->getZ(),
-						$sender->getLevel()->getFolderName()
+						$sender->getWorld()->getFolderName()
 				);
 				$sender->sendMessage("[EconomyProperty] First position has been saved.");
 				break;
@@ -118,7 +118,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 					break;
 				}
 				$level = Server::getInstance()->getLevelByName($this->pos[$sender->getName()][0][2]);
-				if(!$level instanceof Level) {
+				if(!$level instanceof World) {
 					$sender->sendMessage("The property area where you are trying to make is corrupted.");
 					break;
 				}

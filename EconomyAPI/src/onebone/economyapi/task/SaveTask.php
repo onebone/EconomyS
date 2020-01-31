@@ -1,4 +1,4 @@
-<?
+<?php
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP

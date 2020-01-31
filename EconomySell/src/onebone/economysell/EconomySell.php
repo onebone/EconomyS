@@ -266,7 +266,7 @@ class EconomySell extends PluginBase implements Listener {
 
 	public function onPlayerJoin(PlayerJoinEvent $event) {
 		$player = $event->getPlayer();
-		$level = $player->getLevel()->getFolderName();
+		$level = $player->getWorld()->getFolderName();
 
 		if(isset($this->items[$level])) {
 			foreach($this->items[$level] as $displayer) {
@@ -278,7 +278,7 @@ class EconomySell extends PluginBase implements Listener {
 	public function onPlayerTeleport(EntityTeleportEvent $event) {
 		$player = $event->getEntity();
 		if($player instanceof Player) {
-			if(($from = $event->getFrom()->getLevel()) !== ($to = $event->getTo()->getLevel())) {
+			if(($from = $event->getFrom()->getWorld()) !== ($to = $event->getTo()->getWorld())) {
 				if($from !== null and isset($this->items[$from->getFolderName()])) {
 					foreach($this->items[$from->getFolderName()] as $displayer) {
 						$displayer->despawnFrom($player);
@@ -317,7 +317,7 @@ class EconomySell extends PluginBase implements Listener {
 				return;
 			}
 			$result = $this->provider->addSell($block, [
-					$block->getX(), $block->getY(), $block->getZ(), $block->getLevel()->getFolderName(),
+					$block->getX(), $block->getY(), $block->getZ(), $block->getWorld()->getFolderName(),
 					$item->getID(), $item->getDamage(), $item->getName(), $queue[1], $queue[2], $queue[3]
 			]);
 
@@ -328,8 +328,8 @@ class EconomySell extends PluginBase implements Listener {
 						$pos = $block->getSide($queue[3]);
 					}
 
-					$this->items[$pos->getLevel()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
-					$dis->spawnToAll($pos->getLevel());
+					$this->items[$pos->getWorld()->getFolderName()][] = ($dis = new ItemDisplayer($pos, $item, $block));
+					$dis->spawnToAll($pos->getWorld());
 				}
 
 				$player->sendMessage($this->getMessage("sell-created"));
@@ -348,7 +348,7 @@ class EconomySell extends PluginBase implements Listener {
 			foreach($this->items as $level => $arr) {
 				foreach($arr as $key => $displayer) {
 					$link = $displayer->getLinked();
-					if($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getLevel()->getFolderName() === $sell[3]) {
+					if($link->getX() === $sell[0] and $link->getY() === $sell[1] and $link->getZ() === $sell[2] and $link->getWorld()->getFolderName() === $sell[3]) {
 						$displayer->despawnFromAll();
 						unset($this->items[$key]);
 						break 2;

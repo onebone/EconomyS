@@ -21,23 +21,25 @@
 namespace onebone\economyusury\commands;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyusury\EconomyUsury;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
 use pocketmine\utils\TextFormat;
 
-class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, Listener {
+class UsuryCommand extends Command implements PluginIdentifiableCommand, Listener {
 	private $requests = [];
+	private $plugin;
 
-	public function __construct($cmd, $plugin) {
-		parent::__construct($cmd, $plugin);
-		$this->setUsage("/$cmd <host|request|cancel|list|left>");
-		$this->setDescription("Usury master command");
+	public function __construct($cmd, EconomyUsury $plugin) {
+		parent::__construct($cmd, "Usury master command", "/$cmd <host|request|cancel|list|left>");
 
+		$this->plugin = $plugin;
 		$plugin->getServer()->getPluginManager()->registerEvents($this, $plugin);
 	}
 
@@ -45,6 +47,10 @@ class UsuryCommand extends PluginCommand implements PluginIdentifiableCommand, L
 		if(isset($this->requests[strtolower($event->getPlayer()->getName())])) {
 			$event->getPlayer()->sendMessage($this->getPlugin()->getMessage("received-request", [count($this->requests[strtolower($event->getPlayer()->getName())]), "%2"]));
 		}
+	}
+
+	public function getPlugin(): Plugin {
+		return $this->plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {

@@ -37,9 +37,7 @@ class MyMoneyCommand extends Command implements PluginIdentifiableCommand {
 		$this->plugin = $plugin;
 
 		$desc = $plugin->getCommandMessage("mymoney");
-		parent::__construct("mymoney", $plugin);
-		$this->setDescription($desc["description"]);
-		$this->setUsage($desc["usage"]);
+		parent::__construct("mymoney", $desc["description"], $desc["usage"]);
 
 		$this->setPermission("economyapi.command.mymoney");
 	}

@@ -20,7 +20,7 @@
 
 namespace onebone\economysell\provider;
 
-use pocketmine\level\Level;
+use pocketmine\world\World;
 use pocketmine\world\Position;
 use pocketmine\utils\Config;
 
@@ -42,10 +42,10 @@ class YamlDataProvider implements DataProvider {
 
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
-			$level = $x->getLevel();
+			$level = $x->getWorld();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level) {
+		if($level instanceof World) {
 			$level = $level->getFolderName();
 		}
 		if($this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
@@ -67,10 +67,10 @@ class YamlDataProvider implements DataProvider {
 		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
-			$level = $x->getLevel();
+			$level = $x->getWorld();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level) {
+		if($level instanceof World) {
 			$level = $level->getFolderName();
 		}
 		if(!$this->config->exists($x . ":" . $y . ":" . $z . ":" . $level)) {
@@ -87,10 +87,10 @@ class YamlDataProvider implements DataProvider {
 		if($x instanceof Position) {
 			$y = $x->getFloorY();
 			$z = $x->getFloorZ();
-			$level = $x->getLevel();
+			$level = $x->getWorld();
 			$x = $x->getFloorX();
 		}
-		if($level instanceof Level) {
+		if($level instanceof World) {
 			$level = $level->getFolderName();
 		}
 

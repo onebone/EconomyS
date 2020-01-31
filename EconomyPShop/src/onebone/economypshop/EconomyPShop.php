@@ -80,7 +80,7 @@ class EconomyPShop extends PluginBase implements Listener {
 				return;
 			}
 
-			if(in_array(strtolower($event->getBlock()->getLevel()->getFolderName()), $this->getConfig()->get("disallow-worlds", []))) {
+			if(in_array(strtolower($event->getBlock()->getWorld()->getFolderName()), $this->getConfig()->get("disallow-worlds", []))) {
 				$player->sendMessage($this->getMessage("disallowed-world"));
 				return;
 			}
@@ -113,11 +113,11 @@ class EconomyPShop extends PluginBase implements Listener {
 			}
 
 			$block = $event->getBlock();
-			$this->shop[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName()] = [
+			$this->shop[$block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getWorld()->getFolderName()] = [
 					"x" => $block->getX(),
 					"y" => $block->getY(),
 					"z" => $block->getZ(),
-					"level" => $block->getLevel()->getFolderName(),
+					"level" => $block->getWorld()->getFolderName(),
 					"owner" => $player->getName(),
 					"price" => (int) $line[1],
 					"item" => (int) $item->getID(),
@@ -154,7 +154,7 @@ class EconomyPShop extends PluginBase implements Listener {
 
 	public function onBlockBreak(BlockBreakEvent $event) {
 		$block = $event->getBlock();
-		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName();
+		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getWorld()->getFolderName();
 		if(isset($this->shop[$loc])) {
 			$player = $event->getPlayer();
 			$shop = $this->shop[$loc];
@@ -179,7 +179,7 @@ class EconomyPShop extends PluginBase implements Listener {
 			return;
 		}
 		$block = $event->getBlock();
-		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getLevel()->getFolderName();
+		$loc = $block->getX() . ":" . $block->getY() . ":" . $block->getZ() . ":" . $block->getWorld()->getFolderName();
 		if(isset($this->shop[$loc])) {
 			$player = $event->getPlayer();
 			if($player->hasPermission("economypshop.shop.buy")) {
