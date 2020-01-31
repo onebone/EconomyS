@@ -406,7 +406,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return bool
 	 */
 	public function hasAccount($player, ?Currency $currency = null): bool {
-		$holder = $this->getCurrencyHolder($currency);
+		$holder = $this->findCurrencyHolder($currency, null);
 		if($holder === null) return false;
 
 		return $holder->getProvider()->hasAccount($player);
