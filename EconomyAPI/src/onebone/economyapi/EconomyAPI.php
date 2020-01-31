@@ -732,6 +732,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		return isset($this->langList[$lang]);
 	}
 
+	public function getLanguages(): array {
+		return array_keys($this->langList);
+	}
+
 	public function getCurrencyConfig(Currency $currency): ?CurrencyConfig {
 		foreach($this->currencies as $config) {
 			if($config->getCurrency() === $currency) {
@@ -792,6 +796,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
+
+		if($this->pluginConfig->getSendCommandUsages()) {
+			$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
+		}
 	}
 
 	private function initialize() {
@@ -879,7 +887,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$ret = [];
 
 		foreach($this->currencies as $key => $holder) {
-			$ret[] = $holder->getCurrency();
+			$ret[$key] = $holder->getCurrency();
 		}
 
 		return $ret;

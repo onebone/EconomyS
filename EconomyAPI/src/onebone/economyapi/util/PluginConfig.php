@@ -62,6 +62,10 @@ final class PluginConfig {
 		return $this->config->get('auto-save-interval', 10);
 	}
 
+	public function getSendCommandUsages(): bool {
+		return $this->config->get('send-command-usages', true);
+	}
+
 	public function getCheckUpdate(): bool {
 		return $this->config->get('check-update', true);
 	}
