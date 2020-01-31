@@ -25,6 +25,8 @@ use pocketmine\level\Level;
 use pocketmine\math\Vector2;
 
 final class Land {
+	/** @var EconomyLand */
+	private $plugin;
 	/** @var string */
 	private $id;
 	/** @var Vector2 */
@@ -51,6 +53,7 @@ final class Land {
 	 */
 	public function __construct(EconomyLand $plugin, string $id, Vector2 $start, Vector2 $end, $world,
 	                            string $owner, LandOption $option) {
+		$this->plugin = $plugin;
 		$this->id = $id;
 
 		$this->start = new Vector2(min($start->x, $end->x), min($start->y, $end->y));
@@ -93,6 +96,10 @@ final class Land {
 	 * @return Level|null
 	 */
 	public function getWorld(): ?Level {
+		if($this->world === null) {
+			$this->world = $this->plugin->getServer()->getLevelByName($this->worldName);
+		}
+
 		return $this->world;
 	}
 
