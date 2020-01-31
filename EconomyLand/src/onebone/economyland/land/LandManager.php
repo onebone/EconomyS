@@ -76,7 +76,7 @@ class LandManager {
 
 		$land = $this->provider->getLandByPosition($x, $z, $worldName);
 		if($land !== null) {
-			$this->lands[] = $land;
+			$this->lands[$land->getId()] = $land;
 		}
 
 		return $land;
