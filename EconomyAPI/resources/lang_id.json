@@ -4,7 +4,7 @@
   "request-cancelled": "Permintaan Anda dibatalkan",
   "player-not-connected": "Pemain %1 tidak dalam server",
   "player-never-connected": "Pemain%1 tidak pernah terlihat di server ini",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "Gagal bayar.",
   "pay-success": "Telah membayar %$1 ke %2.",
   "takemoney-must-be-number": "Jumlah harus berupa angka",

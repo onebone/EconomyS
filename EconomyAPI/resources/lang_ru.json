@@ -4,7 +4,7 @@
   "request-cancelled": "Запрос отменен",
   "player-not-connected": "Игрок %1 оффлайн",
   "player-never-connected": "Игрок %1 никогда не был на сервере",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "Не удалось передать деньги",
   "pay-success": "Игроку %2 выплачено %$1",
   "takemoney-must-be-number": "Сумма должна быть числом",

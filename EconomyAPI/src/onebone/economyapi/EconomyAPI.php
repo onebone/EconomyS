@@ -42,6 +42,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Replacer;
 use onebone\economyapi\provider\DummyProvider;
 use onebone\economyapi\provider\user\DummyUserProvider;
@@ -726,6 +727,13 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		return true;
+	}
+
+	public function getSortByRange(Currency $currency, int $from, ?int $len = null): ?Promise {
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) return null;
+
+		return $holder->getProvider()->sortByRange($from, $len);
 	}
 
 	public function hasLanguage(string $lang): bool {

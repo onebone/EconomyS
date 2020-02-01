@@ -39,7 +39,7 @@
   "player-not-connected": "玩家 %1 当前不在服务器上",
   "player-never-connected": "服务器中不存在玩家 %1",
   "topmoney-tag": "- 查看服务器金钱排行 (%1 of %2) -",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "付款失败",
   "pay-success": "付款 %$1 给 %2",
   "money-paid": "%1 付款给你 %$2",

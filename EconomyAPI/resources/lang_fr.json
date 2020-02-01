@@ -4,7 +4,7 @@
   "request-cancelled": "Votre requète a été annulee",
   "player-not-connected": "%1 n'est pas connecté au serveur",
   "player-never-connected": "Le joueur %1 ne s'est jamais connecté sur ce serveur",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "Erreur lors du payement.",
   "pay-success": "Vous avez donné %$1 à %2.",
   "money-paid": "%1 vous a donné %$2.",

@@ -39,7 +39,7 @@
   "player-not-connected": "%1 ist Offline.",
   "player-never-connected": "%1 war noch nie auf diesem Server. Bitte überprüfe deine Rechtschreibung.",
   "topmoney-tag": "> Topliste (%1/%2) <",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "Oops bei der Überweisung ist ein Fehler aufgetreten",
   "pay-success": "Du hast %$1 an %2 überwiesen.",
   "money-paid": "%1 hat dir %$2 überwiesen.",

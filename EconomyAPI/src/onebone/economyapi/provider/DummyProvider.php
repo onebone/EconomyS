@@ -20,6 +20,8 @@
 
 namespace onebone\economyapi\provider;
 
+use onebone\economyapi\util\Promise;
+
 class DummyProvider implements Provider {
 	public function hasAccount($player): bool {
 		return false;
@@ -51,6 +53,13 @@ class DummyProvider implements Provider {
 
 	public function getAll(): array {
 		return [];
+	}
+
+	public function sortByRange(int $from, ?int $len): Promise {
+		$promise = new Promise();
+		$promise->reject(null);
+
+		return $promise;
 	}
 
 	public function getName(): string {

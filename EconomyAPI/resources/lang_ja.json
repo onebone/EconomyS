@@ -39,7 +39,7 @@
   "player-not-connected": "%1はオフラインです。",
   "player-never-connected": "%1は存在しません。",
   "topmoney-tag": "- トップランキングを表示 (%2の%1ページ) -",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "支払いに失敗しました。",
   "pay-success": "%2に%$1支払いました。",
   "money-paid": "%1があなたに%$2支払いました。",

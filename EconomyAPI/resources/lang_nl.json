@@ -4,7 +4,7 @@
   "request-cancelled": "jou aanvraag is geannuleerd",
   "player-not-connected": "speler %1 zit niet op de server",
   "player-never-connected": "speler %1 is nog nooit op de server geweest",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "kan niet betalen.",
   "pay-success": "%$1 betaald aan %2.",
   "money-paid": "%1 geeft jou %$2.",

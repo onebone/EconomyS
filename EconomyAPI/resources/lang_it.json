@@ -4,7 +4,7 @@
   "request-cancelled": "La tua richiesta e stata cancellata",
   "player-not-connected": "IL player %1 non e online nel server",
   "player-never-connected": "Il player %1 non esiste",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "takemoney-must-be-number": "Devi specificare una cifra valida",
   "takemoney-invalid-number": "Numero non valido",
   "takemoney-player-lack-of-money": "%1 non ha %$2. Soldi di %1 : %$3",

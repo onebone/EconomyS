@@ -4,7 +4,7 @@
   "request-cancelled": "Zadost byla zrusena",
   "player-not-connected": "Hrac %1 neni na serveru",
   "player-never-connected": "Hrac %1 nikdy na tomto serveru nehral",
-  "topmoney-format": "[%1] %2: %3",
+  "topmoney-format": "&b#1&f %2: &6%$3",
   "pay-failed": "Platba nebyla uspesna.",
   "pay-success": "Zaplaceno %$1 hraci %2.",
   "money-paid": "%1 ti daroval %$2.",
