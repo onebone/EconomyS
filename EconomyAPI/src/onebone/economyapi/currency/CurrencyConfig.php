@@ -41,6 +41,10 @@ class CurrencyConfig {
 		return $this->currency;
 	}
 
+	public function hasMaxMoney(): bool {
+		return $this->max >= 0;
+	}
+
 	public function getMaxMoney(): float {
 		return $this->max;
 	}
