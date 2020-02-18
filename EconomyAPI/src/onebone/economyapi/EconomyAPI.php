@@ -478,7 +478,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if($holder->getProvider()->hasAccount($player)) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
-				if($amount > $config->getMaxMoney()) {
+				if($config->hasMaxMoney() and $amount > $config->getMaxMoney()) {
 					return self::RET_UNAVAILABLE;
 				}
 			}
@@ -549,7 +549,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
-				if($money + $amount > $config->getMaxMoney()) {
+				if($config->hasMaxMoney() and $money + $amount > $config->getMaxMoney()) {
 					return self::RET_UNAVAILABLE;
 				}
 			}
@@ -943,7 +943,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 			$holder = $this->currencies[$key];
 			$holder->setConfig(
-				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? 0, $data['default'] ?? null, $exchange, $isExposed)
+				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? -1, $data['default'] ?? null, $exchange, $isExposed)
 			);
 		}
 	}
