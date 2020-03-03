@@ -70,7 +70,7 @@ class EconomyTax extends PluginBase {
 				if($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
-				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), true, "EconomyTax");
+				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), null, null);
 				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$money has taken by tax.");
 			}
 		}
