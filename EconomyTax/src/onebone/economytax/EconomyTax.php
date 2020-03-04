@@ -59,8 +59,8 @@ class EconomyTax extends PluginBase {
 					continue;
 				}
 				$money = $this->api->myMoney($player);
-				$taking = $money * ($percent / 100);
-				$this->api->reduceMoney($player, min($money, $taking), true, "EconomyTax");
+				$taking = min($money, $money * ($percent / 100));
+				$this->api->reduceMoney($player, $taking);
 				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$taking has taken by tax.");
 			}
 		}else{

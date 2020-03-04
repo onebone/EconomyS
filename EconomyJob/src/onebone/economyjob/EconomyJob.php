@@ -64,14 +64,13 @@ class EconomyJob extends PluginBase implements Listener {
 	}
 
 	private function readResource($res) {
-		$path = $this->getFile() . "resources/" . $res;
 		$resource = $this->getResource($res);
 		if(!is_resource($resource)) {
 			$this->getLogger()->debug("Tried to load unknown resource " . TextFormat::AQUA . $res . TextFormat::RESET);
 			return false;
 		}
 		$content = stream_get_contents($resource);
-		@fclose($content);
+		@fclose($resource);
 		return $content;
 	}
 
