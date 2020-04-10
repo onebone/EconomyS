@@ -39,7 +39,7 @@ class GiveMoneyCommand extends Command{
 			$player = $p->getName();
 		}
 
-		$result = $this->plugin->addMoney($player, $amount);
+		$result = $this->plugin->addMoney($player, $amount,false,'economyapi.command.give');
 		switch($result){
 			case EconomyAPI::RET_INVALID:
 			$sender->sendMessage($this->plugin->getMessage("givemoney-invalid-number", [$amount], $sender->getName()));

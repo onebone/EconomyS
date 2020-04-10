@@ -59,11 +59,11 @@ class PayCommand extends Command{
 
 		$result = EconomyAPI::RET_CANCELLED;
 		if(!$ev->isCancelled()){
-			$result = $this->plugin->reduceMoney($sender, $amount);
+			$result = $this->plugin->reduceMoney($sender, $amount,false,'economyapi.command.pay');
 		}
 
 		if($result === EconomyAPI::RET_SUCCESS){
-			$this->plugin->addMoney($player, $amount, true);
+			$this->plugin->addMoney($player, $amount, true,'economyapi.command.pay');
 
 			$sender->sendMessage($this->plugin->getMessage("pay-success", [$amount, $player], $sender->getName()));
 			if($p instanceof Player){

@@ -40,7 +40,7 @@ class SetMoneyCommand extends Command{
 			$player = $p->getName();
 		}
 
-		$result = $this->plugin->setMoney($player, $amount);
+		$result = $this->plugin->setMoney($player, $amount,false,'economyapi.command.set');
 		switch($result){
 			case EconomyAPI::RET_INVALID:
 			$sender->sendMessage($this->plugin->getMessage("setmoney-invalid-number", [$amount], $sender->getName()));

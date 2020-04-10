@@ -44,7 +44,7 @@ class TakeMoneyCommand extends Command{
 			return true;
 		}
 
-		$result = $this->plugin->reduceMoney($player, $amount);
+		$result = $this->plugin->reduceMoney($player, $amount,false,'economyapi.command.take');
 		switch($result){
 			case EconomyAPI::RET_INVALID:
 			$sender->sendMessage($this->plugin->getMessage("takemoney-player-lack-of-money", [$player, $amount, $this->plugin->myMoney($player)], $sender->getName()));
