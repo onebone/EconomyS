@@ -452,7 +452,7 @@ class EconomyLand extends PluginBase implements Listener{
 						$sender->sendMessage($this->getMessage("not-your-land", array($landnum, "%2", "%3")));
 						return true;
 					}else{
-						if(preg_match('#^[a-zA-Z0-9_]{3,16}$#', $player) == 0){
+						if(!Player::isValidUserName($player)){
 							$sender->sendMessage($this->getMessage("invalid-invitee", [$player, "%2", "%3"]));
 							return true;
 						}
