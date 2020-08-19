@@ -95,7 +95,6 @@ class LandManager {
 		$boundary = $this->plugin->getPluginConfiguration()->getLandUnloadAfter();
 
 		$this->lands = array_filter($this->lands, function($val) use ($now, $boundary) {
-			/** @var $val Land */
 			return $now - $val->getLastAccess() < $boundary;
 		});
 	}

@@ -194,7 +194,6 @@ final class EconomyLand extends PluginBase {
 				}
 
 				$lands = array_filter($this->landManager->matchLands($id), function($val) use ($sender) {
-					/** @var Land $val */
 					return $val->getOwner() === strtolower($sender->getName());
 				});
 

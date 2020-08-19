@@ -20,6 +20,7 @@
 
 namespace onebone\economyland\land;
 
+use InvalidArgumentException;
 use onebone\economyland\EconomyLand;
 use pocketmine\level\Level;
 use pocketmine\math\Vector2;
@@ -66,7 +67,7 @@ final class Land {
 			$this->worldName = $world;
 			$this->world = $plugin->getServer()->getLevelByName($world);
 		}else{
-			throw new \InvalidArgumentException('Invalid $world variable type given to Land constructor');
+			throw new InvalidArgumentException('Invalid $world variable type given to Land constructor');
 		}
 
 		$this->owner = strtolower($owner);

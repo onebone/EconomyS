@@ -2,7 +2,6 @@
 
 namespace onebone\economyland;
 
-use onebone\economyland\land\Land;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\inventory\InventoryPickupItemEvent;
 use pocketmine\event\Listener;
@@ -187,7 +186,6 @@ class EventListener implements Listener {
 					/** @var CommandEnum $enum */
 					$enum->enumName = 'land ID';
 					$enum->enumValues = array_map(function($val) use ($player) {
-						/** @var $val Land */
 						return $val->getId();
 					}, $this->plugin->getLandManager()->getLandsByOwner($player->getName()));
 				});

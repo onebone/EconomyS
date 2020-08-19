@@ -24,7 +24,7 @@ use pocketmine\Player;
 
 class LandOption {
 	/** @var Invitee[] */
-	private $invitee = [];
+	private $invitee;
 	/** @var bool */
 	private $allowTouch;
 	/** @var bool */
