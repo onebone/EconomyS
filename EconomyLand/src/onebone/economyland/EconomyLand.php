@@ -22,7 +22,6 @@ namespace onebone\economyland;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\form\LandOptionForm;
-use onebone\economyland\land\Invitee;
 use onebone\economyland\land\Land;
 use onebone\economyland\land\LandManager;
 use onebone\economyland\land\LandOption;
@@ -235,7 +234,6 @@ final class EconomyLand extends PluginBase {
 				$option = $land->getOption();
 				$sender->sendMessage($this->getMessage('land-info-line1', [$land->getId(), $land->getOwner()]));
 				$sender->sendMessage($this->getMessage('land-info-line2', [implode(', ', array_map(function($val) {
-					/** @var Invitee $val */
 					return $val->getName();
 				}, $option->getAllInvitee()))]));
 				$sender->sendMessage($this->getMessage('land-info-line3', [
