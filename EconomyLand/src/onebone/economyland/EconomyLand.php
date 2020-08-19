@@ -167,6 +167,9 @@ final class EconomyLand extends PluginBase {
 						new LandOption([], false, true, false));
 					$this->landManager->addLand($land);
 
+					// Renew land list in /land option command usage
+					$sender->sendCommandData();
+
 					$size = $land->getEnd()->subtract($land->getStart());
 
 					$sender->sendMessage($this->getMessage('bought-land', [
