@@ -18,6 +18,16 @@
 	"land-info-line1": "Land(ID: &b%1&f) owned by &a%2&f:",
 	"land-info-line2": "* &7Invitee&f: %1",
 	"land-info-line3": "* &7Options&f: {allowIn: %1, allowPickup: %2, allowTouch: %3}",
+	"invite-menu-title": "Invite",
+	"invite-menu-message": "Invite players to land &b%1",
+	"invite-menu-add": "Invite player",
+	"invite-menu-manage": "Manage invitee",
+	"invite-menu-remove": "Remove invitation",
+	"invite-title": "Invite player",
+	"invite-message": "You are inviting player to land &b%1&f.",
+	"invite-name": "Invitee username",
+	"invite-duplicate": "Player &a%1&f is already invited to land &b%2&f.",
+	"invite-done": "Invited player &a%1&f to land &b%2&f.",
 	"true": "&atrue&f",
 	"false": "&cfalse&f"
 }

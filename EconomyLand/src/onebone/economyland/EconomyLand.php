@@ -21,6 +21,7 @@
 namespace onebone\economyland;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyland\form\LandInviteMenuForm;
 use onebone\economyland\form\LandOptionForm;
 use onebone\economyland\land\Land;
 use onebone\economyland\land\LandManager;
@@ -196,21 +197,10 @@ final class EconomyLand extends PluginBase {
 					return true;
 				}
 
-				$lands = array_filter($this->landManager->matchLands($id), function($val) use ($sender) {
-					return $val->getOwner() === strtolower($sender->getName());
-				});
+				$land = $this->processUserLand($sender, $id);
+				if($land === null) return true;
 
-				$count = count($lands);
-				if($count > 1) {
-					$sender->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function($val) {
-						/** @var Land $val */
-						return $val->getId();
-					}, $lands))]));
-				}elseif($count === 1) {
-					$sender->sendForm(new LandOptionForm($this, $lands[0]));
-				}else{
-					$sender->sendMessage($this->getMessage('no-land-match', [$id]));
-				}
+				$sender->sendForm(new LandOptionForm($this, $land));
 				return true;
 			case 'here':
 				if(!$sender instanceof Player) {
@@ -244,9 +234,51 @@ final class EconomyLand extends PluginBase {
 					$option->getAllowTouch() ? $true:$false
 				]));
 				return true;
+			case 'invite':
+				if(!$sender instanceof Player) {
+					$sender->sendMessage($this->getMessage('in-game-command'));
+					return true;
+				}
+
+				if(!$sender->hasPermission('economyland.command.land.invite')) {
+					$sender->sendMessage($this->getMessage('no-permission'));
+					return true;
+				}
+
+				$id = trim(array_shift($args));
+				if($id === '') {
+					$sender->sendMessage($this->getMessage('command-usage', ['/land invite <part of land ID>']));
+					return true;
+				}
+
+				$land = $this->processUserLand($sender, $id);
+				if($land === null) return true;
+
+				$sender->sendForm(new LandInviteMenuForm($this, $land));
+				return true;
 			default:
 				$sender->sendMessage($command->getUsage());
 				return true;
+		}
+	}
+
+	private function processUserLand(Player $player, string $id): ?Land {
+		$lands = array_filter($this->landManager->matchLands($id), function($val) use ($player) {
+			return $val->getOwner() === strtolower($player->getName());
+		});
+
+		$count = count($lands);
+		if($count > 1) {
+			$player->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function($val) {
+				/** @var Land $val */
+				return $val->getId();
+			}, $lands))]));
+			return null;
+		}elseif($count === 1) {
+			return $lands[0];
+		}else{
+			$player->sendMessage($this->getMessage('no-land-match', [$id]));
+			return null;
 		}
 	}
 }
