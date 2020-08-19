@@ -116,7 +116,7 @@ final class Land {
 
 	public function getOption(): LandOption {
 		$this->lastAccess = microtime(true);
-		return $this->option;
+		return clone $this->option;
 	}
 
 	public function setOption(LandOption $option) {
