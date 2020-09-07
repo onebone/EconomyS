@@ -82,7 +82,7 @@ final class EconomyLand extends PluginBase {
 			return $this->api->replaceParameters($this->fallbackLang[$key], $params);
 		}
 
-		return "There is no key named \"$key\"";
+		return $key;
 	}
 
 	private function loadLanguages() {
@@ -197,7 +197,7 @@ final class EconomyLand extends PluginBase {
 					return true;
 				}
 
-				$land = $this->processUserLand($sender, $id);
+				$land = $this->findUserLand($sender, $id);
 				if($land === null) return true;
 
 				$sender->sendForm(new LandOptionForm($this, $land));
@@ -251,7 +251,7 @@ final class EconomyLand extends PluginBase {
 					return true;
 				}
 
-				$land = $this->processUserLand($sender, $id);
+				$land = $this->findUserLand($sender, $id);
 				if($land === null) return true;
 
 				$sender->sendForm(new LandInviteMenuForm($this, $land));
@@ -262,7 +262,7 @@ final class EconomyLand extends PluginBase {
 		}
 	}
 
-	private function processUserLand(Player $player, string $id): ?Land {
+	private function findUserLand(Player $player, string $id): ?Land {
 		$lands = array_filter($this->landManager->matchLands($id), function($val) use ($player) {
 			return $val->getOwner() === strtolower($player->getName());
 		});
