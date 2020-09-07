@@ -28,6 +28,8 @@
 	"invite-name": "Invitee username",
 	"invite-duplicate": "Player &a%1&f is already invited to land &b%2&f.",
 	"invite-done": "Invited player &a%1&f to land &b%2&f.",
+	"invitee-mgr-title": "Invitee",
+	"invitee-mgr-content": "Select your invitee to manage",
 	"true": "&atrue&f",
 	"false": "&cfalse&f"
 }
