@@ -24,7 +24,7 @@ class LandInviteMenuForm implements Form {
 		if($data === 0) {
 			$player->sendForm(new LandInviteForm($this->plugin, $this->land));
 		}elseif($data === 1) {
-			$player->sendForm(new LandInviteeManageForm($this->plugin, $this->land));
+			$player->sendForm(new LandInviteeSelectionForm($this->plugin, $this->land));
 		}
 	}
 

@@ -13,37 +13,51 @@ class LandInviteeManageForm implements Form {
 	private $plugin;
 	/** @var Land */
 	private $land;
-	/** @var Invitee[] */
+	/** @var Invitee */
 	private $invitee;
 
-	public function __construct(EconomyLand $plugin, Land $land) {
+	public function __construct(EconomyLand $plugin, Land $land, Invitee $invitee) {
 		$this->plugin = $plugin;
 		$this->land = $land;
-		// Invitee may be changed after form submit, so save invitee to avoid unexpected behaviour
-		$this->invitee = $land->getOption()->getAllInvitee();
+		$this->invitee = $invitee;
 	}
 
 	public function handleResponse(Player $player, $data): void {
-		if(!is_int($data)) return;
+		if(!is_array($data)) return;
 
-		if(!isset($this->invitee[$data])) {
-			return; // this should not happen
-		}
+		[$_, $allowTouch, $allowPickup] = $data;
+		$opt = $this->land->getOption();
 
-		$target = $this->invitee[$data];
-		// TODO send management form
+		$this->invitee->setAllowTouch($allowTouch);
+		$this->invitee->setAllowPickup($allowPickup);
+
+		$opt->setInvitee($this->invitee);
+		$this->land->setOption($opt);
+
+		$this->plugin->getLandManager()->setLand($this->land);
+		$player->sendMessage($this->plugin->getMessage('invitee-mgr-done', [$this->land->getId(), $this->invitee->getName()]));
 	}
 
 	public function jsonSerialize() {
 		return [
-			'type' => 'form',
+			'type' => 'custom_form',
 			'title' => $this->plugin->getMessage('invitee-mgr-title'),
-			'content' => $this->plugin->getMessage('invitee-mgr-content'),
-			'buttons' => array_map(function (Invitee $invitee) {
-				return [
-					'text' => $invitee->getName()
-				];
-			}, $this->invitee)
+			'content' => [
+				[
+					'type' => 'label',
+					'text' => $this->plugin->getMessage('invitee-mgr-message', [$this->land->getId()])
+				],
+				[
+					'type' => 'toggle',
+					'text' => $this->plugin->getMessage('option-form-allow-touch'),
+					'default' => $this->invitee->getAllowTouch()
+				],
+				[
+					'type' => 'toggle',
+					'text' => $this->plugin->getMessage('option-form-allow-pickup'),
+					'default' => $this->invitee->getAllowPickup()
+				]
+			]
 		];
 	}
 }

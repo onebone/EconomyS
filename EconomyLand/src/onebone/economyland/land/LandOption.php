@@ -60,7 +60,7 @@ class LandOption {
 		$player = strtolower($player);
 
 		foreach($this->invitee as $val) {
-			if($val->getName() === $player) return $val;
+			if($val->getName() === $player) return clone $val;
 		}
 		return null;
 	}
@@ -82,6 +82,17 @@ class LandOption {
 
 		$this->invitee[] = $invitee;
 		return true;
+	}
+
+	public function setInvitee(Invitee $invitee) {
+		foreach($this->invitee as $key => $val) {
+			if($val->getName() === $invitee->getName()) {
+				$this->invitee[$key] = $invitee;
+				return;
+			}
+		}
+
+		$this->invitee[] = $invitee;
 	}
 
 	public function getAllowTouch(): bool {
