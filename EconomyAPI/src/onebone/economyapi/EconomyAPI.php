@@ -401,7 +401,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param Currency $currency
+	 * @param ?Currency $currency
 	 *
 	 * @return bool
 	 */
@@ -414,7 +414,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param Player|string $player
-	 * @param Currency $currency
+	 * @param ?Currency $currency
 	 *
 	 * @return float|bool
 	 */
@@ -427,8 +427,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -498,8 +498,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -570,8 +570,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -645,9 +645,9 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param string|Currency $currency
+	 * @param string|?Currency $currency
 	 * @param float|bool $defaultMoney
-	 * @param Issuer $issuer
+	 * @param ?Issuer $issuer
 	 *
 	 * @return bool
 	 */
