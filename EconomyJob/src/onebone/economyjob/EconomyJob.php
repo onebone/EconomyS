@@ -49,12 +49,9 @@ class EconomyJob extends PluginBase implements Listener {
 	}
 
 	public function onEnable() {
-		@mkdir($this->getDataFolder());
-		if(!is_file($this->getDataFolder() . "jobs.yml")) {
-			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML, yaml_parse($this->readResource("jobs.yml")));
-		}else{
-			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML);
-		}
+		$this->saveResource('jobs.yml');
+
+		$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML);
 		$this->player = new Config($this->getDataFolder() . "players.yml", Config::YAML);
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
