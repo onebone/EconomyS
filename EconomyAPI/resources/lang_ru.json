@@ -1,27 +1,67 @@
 {
-  "language": "ru",
-  "language-set": "Язык сменен на %1 ; перевод Рвач Виктора и Ивана Дмитриева",
-  "request-cancelled": "Запрос отменен",
-  "player-not-connected": "Игрок %1 оффлайн",
-  "player-never-connected": "Игрок %1 никогда не был на сервере",
-  "topmoney-format": "&b#1&f %2: &6%$3",
-  "pay-failed": "Не удалось передать деньги",
-  "pay-success": "Игроку %2 выплачено %$1",
-  "takemoney-must-be-number": "Сумма должна быть числом",
-  "takemoney-invalid-number": "Неправильное число",
-  "takemoney-player-lack-of-money": "У игрока %1 нет %$2. Баланс %1 : %$3",
-  "takemoney-money-taken": "У вас было взято %$1",
-  "takemoney-took-money": "У игрока %1 было взято %$2",
-  "takemoney-failed": "Не удалось взять деньги",
-  "givemoney-must-be-number": "Сумма должна быть числом",
-  "givemoney-invalid-number": "Неправильное число",
-  "givemoney-money-given": "Вы получили %$1",
-  "givemoney-gave-money": "Игроку %2 было выдано %$1",
-  "seemoney-seemoney": "Баланс игрока %1 : %2",
-  "setmoney-setmoney": "Баланс игрока %1 был установлен на %$2",
-  "setmoney-set": "Ваш баланс был изменен на %$1",
-  "setmoney-failed": "Не удалось установить баланс",
-  "setmoney-invalid-number": "MONETARY_UNIT%%1 - неправильная сумма",
-  "mymoney-mymoney": "Ваш баланс : %$1",
-  "mystatus-show": "Ваш финансовый статус : %1%"
+    "language": "ru",
+	"commands": {
+		"mymoney": {
+			"usage": "/mymoney",
+			"description": "Показывает ваш баланс"
+		},
+		"topmoney": {
+			"usage": "/topmoney [страница]",
+			"description": "Показывает богачей этого сервера"
+		},
+		"setmoney": {
+			"usage": "/setmoney <игрок> <сумма>",
+			"description": "Устанавливает баланс игрока"
+		},
+		"seemoney": {
+			"usage": "/seemoney <игрок>",
+			"description": "Показать баланс игрока"
+		},
+		"givemoney": {
+			"usage": "/givemoney <игрок> <сумма>",
+			"description": "Дает деньги игроку"
+		},
+		"takemoney": {
+			"usage": "/takemoney <игрок> <сумма>",
+			"description": "Взять деньги у игрока"
+		},
+		"pay": {
+			"usage": "/pay <игрок> <сумма>",
+			"description": "Заплатить деньги игроку"
+		},
+		"setlang": {
+			"usage": "/setlang <language>",
+			"description": "Устанавливает язык экономики"
+		},
+		"mystatus": {
+			"usage": "/mystatus",
+			"description": "Показывает статус вашего баланса"
+		}
+	},
+    "language-set": " Язык изменен на %1 перевод от BlackCat Developer",
+    "request-cancelled": "Ваш запрос отменен",
+    "player-not-connected": "Игрок %1 оффлайн.",
+    "player-never-connected": "Игрок %1 никогда не был на сервере.",
+    "topmoney-tag": "- Лист богачей сервера (%1 до %2) -",
+    "topmoney-format": "[%1] %2: %3",
+    "pay-failed": "Ошибка платежа.",
+    "pay-success": "Оплачено %$1 игроку %2.",
+    "money-paid": "%1 дал вам %$2.",
+    "takemoney-must-be-number": "Сумма должна быть числом",
+    "takemoney-invalid-number": "Неверный номер",
+    "takemoney-player-lack-of-money": "У %1 игрока недостаточно денег %$2. Баланс игрока %1 : %$3",
+    "takemoney-money-taken": "У вас снято с баланса %$1",
+    "takemoney-took-money": "Взято %$2 от %1",
+    "takemoney-failed": "Ошибка снятия денег",
+    "givemoney-must-be-number": "Сумма должна быть числом",
+    "givemoney-invalid-number": "Неккоректное число",
+    "givemoney-money-given": "Вы получили %$1",
+    "givemoney-gave-money": "Вы дали %$1 игроку %2",
+    "seemoney-seemoney": "Баланс игрока %1: %2",
+    "setmoney-setmoney": "Баланс игрока %1 установлен на %$2",
+    "setmoney-set": "Ваш баланс установлен на %$1",
+    "setmoney-failed": "Неизвестная ошибка во время устоновки баланса",
+    "setmoney-invalid-number": "%$1 должно быть числом!",
+    "mymoney-mymoney": "Ваш баланс : %$1",
+    "mystatus-show": "Статус моего баланса : %1%"
 }
