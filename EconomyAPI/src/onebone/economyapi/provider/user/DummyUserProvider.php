@@ -41,11 +41,11 @@ class DummyUserProvider implements UserProvider {
 	}
 
 	public function getLanguage(string $username): string {
-		return null;
+		return '';
 	}
 
 	public function getPreferredCurrency(string $username): string {
-		return null;
+		return '';
 	}
 
 	public function setPreferredCurrency(string $username, string $currency): bool {
