@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi\command;
 
+use onebone\economyapi\currency\CurrencyReplacer;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\form\AskPayForm;
 use pocketmine\command\CommandSender;
@@ -72,7 +73,7 @@ class PayCommand extends PluginCommand {
 
 		$money = $plugin->myMoney($sender, $currency);
 		if($money < $amount) {
-			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [$amount]));
+			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [new CurrencyReplacer($currency, $amount)]));
 			return true;
 		}
 

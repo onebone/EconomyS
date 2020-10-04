@@ -21,6 +21,7 @@
 namespace onebone\economyapi\form;
 
 use onebone\economyapi\currency\Currency;
+use onebone\economyapi\currency\CurrencyReplacer;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\CommandIssuer;
 use onebone\economyapi\event\money\PayMoneyEvent;
@@ -74,7 +75,7 @@ class AskPayForm implements Form {
 		if($ev->isCancelled()) {
 			$player->sendMessage($this->plugin->getMessage("pay-failed", $player, [
 				$this->target,
-				$this->amount
+				new CurrencyReplacer($this->currency, $this->amount)
 			]));
 			return;
 		}
@@ -84,7 +85,7 @@ class AskPayForm implements Form {
 			new TransactionAction(Transaction::ACTION_ADD, $this->target, $this->amount, $this->currency)
 		]))) {
 			$player->sendMessage($this->plugin->getMessage("pay-success", $player, [
-				$this->amount,
+				new CurrencyReplacer($this->currency, $this->amount),
 				$this->target
 			]));
 
@@ -92,13 +93,13 @@ class AskPayForm implements Form {
 			if($p instanceof Player) {
 				$p->sendMessage($this->plugin->getMessage("money-paid", $this->target, [
 					$player->getName(),
-					$this->amount
+					new CurrencyReplacer($this->currency, $this->amount)
 				]));
 			}
 		}else{
 			$player->sendMessage($this->plugin->getMessage("pay-failed", $player, [
 				$this->target,
-				$this->amount
+				new CurrencyReplacer($this->currency, $this->amount)
 			]));
 		}
 	}
@@ -108,7 +109,7 @@ class AskPayForm implements Form {
 			'type' => 'modal',
 			'title' => $this->plugin->getMessage("pay-ask-title", $this->player),
 			'content' => $this->plugin->getMessage("pay-ask-content", $this->player, [
-				$this->target, $this->amount // TODO format amount with currency
+				$this->target, new CurrencyReplacer($this->currency, $this->amount)
 			]),
 			'button1' => $this->plugin->getMessage("pay-confirm", $this->player),
 			'button2' => $this->plugin->getMessage("pay-cancel", $this->player)
