@@ -607,9 +607,17 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$holder->getProvider()->hasAccount($player)) {
 			if($defaultMoney === false) {
-				if($holder->getConfig() instanceof CurrencyConfig) {
-					$defaultMoney = $holder->getConfig()->getDefaultMoney();
-				}else{
+				// if $defaultMoney is not set on parameter, look at user configured initial balance first
+				// then fallback to currency specified amount if user did not define it
+				$currencyConfig = $holder->getConfig();
+				if($currencyConfig !== null) {
+					$money = $currencyConfig->getDefaultMoney();
+					if($money !== null) {
+						$defaultMoney = $money;
+					}
+				}
+
+				if($defaultMoney === false) {
 					$defaultMoney = $holder->getCurrency()->getDefaultMoney();
 				}
 			}

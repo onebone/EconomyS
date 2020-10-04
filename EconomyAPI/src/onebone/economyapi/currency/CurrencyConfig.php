@@ -28,7 +28,7 @@ class CurrencyConfig {
 	private $exchange;
 	private $isExposed;
 
-	public function __construct(Currency $currency, float $max, float $default, array $exchange, bool $isExposed) {
+	public function __construct(Currency $currency, float $max, ?float $default, array $exchange, bool $isExposed) {
 		$this->currency = $currency;
 
 		$this->max = $max;
@@ -49,7 +49,7 @@ class CurrencyConfig {
 		return $this->max;
 	}
 
-	public function getDefaultMoney(): float {
+	public function getDefaultMoney(): ?float {
 		return $this->default;
 	}
 
