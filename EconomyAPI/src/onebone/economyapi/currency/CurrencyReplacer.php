@@ -18,9 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\internal;
+namespace onebone\economyapi\currency;
 
-use onebone\economyapi\currency\Currency;
 use onebone\economyapi\util\Replacer;
 
 class CurrencyReplacer implements Replacer {

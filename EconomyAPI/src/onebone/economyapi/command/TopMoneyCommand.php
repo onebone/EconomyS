@@ -21,7 +21,7 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\internal\CurrencyReplacer;
+use onebone\economyapi\currency\CurrencyReplacer;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginCommand;
 

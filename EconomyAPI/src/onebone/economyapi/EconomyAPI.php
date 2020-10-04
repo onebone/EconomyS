@@ -170,114 +170,59 @@ class EconomyAPI extends PluginBase implements Listener {
 		return "Language matching key \"$key\" does not exist.";
 	}
 
+	private const STATUS_NONE = 0;
+	private const STATUS_ESCAPE = 1;
+	private const STATUS_PARAMETER = 2;
+	private const STATUS_CURRENCY = 3;
+
 	public function replaceParameters($message, $params = []) {
 		$ret = '';
 
 		$len = strlen($message);
-
-		$isReplace = false;
-		$index = '';
-		$isEscape = false;
-		$isMoney = false;
+		$status = self::STATUS_NONE;
 		$chunk = '';
 
-		for($i = 0; $i < $len; $i++) {
-			$c = $message[$i];
+		for($i = 0; $i < $len + 1; $i++) {
+			$char = $message[$i] ?? '';
 
-			if($c === '\\') {
-				$isEscape = true;
+			if($status === self::STATUS_ESCAPE) {
+				$ret .= $char;
+				$status = self::STATUS_NONE;
 				continue;
 			}
 
-			if($isEscape) {
-				$isEscape = false;
-
-				if($isReplace) {
-					$ret .= $chunk;
-					$isReplace = false;
-				}
-			}elseif($c === '%') {
-				if($isReplace) {
-					if($index === '') {
-						$ret .= '%';
-					}else{
-						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-						if($isMoney) {
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getText();
-							}else{
-								$ret .= $this->getMonetaryUnit() . $replace;
-							}
-						}else{
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getRawText();
-							}else{
-								$ret .= $replace;
-							}
-						}
-					}
-				}
-
-				$index = '';
-				$isReplace = true;
-				$chunk = $c;
-				continue;
-			}
-
-			if($isReplace) {
-				$chunk .= $c;
-
-				if(is_numeric($c)) {
-					$index .= $c;
+			if($char === '%') {
+				if($status === self::STATUS_ESCAPE) {
+					$status = self::STATUS_NONE;
 				}else{
-					if($c === '$' and $index === '') {
-						$isMoney = true;
-					}else{
-						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-						if($isMoney) {
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getText();
-							}else{
-								$ret .= $this->getMonetaryUnit() . $replace;
-							}
-						}else{
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getRawText();
-							}else{
-								$ret .= $replace;
-							}
-						}
-
-						$isReplace = false;
-						$isMoney = false;
-						$chunk = '';
-
-						$ret .= $c;
-					}
+					$status = self::STATUS_PARAMETER;
 				}
-
-				continue;
-			}
-
-			$ret .= $c;
-		}
-
-		if($isReplace) {
-			$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-			if($isMoney) {
-				if($replace instanceof Replacer) { // TODO generalize usage of replacers
-					$ret .= $replace->getText();
-				}else{
-					$ret .= $this->getMonetaryUnit() . $replace;
+			}else if($char === '\\') {
+				$status = self::STATUS_ESCAPE;
+			}else if($char === '$') {
+				if($status === self::STATUS_PARAMETER and $chunk === '') {
+					$status = self::STATUS_CURRENCY;
 				}
 			}else{
-				if($replace instanceof Replacer) {
-					$ret .= $replace->getRawText();
+				if(is_numeric($char) and ($status === self::STATUS_PARAMETER or $status === self::STATUS_CURRENCY)) {
+					$chunk .= $char;
 				}else{
-					$ret .= $replace;
+					if(($status === self::STATUS_PARAMETER or $status === self::STATUS_CURRENCY) and $chunk !== '') {
+						$id = (int) $chunk;
+						$chunk = '';
+
+						$value = $params[$id - 1] ?? '&cnull&f';
+						if($value instanceof Replacer) {
+							$value = $value->getText();
+						}else if($status === self::STATUS_CURRENCY) {
+							$value = $this->getMonetaryUnit() . $value;
+						}
+
+						$ret .= $value;
+					}
+
+					$ret .= $char;
+					$status = self::STATUS_NONE;
 				}
 			}
 		}
