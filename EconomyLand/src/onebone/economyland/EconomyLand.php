@@ -570,8 +570,8 @@ class EconomyLand extends PluginBase implements Listener {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
-						$x = $sender->getX();
-						$z = $sender->getZ();
+						$x = $sender->getPosition()->getX();
+						$z = $sender->getPosition()->getZ();
 
 						$info = $this->db->getByCoord($x, $z, $sender->getWorld()->getFolderName());
 						if($info === false) {
