@@ -59,8 +59,9 @@ class EconomyTax extends PluginBase {
 					continue;
 				}
 				$money = $this->api->myMoney($player);
-				$taking = $money * ($percent / 100);
-				$this->api->reduceMoney($player, min($money, $taking), null, "EconomyTax", true);
+
+				$taking = min($money, $money * ($percent / 100));
+				$this->api->reduceMoney($player, $taking);
 				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$taking has taken by tax.");
 			}
 		}else{
@@ -70,7 +71,8 @@ class EconomyTax extends PluginBase {
 				if($player->hasPermission("economytax.tax.avoid")) {
 					continue;
 				}
-				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), null, "EconomyTax", true);
+
+				$this->api->reduceMoney($player, min($this->api->myMoney($player), $money), null, null);
 				$player->sendMessage("Your " . EconomyAPI::getInstance()->getMonetaryUnit() . "$money has taken by tax.");
 			}
 		}

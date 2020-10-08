@@ -54,13 +54,11 @@ class ItemDisplayer {
 	}
 
 	public function spawnTo(Player $player) {
-		$pk = new AddItemEntityPacket;
-		$pk->eid = $this->eid;
+		$pk = new AddItemActorPacket();
+		$pk->entityRuntimeId = $this->eid;
 		$pk->item = $this->item;
-		$pk->x = $this->pos->x + 0.5;
-		$pk->y = $this->pos->y;
-		$pk->z = $this->pos->z + 0.5;
-		$pk->speedX = $pk->speedY = $pk->speedZ = 0;
+		$pk->position = $this->pos->add(0.5, 0, 0.5);
+		$pk->motion = new Vector3(0, 0, 0);
 
 		$player->dataPacket($pk);
 	}
@@ -72,8 +70,8 @@ class ItemDisplayer {
 	}
 
 	public function despawnFrom(Player $player) {
-		$pk = new RemoveEntityPacket;
-		$pk->eid = $this->eid;
+		$pk = new RemoveActorPacket();
+		$pk->entityUniqueId = $this->eid;
 		$player->dataPacket($pk);
 	}
 

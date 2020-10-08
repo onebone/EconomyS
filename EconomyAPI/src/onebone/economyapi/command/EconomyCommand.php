@@ -24,12 +24,12 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\form\CurrencySelectionForm;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class EconomyCommand extends Command implements PluginIdentifiableCommand {
+class EconomyCommand extends Command implements PluginOwned {
 	/** @var EconomyAPI */
 	private $plugin;
 
@@ -47,8 +47,7 @@ class EconomyCommand extends Command implements PluginIdentifiableCommand {
 			return false;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->plugin;
 
 		$mode = strtolower(array_shift($args));
 		$val = array_shift($args);
@@ -69,7 +68,7 @@ class EconomyCommand extends Command implements PluginIdentifiableCommand {
 				return true;
 			case 'currency':
 				/** @var EconomyAPI $plugin */
-				$plugin = $this->getPlugin();
+				$plugin = $this->getOwningPlugin();
 
 				if(trim($val) === '') {
 					if(!$sender instanceof Player) {
@@ -103,7 +102,7 @@ class EconomyCommand extends Command implements PluginIdentifiableCommand {
 		return false;
 	}
 
-	public function getPlugin(): Plugin {
+	public function getOwningPlugin(): Plugin {
 		return $this->plugin;
 	}
 }

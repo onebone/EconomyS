@@ -11,7 +11,7 @@ commands:
  shop:
   description: Management command for creating/removing shop
   usage: /shop <create|remove|list> [item[:damage]] [amount] [price] [side]
-  permission: economyshop.command.shop;economyshop.command.shop.create;economyshop.command.shop.remove;economyshop.command.shop.list;
+  permission: economyshop.command.shop;economyshop.command.shop.create;economyshop.command.shop.remove;economyshop.command.shop.list
 
 permissions:
  economyshop:

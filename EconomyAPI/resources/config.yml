@@ -7,7 +7,7 @@ add-op-at-rank: false
 allow-pay-offline: true
 
 # default-lang: Set default language
-default-lang: def
+default-lang: en
 # auto-save-interval: Set interval of auto-save
 auto-save-interval: 10
 

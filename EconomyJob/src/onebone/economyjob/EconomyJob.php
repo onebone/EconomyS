@@ -49,12 +49,9 @@ class EconomyJob extends PluginBase implements Listener {
 	}
 
 	public function onEnable() {
-		@mkdir($this->getDataFolder());
-		if(!is_file($this->getDataFolder() . "jobs.yml")) {
-			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML, yaml_parse($this->readResource("jobs.yml")));
-		}else{
-			$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML);
-		}
+		$this->saveResource('jobs.yml');
+
+		$this->jobs = new Config($this->getDataFolder() . "jobs.yml", Config::YAML);
 		$this->player = new Config($this->getDataFolder() . "players.yml", Config::YAML);
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
@@ -142,7 +139,14 @@ class EconomyJob extends PluginBase implements Listener {
 			case "join":
 				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
+					return true;
 				}
+
+				if(!$sender->hasPermission('economyjob.command.job.join')) {
+					$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
+					return true;
+				}
+
 				if($this->player->exists($sender->getName())) {
 					$sender->sendMessage("You already have joined job.");
 				}else{
@@ -162,7 +166,14 @@ class EconomyJob extends PluginBase implements Listener {
 			case "retire":
 				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
+					return true;
 				}
+
+				if(!$sender->hasPermission('economyjob.command.job.retire')) {
+					$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
+					return true;
+				}
+
 				if($this->player->exists($sender->getName())) {
 					$job = $this->player->get($sender->getName());
 					$this->player->remove($sender->getName());
@@ -172,42 +183,61 @@ class EconomyJob extends PluginBase implements Listener {
 				}
 				break;
 			case "list":
-
-				$max = 0;
-				foreach($this->jobs->getAll() as $d) {
-					$max += count($d);
+				if(!$sender->hasPermission('economyjob.command.job.list')) {
+					$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
+					return true;
 				}
 
-				$max = ceil(($max / 5));
-
-				$page = array_shift($params);
-
-				$page = max(1, $page);
-				$page = min($max, $page);
-				$page = (int) $page;
-
-				$n = 1;
-
-				$output = "Showing job list page $page of $max : \n";
-				foreach($this->jobs->getAll() as $name => $job) {
-					$info = "";
-					foreach($job as $id => $money) {
-						$cur = (int) ceil(($n / 5));
-						if($cur === $page) {
-							$info .= $name . " : " . $id . " | " . EconomyAPI::getInstance()->getMonetaryUnit() . "" . $money . "\n";
-						} elseif($cur > $page) {
-							break;
-						}
-						++$n;
-					}
-					$output .= $info;
+				$jobs = array_keys($this->getJobs());
+				$sender->sendMessage(TextFormat::colorize(
+					sprintf('List of jobs (&b%d&f): &6%s', count($jobs), implode('&f, &6', $jobs)))
+				);
+				break;
+			case "detail":
+				if(!$sender->hasPermission('economyjob.command.job.detail')) {
+					$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
+					return true;
 				}
-				$sender->sendMessage($output);
+
+				$name = array_shift($params);
+				if($name === '') {
+					$sender->sendMessage('Usage: /job detail <name>');
+					return true;
+				}
+
+				$jobs = $this->getJobs();
+				if(!isset($jobs[$name])) {
+					$sender->sendMessage(sprintf(TextFormat::colorize('There is no job named &6%s&f', $name)));
+					return true;
+				}
+
+				if(!is_array($jobs[$name])) {
+					$sender->sendMessage(sprintf(TextFormat::colorize('Job &6%s&f is not in correct data format.', $name)));
+					return true;
+				}
+
+				$currency = $this->api->getDefaultCurrency();
+
+				$sender->sendMessage(sprintf(TextFormat::colorize('Job &6%s&f gets:'), $name));
+				foreach($jobs[$name] as $key => $money) {
+					$condition = explode(':', $key);
+					$item = $condition[0] . ':' . $condition[1];
+					$action = $condition[2];
+					$sender->sendMessage(TextFormat::colorize(sprintf('* &6%s&f if you %s %s.', $currency->format($money),
+						($action === 'break' ? '&c':'&a') . $action . '&f', $item)));
+				}
 				break;
 			case "me":
 				if(!$sender instanceof Player) {
 					$sender->sendMessage("Please run this command in-game.");
+					return true;
 				}
+
+				if(!$sender->hasPermission('economyjob.command.job.me')) {
+					$sender->sendMessage(TextFormat::RED . "You don't have permission to run this command.");
+					return true;
+				}
+
 				if($this->player->exists($sender->getName())) {
 					$sender->sendMessage("Your job : " . $this->player->get($sender->getName()));
 				}else{

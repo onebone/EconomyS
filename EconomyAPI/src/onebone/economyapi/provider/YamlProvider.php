@@ -22,6 +22,8 @@ namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
 use pocketmine\player\Player;
+use onebone\economyapi\task\YamlSortTask;
+use onebone\economyapi\util\Promise;
 use pocketmine\utils\Config;
 
 class YamlProvider implements Provider {
@@ -133,6 +135,15 @@ class YamlProvider implements Provider {
 
 	public function getAll(): array {
 		return isset($this->money["money"]) ? $this->money["money"] : [];
+	}
+
+	public function sortByRange(int $from, ?int $len): Promise {
+		$promise = new Promise();
+		$task = new YamlSortTask($promise, $this->money['money'], $from, $len);
+
+		$this->plugin->getServer()->getAsyncPool()->submitTask($task);
+
+		return $promise;
 	}
 
 	public function getName(): string {

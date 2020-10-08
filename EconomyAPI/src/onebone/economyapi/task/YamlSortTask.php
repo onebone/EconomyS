@@ -20,18 +20,41 @@
 
 namespace onebone\economyapi\task;
 
-use onebone\economyapi\EconomyAPI;
-use pocketmine\scheduler\Task;
+use onebone\economyapi\util\Promise;
+use pocketmine\scheduler\AsyncTask;
+use pocketmine\Server;
 
-class SaveTask extends Task {
-	/** @var EconomyAPI */
-	protected $plugin;
+class YamlSortTask extends AsyncTask {
+	/** @var int */
+	private $from, $len;
+	private $money;
 
-	public function __construct(EconomyAPI $plugin) {
-		$this->plugin = $plugin;
+	public function __construct(Promise $promise, array $money, int $from, ?int $len) {
+		$this->storeLocal('promise', $promise);
+
+		$this->money = $money;
+		$this->from = $from;
+		$this->len = $len;
 	}
 
 	public function onRun(): void {
-		$this->plugin->saveAll();
+		$money = (array) $this->money;
+		arsort($money);
+
+		if($this->from < 0)
+			$this->from = 0;
+
+		$this->setResult(array_slice($money, $this->from, $this->len, true));
+	}
+
+	public function onCompletion(): void {
+		/** @var Promise $promise */
+		$promise = $this->fetchLocal('promise');
+
+		if(!$this->isCrashed()) {
+			$promise->resolve($this->getResult());
+		}else{
+			$promise->reject(null);
+		}
 	}
 }

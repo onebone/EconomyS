@@ -24,15 +24,15 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyusury\EconomyUsury;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\item\Item;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class UsuryCommand extends Command implements PluginIdentifiableCommand, Listener {
+class UsuryCommand extends Command implements PluginOwned, Listener {
 	private $requests = [];
 	private $plugin;
 
@@ -45,16 +45,18 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 
 	public function onPlayerJoin(PlayerJoinEvent $event) {
 		if(isset($this->requests[strtolower($event->getPlayer()->getName())])) {
-			$event->getPlayer()->sendMessage($this->getPlugin()->getMessage("received-request", [count($this->requests[strtolower($event->getPlayer()->getName())]), "%2"]));
+			$event->getPlayer()->sendMessage($this->getOwningPlugin()->getMessage("received-request", [count($this->requests[strtolower($event->getPlayer()->getName())]), "%2"]));
 		}
 	}
 
-	public function getPlugin(): Plugin {
+	public function getOwningPlugin(): Plugin {
 		return $this->plugin;
 	}
 
 	public function execute(CommandSender $sender, string $label, array $params): bool {
-		if(!$this->getPlugin()->isEnabled() or !$this->testPermission($sender)) {
+		$plugin = $this->plugin;
+
+		if(!$this->plugin->isEnabled() or !$this->testPermission($sender)) {
 			return false;
 		}
 
@@ -62,8 +64,8 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 			case "host":
 				switch (array_shift($params)) {
 					case "open":
-						if($this->getPlugin()->usuryHostExists($sender->getName())) {
-							$sender->sendMessage($this->getPlugin()->getMessage("host-exists"));
+						if($plugin->usuryHostExists($sender->getName())) {
+							$sender->sendMessage($plugin->getMessage("host-exists"));
 							break;
 						}
 
@@ -75,15 +77,15 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 							break;
 						}
 
-						$this->getPlugin()->openUsuryHost($sender->getName(), $interest, $interval);
-						$this->getPlugin()->getServer()->broadcastMessage($this->getPlugin()->getMessage("host-open", [$sender->getName(), "%2"]));
+						$plugin->openUsuryHost($sender->getName(), $interest, $interval);
+						$plugin->getServer()->broadcastMessage($plugin->getMessage("host-open", [$sender->getName(), "%2"]));
 						break;
 					case "close":
-						$success = $this->getPlugin()->closeUsuryHost($sender->getName());
+						$success = $plugin->closeUsuryHost($sender->getName());
 						if($success) {
-							$sender->sendMessage($this->getPlugin()->getMessage("host-closed"));
+							$sender->sendMessage($plugin->getMessage("host-closed"));
 						}else{
-							$sender->sendMessage($this->getPlugin()->getMessage("no-host"));
+							$sender->sendMessage($plugin->getMessage("no-host"));
 						}
 						break;
 					case "accept":
@@ -93,15 +95,15 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 							break;
 						}
 						if(isset($this->requests[strtolower($sender->getName())][$player])) {
-							$this->getPlugin()->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0], $this->requests[strtolower($sender->getName())][$player][2]);
-							$sender->sendMessage($this->getPlugin()->getMessage("accepted-player", [$player, "%2"]));
-							$this->getPlugin()->queueMessage($player, $this->getPlugin()->getMessage("accepted-by-host", [$sender->getName(), "%2"]));
+							$plugin->joinHost($player, $sender->getName(), $this->requests[strtolower($sender->getName())][$player][1], $this->requests[strtolower($sender->getName())][$player][0], $this->requests[strtolower($sender->getName())][$player][2]);
+							$sender->sendMessage($plugin->getMessage("accepted-player", [$player, "%2"]));
+							$plugin->queueMessage($player, $plugin->getMessage("accepted-by-host", [$sender->getName(), "%2"]));
 							EconomyAPI::getInstance()->addMoney($player, $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
 							EconomyAPI::getInstance()->reduceMoney($sender->getName(), $this->requests[strtolower($sender->getName())][$player][2], true, "EconomyUsury");
 							unset($this->requests[strtolower($sender->getName())][$player]);
 							return true;
 						}
-						$sender->sendMessage($this->getPlugin()->getMessage("no-requester", [$player, "%2"]));
+						$sender->sendMessage($plugin->getMessage("no-requester", [$player, "%2"]));
 						break;
 					case "decline":
 						$player = strtolower(array_shift($params));
@@ -111,35 +113,35 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 						}
 						if(isset($this->requests[strtolower($sender->getName())][$player])) {
 							unset($this->requests[strtolower($sender->getName())][$player]);
-							$this->getPlugin()->queueMessage($player, $this->getPlugin()->getMessage("request-declined-by-host", [$sender->getName(), "%2"]));
-							$sender->sendMessage($this->getPlugin()->getMessage("request-declined", [$sender->getName(), "%2"]));
+							$plugin->queueMessage($player, $plugin->getMessage("request-declined-by-host", [$sender->getName(), "%2"]));
+							$sender->sendMessage($plugin->getMessage("request-declined", [$sender->getName(), "%2"]));
 						}else{
-							$sender->sendMessage($this->getPlugin()->getMessage("no-requester", [$player, "%2"]));
+							$sender->sendMessage($plugin->getMessage("no-requester", [$player, "%2"]));
 						}
 						break;
 					case "list":
 						switch (array_shift($params)) {
 							case "c":
 							case "client":
-								$players = $this->getPlugin()->getJoinedPlayers($sender->getName());
+								$players = $plugin->getJoinedPlayers($sender->getName());
 								if($players === false or count($players) <= 0) {
-									$sender->sendMessage($this->getPlugin()->getMessage("no-joined-host"));
+									$sender->sendMessage($plugin->getMessage("no-joined-host"));
 									break;
 								}
-								$msg = $this->getPlugin()->getMessage("list-clients-top", [count($players)]);
+								$msg = $plugin->getMessage("list-clients-top", [count($players)]);
 								foreach($players as $player => $condition) {
-									$msg .= $this->getPlugin()->getMessage("list-clients", [$player, $condition[2], Item::get($condition[0], $condition[1], $condition[2])->getName(), $condition[2]]);
+									$msg .= $plugin->getMessage("list-clients", [$player, $condition[2], Item::get($condition[0], $condition[1], $condition[2])->getName(), $condition[2]]);
 								}
 								$sender->sendMessage($msg);
 								break;
 							default:
 								if(!isset($this->requests[strtolower($sender->getName())]) or count($this->requests[strtolower($sender->getName())]) <= 0) {
-									$sender->sendMessage($this->getPlugin()->getMessage("no-request-received"));
+									$sender->sendMessage($plugin->getMessage("no-request-received"));
 									return true;
 								}
-								$msg = $this->getPlugin()->getMessage("list-requesters-top", [count($this->requests[strtolower($sender->getName())])]);
+								$msg = $plugin->getMessage("list-requesters-top", [count($this->requests[strtolower($sender->getName())])]);
 								foreach($this->requests[strtolower($sender->getName())] as $player => $condition) {
-									$msg .= $this->getPlugin()->getMessage("list-requesters", [$player, $condition[0]->getCount(), $condition[0]->getName(), $condition[1], $condition[2]]);
+									$msg .= $plugin->getMessage("list-requesters", [$player, $condition[0]->getCount(), $condition[0]->getName(), $condition[1], $condition[2]]);
 								}
 								$sender->sendMessage($msg);
 								break;
@@ -160,18 +162,18 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 					break;
 				}
 
-				if(!$this->getPlugin()->usuryHostExists($requestTo)) {
-					$sender->sendMessage($this->getPlugin()->getMessage("no-requested-host", [$requestTo, "%2"]));
+				if(!$plugin->usuryHostExists($requestTo)) {
+					$sender->sendMessage($plugin->getMessage("no-requested-host", [$requestTo, "%2"]));
 					break;
 				}
 
 				if($requestTo === strtolower($sender->getName())) {
-					$sender->sendMessage($this->getPlugin()->getMessage("cant-join-own-host"));
+					$sender->sendMessage($plugin->getMessage("cant-join-own-host"));
 					break;
 				}
 
-				if(isset($this->requests[$requestTo][strtolower($sender->getName())]) or $this->getPlugin()->isPlayerJoinedHost($sender->getName(), $requestTo)) {
-					$sender->sendMessage($this->getPlugin()->getMessage("already-related", [$requestTo, "%2"]));
+				if(isset($this->requests[$requestTo][strtolower($sender->getName())]) or $plugin->isPlayerJoinedHost($sender->getName(), $requestTo)) {
+					$sender->sendMessage($plugin->getMessage("already-related", [$requestTo, "%2"]));
 					break;
 				}
 
@@ -179,12 +181,12 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 				$item->setCount($count);
 				if($sender->getInventory()->contains($item)) {
 					$this->requests[$requestTo][strtolower($sender->getName())] = [$item, $due, $money];
-					$sender->sendMessage($this->getPlugin()->getMessage("sent-request", [$requestTo, "%2"]));
-					if(($player = $this->getPlugin()->getServer()->getPlayerExact($requestTo)) instanceof Player) {
-						$player->sendMessage($this->getPlugin()->getMessage("received-request-now", [$sender->getName(), "%2"]));
+					$sender->sendMessage($plugin->getMessage("sent-request", [$requestTo, "%2"]));
+					if(($player = $plugin->getServer()->getPlayerExact($requestTo)) instanceof Player) {
+						$player->sendMessage($plugin->getMessage("received-request-now", [$sender->getName(), "%2"]));
 					}
 				}else{
-					$sender->sendMessage($this->getPlugin()->getMessage("no-guarantee"));
+					$sender->sendMessage($plugin->getMessage("no-guarantee"));
 				}
 				break;
 			case "cancel":
@@ -195,21 +197,21 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 				}
 				if(isset($this->requests[$host][strtolower($sender->getName())])) {
 					unset($this->requests[$host][strtolower($sender->getName())]);
-					$sender->sendMessage($this->getPlugin()->getMessage("request-cancelled", [$host, "%2"]));
+					$sender->sendMessage($plugin->getMessage("request-cancelled", [$host, "%2"]));
 				}else{
-					$sender->sendMessage($this->getPlugin()->getMessage("no-request-sent", [$host, "%2"]));
+					$sender->sendMessage($plugin->getMessage("no-request-sent", [$host, "%2"]));
 				}
 				break;
 			case "list":
 				switch (array_shift($params)) {
 					case "joined":
 					case "j":
-						$hosts = $this->getPlugin()->getHostsJoined($sender->getName());
+						$hosts = $plugin->getHostsJoined($sender->getName());
 						if(count($hosts) <= 0) {
-							$sender->sendMessage($this->getPlugin()->getMessage("no-host-joined"));
+							$sender->sendMessage($plugin->getMessage("no-host-joined"));
 							break;
 						}
-						$msg = $this->getPlugin()->getMessage("list-joined-top", [count($hosts)]);
+						$msg = $plugin->getMessage("list-joined-top", [count($hosts)]);
 						foreach($hosts as $host) {
 							$msg .= $host . ", ";
 						}
@@ -217,29 +219,29 @@ class UsuryCommand extends Command implements PluginIdentifiableCommand, Listene
 						$sender->sendMessage($msg);
 						break;
 					default:
-						$msg = $this->getPlugin()->getMessage("list-hosts-top", [count($this->getPlugin()->getAllHosts())]);
-						foreach($this->getPlugin()->getAllHosts() as $host => $data) {
+						$msg = $plugin->getMessage("list-hosts-top", [count($plugin->getAllHosts())]);
+						foreach($plugin->getAllHosts() as $host => $data) {
 							$ic = TextFormat::GREEN;
 							if($data[0] >= 50) {
 								$ic = TextFormat::YELLOW;
 							} elseif($data[0] >= 100) {
 								$ic = TextFormat::RED;
 							}
-							$msg .= $this->getPlugin()->getMessage("list-hosts", [$host, count($data["players"]), $ic, $data[0], $data[1]]);
+							$msg .= $plugin->getMessage("list-hosts", [$host, count($data["players"]), $ic, $data[0], $data[1]]);
 						}
 						$sender->sendMessage($msg);
 				}
 				break;
 			case "left":
-				$hosts = $this->getPlugin()->getHostsJoined($sender->getName());
+				$hosts = $plugin->getHostsJoined($sender->getName());
 				if(count($hosts) <= 0) {
-					$sender->sendMessage($this->getPlugin()->getMessage("no-host-joined"));
+					$sender->sendMessage($plugin->getMessage("no-host-joined"));
 					break;
 				}
-				$msg = $this->getPlugin()->getMessage("list-left-top", [count($hosts)]);
-				$all = $this->getPlugin()->getAllHosts();
+				$msg = $plugin->getMessage("list-left-top", [count($hosts)]);
+				$all = $plugin->getAllHosts();
 				foreach($hosts as $host) {
-					$msg .= $this->getPlugin()->getMessage("list-left", [$host, $all[$host]["players"][strtolower($sender->getName())][5]]);
+					$msg .= $plugin->getMessage("list-left", [$host, $all[$host]["players"][strtolower($sender->getName())][5]]);
 				}
 				$sender->sendMessage($msg);
 				break;

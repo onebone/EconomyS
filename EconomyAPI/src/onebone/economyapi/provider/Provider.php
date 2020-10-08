@@ -39,6 +39,7 @@ namespace onebone\economyapi\provider;
  */
 
 use pocketmine\player\Player;
+use onebone\economyapi\util\Promise;
 
 // Provider is currency-related data provider
 interface Provider {
@@ -88,14 +89,10 @@ interface Provider {
 	 */
 	public function reduceMoney($player, float $amount): bool;
 
-	/**
-	 * @return array
-	 */
 	public function getAll(): array;
 
-	/**
-	 * @return string
-	 */
+	public function sortByRange(int $from, ?int $len): Promise;
+
 	public function getName(): string;
 
 	public function save();

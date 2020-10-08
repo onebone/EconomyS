@@ -10,7 +10,7 @@ author: onebone
 commands:
  job:
   description: Job master command
-  usage: /job <join|retire|list|me>
+  usage: /job <join|retire|list|detail|me>
   permission: economyjob.command.job
 permissions:
  economyjob.command:
@@ -32,3 +32,7 @@ permissions:
       default: true
      economyjob.command.job.me:
       description: Allows player to use command that allows to see its job
+      default: true
+     economyjob.command.job.detail:
+      description: Allows player to use command that allows to see its job
+      default: true

@@ -22,14 +22,14 @@ namespace onebone\economyproperty;
 
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
-use pocketmine\world\Level;
+use pocketmine\plugin\PluginOwned;
+use pocketmine\world\World;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
-class PropertyCommand extends Command implements PluginIdentifiableCommand {
+class PropertyCommand extends Command implements PluginOwned {
 	private $plugin;
 	private $command, $pos1, $pos2, $make, $touchPos;
 
@@ -38,7 +38,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make", $touchPos = "touchpos") {
 		parent::__construct($command);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
-		$this->setPermission("economyproperty.command.property;economyproperty.command.property.pos1;economyproperty.command.property.pos2;");
+		$this->setPermission("economyproperty.command.property;economyproperty.command.property.pos1;economyproperty.command.property.pos2");
 		$this->setDescription("Property manage command");
 		$this->plugin = $plugin;
 		$this->command = $command;
@@ -49,7 +49,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 		$this->pos = array();
 	}
 
-	public function getPlugin(): Plugin {
+	public function getOwningPlugin(): Plugin {
 		return $this->plugin;
 	}
 
@@ -74,8 +74,8 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 					break;
 				}
 				$this->pos[$sender->getName()][0] = array(
-						(int) $sender->getX(),
-						(int) $sender->getZ(),
+						(int) $sender->getPosition()->getX(),
+						(int) $sender->getPosition()->getZ(),
 						$sender->getWorld()->getFolderName()
 				);
 				$sender->sendMessage("[EconomyProperty] First position has been saved.");
@@ -94,8 +94,8 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 					break;
 				}
 				$this->pos[$sender->getName()][1] = array(
-						(int) $sender->getX(),
-						(int) $sender->getZ(),
+						(int) $sender->getPosition()->getX(),
+						(int) $sender->getPosition()->getZ(),
 				);
 				$sender->sendMessage("[EconomyProperty] Second position has been saved.");
 				break;
@@ -117,7 +117,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 					$sender->sendMessage("Please check if your positions are all set.");
 					break;
 				}
-				$level = Server::getInstance()->getLevelByName($this->pos[$sender->getName()][0][2]);
+				$level = Server::getInstance()->getWorldManager()->getWorldByName($this->pos[$sender->getName()][0][2]);
 				if(!$level instanceof World) {
 					$sender->sendMessage("The property area where you are trying to make is corrupted.");
 					break;
@@ -130,7 +130,7 @@ class PropertyCommand extends Command implements PluginIdentifiableCommand {
 						$this->pos[$sender->getName()][1][0],
 						$this->pos[$sender->getName()][1][1]
 				);
-				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getY(), (isset($params[0]) ? $params[0] : null), $sender->getYaw());
+				$result = $this->plugin->registerArea($first, $end, $level, $price, $sender->getPosition()->getY(), (isset($params[0]) ? $params[0] : null), $sender->getPosition()->getYaw());
 				if($result) {
 					$sender->sendMessage("[EconomyProperty] Property has successfully created.");
 				}else{

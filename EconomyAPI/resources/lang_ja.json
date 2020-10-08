@@ -1,63 +1,63 @@
 {
-	"language": "jp",
-	"commands": {
-		"mymoney": {
-			"uasge": "/mymoney",
-			"description": "自分の持っている所持金を表示します"
-		},
-		"topmoney": {
-			"uasge": "/topmoney [ページ]",
-			"description": "このサーバーのプレーヤー所持金ランキングを表示します"
-		},
-		"setmoney": {
-			"usage": "/setmoney <プレーヤー> <数値> [貨幣]",
-			"description": "プレーヤーの所持金を設定します"
-		},
-		"seemoney": {
-			"usage": "/seemoney <プレーヤー> [貨幣]",
-			"description": "プレーヤーの所持金を表示します"
-		},
-		"givemoney": {
-			"usage": "/givemoney <プレーヤー> <数値> [貨幣]",
-			"description": "プレーヤーにお金を支給します"
-		},
-		"takemoney": {
-			"usage": "/takemoney <プレーヤー> <数値> [貨幣]",
-			"description": "プレーヤーからお金を奪います"
-		},
-		"pay": {
-			"usage": "/pay <プレーヤー> <数値> [貨幣]",
-			"description": "プレーヤーに支払いします"
-		},
-		"mystatus": {
-			"usage": "/mystatus",
-			"description": "自分の所持金の状況を表示します"
-		}
-	},
-	"language-set": "言語を%1に変更しました。",
-	"request-cancelled": "リクエストはキャンセルされました。",
-	"player-not-connected": "%1はオフラインです。",
-	"player-never-connected": "%1は存在しません。",
-	"topmoney-tag": "- トップランキングを表示 (%2の%1ページ) -",
-	"topmoney-format": "[%1] %2: %3",
-	"pay-failed": "支払いに失敗しました。",
-	"pay-success": "%2に%$1支払いました。",
-	"money-paid": "%1があなたに%$2支払いました。",
-	"takemoney-must-be-number": "金額は数字で入力してください。",
-	"takemoney-invalid-number": "無効な数値です。",
-	"takemoney-player-lack-of-money": "%1は%$2を持っていません。 %1の所持金 : %$3",
-	"takemoney-money-taken": "所持金が%$1減殺されました。",
-	"takemoney-took-money": "%1の所持金を%$2減殺しました。",
-	"takemoney-failed": "所持金の減殺に失敗しました。",
-	"givemoney-must-be-number": "金額は数字で入力してください。",
-	"givemoney-invalid-number": "無効な数値です。",
-	"givemoney-money-given": "所持金が%$1増えました。",
-	"givemoney-gave-money": "%2の所持金を%$1増やしました。",
-	"seemoney-seemoney": "%1の所持金 : %2",
-	"setmoney-setmoney": "%1の所持金を%$2にしました。",
-	"setmoney-set": "所持金が%$1に設定されました。",
-	"setmoney-failed": "不明なエラーにより所持金の設定に失敗しました。",
-	"setmoney-invalid-number": "%$1は無効な数値です。",
-	"mymoney-mymoney": "現在の所持金 : %$1",
-	"mystatus-show": "あなたの所持金は全体の%1%を占めています。"
+  "language": "jp",
+  "commands": {
+    "mymoney": {
+      "uasge": "/mymoney",
+      "description": "自分の持っている所持金を表示します"
+    },
+    "topmoney": {
+      "uasge": "/topmoney [ページ]",
+      "description": "このサーバーのプレーヤー所持金ランキングを表示します"
+    },
+    "setmoney": {
+      "usage": "/setmoney <プレーヤー> <数値> [貨幣]",
+      "description": "プレーヤーの所持金を設定します"
+    },
+    "seemoney": {
+      "usage": "/seemoney <プレーヤー> [貨幣]",
+      "description": "プレーヤーの所持金を表示します"
+    },
+    "givemoney": {
+      "usage": "/givemoney <プレーヤー> <数値> [貨幣]",
+      "description": "プレーヤーにお金を支給します"
+    },
+    "takemoney": {
+      "usage": "/takemoney <プレーヤー> <数値> [貨幣]",
+      "description": "プレーヤーからお金を奪います"
+    },
+    "pay": {
+      "usage": "/pay <プレーヤー> <数値> [貨幣]",
+      "description": "プレーヤーに支払いします"
+    },
+    "mystatus": {
+      "usage": "/mystatus",
+      "description": "自分の所持金の状況を表示します"
+    }
+  },
+  "language-set": "言語を%1に変更しました。",
+  "request-cancelled": "リクエストはキャンセルされました。",
+  "player-not-connected": "%1はオフラインです。",
+  "player-never-connected": "%1は存在しません。",
+  "topmoney-tag": "- トップランキングを表示 (%2の%1ページ) -",
+  "topmoney-format": "&b#1&f %2: &6%$3",
+  "pay-failed": "支払いに失敗しました。",
+  "pay-success": "%2に%$1支払いました。",
+  "money-paid": "%1があなたに%$2支払いました。",
+  "takemoney-must-be-number": "金額は数字で入力してください。",
+  "takemoney-invalid-number": "無効な数値です。",
+  "takemoney-player-lack-of-money": "%1は%$2を持っていません。 %1の所持金 : %$3",
+  "takemoney-money-taken": "所持金が%$1減殺されました。",
+  "takemoney-took-money": "%1の所持金を%$2減殺しました。",
+  "takemoney-failed": "所持金の減殺に失敗しました。",
+  "givemoney-must-be-number": "金額は数字で入力してください。",
+  "givemoney-invalid-number": "無効な数値です。",
+  "givemoney-money-given": "所持金が%$1増えました。",
+  "givemoney-gave-money": "%2の所持金を%$1増やしました。",
+  "seemoney-seemoney": "%1の所持金 : %2",
+  "setmoney-setmoney": "%1の所持金を%$2にしました。",
+  "setmoney-set": "所持金が%$1に設定されました。",
+  "setmoney-failed": "不明なエラーにより所持金の設定に失敗しました。",
+  "setmoney-invalid-number": "%$1は無効な数値です。",
+  "mymoney-mymoney": "現在の所持金 : %$1",
+  "mystatus-show": "あなたの所持金は全体の%1%を占めています。"
 }

@@ -51,7 +51,7 @@ class MoneyChangedEvent extends EconomyAPIEvent implements Cancellable {
 	}
 
 	/**
-	 * @return float
+	 * @return float Returns old balance of the player before change
 	 */
 	public function getMoney() {
 		return $this->money;

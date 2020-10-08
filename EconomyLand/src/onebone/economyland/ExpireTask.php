@@ -31,7 +31,7 @@ class ExpireTask extends Task {
 		$this->landId = $landId;
 	}
 
-	public function onRun(int $currentTick) {
+	public function onRun(): void {
 		$this->plugin->expireLand($this->landId);
 	}
 }

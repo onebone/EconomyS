@@ -21,13 +21,13 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\task\SortTask;
+use onebone\economyapi\currency\CurrencyReplacer;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 
-class TopMoneyCommand extends Command implements PluginIdentifiableCommand {
+class TopMoneyCommand extends Command implements PluginOwned {
 	/** @var EconomyAPI */
 	private $plugin;
 
@@ -43,33 +43,29 @@ class TopMoneyCommand extends Command implements PluginIdentifiableCommand {
 	public function execute(CommandSender $sender, string $label, array $params): bool {
 		if(!$this->testPermission($sender)) return false;
 
-		$page = (int) array_shift($params);
+		$page = max(1, (int) array_shift($params));
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
-		$server = $plugin->getServer();
+		$plugin = $this->plugin;
 
-		$banned = [];
-		foreach($server->getNameBans()->getEntries() as $entry) {
-			if($plugin->hasAccount($entry->getName())) {
-				$banned[] = $entry->getName();
+		$currency = $plugin->getPlayerPreferredCurrency($sender, false);
+
+		$plugin->getSortByRange($currency, ($page - 1) * 5, 5)->then(function($value) use ($plugin, $currency, $sender, $page) {
+			$sender->sendMessage($plugin->getMessage('topmoney-tag', $sender, [$page, '&enull&f'])); // TODO: show max page
+
+			$i = 0;
+			foreach($value as $player => $money) {
+				$i++;
+				$sender->sendMessage($plugin->getMessage('topmoney-format', $sender, [
+					($page - 1) * 5 + $i, $player, new CurrencyReplacer($currency, $money)
+				]));
 			}
-		}
-		$ops = [];
-		foreach($server->getOps()->getAll() as $op) {
-			if($plugin->hasAccount($op)) {
-				$ops[] = $op;
-			}
-		}
-
-		$task = new SortTask($sender->getName(), $plugin->getAllMoney(), $plugin->getConfig()->get("add-op-at-rank"), $page, $ops, $banned);
-
-		$server->getAsyncPool()->submitTask($task);
-
+		})->catch(function() use ($sender) {
+			$sender->sendMessage('Failed to fetch money leaderboard :(');
+		});
 		return true;
 	}
 
-	public function getPlugin(): Plugin {
+	public function getOwningPlugin(): Plugin {
 		return $this->plugin;
 	}
 }

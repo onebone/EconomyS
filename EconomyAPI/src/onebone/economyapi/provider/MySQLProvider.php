@@ -23,8 +23,8 @@ namespace onebone\economyapi\provider;
 use mysqli;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\MySQLPingTask;
-
 use pocketmine\player\Player;
+use onebone\economyapi\util\Promise;
 
 class MySQLProvider implements Provider {
 	/**
@@ -180,6 +180,14 @@ class MySQLProvider implements Provider {
 		$res->free();
 
 		return $ret;
+	}
+
+	public function sortByRange(int $from, ?int $len): Promise {
+		// TODO implement here
+		$promise = new Promise();
+		$promise->reject(null);
+
+		return $promise;
 	}
 
 	/**

@@ -11,7 +11,7 @@ commands:
  sell:
   description: Management command for creating/removing sell
   usage: /sell <create|remove|list> [item[:damage]] [amount] [price] [side]
-  permission: economysell.command.sell;economysell.command.sell.create;economysell.command.sell.remove;economysell.command.sell.list;
+  permission: economysell.command.sell;economysell.command.sell.create;economysell.command.sell.remove;economysell.command.sell.list
 
 permissions:
  economysell:

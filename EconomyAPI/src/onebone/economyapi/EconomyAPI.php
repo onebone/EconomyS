@@ -44,6 +44,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Replacer;
 use onebone\economyapi\provider\DummyProvider;
 use onebone\economyapi\provider\user\DummyUserProvider;
@@ -169,114 +170,59 @@ class EconomyAPI extends PluginBase implements Listener {
 		return "Language matching key \"$key\" does not exist.";
 	}
 
+	private const STATUS_NONE = 0;
+	private const STATUS_ESCAPE = 1;
+	private const STATUS_PARAMETER = 2;
+	private const STATUS_CURRENCY = 3;
+
 	public function replaceParameters($message, $params = []) {
 		$ret = '';
 
 		$len = strlen($message);
-
-		$isReplace = false;
-		$index = '';
-		$isEscape = false;
-		$isMoney = false;
+		$status = self::STATUS_NONE;
 		$chunk = '';
 
-		for($i = 0; $i < $len; $i++) {
-			$c = $message[$i];
+		for($i = 0; $i < $len + 1; $i++) {
+			$char = $message[$i] ?? '';
 
-			if($c === '\\') {
-				$isEscape = true;
+			if($status === self::STATUS_ESCAPE) {
+				$ret .= $char;
+				$status = self::STATUS_NONE;
 				continue;
 			}
 
-			if($isEscape) {
-				$isEscape = false;
-
-				if($isReplace) {
-					$ret .= $chunk;
-					$isReplace = false;
-				}
-			}elseif($c === '%') {
-				if($isReplace) {
-					if($index === '') {
-						$ret .= '%';
-					}else{
-						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-						if($isMoney) {
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getText();
-							}else{
-								$ret .= $this->getMonetaryUnit() . $replace;
-							}
-						}else{
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getRawText();
-							}else{
-								$ret .= $replace;
-							}
-						}
-					}
-				}
-
-				$index = '';
-				$isReplace = true;
-				$chunk = $c;
-				continue;
-			}
-
-			if($isReplace) {
-				$chunk .= $c;
-
-				if(is_numeric($c)) {
-					$index .= $c;
+			if($char === '%') {
+				if($status === self::STATUS_ESCAPE) {
+					$status = self::STATUS_NONE;
 				}else{
-					if($c === '$' and $index === '') {
-						$isMoney = true;
-					}else{
-						$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-						if($isMoney) {
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getText();
-							}else{
-								$ret .= $this->getMonetaryUnit() . $replace;
-							}
-						}else{
-							if($replace instanceof Replacer) {
-								$ret .= $replace->getRawText();
-							}else{
-								$ret .= $replace;
-							}
-						}
-
-						$isReplace = false;
-						$isMoney = false;
-						$chunk = '';
-
-						$ret .= $c;
-					}
+					$status = self::STATUS_PARAMETER;
 				}
-
-				continue;
-			}
-
-			$ret .= $c;
-		}
-
-		if($isReplace) {
-			$replace = $params[(int)$index - 1] ?? TextFormat::RED.'null'.TextFormat::WHITE;
-
-			if($isMoney) {
-				if($replace instanceof Replacer) { // TODO generalize usage of replacers
-					$ret .= $replace->getText();
-				}else{
-					$ret .= $this->getMonetaryUnit() . $replace;
+			}else if($char === '\\') {
+				$status = self::STATUS_ESCAPE;
+			}else if($char === '$') {
+				if($status === self::STATUS_PARAMETER and $chunk === '') {
+					$status = self::STATUS_CURRENCY;
 				}
 			}else{
-				if($replace instanceof Replacer) {
-					$ret .= $replace->getRawText();
+				if(is_numeric($char) and ($status === self::STATUS_PARAMETER or $status === self::STATUS_CURRENCY)) {
+					$chunk .= $char;
 				}else{
-					$ret .= $replace;
+					if(($status === self::STATUS_PARAMETER or $status === self::STATUS_CURRENCY) and $chunk !== '') {
+						$id = (int) $chunk;
+						$chunk = '';
+
+						$value = $params[$id - 1] ?? '&cnull&f';
+						if($value instanceof Replacer) {
+							$value = $value->getText();
+						}else if($status === self::STATUS_CURRENCY) {
+							$value = $this->getMonetaryUnit() . $value;
+						}
+
+						$ret .= $value;
+					}
+
+					$ret .= $char;
+					$status = self::STATUS_NONE;
 				}
 			}
 		}
@@ -401,7 +347,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param Currency $currency
+	 * @param ?Currency $currency
 	 *
 	 * @return bool
 	 */
@@ -414,7 +360,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param Player|string $player
-	 * @param Currency $currency
+	 * @param ?Currency $currency
 	 *
 	 * @return float|bool
 	 */
@@ -427,8 +373,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -478,7 +424,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if($holder->getProvider()->hasAccount($player)) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
-				if($amount > $config->getMaxMoney()) {
+				if($config->hasMaxMoney() and $amount > $config->getMaxMoney()) {
 					return self::RET_UNAVAILABLE;
 				}
 			}
@@ -498,8 +444,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -549,7 +495,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
 			$config = $holder->getConfig();
 			if($config instanceof CurrencyConfig) {
-				if($money + $amount > $config->getMaxMoney()) {
+				if($config->hasMaxMoney() and $money + $amount > $config->getMaxMoney()) {
 					return self::RET_UNAVAILABLE;
 				}
 			}
@@ -570,8 +516,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * @param string|Player $player
 	 * @param float $amount
-	 * @param Currency $currency
-	 * @param Issuer $issuer
+	 * @param ?Currency $currency
+	 * @param ?Issuer $issuer
 	 * @param bool $force
 	 *
 	 * @return int
@@ -645,9 +591,9 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	/**
 	 * @param string|Player $player
-	 * @param string|Currency $currency
+	 * @param string|?Currency $currency
 	 * @param float|bool $defaultMoney
-	 * @param Issuer $issuer
+	 * @param ?Issuer $issuer
 	 *
 	 * @return bool
 	 */
@@ -661,9 +607,17 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$holder->getProvider()->hasAccount($player)) {
 			if($defaultMoney === false) {
-				if($holder->getConfig() instanceof CurrencyConfig) {
-					$defaultMoney = $holder->getConfig()->getDefaultMoney();
-				}else{
+				// if $defaultMoney is not set on parameter, look at user configured initial balance first
+				// then fallback to currency specified amount if user did not define it
+				$currencyConfig = $holder->getConfig();
+				if($currencyConfig !== null) {
+					$money = $currencyConfig->getDefaultMoney();
+					if($money !== null) {
+						$defaultMoney = $money;
+					}
+				}
+
+				if($defaultMoney === false) {
 					$defaultMoney = $holder->getCurrency()->getDefaultMoney();
 				}
 			}
@@ -726,6 +680,13 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		return true;
+	}
+
+	public function getSortByRange(Currency $currency, int $from, ?int $len = null): ?Promise {
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) return null;
+
+		return $holder->getProvider()->sortByRange($from, $len);
 	}
 
 	public function hasLanguage(string $lang): bool {
@@ -943,7 +904,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 			$holder = $this->currencies[$key];
 			$holder->setConfig(
-				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? 0, $data['default'] ?? null, $exchange, $isExposed)
+				new CurrencyConfig($holder->getCurrency(), $data['max'] ?? -1, $data['default'] ?? null, $exchange, $isExposed)
 			);
 		}
 	}

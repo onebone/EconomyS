@@ -20,16 +20,17 @@
 
 namespace onebone\economyapi\command;
 
+use onebone\economyapi\currency\CurrencyReplacer;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\form\AskPayForm;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\player\Player;
 use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class PayCommand extends Command implements PluginIdentifiableCommand {
+class PayCommand extends Command implements PluginOwned {
 	/** @var EconomyAPI */
 	private $plugin;
 
@@ -61,8 +62,7 @@ class PayCommand extends Command implements PluginIdentifiableCommand {
 			return true;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->plugin;
 
 		if($currencyId === null) {
 			$currency = $plugin->getPlayerPreferredCurrency($player, false);
@@ -77,7 +77,7 @@ class PayCommand extends Command implements PluginIdentifiableCommand {
 
 		$money = $plugin->myMoney($sender, $currency);
 		if($money < $amount) {
-			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [$amount]));
+			$sender->sendMessage($plugin->getMessage("pay-no-money", $sender, [new CurrencyReplacer($currency, $amount)]));
 			return true;
 		}
 
@@ -104,7 +104,7 @@ class PayCommand extends Command implements PluginIdentifiableCommand {
 		return true;
 	}
 
-	public function getPlugin(): Plugin {
+	public function getOwningPlugin(): Plugin {
 		return $this->plugin;
 	}
 }

@@ -1,84 +1,85 @@
 {
-	"language": "ko",
-	"commands": {
-		"mymoney": {
-			"usage": "/mymoney",
-			"description": "자신의 돈을 보여줍니다"
-		},
-		"topmoney": {
-			"usage": "/topmoney [페이지]",
-			"description": "이 서버의 돈 순위를 보여줍니다"
-		},
-		"setmoney": {
-			"usage": "/setmoney <플레이어> <값> [화폐]",
-			"description": "플레이어의 돈을 설정합니다"
-		},
-		"seemoney": {
-			"usage": "/seemoney <플레이어> [화페}",
-			"description": "플레이어의 돈을 보여줍니다"
-		},
-		"givemoney": {
-			"usage": "/givemoney <플레이어> <값> [화폐]",
-			"description": "플레이어에게 돈을 지급합니다"
-		},
-		"takemoney": {
-			"usage": "/takemoney <플레이어> <값> [화폐]",
-			"description": "플레이어에게서 돈을 빼앗습니다"
-		},
-		"pay": {
-			"usage": "/pay <플레이어> <값> [화폐]",
-			"description": "플레이어에게 돈을 지불합니다"
-		},
-		"mystatus": {
-			"usage": "/mystatus",
-			"description": "자신의 돈의 상태를 봅니다"
-		},
-		"economy": {
-			"usage": "/economy <lang|currency> <값>",
-			"description": "EconomyAPI에 대한 설정을 제어합니다."
-		}
-	},
-	"language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
-	"request-cancelled": "요청이 거부되었습니다.",
-	"player-not-connected": "%1님은 서버에 접속하지 않았습니다.",
-	"player-never-connected": "%1님은 서버에 접속한 적이 없습니다.",
-	"currency-unavailable": "화폐 %1은(는) 사용이 불가능합니다.",
-	"topmoney-tag": "- 돈 순위를 표시합니다 (%1 / %2 페이지) -",
-	"topmoney-format": "[%1] %2: %3",
-	"pay-ask-title": "송금",
-	"pay-ask-content": "수취인: &l&b%1&r&f\n금액: &l&6%$2&r&f\n\n정말로 송금하시겠습니까?",
-	"pay-confirm": "송금",
-	"pay-cancel": "취소",
-	"pay-failed": "돈을 지불할 수 없습니다.",
-	"pay-cancelled": "송금을 취소했습니다.",
-	"pay-no-self": "자신에게는 송금할 수 없습니다.",
-	"pay-no-money": "돈이 부족하여 %$1을(를) 지불할 수 없습니다.",
-	"pay-success": "%2님에게 %$1을(를) 지불하였습니다.",
-	"money-paid": "%1님이 %$2을(를) 지불하였습니다.",
-	"takemoney-must-be-number": "수량은 숫자여야 합니다.",
-	"takemoney-invalid-number": "잘못된 숫자입니다.",
-	"takemoney-unavailable": "플레이어가 가지고 있는 돈보다 많습니다.",
-	"takemoney-player-lack-of-money": "%1님은 %$2만큼의 돈이 없습니다. %1님의 돈: %$3",
-	"takemoney-money-taken": "%$1을(를) 빼앗기셨습니다.",
-	"takemoney-took-money": "%1님의 %$2을(를) 빼앗으셨습니다.",
-	"takemoney-failed": "돈을 빼앗을 수 없습니다.",
-	"givemoney-must-be-number": "수량은 숫자여야 합니다.",
-	"givemoney-unavailable": "돈을 지급하면 플레이어가 가지고 있는 돈이 제한을 넘어가게 됩니다.",
-	"givemoney-invalid-number": "잘못된 숫자입니다.",
-	"givemoney-money-given": "%$1을(를) 받으셨습니다.",
-	"givemoney-gave-money": "%2님에게 %$1를 주셨습니다.",
-	"seemoney-seemoney": "%1님의 돈: %$2",
-	"setmoney-unavailable": "음수이거나 돈 제한을 넘어가는 돈은 설정할 수 없습니다.",
-	"setmoney-setmoney": "%1님의 돈이 %$2(으)로 설정되었습니다.",
-	"setmoney-set": "돈이 %$1(으)로 설정되었습니다.",
-	"setmoney-failed": "돈을 설정할 수 없습니다.",
-	"setmoney-invalid-number": "%1은(는) 잘못된 숫자입니다.",
-	"mymoney-mymoney": "내 돈: %$1",
-	"mystatus-show": "내 돈 상황: %1%",
-	"economy-currency-form-title": "선호 화폐",
-	"economy-currency-form-content": "기본으로 사용할 화폐를 선택하십시오",
-	"economy-currency-form-invalid": "올바르지 않은 양식 응답입니다.",
-	"economy-currency-set": "선호 화폐를 %1 (%2)로 설정했습니다.",
-	"economy-currency-failed": "선호 화폐를 %1 (%2)로 설정할 수 없습니다.",
-	"economy-currency-specify": "선호 화폐를 지정하십시오."
+  "language": "ko",
+  "commands": {
+    "mymoney": {
+      "usage": "/mymoney",
+      "description": "자신의 돈을 보여줍니다"
+    },
+    "topmoney": {
+      "usage": "/topmoney [페이지]",
+      "description": "이 서버의 돈 순위를 보여줍니다"
+    },
+    "setmoney": {
+      "usage": "/setmoney <플레이어> <값> [화폐]",
+      "description": "플레이어의 돈을 설정합니다"
+    },
+    "seemoney": {
+      "usage": "/seemoney <플레이어> [화페}",
+      "description": "플레이어의 돈을 보여줍니다"
+    },
+    "givemoney": {
+      "usage": "/givemoney <플레이어> <값> [화폐]",
+      "description": "플레이어에게 돈을 지급합니다"
+    },
+    "takemoney": {
+      "usage": "/takemoney <플레이어> <값> [화폐]",
+      "description": "플레이어에게서 돈을 빼앗습니다"
+    },
+    "pay": {
+      "usage": "/pay <플레이어> <값> [화폐]",
+      "description": "플레이어에게 돈을 지불합니다"
+    },
+    "mystatus": {
+      "usage": "/mystatus",
+      "description": "자신의 돈의 상태를 봅니다"
+    },
+    "economy": {
+      "usage": "/economy <lang|currency> <값>",
+      "description": "EconomyAPI에 대한 설정을 제어합니다."
+    }
+  },
+  "language-set": "언어가 onebone님의 %1(으)로 설정되었습니다.",
+  "request-cancelled": "요청이 거부되었습니다.",
+  "player-not-connected": "%1님은 서버에 접속하지 않았습니다.",
+  "player-never-connected": "%1님은 서버에 접속한 적이 없습니다.",
+  "currency-unavailable": "화폐 %1은(는) 사용이 불가능합니다.",
+  "topmoney-tag": "- 돈 순위를 표시합니다 (%1 / %2 페이지) -",
+  "topmoney-format": "&b#1&f %2: &6%$3",
+  "topmoney-failed": "돈 순위를 얻어오는 데 실패했습니다.",
+  "pay-ask-title": "송금",
+  "pay-ask-content": "수취인: &l&b%1&r&f\n금액: &l&6%$2&r&f\n\n정말로 송금하시겠습니까?",
+  "pay-confirm": "송금",
+  "pay-cancel": "취소",
+  "pay-failed": "돈을 지불할 수 없습니다.",
+  "pay-cancelled": "송금을 취소했습니다.",
+  "pay-no-self": "자신에게는 송금할 수 없습니다.",
+  "pay-no-money": "돈이 부족하여 %$1을(를) 지불할 수 없습니다.",
+  "pay-success": "%2님에게 %$1을(를) 지불하였습니다.",
+  "money-paid": "%1님이 %$2을(를) 지불하였습니다.",
+  "takemoney-must-be-number": "수량은 숫자여야 합니다.",
+  "takemoney-invalid-number": "잘못된 숫자입니다.",
+  "takemoney-unavailable": "플레이어가 가지고 있는 돈보다 많습니다.",
+  "takemoney-player-lack-of-money": "%1님은 %$2만큼의 돈이 없습니다. %1님의 돈: %$3",
+  "takemoney-money-taken": "%$1을(를) 빼앗기셨습니다.",
+  "takemoney-took-money": "%1님의 %$2을(를) 빼앗으셨습니다.",
+  "takemoney-failed": "돈을 빼앗을 수 없습니다.",
+  "givemoney-must-be-number": "수량은 숫자여야 합니다.",
+  "givemoney-unavailable": "돈을 지급하면 플레이어가 가지고 있는 돈이 제한을 넘어가게 됩니다.",
+  "givemoney-invalid-number": "잘못된 숫자입니다.",
+  "givemoney-money-given": "%$1을(를) 받으셨습니다.",
+  "givemoney-gave-money": "%2님에게 %$1를 주셨습니다.",
+  "seemoney-seemoney": "%1님의 돈: %$2",
+  "setmoney-unavailable": "음수이거나 돈 제한을 넘어가는 돈은 설정할 수 없습니다.",
+  "setmoney-setmoney": "%1님의 돈이 %$2(으)로 설정되었습니다.",
+  "setmoney-set": "돈이 %$1(으)로 설정되었습니다.",
+  "setmoney-failed": "돈을 설정할 수 없습니다.",
+  "setmoney-invalid-number": "%1은(는) 잘못된 숫자입니다.",
+  "mymoney-mymoney": "내 돈: %$1",
+  "mystatus-show": "내 돈 상황: %1%",
+  "economy-currency-form-title": "선호 화폐",
+  "economy-currency-form-content": "기본으로 사용할 화폐를 선택하십시오.",
+  "economy-currency-form-invalid": "올바르지 않은 양식 응답입니다.",
+  "economy-currency-set": "선호 화폐를 %1 (%2)로 설정했습니다.",
+  "economy-currency-failed": "선호 화폐를 %1 (%2)로 설정할 수 없습니다.",
+  "economy-currency-specify": "선호 화폐를 지정하십시오."
 }
