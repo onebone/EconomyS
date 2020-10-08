@@ -20,6 +20,7 @@
 
 namespace onebone\economyland;
 
+use Closure;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\database\Database;
 use onebone\economyland\database\YamlDatabase;
@@ -102,9 +103,9 @@ class EconomyLand extends PluginBase implements Listener {
 				$this->getLogger()->alert("Specified database type is unavailable. Database type is YAML.");
 		}
 
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", \Closure::fromCallable([$this, 'onPlaceEvent']), EventPriority::HIGHEST, $this);
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", \Closure::fromCallable([$this, 'onBreakEvent']), EventPriority::HIGHEST, $this);
-		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\player\\PlayerInteractEvent", \Closure::fromCallable([$this, 'onPlayerInteract']), EventPriority::HIGHEST, $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockPlaceEvent", Closure::fromCallable([$this, 'onPlaceEvent']), EventPriority::HIGHEST, $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\block\\BlockBreakEvent", Closure::fromCallable([$this, 'onBreakEvent']), EventPriority::HIGHEST, $this);
+		$this->getServer()->getPluginManager()->registerEvent("pocketmine\\event\\player\\PlayerInteractEvent", Closure::fromCallable([$this, 'onPlayerInteract']), EventPriority::HIGHEST, $this);
 	}
 
 	private function createConfig() {
@@ -191,8 +192,8 @@ class EconomyLand extends PluginBase implements Listener {
 					$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 					return true;
 				}
-				$x = floor($sender->x);
-				$z = floor($sender->z);
+				$x = floor($sender->getPosition()->getX());
+				$z = floor($sender->getPosition()->getZ());
 				$level = $sender->getWorld()->getFolderName();
 				$this->start[$sender->getName()] = array("x" => $x, "z" => $z, "level" => $level);
 				$sender->sendMessage($this->getMessage("first-position-saved"));
@@ -213,8 +214,8 @@ class EconomyLand extends PluginBase implements Listener {
 
 				$startX = $this->start[$sender->getName()]["x"];
 				$startZ = $this->start[$sender->getName()]["z"];
-				$endX = floor($sender->x);
-				$endZ = floor($sender->z);
+				$endX = floor($sender->getPosition()->getX());
+				$endZ = floor($sender->getPosition()->getZ());
 				$this->end[$sender->getName()] = array(
 						"x" => $endX,
 						"z" => $endZ
@@ -296,7 +297,7 @@ class EconomyLand extends PluginBase implements Listener {
 							return true;
 						}
 						$price = ((($endX + 1) - ($startX - 1)) - 1) * ((($endZ + 1) - ($startZ - 1)) - 1) * $this->getConfig()->get("price-per-y-axis", 100);
-						if(EconomyAPI::getInstance()->reduceMoney($sender, $price, null, "EconomyLand", true) === EconomyAPI::RET_INVALID) {
+						if(EconomyAPI::getInstance()->reduceMoney($sender, $price, null, null, true) === EconomyAPI::RET_INVALID) {
 							$sender->sendMessage($this->getMessage("no-money-to-buy-land"));
 							return true;
 						}
@@ -384,7 +385,7 @@ class EconomyLand extends PluginBase implements Listener {
 								return true;
 							}
 						}
-						$level = $this->getServer()->getLevelByName($info["level"]);
+						$level = $this->getServer()->getWorldManager()->getWorldByName($info["level"]);
 						if(!$level instanceof World) {
 							$sender->sendMessage($this->getMessage("land-corrupted", array($num, $info["level"], "")));
 							return true;
@@ -548,8 +549,8 @@ class EconomyLand extends PluginBase implements Listener {
 							$sender->sendMessage($this->getMessage("run-cmd-in-game"));
 							return true;
 						}
-						$x = $sender->x;
-						$z = $sender->z;
+						$x = $sender->getPosition()->getX();
+						$z = $sender->getPosition()->getZ();
 
 						$info = $this->db->getByCoord($x, $z, $sender->getWorld()->getFolderName());
 						if($info === false) {
@@ -596,7 +597,7 @@ class EconomyLand extends PluginBase implements Listener {
 								return true;
 							}
 							if($info["owner"] === $sender->getName() or $sender->hasPermission("economyland.landsell.others")) {
-								EconomyAPI::getInstance()->addMoney($sender, ($info["price"] / 2), null, "EconomyLand", true);
+								EconomyAPI::getInstance()->addMoney($sender, ($info["price"] / 2), null, null, true);
 								$sender->sendMessage($this->getMessage("sold-land", array(($info["price"] / 2), "", "")));
 
 								$this->db->removeLandById($p);
@@ -627,7 +628,6 @@ class EconomyLand extends PluginBase implements Listener {
 
 	public function permissionCheck(Event $event) {
 		/** @var $player Player */
-		/** @var BlockEvent|PlayerEvent $event*/
 		$player = $event->getPlayer();
 		if($event instanceof PlayerInteractEvent) {
 			$block = $event->getBlock()->getSide($event->getFace());
@@ -635,9 +635,9 @@ class EconomyLand extends PluginBase implements Listener {
 			$block = $event->getBlock();
 		}
 
-		$x = $block->getX();
-		$z = $block->getZ();
-		$level = $block->getWorld()->getFolderName();
+		$x = $block->getPos()->getX();
+		$z = $block->getPos()->getZ();
+		$level = $block->getPos()->getWorld()->getFolderName();
 
 		if(in_array($level, $this->getConfig()->get("non-check-worlds", []))) {
 			return false;

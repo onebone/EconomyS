@@ -29,6 +29,8 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
+use pocketmine\item\ItemFactory;
+use pocketmine\item\ItemIds;
 use pocketmine\world\World;
 use pocketmine\world\Position;
 use pocketmine\math\Vector3;
@@ -37,8 +39,8 @@ use pocketmine\nbt\tag\IntTag;
 use pocketmine\nbt\tag\StringTag;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\tile\Sign;
-use pocketmine\tile\Tile;
+use pocketmine\block\tile\Sign;
+use pocketmine\block\tile\Tile;
 use SQLite3;
 
 class EconomyProperty extends PluginBase implements Listener {
@@ -106,11 +108,12 @@ class EconomyProperty extends PluginBase implements Listener {
 		}
 
 		$block = $event->getBlock();
+		$pos = $block->getPos();
 		$player = $event->getPlayer();
 
 		if(isset($this->touch[$player->getName()])) {
 			//	$mergeData[$player->getName()][0] = [(int)$block->getX(), (int)$block->getZ(), $block->getWorld()->getName()];
-			$this->command->mergePosition($player->getName(), 0, [(int) $block->getX(), (int) $block->getZ(), $block->getWorld()->getFolderName()]);
+			$this->command->mergePosition($player->getName(), 0, [(int) $pos->getX(), (int) $pos->getZ(), $pos->getWorld()->getFolderName()]);
 			$player->sendMessage("[EconomyProperty] First position has been saved.");
 			$event->setCancelled(true);
 			if($event->getItem()->canBePlaced()) {
@@ -119,9 +122,10 @@ class EconomyProperty extends PluginBase implements Listener {
 			return;
 		}
 
-		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getWorld()->getName()}'")->fetchArray(SQLITE3_ASSOC);
+		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$pos->getX()} AND landX >= {$pos->getX()} AND startZ <= {$pos->getZ()} AND landZ >= {$pos->getZ()} AND level = '{$pos->getWorld()->getFolderName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(!is_bool($info)) {
-			if(!($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ())) {
+			$pos = $block->getPos();
+			if(!($info["x"] === $pos->getX() and $info["y"] === $pos->getY() and $info["z"] === $pos->getZ())) {
 				if($player->hasPermission("economyproperty.property.modify") === false) {
 					$event->setCancelled(true);
 					if($event->getItem()->canBePlaced()) {
@@ -133,8 +137,8 @@ class EconomyProperty extends PluginBase implements Listener {
 					return;
 				}
 			}
-			$level = $block->getWorld();
-			$tile = $level->getTile($block);
+			$level = $pos->getWorld();
+			$tile = $level->getTile($pos);
 			if(!$tile instanceof Sign) {
 				$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 				return;
@@ -148,7 +152,7 @@ class EconomyProperty extends PluginBase implements Listener {
 					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"], $info["rentTime"]);
 					switch ($result) {
 						case EconomyLand::RET_SUCCESS:
-							EconomyAPI::getInstance()->reduceMoney($player, $info["price"], null, "EconomyProperty", true);
+							EconomyAPI::getInstance()->reduceMoney($player, $info["price"], null, null, true);
 							$player->sendMessage("Successfully bought land.");
 							$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 							break;
@@ -161,10 +165,10 @@ class EconomyProperty extends PluginBase implements Listener {
 					}
 				}
 				$tile->close();
-				$level->setBlock($block, new Air());
+				$level->setBlock($pos, ItemFactory::getInstance()->get(ItemIds::AIR));
 				unset($this->tap[$player->getName()]);
 			}else{
-				$this->tap[$player->getName()] = array($block->x . ":" . $block->y . ":" . $block->z, $now);
+				$this->tap[$player->getName()] = array($pos->x . ":" . $pos->y . ":" . $pos->z, $now);
 				$player->sendMessage("#" . $info["landNum"] . " [EconomyProperty] Are you sure to buy here? Tap again to confirm.");
 				$event->setCancelled(true);
 				if($event->getItem()->canBePlaced()) {
@@ -185,19 +189,20 @@ class EconomyProperty extends PluginBase implements Listener {
 
 	public function onBlockBreak(BlockBreakEvent $event) {
 		$block = $event->getBlock();
+		$pos = $block->getPos();
 		$player = $event->getPlayer();
 
 		if(isset($this->touch[$player->getName()])) {
 			//$mergeData[$player->getName()][1] = [(int)$block->getX(), (int)$block->getZ()];
-			$this->command->mergePosition($player->getName(), 1, [(int) $block->getX(), (int) $block->getZ()]);
+			$this->command->mergePosition($player->getName(), 1, [(int) $pos->getX(), (int) $pos->getZ()]);
 			$player->sendMessage("[EconomyProperty] Second position has been saved.");
 			$event->setCancelled(true);
 			return;
 		}
 
-		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$block->getX()} AND landX >= {$block->getX()} AND startZ <= {$block->getZ()} AND landZ >= {$block->getZ()} AND level = '{$block->getWorld()->getName()}'")->fetchArray(SQLITE3_ASSOC);
+		$info = $this->property->query("SELECT * FROM Property WHERE startX <= {$pos->getX()} AND landX >= {$pos->getX()} AND startZ <= {$pos->getZ()} AND landZ >= {$pos->getZ()} AND level = '{$pos->getWorld()->getFolderName()}'")->fetchArray(SQLITE3_ASSOC);
 		if(is_bool($info) === false) {
-			if($info["x"] === $block->getX() and $info["y"] === $block->getY() and $info["z"] === $block->getZ()) {
+			if($info["x"] === $pos->getX() and $info["y"] === $pos->getY() and $info["z"] === $pos->getZ()) {
 				if($player->hasPermission("economyproperty.property.remove")) {
 					$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 					$player->sendMessage("[EconomyProperty] You have removed property area #" . $info["landNum"]);
@@ -216,7 +221,7 @@ class EconomyProperty extends PluginBase implements Listener {
 
 	public function registerArea($first, $sec, $level, $price, $expectedY = 64, $rentTime = null, $expectedYaw = 0){
 		if(!$level instanceof World){
-			$level = $this->getServer()->getLevelManager()->getLevelByName($level);
+			$level = $this->getServer()->getWorldManager()->getWorldByName($level);
 			if(!$level instanceof World){
 
 				return false;
