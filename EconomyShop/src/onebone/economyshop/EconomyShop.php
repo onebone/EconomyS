@@ -421,7 +421,7 @@ class EconomyShop extends PluginBase implements Listener {
 	public function onBlockPlace(BlockPlaceEvent $event) {
 		$iusername = strtolower($event->getPlayer()->getName());
 		if(isset($this->placeQueue[$iusername])) {
-			$event->setCancelled();
+			$event->cancel();
 			unset($this->placeQueue[$iusername]);
 		}
 	}
@@ -431,7 +431,7 @@ class EconomyShop extends PluginBase implements Listener {
 		if($this->provider->getShop($block) !== false) {
 			$player = $event->getPlayer();
 
-			$event->setCancelled(true);
+			$event->cancel();
 			$player->sendMessage($this->getMessage("shop-breaking-forbidden"));
 		}
 	}

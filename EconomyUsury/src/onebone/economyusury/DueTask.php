@@ -35,7 +35,7 @@ class DueTask extends Task {
 		$this->hostOwner = $hostOwner;
 	}
 
-	public function onRun(int $currentTick) {
+	public function onRun(): void {
 		$this->removeItem();
 	}
 

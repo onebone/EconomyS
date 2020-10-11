@@ -168,7 +168,7 @@ class EconomyPShop extends PluginBase implements Listener {
 					unset($this->shop[$loc]);
 				}else{
 					$player->sendMessage($this->getMessage("no-permission-remove-shop"));
-					$event->setCancelled();
+					$event->cancel();
 				}
 			}
 		}
@@ -225,7 +225,7 @@ class EconomyPShop extends PluginBase implements Listener {
 				}else{
 					$player->sendMessage($this->getMessage("shop-owner-no-account"));
 				}
-				$event->setCancelled();
+				$event->cancel();
 				if($event->getItem()->canBePlaced()) {
 					$this->placeQueue[$player->getName()] = true;
 				}
@@ -238,7 +238,7 @@ class EconomyPShop extends PluginBase implements Listener {
 	public function onBlockPlace(BlockPlaceEvent $event) {
 		$user = $event->getPlayer()->getName();
 		if(isset($this->placeQueue[$user])) {
-			$event->setCancelled();
+			$event->cancel();
 			unset($this->placeQueue[$user]);
 		}
 	}

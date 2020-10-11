@@ -31,7 +31,7 @@ class QuitAuctionTask extends Task {
 		$this->player = strtolower($player);
 	}
 
-	public function onRun(int $currentTick) {
+	public function onRun(): void {
 		$this->plugin->quitAuction($this->player);
 	}
 }
