@@ -44,6 +44,7 @@ class LandOptionForm implements Form {
 		$option->setAllowIn($data[0]);
 		$option->setAllowTouch($data[1]);
 		$option->setAllowPickup($data[2]);
+		$this->land->setOption($option);
 
 		$this->plugin->getLandManager()->setLand($this->land);
 		$player->sendMessage($this->plugin->getMessage('land-option-updated', [$this->land->getId()]));
