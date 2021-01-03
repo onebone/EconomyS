@@ -801,9 +801,15 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->provider->init();
 	}
 
-	private function checkUpdate() {
+	private function checkUpdate(): bool {
 		try{
-			$info = json_decode(Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
+			$result = Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION);
+			if($result === null) {
+				$this->getLogger()->notice("There was a network exception while fetching new version.");
+				return false;
+			}
+
+			$info = json_decode($result->getBody(), true);
 			if(!isset($info["status"]) or $info["status"] !== true) {
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;

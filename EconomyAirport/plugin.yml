@@ -8,10 +8,7 @@ main: onebone\economyairport\EconomyAirport
 depend: [EconomyAPI]
 
 permissions:
- economyairport:
-  description: Includes all permissions related to EconomyAirport
-  children:
-   economyairport.create:
-    description: Allows player construction of airport
-   economyairport.remove:
-    description: Allows player to remove airport
+ economyairport.create:
+  description: Allows player construction of airport
+ economyairport.remove:
+  description: Allows player to remove airport

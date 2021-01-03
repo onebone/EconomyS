@@ -11,36 +11,24 @@ commands:
  auction:
   description: Manages all auctions
   usage: /auction <start|stop|time|bid>
-  permission: economyauction.command.auction
+  permission: economyauction.command.auction.start;economyauction.command.auction.stop;economyauction.command.auction.time;economyauction.command.auction.bid;economyauction.command.auction.list;economyauction.auction.stop.others
 
 permissions:
- economyauction:
-  description: Allows player to use all functions in EconomyAuction
-  default: op
-  children:
-   economyauction.command:
-    description: Allows player to use all of commands in EconomyAuction
-    default: op
-    children:
-     economyauction.command.auction:
-      description: Allows player to manage all the auctions
-      default: true
-      children:
-       economyauction.command.auction.start:
-        description: Allows player to start auction with no limited time
-        default: true
-       economyauction.command.auction.stop:
-        description: Allows player to stop auction by force
-        default: true
-       economyauction.command.auction.time:
-        description: Allows player to start auction with limited time
-        default: true
-       economyauction.command.auction.bid:
-        description: Allows player to bid price for an auction
-        default: true
-       economyauction.command.auction.list:
-        description: Allows player to see list of auctions
-        default: true
-   economyauction.auction.stop.others:
+  economyauction.command.auction.start:
+    description: Allows player to start auction with no limited time
+    default: true
+  economyauction.command.auction.stop:
+    description: Allows player to stop auction by force
+    default: true
+  economyauction.command.auction.time:
+    description: Allows player to start auction with limited time
+    default: true
+  economyauction.command.auction.bid:
+    description: Allows player to bid price for an auction
+    default: true
+  economyauction.command.auction.list:
+    description: Allows player to see list of auctions
+    default: true
+  economyauction.auction.stop.others:
     description: Allows player to stop others' auctions
     default: op

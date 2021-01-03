@@ -11,27 +11,16 @@ commands:
  shop:
   description: Management command for creating/removing shop
   usage: /shop <create|remove|list> [item[:damage]] [amount] [price] [side]
-  permission: economyshop.command.shop;economyshop.command.shop.create;economyshop.command.shop.remove;economyshop.command.shop.list
+  permission: economyshop.command.shop.create;economyshop.command.shop.remove;economyshop.command.shop.list
 
 permissions:
- economyshop:
-  description: Allows all functions in EconomyShop
-  default: op
-  children:
-   economyshop.command.shop:
-    description: Allows player to use /shop
-    children:
-     economyshop.command.shop.create:
-      description: Allows player to use /shop create
-     economyshop.command.shop.remove:
-      description: Allows player to use /shop remove
-     economyshop.command.shop.list:
-      description: Allows player to use /shop list
-      default: true
-   economyshop.shop:
-    description: Allows all functions about shops
-    default: op
-    children:
-     economyshop.shop.buy:
-      description: Allows player to buy from shop
-      default: true
+ economyshop.command.shop.create:
+  description: Allows player to use /shop create
+ economyshop.command.shop.remove:
+  description: Allows player to use /shop remove
+ economyshop.command.shop.list:
+  description: Allows player to use /shop list
+  default: true
+ economyshop.shop.buy:
+  description: Allows player to buy from shop
+  default: true

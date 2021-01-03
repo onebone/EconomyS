@@ -8,31 +8,20 @@ api:
 depend:
 - EconomyLand
 - EconomyAPI
+
 permissions:
- economyproperty:
-  description: Includes all permissions related to EconomyProperty
+ economyproperty.property.modify:
+  description: Allows player to modify property area
   default: op
-  children:
-   economyproperty.property:
-    description: Includes all permission related to property area
-    default: op
-    children:
-     economyproperty.property.modify:
-      description: Allows player to modify property area
-      default: op
-     economyproperty.property.remove:
-      description: Allows player to remove property
-      default: op
-   economyproperty.command.property:
-    description: Allows player to use property command
-    default: op
-    children:
-     economyproperty.command.property.pos1:
-      default: op
-      description: Allows player to use /property pos1 command
-     economyproperty.command.property.pos2:
-      default: op
-      description: Allows player to use /property pos2 command
-     economyproperty.command.property.make:
-      default: op
-      description: Allows player to use /property make command
+ economyproperty.property.remove:
+  description: Allows player to remove property
+  default: op
+ economyproperty.command.property.pos1:
+  default: op
+  description: Allows player to use /property pos1 command
+ economyproperty.command.property.pos2:
+  default: op
+  description: Allows player to use /property pos2 command
+ economyproperty.command.property.make:
+  default: op
+  description: Allows player to use /property make command

@@ -8,22 +8,8 @@ main: onebone\economyusury\EconomyUsury
 depend: [EconomyAPI]
 
 permissions:
- economyusury:
-  description: Gives player all access permissions to EconomyUsury
-  children:
-   economyusury.command:
-    description: Gives player all access permissions of commands
-    children:
-     economyusury.command.usury:
-      description: Gives player permission to execute usury command
-      default: true
-      children:
-       economyusury.command.usury.host:
-        description: Gives player permission to execute usury host command
-        default: true
-        children:
-         economyusury.command.usury.host.open:
-          description: Gives player permission to open usury host by command
-          default: true
-         economyusury.command.usury.host.close:
-          description: Gives player permission to close usury host by command
+ economyusury.command.usury.host.open:
+  description: Gives player permission to open usury host by command
+  default: true
+ economyusury.command.usury.host.close:
+  description: Gives player permission to close usury host by command

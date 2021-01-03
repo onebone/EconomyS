@@ -11,28 +11,21 @@ commands:
  job:
   description: Job master command
   usage: /job <join|retire|list|detail|me>
-  permission: economyjob.command.job
+  permission: economyjob.command.job.join;economyjob.command.job.retire;economyjob.command.job.list;economyjob.command.job.me;economyjob.command.job.detail
+
 permissions:
- economyjob.command:
-  description: Allows player to use all of job command
-  default: op
-  children:
-   economyjob.command.job:
-    description: Allows player to use /job command
-    default: true
-    children:
-     economyjob.command.job.join:
-      description: Allows player to use command that allows to join job
-      default: true
-     economyjob.command.job.retire:
-      description: Allows player to use command that allows to retire job
-      default: true
-     economyjob.command.job.list:
-      description: Allows player to use command that allows to see job list
-      default: true
-     economyjob.command.job.me:
-      description: Allows player to use command that allows to see its job
-      default: true
-     economyjob.command.job.detail:
-      description: Allows player to use command that allows to see its job
-      default: true
+ economyjob.command.job.join:
+  description: Allows player to use command that allows to join job
+  default: true
+ economyjob.command.job.retire:
+  description: Allows player to use command that allows to retire job
+  default: true
+ economyjob.command.job.list:
+  description: Allows player to use command that allows to see job list
+  default: true
+ economyjob.command.job.me:
+  description: Allows player to use command that allows to see its job
+  default: true
+ economyjob.command.job.detail:
+  description: Allows player to use command that allows to see its job
+  default: true

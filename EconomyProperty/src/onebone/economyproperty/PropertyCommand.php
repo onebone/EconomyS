@@ -38,7 +38,7 @@ class PropertyCommand extends Command implements PluginOwned {
 	public function __construct(EconomyProperty $plugin, $command = "property", $pos1 = "pos1", $pos2 = "pos2", $make = "make", $touchPos = "touchpos") {
 		parent::__construct($command);
 		$this->setUsage("/$command <$pos1|$pos2|$make> [price]");
-		$this->setPermission("economyproperty.command.property;economyproperty.command.property.pos1;economyproperty.command.property.pos2");
+		$this->setPermission("economyproperty.command.property.pos1;economyproperty.command.property.pos2");
 		$this->setDescription("Property manage command");
 		$this->plugin = $plugin;
 		$this->command = $command;
