@@ -123,7 +123,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		$this->data[$username] = $this->readPlayer($username);
 	}
 
-	private function validate(&$data) {
+	private function fix(&$data) {
 		if(!isset($data['language'])
 			or !is_string($data['language'])
 			or !$this->api->hasLanguage($data['language'])) {
@@ -157,7 +157,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		}
 
 		$data = yaml_parse_file($path);
-		$this->validate($data);
+		$this->fix($data);
 
 		return $data;
 	}
