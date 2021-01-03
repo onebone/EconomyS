@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2020  onebone <me@onebone.me>
+ * Copyright (C) 2013-2021  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,7 +123,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		$this->data[$username] = $this->readPlayer($username);
 	}
 
-	private function validate(&$data) {
+	private function fix(&$data) {
 		if(!isset($data['language'])
 			or !is_string($data['language'])
 			or !$this->api->hasLanguage($data['language'])) {
@@ -157,7 +157,7 @@ class YamlUserProvider implements UserProvider, Listener {
 		}
 
 		$data = yaml_parse_file($path);
-		$this->validate($data);
+		$this->fix($data);
 
 		return $data;
 	}
