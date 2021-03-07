@@ -50,6 +50,6 @@ class Invitee {
 	}
 
 	public function setAllowPickup(bool $val) {
-		return $this->allowPickup = $val;
+		$this->allowPickup = $val;
 	}
 }

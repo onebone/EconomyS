@@ -50,7 +50,7 @@ class LandOptionForm implements Form {
 		$player->sendMessage($this->plugin->getMessage('land-option-updated', [$this->land->getId()]));
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		$option = $this->land->getOption();
 
 		return [

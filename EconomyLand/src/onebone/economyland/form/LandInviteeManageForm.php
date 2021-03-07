@@ -38,7 +38,7 @@ class LandInviteeManageForm implements Form {
 		$player->sendMessage($this->plugin->getMessage('invitee-mgr-done', [$this->land->getId(), $this->invitee->getName()]));
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'type' => 'custom_form',
 			'title' => $this->plugin->getMessage('invitee-mgr-title'),

@@ -28,7 +28,7 @@ class LandInviteMenuForm implements Form {
 		}
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'type' => 'form',
 			'title' => $this->plugin->getMessage('invite-menu-title'),

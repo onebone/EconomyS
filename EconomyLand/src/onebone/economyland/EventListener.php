@@ -38,7 +38,7 @@ class EventListener implements Listener {
 		}
 	}
 
-	private function canMove(Position $to, Player $player) {
+	private function canMove(Position $to, Player $player): bool {
 		$vec = $to->floor();
 
 		$lands = $this->plugin->getLandManager();

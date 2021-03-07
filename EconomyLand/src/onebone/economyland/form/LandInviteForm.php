@@ -38,7 +38,7 @@ class LandInviteForm implements Form {
 		$player->sendMessage($this->plugin->getMessage('invite-done', [$username, $this->land->getId()]));
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'type' => 'custom_form',
 			'title' => $this->plugin->getMessage('invite-title'),

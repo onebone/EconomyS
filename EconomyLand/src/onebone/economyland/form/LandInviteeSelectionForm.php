@@ -34,7 +34,7 @@ class LandInviteeSelectionForm implements Form {
 		$player->sendForm(new LandInviteeManageForm($this->plugin, $this->land, $target));
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'type' => 'form',
 			'title' => $this->plugin->getMessage('invitee-select-title'),

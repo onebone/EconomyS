@@ -108,7 +108,7 @@ class LandOption {
 	}
 
 	public function setAllowIn(bool $val) {
-		return $this->allowIn = $val;
+		$this->allowIn = $val;
 	}
 
 	public function getAllowPickup(): bool {
@@ -116,6 +116,6 @@ class LandOption {
 	}
 
 	public function setAllowPickup(bool $val) {
-		return $this->allowPickup = $val;
+		$this->allowPickup = $val;
 	}
 }
