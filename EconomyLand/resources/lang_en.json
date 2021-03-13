@@ -5,6 +5,7 @@
 	"land-no-permission-touch": "You have&c no permission&f to touch this land. Owner: &a%1",
 	"pos1-set": "Position 1 set.",
 	"pos2-set": "Position 2 set.",
+	"cannot-set-different-world": "Each set position should be in the same world.",
 	"set-position": "Please set position both 1 and 2 before buying land with &a/land pos1&f and &a/land pos2&f.",
 	"bought-land": "You have bought land (ID: &b%1&f) size &6%2&f.",
 	"option-form-title": "Land Options",
