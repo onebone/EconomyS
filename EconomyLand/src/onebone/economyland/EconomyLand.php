@@ -2,7 +2,7 @@
 
 /*
  * EconomyS, the massive economy plugin with many features for PocketMine-MP
- * Copyright (C) 2013-2020  onebone <me@onebone.me>
+ * Copyright (C) 2013-2021  onebone <me@onebone.me>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,16 +21,10 @@
 namespace onebone\economyland;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyland\form\LandInviteMenuForm;
-use onebone\economyland\form\LandOptionForm;
-use onebone\economyland\land\Land;
+use onebone\economyland\command\LandCommand;
 use onebone\economyland\land\LandManager;
-use onebone\economyland\land\LandOption;
 use onebone\economyland\provider\YamlProvider;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
 use pocketmine\math\Vector2;
-use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 
 final class EconomyLand extends PluginBase {
@@ -72,6 +66,7 @@ final class EconomyLand extends PluginBase {
 			$this->landManager = new LandManager($this, new YamlProvider($this));
 		}
 
+		$this->getServer()->getCommandMap()->register("economyland", new LandCommand($this));
 		$this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
 	}
 
@@ -114,180 +109,5 @@ final class EconomyLand extends PluginBase {
 
 	public function getLandManager(): LandManager {
 		return $this->landManager;
-	}
-
-	public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
-		switch(array_shift($args)) {
-			case 'pos1':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.pos')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$vec = $sender->floor();
-				$this->pos[$sender->getName()][0] = new Vector2($vec->x, $vec->z);
-				$sender->sendMessage($this->getMessage('pos1-set'));
-				return true;
-			case 'pos2':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.pos')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$vec = $sender->floor();
-				$this->pos[$sender->getName()][1] = new Vector2($vec->x, $vec->z);
-				$sender->sendMessage($this->getMessage('pos2-set'));
-				return true;
-			case 'buy':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.buy')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$username = $sender->getName();
-				if(isset($this->pos[$username][0]) and isset($this->pos[$username][1])) {
-					$start = $this->pos[$username][0];
-					$end = $this->pos[$username][1];
-
-					$land = $this->landManager->createLand($start, $end, $sender->getLevel(), $sender,
-						new LandOption([], false, true, false));
-					$this->landManager->addLand($land);
-
-					// Renew land list in /land option command usage
-					$sender->sendCommandData();
-
-					$size = $land->getEnd()->subtract($land->getStart());
-
-					$sender->sendMessage($this->getMessage('bought-land', [
-						$land->getId(), ($size->x + 1) * ($size->y + 1)
-					]));
-				}else{
-					$sender->sendMessage($this->getMessage('set-position'));
-				}
-				return true;
-			case "option":
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.option')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$id = trim(array_shift($args));
-				if($id === '') {
-					$sender->sendMessage($this->getMessage('command-usage', ['/land option <part of land ID>']));
-					return true;
-				}
-
-				$land = $this->getSingleUserLandVerbose($sender, $id);
-				if($land === null) return true;
-
-				$sender->sendForm(new LandOptionForm($this, $land));
-				return true;
-			case 'here':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.here')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$vec = $sender->floor();
-				$land = $this->landManager->getLandAt($vec->getX(), $vec->getZ(), $sender->getLevel()->getFolderName());
-				if($land === null) {
-					$sender->sendMessage($this->getMessage('no-land-here'));
-					return true;
-				}
-
-				$true = $this->getMessage('true');
-				$false = $this->getMessage('false');
-
-				$option = $land->getOption();
-				$sender->sendMessage($this->getMessage('land-info-line1', [$land->getId(), $land->getOwner()]));
-				$sender->sendMessage($this->getMessage('land-info-line2', [implode(', ', array_map(function($val) {
-					return $val->getName();
-				}, $option->getAllInvitee()))]));
-				$sender->sendMessage($this->getMessage('land-info-line3', [
-					$option->getAllowIn() ? $true:$false,
-					$option->getAllowPickup() ? $true:$false,
-					$option->getAllowTouch() ? $true:$false
-				]));
-				return true;
-			case 'invite':
-				if(!$sender instanceof Player) {
-					$sender->sendMessage($this->getMessage('in-game-command'));
-					return true;
-				}
-
-				if(!$sender->hasPermission('economyland.command.land.invite')) {
-					$sender->sendMessage($this->getMessage('no-permission'));
-					return true;
-				}
-
-				$id = trim(array_shift($args));
-				if($id === '') {
-					$sender->sendMessage($this->getMessage('command-usage', ['/land invite <part of land ID>']));
-					return true;
-				}
-
-				$land = $this->getSingleUserLandVerbose($sender, $id);
-				if($land === null) return true;
-
-				$sender->sendForm(new LandInviteMenuForm($this, $land));
-				return true;
-			default:
-				$sender->sendMessage($command->getUsage());
-				return true;
-		}
-	}
-
-	/**
-	 * @param Player $player
-	 * @param string $id
-	 * @return Land[]
-	 */
-	private function findUserLand(Player $player, string $id): array {
-		return array_filter($this->landManager->matchLands($id), function($val) use ($player) {
-			return $val->getOwner() === strtolower($player->getName());
-		});
-	}
-
-	private function getSingleUserLandVerbose(Player $player, string $id): ?Land {
-		$lands = $this->findUserLand($player, $id);
-
-		$count = count($lands);
-		if($count > 1) {
-			$player->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function(Land $val) {
-				return $val->getId();
-			}, $lands))]));
-			return null;
-		}elseif($count === 0) {
-			$player->sendMessage($this->getMessage('no-land-match', [$id]));
-			return null;
-		}
-
-		// only one matching land here
-		return $lands[0];
 	}
 }

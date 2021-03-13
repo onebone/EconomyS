@@ -83,8 +83,3 @@ permissions:
          economyland.command.land.invite.remove.others:
           default: op
 
-commands:
- land:
-  description: Manage land
-  usage: /land <pos1|pos2|buy|here|option|invite> [args...]
-  permission: economyland.command.land;economyland.command.land.option;economyland.command.land.sell;economyland.command.land.pos;economyland.command.land.buy;economyland.command.land.move;economyland.command.land.list;economyland.command.land.whose;economyland.command.land.give;economyland.command.land.here;economyland.command.land.invite;economyland.command.land.invite.remove

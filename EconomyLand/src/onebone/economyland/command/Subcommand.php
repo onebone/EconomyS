@@ -18,19 +18,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyland\task;
+namespace onebone\economyland\command;
 
-use onebone\economyland\land\LandManager;
-use pocketmine\scheduler\Task;
+use pocketmine\command\CommandSender;
 
-class LandUnloadTask extends Task {
-	private $manager;
-
-	public function __construct(LandManager $manager) {
-		$this->manager = $manager;
-	}
-
-	public function onRun(int $currentTick) {
-		$this->manager->unloadLands();
-	}
+interface Subcommand {
+	public function getName(): string;
+	public function process(CommandSender $sender, array $args): void;
 }
