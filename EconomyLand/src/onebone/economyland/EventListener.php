@@ -121,13 +121,11 @@ class EventListener implements Listener {
 
 		// land pos1, land pos2
 		$data->overloads[] = [
-			self::also(new CommandParameter(), function($it) {
-				/** @var CommandParameter $it */
+			self::also(new CommandParameter(), function(CommandParameter $it) {
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
 				$it->paramName = 'pos';
 				$it->isOptional = false;
-				$it->enum = self::also(new CommandEnum(), function($enum) {
-					/** @var CommandEnum $enum */
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
 					$enum->enumName = 'pos1|pos2';
 					$enum->enumValues = ['pos1', 'pos2'];
 				});
@@ -136,13 +134,11 @@ class EventListener implements Listener {
 
 		// land buy
 		$data->overloads[] = [
-			self::also(new CommandParameter(), function($it) {
-				/** @var CommandParameter $it */
+			self::also(new CommandParameter(), function(CommandParameter $it) {
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
 				$it->paramName = 'buy';
 				$it->isOptional = false;
-				$it->enum = self::also(new CommandEnum(), function($enum) {
-					/** @var CommandEnum $enum */
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
 					$enum->enumName = 'buy';
 					$enum->enumValues = ['buy'];
 				});
@@ -151,13 +147,11 @@ class EventListener implements Listener {
 
 		// land here
 		$data->overloads[] = [
-			self::also(new CommandParameter(), function($it) {
-				/** @var CommandParameter $it */
+			self::also(new CommandParameter(), function(CommandParameter $it) {
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
 				$it->paramName = 'here';
 				$it->isOptional = false;
-				$it->enum = self::also(new CommandEnum(), function($enum) {
-					/** @var CommandEnum $enum */
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
 					$enum->enumName = 'here';
 					$enum->enumValues = ['here'];
 				});
@@ -166,33 +160,47 @@ class EventListener implements Listener {
 
 		// land option
 		$data->overloads[] = [
-			self::also(new CommandParameter(), function($it) {
-				/** @var CommandParameter $it */
+			self::also(new CommandParameter(), function(CommandParameter $it) {
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
 				$it->paramName = 'option';
 				$it->isOptional = false;
-				$it->enum = self::also(new CommandEnum(), function($enum) {
-					/** @var CommandEnum $enum */
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
 					$enum->enumName = 'option';
 					$enum->enumValues = ['option'];
 				});
 			}),
-			self::also(new CommandParameter(), function($it) use ($player) {
-				/** @var CommandParameter $it */
-				$it->paramName = 'land ID';
+			$this->buildLandIdAutoComplete($player)
+		];
+
+		// land invite
+		$data->overloads[] = [
+			self::also(new CommandParameter(), function(CommandParameter $it) {
 				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
+				$it->paramName = 'invite';
 				$it->isOptional = false;
-				$it->enum = self::also(new CommandEnum(), function($enum) use ($player) {
-					/** @var CommandEnum $enum */
-					$enum->enumName = 'land ID';
-					$enum->enumValues = array_map(function($val) use ($player) {
-						return $val->getId();
-					}, $this->plugin->getLandManager()->getLandsByOwner($player->getName()));
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
+					$enum->enumName = 'invite';
+					$enum->enumValues = ['invite'];
 				});
-			})
+			}),
+			$this->buildLandIdAutoComplete($player)
 		];
 
 		$pk->commandData['land'] = $data;
+	}
+
+	private function buildLandIdAutoComplete(Player $player): CommandParameter {
+		return self::also(new CommandParameter(), function(CommandParameter $it) use ($player) {
+			$it->paramName = 'land ID';
+			$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
+			$it->isOptional = false;
+			$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) use ($player) {
+				$enum->enumName = 'land ID';
+				$enum->enumValues = array_map(function($val) {
+					return $val->getId();
+				}, $this->plugin->getLandManager()->getLandsByOwner($player->getName()));
+			});
+		});
 	}
 
 	public static function also($object, $callback) {

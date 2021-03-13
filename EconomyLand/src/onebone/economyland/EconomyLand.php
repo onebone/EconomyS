@@ -61,7 +61,7 @@ final class EconomyLand extends PluginBase {
 		$this->api = $api;
 
 		if(EconomyAPI::API_VERSION < 4) {
-			$this->getLogger()->warning('Current applied version of EconomyAPI is outdated. Please update EconomyAPI.');
+			$this->getLogger()->warning('Current installed version of EconomyAPI is outdated. Please update EconomyAPI.');
 			$this->getLogger()->warning('Expected minimum API version: 4, got ' . EconomyAPI::API_VERSION);
 			return;
 		}
