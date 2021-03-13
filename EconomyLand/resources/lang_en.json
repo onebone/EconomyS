@@ -31,7 +31,7 @@
 	"invitee-select-title": "Invitee",
 	"invitee-select-content": "Select your invitee to manage",
 	"invitee-mgr-title": "Manage invitee",
-	"invitee-mgr-message": "Change invitee permission to land &b%2&f.",
+	"invitee-mgr-message": "Change invitee permission to land &b%1&f.",
 	"invitee-mgr-done": "Updated permission for invitee &a%2&f of land &b%1&f.",
 	"true": "&atrue&f",
 	"false": "&cfalse&f"

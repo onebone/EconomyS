@@ -197,7 +197,7 @@ final class EconomyLand extends PluginBase {
 					return true;
 				}
 
-				$land = $this->findUserLand($sender, $id);
+				$land = $this->getSingleUserLandVerbose($sender, $id);
 				if($land === null) return true;
 
 				$sender->sendForm(new LandOptionForm($this, $land));
@@ -251,7 +251,7 @@ final class EconomyLand extends PluginBase {
 					return true;
 				}
 
-				$land = $this->findUserLand($sender, $id);
+				$land = $this->getSingleUserLandVerbose($sender, $id);
 				if($land === null) return true;
 
 				$sender->sendForm(new LandInviteMenuForm($this, $land));
@@ -262,23 +262,32 @@ final class EconomyLand extends PluginBase {
 		}
 	}
 
-	private function findUserLand(Player $player, string $id): ?Land {
-		$lands = array_filter($this->landManager->matchLands($id), function($val) use ($player) {
+	/**
+	 * @param Player $player
+	 * @param string $id
+	 * @return Land[]
+	 */
+	private function findUserLand(Player $player, string $id): array {
+		return array_filter($this->landManager->matchLands($id), function($val) use ($player) {
 			return $val->getOwner() === strtolower($player->getName());
 		});
+	}
+
+	private function getSingleUserLandVerbose(Player $player, string $id): ?Land {
+		$lands = $this->findUserLand($player, $id);
 
 		$count = count($lands);
 		if($count > 1) {
-			$player->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function($val) {
-				/** @var Land $val */
+			$player->sendMessage($this->getMessage('multiple-land-matches', [implode(', ', array_map(function(Land $val) {
 				return $val->getId();
 			}, $lands))]));
 			return null;
-		}elseif($count === 1) {
-			return $lands[0];
-		}else{
+		}elseif($count === 0) {
 			$player->sendMessage($this->getMessage('no-land-match', [$id]));
 			return null;
 		}
+
+		// only one matching land here
+		return $lands[0];
 	}
 }

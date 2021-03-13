@@ -25,7 +25,7 @@ class LandInviteeManageForm implements Form {
 	public function handleResponse(Player $player, $data): void {
 		if(!is_array($data)) return;
 
-		[$_, $allowTouch, $allowPickup] = $data;
+		[, $allowTouch, $allowPickup] = $data;
 		$opt = $this->land->getOption();
 
 		$this->invitee->setAllowTouch($allowTouch);

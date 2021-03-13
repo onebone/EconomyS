@@ -22,7 +22,7 @@ class LandInviteForm implements Form {
 	public function handleResponse(Player $player, $data): void {
 		if(!is_array($data)) return;
 
-		[$_, $username, $allowTouch, $allowPickup] = $data;
+		[, $username, $allowTouch, $allowPickup] = $data;
 
 		$option = $this->land->getOption();
 		if($option->isInvitee($username)) {
