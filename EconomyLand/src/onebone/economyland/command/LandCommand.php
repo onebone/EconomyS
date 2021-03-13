@@ -62,12 +62,14 @@ class LandCommand extends Command implements PluginIdentifiableCommand {
 		return $this->plugin;
 	}
 
-	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+	public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
 		$subcommand = array_shift($args);
 		if(isset($this->subcommands[$subcommand])) {
 			$this->subcommands[$subcommand]->process($sender, $args);
+			return true;
 		}else{
 			$sender->sendMessage($this->getUsage());
+			return false;
 		}
 	}
 
