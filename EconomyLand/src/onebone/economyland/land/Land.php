@@ -24,6 +24,7 @@ use InvalidArgumentException;
 use onebone\economyland\EconomyLand;
 use pocketmine\level\Level;
 use pocketmine\math\Vector2;
+use pocketmine\Player;
 
 final class Land {
 	/** @var EconomyLand */
@@ -82,10 +83,16 @@ final class Land {
 		return $this->id;
 	}
 
+	/**
+	 * @return Vector2 Note that Y element of returned Vector2 object actually maps into Z in Minecraft world
+	 */
 	public function getStart(): Vector2 {
 		return $this->start;
 	}
 
+	/**
+	 * @return Vector2 Note that Y element of returned Vector2 object actually maps into Z in Minecraft world
+	 */
 	public function getEnd(): Vector2 {
 		return $this->end;
 	}
@@ -111,6 +118,21 @@ final class Land {
 	public function getOwner(): string {
 		$this->lastAccess = microtime(true);
 		return $this->owner;
+	}
+
+	/**
+	 * @param Player|string $player
+	 * @return bool
+	 */
+	public function isOwner($player): bool {
+		$this->lastAccess = microtime(true);
+
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		return $this->owner === $player;
 	}
 
 	public function setOwner(string $owner) {

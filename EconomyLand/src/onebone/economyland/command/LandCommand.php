@@ -82,7 +82,8 @@ class LandCommand extends Command implements PluginIdentifiableCommand {
 			"buy" => new BuySubcommand($this->plugin, $sharedPosition),
 			"here" => new HereSubcommand($this->plugin),
 			"invite" => new InviteSubcommand($this->plugin),
-			"option" => new OptionSubcommand($this->plugin)
+			"option" => new OptionSubcommand($this->plugin),
+			"move" => new MoveSubcommand($this->plugin)
 		];
 	}
 }

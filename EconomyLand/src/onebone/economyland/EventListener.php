@@ -186,6 +186,20 @@ class EventListener implements Listener {
 			$this->buildLandIdAutoComplete($player)
 		];
 
+		// land move
+		$data->overloads[] = [
+			self::also(new CommandParameter(), function(CommandParameter $it) {
+				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
+				$it->paramName = 'move';
+				$it->isOptional = false;
+				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
+					$enum->enumName = 'move';
+					$enum->enumValues = ['move'];
+				});
+			}),
+			$this->buildLandIdAutoComplete($player)
+		];
+
 		$pk->commandData['land'] = $data;
 	}
 

@@ -34,6 +34,8 @@
 	"invitee-mgr-title": "Manage invitee",
 	"invitee-mgr-message": "Change invitee permission to land &b%1&f.",
 	"invitee-mgr-done": "Updated permission for invitee &a%2&f of land &b%1&f.",
+	"no-world": "The world of your land is not loaded.",
+	"land-no-permission-move": "You have no permission to go inside land &b%1&f.",
 	"true": "&atrue&f",
 	"false": "&cfalse&f"
 }
