@@ -24,7 +24,6 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyland\command\LandCommand;
 use onebone\economyland\land\LandManager;
 use onebone\economyland\provider\YamlProvider;
-use pocketmine\math\Vector2;
 use pocketmine\plugin\PluginBase;
 
 final class EconomyLand extends PluginBase {
@@ -37,8 +36,6 @@ final class EconomyLand extends PluginBase {
 	private $api;
 	/** @var PluginConfiguration */
 	private $pluginConfig;
-	/** @var Vector2[][] */
-	private $pos = [];
 	/** @var LandManager */
 	private $landManager = null;
 

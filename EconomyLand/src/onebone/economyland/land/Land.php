@@ -40,6 +40,8 @@ final class Land {
 	private $owner;
 	/** @var LandOption */
 	private $option;
+	/** @var LandMeta */
+	private $meta;
 	/** @var float */
 	private $lastAccess = 0;
 
@@ -51,9 +53,10 @@ final class Land {
 	 * @param string|Level $world
 	 * @param string $owner
 	 * @param LandOption $option
+	 * @param LandMeta $meta
 	 */
 	public function __construct(EconomyLand $plugin, string $id, Vector2 $start, Vector2 $end, $world,
-	                            string $owner, LandOption $option) {
+	                            string $owner, LandOption $option, LandMeta $meta) {
 		$this->plugin = $plugin;
 		$this->id = $id;
 
@@ -72,6 +75,7 @@ final class Land {
 
 		$this->owner = strtolower($owner);
 		$this->option = $option;
+		$this->meta = $meta;
 	}
 
 	public function getId(): string {
@@ -122,6 +126,16 @@ final class Land {
 	public function setOption(LandOption $option) {
 		$this->lastAccess = microtime(true);
 		$this->option = $option;
+	}
+
+	public function getMeta(): LandMeta {
+		$this->lastAccess = microtime(true);
+		return clone $this->meta;
+	}
+
+	public function setMeta(LandMeta $meta) {
+		$this->lastAccess = microtime(true);
+		$this->meta = $meta;
 	}
 
 	public function isInside(int $x, int $z, string $worldName): bool {

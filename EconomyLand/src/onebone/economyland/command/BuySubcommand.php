@@ -21,6 +21,7 @@
 namespace onebone\economyland\command;
 
 use onebone\economyland\EconomyLand;
+use onebone\economyland\land\LandMeta;
 use onebone\economyland\land\LandOption;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector2;
@@ -65,7 +66,7 @@ class BuySubcommand implements Subcommand {
 			$endVec = new Vector2($end[0], $end[1]);
 
 			$land = $this->plugin->getLandManager()->createLand($startVec, $endVec, $sender->getLevel(), $sender,
-				new LandOption([], false, true, false));
+				new LandOption([], false, true, false), new LandMeta(microtime(true)));
 			$this->plugin->getLandManager()->addLand($land);
 
 			// Renew land list in /land option, /land invite command usage

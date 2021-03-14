@@ -44,9 +44,9 @@ class LandManager {
 			$plugin->getPluginConfiguration()->getLandUnloadTaskPeriod());
 	}
 
-	public function createLand(Vector2 $start, Vector2 $end, Level $world, Player $owner, LandOption $option): Land {
+	public function createLand(Vector2 $start, Vector2 $end, Level $world, Player $owner, LandOption $option, LandMeta $meta): Land {
 		return new Land($this->plugin, $this->provider->getNewId(),
-			$start, $end, $world, $owner->getName(), $option);
+			$start, $end, $world, $owner->getName(), $option, $meta);
 	}
 
 	public function addLand(Land $land): void {

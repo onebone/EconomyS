@@ -23,6 +23,7 @@ namespace onebone\economyland\provider;
 use onebone\economyland\EconomyLand;
 use onebone\economyland\land\Invitee;
 use onebone\economyland\land\Land;
+use onebone\economyland\land\LandMeta;
 use onebone\economyland\land\LandOption;
 use pocketmine\math\Vector2;
 
@@ -68,7 +69,9 @@ class YamlProvider implements Provider {
 		return new Land($this->plugin, $land['id'],
 			new Vector2($land['startX'], $land['startZ']), new Vector2($land['endX'], $land['endZ']),
 			$land['world'], $land['owner'],
-			new LandOption($invitee, $land['allowTouch'], $land['allowIn'], $land['allowPickup']));
+			new LandOption($invitee, $land['allowTouch'], $land['allowIn'], $land['allowPickup']),
+			new LandMeta($land['creationTime'] ?? 0)
+		);
 	}
 
 	public function getMatches(string $id): array {
@@ -99,6 +102,7 @@ class YamlProvider implements Provider {
 		$start = $land->getStart();
 		$end = $land->getEnd();
 		$option = $land->getOption();
+		$meta = $land->getMeta();
 
 		$invitee = $option->getAllInvitee();
 		$inviteeSave = [];
@@ -121,6 +125,7 @@ class YamlProvider implements Provider {
 			'allowIn' => $option->getAllowIn(),
 			'allowTouch' => $option->getAllowTouch(),
 			'allowPickup' => $option->getAllowPickup(),
+			'creationTime' => $meta->getCreationTime(),
 			'invitee' => $inviteeSave
 		];
 	}

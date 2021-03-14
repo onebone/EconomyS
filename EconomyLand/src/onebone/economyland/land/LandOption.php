@@ -22,7 +22,7 @@ namespace onebone\economyland\land;
 
 use pocketmine\Player;
 
-class LandOption {
+final class LandOption {
 	/** @var Invitee[] */
 	private $invitee;
 	/** @var bool */
