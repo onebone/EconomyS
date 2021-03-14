@@ -18,18 +18,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyland;
+namespace onebone\economyland\task;
 
+use onebone\economyland\land\LandManager;
 use pocketmine\scheduler\Task;
 
-class SaveTask extends Task {
-	private $plugin;
+class LandUnloadTask extends Task {
+	private $manager;
 
-	public function __construct(EconomyLand $plugin) {
-		$this->plugin = $plugin;
+	public function __construct(LandManager $manager) {
+		$this->manager = $manager;
 	}
 
 	public function onRun(int $currentTick) {
-		$this->plugin->save();
+		$this->manager->unloadLands();
 	}
 }

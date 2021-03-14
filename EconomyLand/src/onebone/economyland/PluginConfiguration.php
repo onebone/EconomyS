@@ -20,18 +20,23 @@
 
 namespace onebone\economyland;
 
-use pocketmine\scheduler\Task;
-
-class ExpireTask extends Task {
+class PluginConfiguration {
+	/** @var EconomyLand */
 	private $plugin;
-	private $landId;
 
-	public function __construct(EconomyLand $plugin, $landId) {
+	public function __construct(EconomyLand $plugin) {
 		$this->plugin = $plugin;
-		$this->landId = $landId;
 	}
 
-	public function onRun(int $currentTick) {
-		$this->plugin->expireLand($this->landId);
+	public function getLanguage(): string {
+		return $this->plugin->getConfig()->get('language', 'en');
+	}
+
+	public function getLandUnloadTaskPeriod(): int {
+		return $this->plugin->getConfig()->get('land-unload-task-period', 200);
+	}
+
+	public function getLandUnloadAfter(): int {
+		return $this->plugin->getConfig()->get('land-unload-after', 10);
 	}
 }

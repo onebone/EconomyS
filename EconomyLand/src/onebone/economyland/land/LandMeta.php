@@ -18,21 +18,17 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyland\event;
+namespace onebone\economyland\land;
 
-use pocketmine\event\Cancellable;
-use pocketmine\event\Event;
+final class LandMeta {
+	/** @var float */
+	private $creationTime;
 
-class LandRemoveEvent extends Event implements Cancellable {
-	public static $handlerList = null;
-
-	private $id;
-
-	public function __construct($id) {
-		$this->id = $id;
+	public function __construct(float $creationTime) {
+		$this->creationTime = $creationTime;
 	}
 
-	public function getId() {
-		return $this->id;
+	public function getCreationTime(): float {
+		return $this->creationTime;
 	}
 }

@@ -1,8 +1,7 @@
 name: EconomyLand
 main: onebone\economyland\EconomyLand
 api: 3.9.0
-
-version: "2.0.9"
+version: "3.0.0-SNAPSHOT"
 author: onebone
 depend: [EconomyAPI]
 
@@ -43,18 +42,21 @@ permissions:
     description: Allows player to use all commands in EconomyLand
     default: op
     children:
-     economyland.command.startp:
-      description: Allows player to set start position
-      default: true
-     economyland.command.endp:
-      description: Allows player to set end position
-      default: true
      economyland.command.land:
       description: Allows player to use land command
       default: true
       children:
+       economyland.command.land.pos:
+        description: Allows player to set positions for setting land
+        default: true
        economyland.command.land.buy:
         description: Allows player to buy land
+        default: true
+       economyland.command.land.option:
+        description: Allows player to edit option of land
+        default: true
+       economyland.command.land.sell:
+        description: Allows player to sell land
         default: true
        economyland.command.land.move:
         description: Allows player to move to other land
@@ -80,34 +82,4 @@ permissions:
         children:
          economyland.command.land.invite.remove.others:
           default: op
-       economyland.command.land.invitee:
-        description: Allows player to see invitee
-        default: true
 
-     economyland.command.landsell:
-      description: Allows player to sell lands
-      default: op
-      children:
-       economyland.command.landsell.here:
-        description: Allows player to sell land here
-        default: true
-       economyland.command.landsell.number:
-        description: Allows player to sell land with numbers
-        default: true
-commands:
- startp:
-  description: Sets start position
-  usage: /startp
-  permission: economyland.command.startp
- endp:
-  description: Sets second position
-  usage: /endp
-  permission: economyland.command.endp
- land:
-  description: Manage land
-  usage: /land <buy|move|list|whose|give|here|[r:]invite|kick|invitee>
-  permission: economyland.command.land;economyland.command.land.buy;economyland.command.land.move;economyland.command.land.list;economyland.command.land.whose;economyland.command.land.give;economyland.command.land.here;economyland.command.land.invite;economyland.command.land.invite.remove;economyland.command.land.invitee
- landsell:
-  description: Sell land
-  usage: /landsell <here|land num>
-  permission: economyland.command.landsell;economyland.command.landsell.here;economyland.command.landsell.number
