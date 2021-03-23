@@ -37,7 +37,7 @@ class EconomyCommand extends PluginCommand {
 		$this->setPermission("economyapi.command.economy");
 	}
 
-	public function execute(CommandSender $sender, string $commandLabel, array $args) {
+	public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
 		if(!$this->testPermission($sender)) {
 			return false;
 		}

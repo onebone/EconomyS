@@ -29,7 +29,7 @@ use pocketmine\event\Cancellable;
 class PayMoneyEvent extends EconomyAPIEvent implements Cancellable {
 	private $payer, $target, $currency, $amount;
 
-	public function __construct(EconomyAPI $plugin, $payer, $target, Currency $currency, float $amount, ?Issuer $issuer) {
+	public function __construct(EconomyAPI $plugin, string $payer, string $target, Currency $currency, float $amount, ?Issuer $issuer) {
 		parent::__construct($plugin, $issuer);
 
 		$this->payer = $payer;
@@ -38,11 +38,11 @@ class PayMoneyEvent extends EconomyAPIEvent implements Cancellable {
 		$this->amount = $amount;
 	}
 
-	public function getPayer() {
+	public function getPayer(): string {
 		return $this->payer;
 	}
 
-	public function getTarget() {
+	public function getTarget(): string {
 		return $this->target;
 	}
 
@@ -50,7 +50,7 @@ class PayMoneyEvent extends EconomyAPIEvent implements Cancellable {
 		return $this->currency;
 	}
 
-	public function getAmount() {
+	public function getAmount(): float {
 		return $this->amount;
 	}
 }

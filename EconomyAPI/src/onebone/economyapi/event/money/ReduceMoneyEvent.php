@@ -44,7 +44,7 @@ class ReduceMoneyEvent extends EconomyAPIEvent implements Cancellable {
 		return $this->currency;
 	}
 
-	public function getAmount() {
+	public function getAmount(): float {
 		return $this->amount;
 	}
 }

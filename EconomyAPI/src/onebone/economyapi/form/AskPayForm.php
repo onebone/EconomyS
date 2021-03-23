@@ -104,7 +104,7 @@ class AskPayForm implements Form {
 		}
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		return [
 			'type' => 'modal',
 			'title' => $this->plugin->getMessage("pay-ask-title", $this->player),

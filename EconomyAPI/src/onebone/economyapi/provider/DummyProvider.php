@@ -27,7 +27,7 @@ class DummyProvider implements Provider {
 		return false;
 	}
 
-	public function createAccount($player, $defaultMoney = 1000): bool {
+	public function createAccount($player, float $defaultMoney = 1000): bool {
 		return false;
 	}
 
@@ -39,15 +39,15 @@ class DummyProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, $amount): bool {
+	public function setMoney($player, float $amount): bool {
 		return false;
 	}
 
-	public function addMoney($player, $amount): bool {
+	public function addMoney($player, float $amount): bool {
 		return false;
 	}
 
-	public function reduceMoney($player, $amount): bool {
+	public function reduceMoney($player, float $amount): bool {
 		return false;
 	}
 

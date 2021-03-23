@@ -124,9 +124,10 @@ class EconomyAPI extends PluginBase implements Listener {
 	private $lang = [];
 
 	/**
+	 * Returns instance of EconomyAPI. Should be called after onLoad() phase.
 	 * @return EconomyAPI
 	 */
-	public static function getInstance() {
+	public static function getInstance(): EconomyAPI {
 		return self::$instance;
 	}
 
@@ -175,7 +176,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	private const STATUS_PARAMETER = 2;
 	private const STATUS_CURRENCY = 3;
 
-	public function replaceParameters($message, $params = []) {
+	public function replaceParameters($message, $params = []): string {
 		$ret = '';
 
 		$len = strlen($message);
@@ -658,7 +659,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return true;
 	}
 
-	private function validateTransaction(Transaction $transaction, ?Issuer $issuer) {
+	private function validateTransaction(Transaction $transaction, ?Issuer $issuer): bool {
 		foreach($transaction->getActions() as $action) {
 			switch($action->getType()) {
 				case Transaction::ACTION_SET:
@@ -801,7 +802,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->provider->init();
 	}
 
-	private function checkUpdate() {
+	private function checkUpdate(): bool {
 		try{
 			$info = json_decode(Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
 			if(!isset($info["status"]) or $info["status"] !== true) {
@@ -819,7 +820,14 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 	}
 
-	public function registerCurrency(string $id, Currency $currency, Provider $provider) {
+	/**
+	 * Register Currency to EconomyAPI.
+	 * @param string $id
+	 * @param Currency $currency
+	 * @param Provider $provider
+	 * @return bool True if there was no Currency that is already registered with the same ID, false otherwise.
+	 */
+	public function registerCurrency(string $id, Currency $currency, Provider $provider): bool {
 		$id = strtolower($id);
 
 		if(isset($this->currencies[$id])) {

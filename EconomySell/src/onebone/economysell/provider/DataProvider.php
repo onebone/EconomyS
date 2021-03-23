@@ -27,7 +27,7 @@ interface DataProvider {
 	 * @param string $file
 	 * @param bool $save
 	 */
-	public function __construct($file, $save);
+	public function __construct(string $file, bool $save);
 
 	/**
 	 * @param \pocketmine\level\Position|int $x

@@ -9,7 +9,7 @@ use pocketmine\Player;
 
 class CurrencySelectionForm implements Form {
 	private $plugin;
-	private $currencies = [];
+	private $currencies;
 	private $player;
 
 	/**
@@ -42,7 +42,7 @@ class CurrencySelectionForm implements Form {
 		}
 	}
 
-	public function jsonSerialize() {
+	public function jsonSerialize(): array {
 		$buttons = [];
 		foreach($this->currencies as $currency) {
 			if($currency->isExposed() and $currency->isAvailableTo($this->player)) {

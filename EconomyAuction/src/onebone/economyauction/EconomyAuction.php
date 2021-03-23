@@ -78,7 +78,7 @@ class EconomyAuction extends PluginBase {
 		file_put_contents($this->getDataFolder() . "QuitQueue.dat", serialize($this->queue));
 	}
 
-	public function onCommand(CommandSender $sender, Command $command, $label, array $params): bool {
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $params): bool {
 		switch ($command->getName()) {
 			case "auction":
 				$sub = array_shift($params);

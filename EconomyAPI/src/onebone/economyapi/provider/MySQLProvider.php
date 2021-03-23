@@ -27,9 +27,7 @@ use onebone\economyapi\util\Promise;
 use pocketmine\Player;
 
 class MySQLProvider implements Provider {
-	/**
-	 * @var mysqli
-	 */
+	/** @var mysqli */
 	private $db;
 
 	/** @var EconomyAPI */
@@ -103,7 +101,7 @@ class MySQLProvider implements Provider {
 	}
 
 	/**
-	 * @param string $player
+	 * @param Player|string $player
 	 * @return float|bool
 	 */
 	public function getMoney($player) {

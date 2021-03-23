@@ -30,7 +30,7 @@ class YamlDataProvider implements DataProvider {
 
 	private $save;
 
-	public function __construct($file, $save) {
+	public function __construct(string $file, bool $save) {
 		$this->config = new Config($file, Config::YAML);
 
 		$this->save = $save;
