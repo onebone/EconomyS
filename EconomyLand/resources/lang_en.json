@@ -37,5 +37,9 @@
 	"no-world": "The world of your land is not loaded.",
 	"land-no-permission-move": "You have no permission to go inside land &b%1&f.",
 	"true": "&atrue&f",
-	"false": "&cfalse&f"
+	"false": "&cfalse&f",
+	"list-command-help": "Searching lands owned by you by default. You can target other player using &e/land list <owner> [page]&f.",
+	"no-list-entry": "&a%1&f has no possessing land.",
+	"list-header": "Showing lands owned by &a%1&f (Page %2/%3):",
+	"list-entry": "* &b%1&f = area: &d%2&f"
 }

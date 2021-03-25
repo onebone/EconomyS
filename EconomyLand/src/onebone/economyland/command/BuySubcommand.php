@@ -42,6 +42,10 @@ class BuySubcommand implements Subcommand {
 		return "buy";
 	}
 
+	public function getUsage(array $args): string {
+		return "/land buy";
+	}
+
 	public function process(CommandSender $sender, array $args): void {
 		if(!$sender instanceof Player) {
 			$sender->sendMessage($this->plugin->getMessage('in-game-command'));

@@ -38,6 +38,10 @@ class OptionSubcommand implements Subcommand {
 		return "option";
 	}
 
+	public function getUsage(array $args): string {
+		return "/land option <part of land ID>";
+	}
+
 	public function process(CommandSender $sender, array $args): void {
 		if(!$sender instanceof Player) {
 			$sender->sendMessage($this->plugin->getMessage('in-game-command'));

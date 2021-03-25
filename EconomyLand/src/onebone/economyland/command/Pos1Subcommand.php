@@ -39,6 +39,10 @@ class Pos1Subcommand implements Subcommand {
 		return "pos1";
 	}
 
+	public function getUsage(array $args): string {
+		return "/land pos1";
+	}
+
 	public function process(CommandSender $sender, array $args): void {
 		if(!$sender instanceof Player) {
 			$sender->sendMessage($this->plugin->getMessage('in-game-command'));

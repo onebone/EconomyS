@@ -24,5 +24,6 @@ use pocketmine\command\CommandSender;
 
 interface Subcommand {
 	public function getName(): string;
+	public function getUsage(array $args): string;
 	public function process(CommandSender $sender, array $args): void;
 }

@@ -35,6 +35,10 @@ class HereSubcommand implements Subcommand {
 		return "here";
 	}
 
+	public function getUsage(array $args): string {
+		return "/land here";
+	}
+
 	public function process(CommandSender $sender, array $args): void {
 		if(!$sender instanceof Player) {
 			$sender->sendMessage($this->plugin->getMessage('in-game-command'));

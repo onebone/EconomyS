@@ -36,13 +36,26 @@ class MoveSubcommand implements Subcommand {
 		return "move";
 	}
 
+	public function getUsage(array $args): string {
+		return "/land move <part of land ID>";
+	}
+
 	public function process(CommandSender $sender, array $args): void {
 		if(!$sender instanceof Player) {
 			$sender->sendMessage($this->plugin->getMessage('in-game-command'));
 			return;
 		}
 
-		$id = array_shift($args);
+		if(!$sender->hasPermission("economyland.command.land.move")) {
+			$sender->sendMessage($this->plugin->getMessage('no-permission'));
+			return;
+		}
+
+		$id = trim(array_shift($args));
+		if($id === '') {
+			$sender->sendMessage($this->plugin->getMessage('command-usage', [$this->getUsage($args)]));
+			return;
+		}
 
 		$lands = $this->plugin->getLandManager()->matchLands($id);
 		$count = count($lands);

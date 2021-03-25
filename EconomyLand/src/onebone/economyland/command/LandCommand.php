@@ -45,11 +45,13 @@ class LandCommand extends Command implements PluginIdentifiableCommand {
 		$permissions = [
 			"economyland.command.land",
 			"economyland.command.land.option",
+			"economyland.command.land.move",
 			"economyland.command.land.pos",
 			"economyland.command.land.buy",
 			"economyland.command.land.here",
 			"economyland.command.land.invite",
-			"economyland.command.land.invite.remove"
+			"economyland.command.land.invite.remove",
+			"economyland.command.land.list"
 		];
 		$this->setPermission(implode(";", $permissions));
 
@@ -83,7 +85,8 @@ class LandCommand extends Command implements PluginIdentifiableCommand {
 			"here" => new HereSubcommand($this->plugin),
 			"invite" => new InviteSubcommand($this->plugin),
 			"option" => new OptionSubcommand($this->plugin),
-			"move" => new MoveSubcommand($this->plugin)
+			"move" => new MoveSubcommand($this->plugin),
+			"list" => new ListSubcommand($this->plugin)
 		];
 	}
 }
