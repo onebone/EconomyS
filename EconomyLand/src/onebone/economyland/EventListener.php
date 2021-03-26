@@ -203,13 +203,23 @@ class EventListener implements Listener {
 		// land list
 		$data->overloads[] = [
 			self::also(new CommandParameter(), function(CommandParameter $it) {
-				$it->paramType = AvailableCommandsPacket::ARG_TYPE_STRING;
+				$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
 				$it->paramName = 'list';
 				$it->isOptional = false;
 				$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
 					$enum->enumName = 'list';
 					$enum->enumValues = ['list'];
 				});
+			}),
+			self::also(new CommandParameter(), function(CommandParameter $it) {
+				$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
+				$it->paramName = 'owner';
+				$it->isOptional = true;
+			}),
+			self::also(new CommandParameter(), function(CommandParameter $it) {
+				$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_INT;
+				$it->paramName = 'page';
+				$it->isOptional = true;
 			})
 		];
 

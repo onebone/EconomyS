@@ -406,16 +406,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			return self::RET_INVALID;
 		}
 
-		$holder = $this->getCurrencyHolder($currency);
-		if($holder === null) {
-			return self::RET_INVALID_CURRENCY;
-		}
-
-		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isAvailableTo($player)) {
-				return self::RET_INVALID_CURRENCY;
-			}
-		}
+		$holder = $this->validateCurrency($player, $currency);
+		if($holder === null) return self::RET_INVALID_CURRENCY;
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -477,16 +469,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			return self::RET_INVALID;
 		}
 
-		$holder = $this->getCurrencyHolder($currency);
-		if($holder === null) {
-			return self::RET_INVALID_CURRENCY;
-		}
-
-		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isAvailableTo($player)) {
-				return self::RET_INVALID_CURRENCY;
-			}
-		}
+		$holder = $this->validateCurrency($player, $currency);
+		if($holder === null) return self::RET_INVALID_CURRENCY;
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -549,16 +533,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			return self::RET_INVALID;
 		}
 
-		$holder = $this->getCurrencyHolder($currency);
-		if($holder === null) {
-			return self::RET_INVALID_CURRENCY;
-		}
-
-		if($player instanceof Player) {
-			if(!$holder->getCurrency()->isAvailableTo($player)) {
-				return self::RET_INVALID_CURRENCY;
-			}
-		}
+		$holder = $this->validateCurrency($player, $currency);
+		if($holder === null) return self::RET_INVALID_CURRENCY;
 
 		if($player instanceof Player) {
 			$player = $player->getName();
@@ -580,6 +556,21 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 
 		return self::RET_NO_ACCOUNT;
+	}
+
+	private function validateCurrency($player, Currency $currency) : ?CurrencyHolder {
+		$holder = $this->getCurrencyHolder($currency);
+		if($holder === null) {
+			return null;
+		}
+
+		if($player instanceof Player) {
+			if(!$holder->getCurrency()->isAvailableTo($player)) {
+				return null;
+			}
+		}
+
+		return $holder;
 	}
 
 	public function getDefaultCurrency(): Currency {
