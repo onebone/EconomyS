@@ -31,8 +31,8 @@ use onebone\economyapi\command\TakeMoneyCommand;
 use onebone\economyapi\command\TopMoneyCommand;
 use onebone\economyapi\currency\Currency;
 use onebone\economyapi\currency\CurrencyConfig;
-use onebone\economyapi\currency\CurrencyDeterminer;
-use onebone\economyapi\currency\SimpleCurrencyDeterminer;
+use onebone\economyapi\currency\CurrencySelector;
+use onebone\economyapi\currency\SimpleCurrencySelector;
 use onebone\economyapi\event\Issuer;
 use onebone\economyapi\internal\CurrencyHolder;
 use onebone\economyapi\currency\CurrencyDollar;
@@ -101,8 +101,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/** @var CurrencyHolder */
 	private $defaultCurrency;
 
-	/** @var CurrencyDeterminer */
-	private $currencyDeterminer = null;
+	/** @var CurrencySelector */
+	private $currencySelector = null;
 
 	/** @var UserProvider */
 	private $provider;
@@ -238,12 +238,12 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->pluginConfig;
 	}
 
-	public function setCurrencyDeterminer(CurrencyDeterminer $determiner) {
-		$this->currencyDeterminer = $determiner;
+	public function setCurrencySelector(CurrencySelector $selector) {
+		$this->currencySelector = $selector;
 	}
 
-	public function getCurrencyDeterminer(): CurrencyDeterminer {
-		return $this->currencyDeterminer;
+	public function getCurrencySelector(): CurrencySelector {
+		return $this->currencySelector;
 	}
 
 	public function getMonetaryUnit(): string {
@@ -715,7 +715,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			return $this->getCurrencyHolder($currency);
 		}else{
 			if($player instanceof Player) {
-				return $this->getCurrencyHolder($this->currencyDeterminer->getDefaultCurrency($player));
+				return $this->getCurrencyHolder($this->currencySelector->getDefaultCurrency($player));
 			}
 		}
 
@@ -744,8 +744,8 @@ class EconomyAPI extends PluginBase implements Listener {
 			$this->getScheduler()->scheduleDelayedRepeatingTask(new SaveTask($this), $this->pluginConfig->getAutoSaveInterval() * 1200, $this->pluginConfig->getAutoSaveInterval() * 1200);
 		}
 
-		if($this->currencyDeterminer === null) {
-			$this->currencyDeterminer = new SimpleCurrencyDeterminer($this);
+		if($this->currencySelector === null) {
+			$this->currencySelector = new SimpleCurrencySelector($this);
 		}
 
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);

@@ -20,8 +20,8 @@
 
 namespace onebone\economyapi\currency;
 
-use pocketmine\Player;
-
-interface CurrencyDeterminer {
-	public function getDefaultCurrency(Player $player): Currency;
+/**
+ * @deprecated Use {@see CurrencySelector} instead.
+ */
+interface CurrencyDeterminer extends CurrencySelector {
 }
