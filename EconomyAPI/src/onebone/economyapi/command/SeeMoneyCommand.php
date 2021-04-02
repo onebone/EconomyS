@@ -55,7 +55,7 @@ class SeeMoneyCommand extends Command implements PluginOwned {
 		}
 
 		$plugin = $this->plugin;
-		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		if(($p = $plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
