@@ -24,13 +24,14 @@ use pocketmine\Player;
 
 /**
  *  Selects currency to do work with when $currency argument at API function
- * calls such as myMoney(), setMoney(), reduceMoney(), addMoney(), ...  is
+ * calls such as {@see EconomyAPI::myMoney()}, {@see EconomyAPI::setMoney()},
+ * {@see EconomyAPI::reduceMoney()}, {@see EconomyAPI::addMoney()}, ...  is
  * not specified. The function calls that omit $currency parameter may be
  * due to the legacy plugins that is created before the EconomyAPI adopted
  * multi currency feature or is just leaving choices to EconomyAPI.
  *  To keep backwards-compatibility, EconomyAPI sets CurrencySelector to
  * select default currency specified at config.yml, which is dollar by default
- * but user may change this behavior using EconomyAPI->setCurrencySelector().
+ * but user may change this behavior using {@see EconomyAPI::setCurrencySelector()}.
  *  Changing this behavior is not encouraged unless you need highly customized
  * behavior on dealing with the currency feature.
  */
