@@ -20,6 +20,8 @@
 
 namespace onebone\economyapi;
 
+use AssertionError;
+use InvalidArgumentException;
 use onebone\economyapi\command\EconomyCommand;
 use onebone\economyapi\command\GiveMoneyCommand;
 use onebone\economyapi\command\MyMoneyCommand;
@@ -624,51 +626,37 @@ class EconomyAPI extends PluginBase implements Listener {
 		return false;
 	}
 
+	/**
+	 * Executes multiple actions at the same time.
+	 *
+	 * Be aware that the function does not provide consistency property if actions in $transaction has
+	 * multiple types of currencies. Also currency availability for a player is not considered during
+	 * the transaction.
+	 *
+	 * @param Transaction $transaction
+	 * @param Issuer|null $issuer
+	 * @return bool Returns true if succeed or false if failed. If actions contain multiple currencies,
+	 *              consistency property is not guaranteed.
+	 */
 	public function executeTransaction(Transaction $transaction, ?Issuer $issuer = null): bool {
-		if(!$this->validateTransaction($transaction, $issuer)) {
-			return false;
-		}
-
+		$transactionMap = [];
 		foreach($transaction->getActions() as $action) {
-			$holder = $this->getCurrencyHolder($action->getCurrency());
-			$money = $holder->getProvider()->getMoney($action->getPlayer());
-			switch($action->getType()) {
-				case Transaction::ACTION_SET:
-					$holder->getProvider()->setMoney($action->getPlayer(), $action->getAmount());
-					break;
-				case Transaction::ACTION_ADD:
-					$holder->getProvider()->addMoney($action->getPlayer(), $action->getAmount());
-					break;
-				case Transaction::ACTION_REDUCE:
-					$holder->getProvider()->reduceMoney($action->getPlayer(), $action->getAmount());
-					break;
+			$key = $this->getCurrencyId($action->getCurrency());
+			if($key === null)
+				throw new InvalidArgumentException("Each action of transaction must reference registered Currency instance.");
+
+			if(!isset($transactionMap[$key])) {
+				$transactionMap[$key] = [];
 			}
 
-			(new MoneyChangedEvent($this, $action->getPlayer(), $action->getCurrency(), $money, $issuer))->call();
+			$transactionMap[$key][] = $action;
 		}
 
-		return true;
-	}
+		foreach($transactionMap as $currencyId => $actions) {
+			$currency = $this->getCurrencyHolder($this->getCurrency($currencyId));
+			if($currency === null) throw new AssertionError("This should not happen");
 
-	private function validateTransaction(Transaction $transaction, ?Issuer $issuer): bool {
-		foreach($transaction->getActions() as $action) {
-			switch($action->getType()) {
-				case Transaction::ACTION_SET:
-					if($this->canSetMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
-						return false;
-					}
-					break;
-				case Transaction::ACTION_ADD:
-					if($this->canAddMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
-						return false;
-					}
-					break;
-				case Transaction::ACTION_REDUCE:
-					if($this->canReduceMoney($action->getPlayer(), $action->getAmount(), false, $issuer, $action->getCurrency()) !== self::RET_VALID) {
-						return false;
-					}
-					break;
-			}
+			if(!$currency->getProvider()->executeTransaction($actions)) return false;
 		}
 
 		return true;

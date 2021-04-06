@@ -23,6 +23,8 @@ namespace onebone\economyapi\provider;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\YamlSortTask;
 use onebone\economyapi\util\Promise;
+use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionAction;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -144,6 +146,65 @@ class YamlProvider implements Provider {
 		$this->plugin->getServer()->getAsyncPool()->submitTask($task);
 
 		return $promise;
+	}
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return bool
+	 */
+	public function executeTransaction(array $actions): bool {
+		if(!$this->validateTransaction($actions)) return false;
+
+		foreach($actions as $action) {
+			$player = strtolower($action->getPlayer());
+			$amount = $action->getAmount();
+			$type = $action->getType();
+
+			switch($type) {
+				case Transaction::ACTION_SET:
+					$this->money['money'][$player] = $amount;
+					break;
+				case Transaction::ACTION_ADD:
+					if(!isset($this->money['money'][$player])) return false;
+
+					$this->money['money'][$player] += $amount;
+					break;
+				case Transaction::ACTION_REDUCE:
+					$this->money['money'][$player] -= $amount;
+					break;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return bool
+	 */
+	private function validateTransaction(array $actions): bool {
+		foreach($actions as $action) {
+			$player = strtolower($action->getPlayer());
+			$amount = $action->getAmount();
+			$type = $action->getType();
+
+			switch($type) {
+				case Transaction::ACTION_SET:
+					if($amount < 0) return false;
+					break;
+				case Transaction::ACTION_REDUCE:
+					if(!isset($this->money['money'][$player])) return false;
+
+					$money = $this->money['money'][$player];
+					if($money - $amount < 0) return false;
+					break;
+				case Transaction::ACTION_ADD:
+					if(!isset($this->money['money'][$player])) return false;
+					break;
+			}
+		}
+
+		return true;
 	}
 
 	public function getName(): string {

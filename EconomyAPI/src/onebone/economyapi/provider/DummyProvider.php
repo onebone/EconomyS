@@ -21,6 +21,7 @@
 namespace onebone\economyapi\provider;
 
 use onebone\economyapi\util\Promise;
+use onebone\economyapi\util\Transaction;
 
 class DummyProvider implements Provider {
 	public function hasAccount($player): bool {
@@ -60,6 +61,10 @@ class DummyProvider implements Provider {
 		$promise->reject(null);
 
 		return $promise;
+	}
+
+	public function executeTransaction(array $actions): bool {
+		return false;
 	}
 
 	public function getName(): string {

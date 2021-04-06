@@ -39,6 +39,8 @@ namespace onebone\economyapi\provider;
  */
 
 use onebone\economyapi\util\Promise;
+use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionAction;
 use pocketmine\Player;
 
 // Provider is currency-related data provider
@@ -92,6 +94,12 @@ interface Provider {
 	public function getAll(): array;
 
 	public function sortByRange(int $from, ?int $len): Promise;
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return bool
+	 */
+	public function executeTransaction(array $actions): bool;
 
 	public function getName(): string;
 

@@ -24,6 +24,7 @@ use mysqli;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\task\MySQLPingTask;
 use onebone\economyapi\util\Promise;
+use onebone\economyapi\util\Transaction;
 use pocketmine\Player;
 
 class MySQLProvider implements Provider {
@@ -186,6 +187,11 @@ class MySQLProvider implements Provider {
 		$promise->reject(null);
 
 		return $promise;
+	}
+
+	public function executeTransaction(array $actions): bool {
+		// TODO implement here
+		return false;
 	}
 
 	/**
