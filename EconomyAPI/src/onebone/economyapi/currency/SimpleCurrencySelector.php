@@ -6,7 +6,7 @@ namespace onebone\economyapi\currency;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\Player;
 
-class SimpleCurrencySelector implements CurrencyDeterminer {
+class SimpleCurrencySelector implements CurrencySelector {
 	private $plugin;
 
 	public function __construct(EconomyAPI $plugin) {

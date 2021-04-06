@@ -80,7 +80,7 @@ class SetMoneyCommand extends PluginCommand {
 			}
 		}
 
-		$result = $plugin->setMoney($player, $amount, $currency, null);
+		$result = $plugin->setMoney($player, $amount, $currency);
 		switch ($result) {
 			case EconomyAPI::RET_INVALID:
 				$sender->sendMessage($plugin->getMessage("setmoney-invalid-number", $sender, [$amount]));

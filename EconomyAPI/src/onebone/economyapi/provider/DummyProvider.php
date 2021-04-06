@@ -35,7 +35,7 @@ class DummyProvider implements Provider {
 		return false;
 	}
 
-	public function getMoney($player) {
+	public function getMoney($player): bool {
 		return false;
 	}
 

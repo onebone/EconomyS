@@ -20,6 +20,8 @@
 
 namespace onebone\economyapi\util;
 
+use InvalidArgumentException;
+
 class Transaction {
 	const ACTION_SET = 0;
 	const ACTION_ADD = 1;
@@ -36,12 +38,12 @@ class Transaction {
 
 		foreach($actions as $action) {
 			if(!$action instanceof TransactionAction) {
-				throw new \InvalidArgumentException('TransactionAction[] is required to the constructor');
+				throw new InvalidArgumentException('TransactionAction[] is required to the constructor');
 			}
 
 			$username = strtolower($action->getPlayer());
 			if(in_array($username, $players)) {
-				throw new \InvalidArgumentException('Two or more TransactionAction elements are targeting one player');
+				throw new InvalidArgumentException('Two or more TransactionAction elements are targeting one player');
 			}
 
 			$players[] = $username;

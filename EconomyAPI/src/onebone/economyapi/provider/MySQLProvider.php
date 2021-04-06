@@ -83,7 +83,7 @@ class MySQLProvider implements Provider {
 		$player = strtolower($player);
 
 		$result = $this->db->query("SELECT * FROM user_money WHERE username='" . $this->db->real_escape_string($player) . "'");
-		return $result->num_rows > 0 ? true : false;
+		return $result->num_rows > 0;
 	}
 
 	/**

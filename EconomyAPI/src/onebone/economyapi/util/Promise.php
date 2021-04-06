@@ -20,6 +20,8 @@
 
 namespace onebone\economyapi\util;
 
+use InvalidStateException;
+
 class Promise {
 	const STATE_PENDING = 0;
 	const STATE_FULFILLED = 1;
@@ -65,7 +67,7 @@ class Promise {
 	private function settle($state, $value) {
 		if($this->state !== self::STATE_PENDING) {
 			if($this->state !== $state) {
-				throw new \InvalidStateException();
+				throw new InvalidStateException();
 			}
 
 			if($value === $this->result) return;

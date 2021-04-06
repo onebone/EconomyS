@@ -35,7 +35,7 @@ class YamlProvider implements Provider {
 	/** @var EconomyAPI */
 	private $plugin;
 
-	private $money = [];
+	private $money;
 
 	public function __construct(EconomyAPI $plugin, string $fileName) {
 		$this->plugin = $plugin;

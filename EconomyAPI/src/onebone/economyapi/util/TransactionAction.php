@@ -20,6 +20,7 @@
 
 namespace onebone\economyapi\util;
 
+use InvalidArgumentException;
 use onebone\economyapi\currency\Currency;
 use pocketmine\Player;
 
@@ -41,7 +42,7 @@ class TransactionAction {
 	 */
 	public function __construct(int $type, $player, float $amount, Currency $currency) {
 		if($type > 2) {
-			throw new \InvalidArgumentException("Invalid transaction type given: $type");
+			throw new InvalidArgumentException("Invalid transaction type given: $type");
 		}
 
 		if($player instanceof Player) {
