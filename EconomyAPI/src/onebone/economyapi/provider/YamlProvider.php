@@ -165,8 +165,6 @@ class YamlProvider implements Provider {
 					$this->money['money'][$player] = $amount;
 					break;
 				case Transaction::ACTION_ADD:
-					if(!isset($this->money['money'][$player])) return false;
-
 					$this->money['money'][$player] += $amount;
 					break;
 				case Transaction::ACTION_REDUCE:
