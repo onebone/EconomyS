@@ -20,8 +20,8 @@
 
 namespace onebone\economyapi\provider;
 
+use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\util\Promise;
-use onebone\economyapi\util\Transaction;
 
 class DummyProvider implements Provider {
 	public function hasAccount($player): bool {
@@ -40,16 +40,16 @@ class DummyProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, float $amount): bool {
-		return false;
+	public function setMoney($player, float $amount): int {
+		return EconomyAPI::RET_PROVIDER_FAILURE;
 	}
 
-	public function addMoney($player, float $amount): bool {
-		return false;
+	public function addMoney($player, float $amount): int {
+		return EconomyAPI::RET_PROVIDER_FAILURE;
 	}
 
-	public function reduceMoney($player, float $amount): bool {
-		return false;
+	public function reduceMoney($player, float $amount): int {
+		return EconomyAPI::RET_PROVIDER_FAILURE;
 	}
 
 	public function getAll(): array {
@@ -63,8 +63,8 @@ class DummyProvider implements Provider {
 		return $promise;
 	}
 
-	public function executeTransaction(array $actions): bool {
-		return false;
+	public function executeTransaction(array $actions): array {
+		return [];
 	}
 
 	public function getName(): string {

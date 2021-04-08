@@ -23,8 +23,11 @@ namespace onebone\economyapi\internal;
 use onebone\economyapi\currency\Currency;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\provider\Provider;
+use onebone\economyapi\provider\RevertAction;
+use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Transaction;
 use onebone\economyapi\util\TransactionAction;
+use onebone\economyapi\util\TransactionResult;
 use pocketmine\Player;
 
 class BalanceRepository {
@@ -32,6 +35,7 @@ class BalanceRepository {
 	private $currency;
 	/** @var Provider */
 	private $provider;
+	/** @var ReversionProvider */
 	private $reversionProvider;
 
 	public function __construct(Currency $currency, Provider $provider, ReversionProvider $reversionProvider) {
@@ -42,13 +46,87 @@ class BalanceRepository {
 
 	public function tryFlushPending() {
 		$pending = $this->reversionProvider->getAllPending();
-		if($this->provider->executeTransaction($pending)) {
+		if($this->provider->executeTransaction(
+			$this->revertActionToTransactionAction($pending)
+		)) {
 			$this->reversionProvider->clearPending();
 		}
 	}
 
-	public function getMoney(string $player): float {
-		return $this->provider->getMoney($player) + $this->reversionProvider->getPendingBalance($player);
+	/**
+	 * @param RevertAction[] $reverts
+	 * @return TransactionAction[]
+	 */
+	private function revertActionToTransactionAction(array $reverts): array {
+		$actions = [];
+		foreach($reverts as $entry) {
+			if($entry->getType() === RevertAction::ADD) {
+				$type = Transaction::ACTION_ADD;
+			}else{
+				$type = Transaction::ACTION_REDUCE;
+			}
+
+			$actions[] = new TransactionAction($type, $entry->getPlayer(), $entry->getValue(), $this->currency);
+		}
+
+		return $actions;
+	}
+
+	public function getAllBalances(): array {
+		return $this->provider->getAll();
+	}
+
+	/**
+	 * @param string|Player $player
+	 * @return bool
+	 */
+	public function hasAccount($player): bool {
+		return $this->provider->hasAccount($player);
+	}
+
+	/**
+	 * @param string|Player $player
+	 * @param float $defaultBalance
+	 * @return bool
+	 */
+	public function createAccount($player, float $defaultBalance): bool {
+		return $this->provider->createAccount($player, $defaultBalance);
+	}
+
+	public function sortByRange(int $from, ?int $len): Promise {
+		return $this->provider->sortByRange($from, $len);
+	}
+
+	/**
+	 * @param string|Player $player
+	 * @return bool|float
+	 */
+	public function getMoney($player) {
+		$balance = $this->provider->getMoney($player);
+		if($balance === false) return $balance;
+
+		if($player instanceof Player) {
+			$player = $player->getName();
+		}
+		$player = strtolower($player);
+
+		return $balance + $this->reversionProvider->getPendingBalance($player);
+	}
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return TransactionResult
+	 */
+	public function executeTransaction(array $actions): TransactionResult {
+		// TODO merge with pending transaction?
+		return $this->provider->executeTransaction($actions);
+	}
+
+	/**
+	 * @param RevertAction[] $actions
+	 */
+	public function revert(array $actions) {
+		$this->reversionProvider->addRevertActions($actions);
 	}
 
 	/**
@@ -65,6 +143,8 @@ class BalanceRepository {
 	 * </ul>
 	 */
 	public function addMoney($player, float $value, ?TransactionAction &$action): int {
+		// TODO provider should check constraints such as limiting balance going over maximum value by itself
+
 		$result = $this->provider->addMoney($player, $value);
 		if($result === EconomyAPI::RET_SUCCESS) {
 			$action = new TransactionAction(Transaction::ACTION_REDUCE, $player, $value, $this->currency);
@@ -89,6 +169,8 @@ class BalanceRepository {
 	 * </ul>
 	 */
 	public function reduceMoney($player, float $value, ?TransactionAction &$action): int {
+		// TODO provider should check constraints such as limiting balance going to negative value by itself
+
 		$result = $this->provider->reduceMoney($player, $value);
 		if($result === EconomyAPI::RET_SUCCESS) {
 			$action = new TransactionAction(Transaction::ACTION_ADD, $player, $value, $this->currency);
@@ -113,6 +195,8 @@ class BalanceRepository {
 	 * </ul>
 	 */
 	public function setMoney($player, float $value, ?TransactionAction &$action): int {
+		// TODO provider should check constraints such as limiting balance going over maximum value or to negative value by itself
+
 		$result = $this->provider->setMoney($player, $value);
 
 		$action = null;
@@ -126,5 +210,15 @@ class BalanceRepository {
 		}
 
 		return $result;
+	}
+
+	public function close() {
+		$this->provider->close();
+		$this->reversionProvider->close();
+	}
+
+	public function save() {
+		$this->provider->save();
+		$this->reversionProvider->save();
 	}
 }

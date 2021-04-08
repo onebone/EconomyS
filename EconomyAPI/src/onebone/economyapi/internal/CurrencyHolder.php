@@ -34,15 +34,15 @@ final class CurrencyHolder {
 	private $id;
 	/** @var Currency */
 	private $currency;
-	/** @var Provider */
-	private $provider;
+	/** @var BalanceRepository */
+	private $repository;
 	/** @var CurrencyConfig */
 	private $config = null;
 
 	public function __construct(string $id, Currency $currency, Provider $provider) {
 		$this->id = $id;
 		$this->currency = $currency;
-		$this->provider = $provider;
+		$this->repository = new BalanceRepository($currency, $provider, new ReversionProviderImpl());
 	}
 
 	public function getId(): string {
@@ -53,8 +53,8 @@ final class CurrencyHolder {
 		return $this->currency;
 	}
 
-	public function getProvider(): Provider {
-		return $this->provider;
+	public function getBalanceRepository(): BalanceRepository {
+		return $this->repository;
 	}
 
 	public function setConfig(CurrencyConfig $config) {

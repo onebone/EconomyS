@@ -18,35 +18,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\internal;
+namespace onebone\economyapi\provider;
 
-use onebone\economyapi\provider\RevertAction;
+class RevertAction {
+	public const ADD = 0;
+	public const REDUCE = 1;
 
-interface ReversionProvider {
-	/**
-	 * Pending balance that is not reflected to the database. Returns 0
-	 * if none.
-	 *
-	 * @param string $player
-	 * @return float
-	 */
-	public function getPendingBalance(string $player): float;
+	/** @var int */
+	private $type;
+	/** @var string */
+	private $player;
+	/** @var float */
+	private $value;
 
-	/**
-	 * Returns all pending balances
-	 *
-	 * @return RevertAction[]
-	 */
-	public function getAllPending(): array;
+	public function __construct(int $type, string $player, float $value) {
+		$this->type = $type;
+		$this->player = $player;
+		$this->value = $value;
+	}
 
-	public function clearPending(): void;
+	public function getType(): int {
+		return $this->type;
+	}
 
-	/**
-	 * @param RevertAction[] $actions
-	 */
-	public function addRevertActions(array $actions): void;
+	public function getPlayer(): string {
+		return $this->player;
+	}
 
-	public function save(): void;
-
-	public function close(): void;
+	public function getValue(): float {
+		return $this->value;
+	}
 }

@@ -36,7 +36,6 @@ use onebone\economyapi\currency\CurrencyConfig;
 use onebone\economyapi\currency\CurrencySelector;
 use onebone\economyapi\currency\SimpleCurrencySelector;
 use onebone\economyapi\event\Issuer;
-use onebone\economyapi\internal\CurrencyHolder;
 use onebone\economyapi\currency\CurrencyDollar;
 use onebone\economyapi\currency\CurrencyWon;
 use onebone\economyapi\event\account\CreateAccountEvent;
@@ -44,6 +43,7 @@ use onebone\economyapi\event\money\AddMoneyEvent;
 use onebone\economyapi\event\money\MoneyChangedEvent;
 use onebone\economyapi\event\money\ReduceMoneyEvent;
 use onebone\economyapi\event\money\SetMoneyEvent;
+use onebone\economyapi\internal\CurrencyHolder;
 use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Replacer;
 use onebone\economyapi\provider\DummyProvider;
@@ -56,6 +56,7 @@ use onebone\economyapi\provider\user\YamlUserProvider;
 use onebone\economyapi\task\SaveTask;
 use onebone\economyapi\util\PluginConfig;
 use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionResult;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
@@ -340,7 +341,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @return array
 	 */
 	public function getAllMoney(): array {
-		return $this->defaultCurrency->getProvider()->getAll();
+		return $this->defaultCurrency->getBalanceRepository()->getAllBalances();
 	}
 
 	/**
@@ -363,7 +364,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$holder = $this->findCurrencyHolder($currency, null);
 		if($holder === null) return false;
 
-		return $holder->getProvider()->hasAccount($player);
+		return $holder->getBalanceRepository()->hasAccount($player);
 	}
 
 	/**
@@ -375,7 +376,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function myMoney($player, ?Currency $currency = null) {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
-		return $holder->getProvider()->getMoney($player);
+		return $holder->getBalanceRepository()->getMoney($player);
 	}
 
 	/**
@@ -398,10 +399,11 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if($ret === self::RET_VALID) {
-			$money = $holder->getProvider()->getMoney($player);
+			$revertAction = null;
+			$result = $holder->getBalanceRepository()->setMoney($player, $amount, $revertAction);
+			if($result < 0) return $result;
 
-			$holder->getProvider()->setMoney($player, $amount);
-			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
+			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $result, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
 
@@ -421,14 +423,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if($holder->getProvider()->hasAccount($player)) {
-			$config = $holder->getConfig();
-			if($config instanceof CurrencyConfig) {
-				if($config->hasMaxMoney() and $amount > $config->getMaxMoney()) {
-					return self::RET_UNAVAILABLE;
-				}
-			}
-
+		if($holder->getBalanceRepository()->hasAccount($player)) {
 			$ev = new SetMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 			if($ev->isCancelled() and $force === false) {
@@ -461,9 +456,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if($ret === self::RET_VALID) {
-			$money = $holder->getProvider()->getMoney($player);
+			$money = $holder->getBalanceRepository()->getMoney($player);
 
-			$holder->getProvider()->addMoney($player, $amount);
+			$revertAction = null;
+			$holder->getBalanceRepository()->addMoney($player, $amount, $revertAction);
 			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
@@ -484,14 +480,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
-			$config = $holder->getConfig();
-			if($config instanceof CurrencyConfig) {
-				if($config->hasMaxMoney() and $money + $amount > $config->getMaxMoney()) {
-					return self::RET_UNAVAILABLE;
-				}
-			}
-
+		if($holder->getBalanceRepository()->hasAccount($player)) {
 			$ev = new AddMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 
@@ -525,9 +514,10 @@ class EconomyAPI extends PluginBase implements Listener {
 		$player = strtolower($player);
 
 		if($ret === self::RET_VALID) {
-			$money = $holder->getProvider()->getMoney($player);
+			$money = $holder->getBalanceRepository()->getMoney($player);
 
-			$holder->getProvider()->reduceMoney($player, $amount);
+			$revertActions = null;
+			$holder->getBalanceRepository()->reduceMoney($player, $amount, $revertActions);
 			(new MoneyChangedEvent($this, $player, $holder->getCurrency(), $money, $issuer))->call();
 			return self::RET_SUCCESS;
 		}
@@ -548,11 +538,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if(($money = $holder->getProvider()->getMoney($player)) !== false) {
-			if($money - $amount < 0) {
-				return self::RET_UNAVAILABLE;
-			}
-
+		if($holder->getBalanceRepository()->hasAccount($player)) {
 			$ev = new ReduceMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 			if($ev->isCancelled() and $force === false) {
@@ -604,7 +590,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 		$player = strtolower($player);
 
-		if(!$holder->getProvider()->hasAccount($player)) {
+		if(!$holder->getBalanceRepository()->hasAccount($player)) {
 			if($defaultMoney === false) {
 				// if $defaultMoney is not set on parameter, look at user configured initial balance first
 				// then fallback to currency specified amount if user did not define it
@@ -624,7 +610,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev = new CreateAccountEvent($this, $player, $holder->getCurrency(), $defaultMoney, $issuer);
 			$ev->call();
 
-			$holder->getProvider()->createAccount($player, $ev->getDefaultMoney());
+			$holder->getBalanceRepository()->createAccount($player, $ev->getDefaultMoney());
 			return true;
 		}
 
@@ -634,14 +620,14 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * Executes multiple actions at the same time.
 	 *
-	 * Be aware that the function does not provide consistency property if actions in $transaction has
-	 * multiple types of currencies. Also currency availability for a player is not considered during
+	 * Be aware that the function does not guarantee atomicity if actions in $transaction contains actions
+	 * with multiple types of currencies. Also currency availability for a player is not considered during
 	 * the transaction.
 	 *
 	 * @param Transaction $transaction
 	 * @param Issuer|null $issuer
 	 * @return bool Returns true if succeed or false if failed. If actions contain multiple currencies,
-	 *              consistency property is not guaranteed.
+	 *              atomicity is not guaranteed.
 	 */
 	public function executeTransaction(Transaction $transaction, ?Issuer $issuer = null): bool {
 		$transactionMap = [];
@@ -657,11 +643,22 @@ class EconomyAPI extends PluginBase implements Listener {
 			$transactionMap[$key][] = $action;
 		}
 
+		$reverts = [];
 		foreach($transactionMap as $currencyId => $actions) {
 			$currency = $this->getCurrencyHolder($this->getCurrency($currencyId));
 			if($currency === null) throw new AssertionError("This should not happen");
 
-			if(!$currency->getProvider()->executeTransaction($actions)) return false;
+			$result = $currency->getBalanceRepository()->executeTransaction($actions);
+			if($result->getState() === TransactionResult::FAILURE) {
+				foreach($reverts as [$revertCurrency, $revertActions]) {
+					/** @type CurrencyHolder $revertCurrency */
+					$revertCurrency->getBalanceRepository()->revert($revertActions);
+				}
+
+				return $result->getReason();
+			}
+
+			$reverts[] = [$currency, $result->getReason()];
 		}
 
 		return true;
@@ -671,7 +668,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$holder = $this->getCurrencyHolder($currency);
 		if($holder === null) return null;
 
-		return $holder->getProvider()->sortByRange($from, $len);
+		return $holder->getBalanceRepository()->sortByRange($from, $len);
 	}
 
 	public function hasLanguage(string $lang): bool {
@@ -929,7 +926,7 @@ class EconomyAPI extends PluginBase implements Listener {
 	public function onJoin(PlayerJoinEvent $event) {
 		$player = $event->getPlayer();
 
-		if(!$this->defaultCurrency->getProvider()->hasAccount($player)) {
+		if(!$this->defaultCurrency->getBalanceRepository()->hasAccount($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
 			$this->createAccount($player, $this->defaultCurrency->getCurrency());
 		}
@@ -937,13 +934,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	public function onDisable() {
 		foreach($this->currencies as $currency) {
-			$currency->getProvider()->close();
+			$currency->getBalanceRepository()->close();
 		}
 	}
 
 	public function saveAll() {
 		foreach($this->currencies as $currency) {
-			$currency->getProvider()->save();
+			$currency->getBalanceRepository()->save();
 		}
 	}
 }
