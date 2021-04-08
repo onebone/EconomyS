@@ -73,23 +73,29 @@ interface Provider {
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
-	 * @return bool
+	 * @return int Result code or old balance value, returns {@see EconomyAPI::RET_UNAVAILABLE}
+	 *          if the resulting amount is exceeding max balance, {@see EconomyAPI::RET_PROVIDER_FAILURE}
+	 *          if operations failed. Returns old balance value(>= 0) if operation had succeed.
 	 */
-	public function setMoney($player, float $amount): bool;
+	public function setMoney($player, float $amount): int;
 
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
-	 * @return bool
+	 * @return int Result code, returns {@see EconomyAPI::RET_UNAVAILABLE} if the resulting
+	 *           amount is exceeding max balance, {@see EconomyAPI::RET_PROVIDER_FAILURE}
+	 *           if operations failed.
 	 */
-	public function addMoney($player, float $amount): bool;
+	public function addMoney($player, float $amount): int;
 
 	/**
 	 * @param Player|string $player
 	 * @param float $amount
-	 * @return bool
+	 * @return int Result code, returns {@see EconomyAPI::RET_UNAVAILABLE} if the resulting
+	 *           amount is negative value, {@see EconomyAPI::RET_PROVIDER_FAILURE} if operations
+	 *           have failed.
 	 */
-	public function reduceMoney($player, float $amount): bool;
+	public function reduceMoney($player, float $amount): int;
 
 	public function getAll(): array;
 

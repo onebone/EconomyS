@@ -70,6 +70,11 @@ class EconomyAPI extends PluginBase implements Listener {
 	const API_VERSION = 4;
 	const PACKAGE_VERSION = "6.0";
 
+	/**
+	 * @since 4
+	 * Currency provider has failed to process the request
+	 */
+	const RET_PROVIDER_FAILURE = -5;
 	// RET_INVALID_CURRENCY: Player could not use currency at that time
 	const RET_INVALID_CURRENCY = -4;
 	// RET_NO_ACCOUNT: Account associated with given currency does not exist
@@ -858,8 +863,8 @@ class EconomyAPI extends PluginBase implements Listener {
 		switch(strtolower($this->getPluginConfig()->getProvider())) {
 			case 'yaml':
 				return new YamlProvider($this, $file);
-			case 'mysql':
-				return new MySQLProvider($this);
+			/* case 'mysql':
+				return new MySQLProvider($this); */
 			default:
 				return new DummyProvider();
 		}

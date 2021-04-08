@@ -96,17 +96,19 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, float $amount): bool {
+	public function setMoney($player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		if(isset($this->money["money"][$player])) {
+			$old = $this->money["money"][$player];
 			$this->money["money"][$player] = $amount;
-			return true;
+			return $old;
 		}
-		return false;
+
+		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
 	public function addMoney($player, float $amount): bool {
