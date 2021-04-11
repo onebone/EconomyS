@@ -107,20 +107,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	/** @var UserProvider */
 	private $provider;
 
-	private $langList = [
-		"user-define" => "User Defined",
-		"ch"          => "简体中文",
-		"cs"          => "Čeština",
-		"en"          => "English",
-		"fr"          => "Français",
-		"id"          => "Bahasa Indonesia",
-		"it"          => "Italiano",
-		"ja"          => "日本語",
-		"ko"          => "한국어",
-		"nl"          => "Nederlands",
-		"ru"          => "Русский",
-		"zh"          => "繁體中文",
-	];
+	const USER_DEFINED = 'user-define';
+
 	private $lang = [];
 
 	/**
@@ -145,6 +133,14 @@ class EconomyAPI extends PluginBase implements Listener {
 		}else{
 			return $this->lang[self::FALLBACK_LANGUAGE]["commands"][$command];
 		}
+	}
+
+	public function hasLanguage(string $lang): bool {
+		return isset($this->lang[$lang]);
+	}
+
+	public function getLanguages(): array {
+		return array_keys($this->lang);
 	}
 
 	/**
@@ -681,14 +677,6 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $holder->getProvider()->sortByRange($from, $len);
 	}
 
-	public function hasLanguage(string $lang): bool {
-		return isset($this->langList[$lang]);
-	}
-
-	public function getLanguages(): array {
-		return array_keys($this->langList);
-	}
-
 	public function getCurrencyConfig(Currency $currency): ?CurrencyConfig {
 		foreach($this->currencies as $config) {
 			if($config->getCurrency() === $currency) {
@@ -914,7 +902,7 @@ class EconomyAPI extends PluginBase implements Listener {
 				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
 			}
 		}
-		$this->lang["user-define"] = (new Config(
+		$this->lang[self::USER_DEFINED] = (new Config(
 			$this->getDataFolder() . "messages.yml", Config::YAML, $this->lang[self::FALLBACK_LANGUAGE]
 		))->getAll();
 	}
