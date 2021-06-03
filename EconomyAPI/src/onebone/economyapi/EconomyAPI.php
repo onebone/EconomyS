@@ -618,6 +618,8 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	/**
+	 * @experimental
+	 *
 	 * Executes multiple actions at the same time.
 	 *
 	 * Be aware that the function does not guarantee atomicity if actions in $transaction contains actions
@@ -934,13 +936,13 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	public function onDisable() {
 		foreach($this->currencies as $currency) {
-			$currency->getBalanceRepository()->close();
+			$currency->close();
 		}
 	}
 
 	public function saveAll() {
 		foreach($this->currencies as $currency) {
-			$currency->getBalanceRepository()->save();
+			$currency->save();
 		}
 	}
 }

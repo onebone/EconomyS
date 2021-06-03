@@ -30,6 +30,12 @@ use onebone\economyapi\util\TransactionAction;
 use onebone\economyapi\util\TransactionResult;
 use pocketmine\Player;
 
+/**
+ * @internal
+ * Holds reference to various Providers and returns appropriate values for the request
+ *
+ * THIS IS INTERNAL CLASS, AND IS SUBJECT TO CHANGE ANYTIME WITHOUT NOTICE.
+ */
 class BalanceRepository {
 	/** @var Currency */
 	private $currency;

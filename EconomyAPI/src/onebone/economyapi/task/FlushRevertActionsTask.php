@@ -18,41 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace onebone\economyapi\internal;
+namespace onebone\economyapi\task;
 
-use onebone\economyapi\provider\RevertAction;
+use onebone\economyapi\internal\BalanceRepository;
+use pocketmine\scheduler\Task;
 
-/**
- * @internal
- * Provider that stores what must be undone.
- *
- * THIS IS INTERNAL CLASS, AND IS SUBJECT TO CHANGE ANYTIME WITHOUT NOTICE.
- */
-interface ReversionProvider {
-	/**
-	 * Pending balance that is not reflected to the database. Returns 0
-	 * if none.
-	 *
-	 * @param string $player
-	 * @return float
-	 */
-	public function getPendingBalance(string $player): float;
+class FlushRevertActionsTask extends Task {
+	/** @var BalanceRepository */
+	private $repository;
 
-	/**
-	 * Returns all pending balances
-	 *
-	 * @return RevertAction[]
-	 */
-	public function getAllPending(): array;
+	public function __construct(BalanceRepository $repository) {
+		$this->repository = $repository;
+	}
 
-	public function clearPending(): void;
-
-	/**
-	 * @param RevertAction[] $actions
-	 */
-	public function addRevertActions(array $actions): void;
-
-	public function save(): void;
-
-	public function close(): void;
+	public function onRun(int $currentTick) {
+		$this->repository->tryFlushPending();
+	}
 }

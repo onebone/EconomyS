@@ -22,6 +22,11 @@ namespace onebone\economyapi\internal;
 
 use onebone\economyapi\provider\RevertAction;
 
+/**
+ * @internal
+ *
+ * THIS IS INTERNAL CLASS, AND IS SUBJECT TO CHANGE ANYTIME WITHOUT NOTICE.
+ */
 class ReversionProviderImpl implements ReversionProvider {
 	/** @var RevertAction[] */
 	private $pending = [];
