@@ -149,20 +149,20 @@ class EconomyProperty extends PluginBase implements Listener {
 					$player->sendMessage("You don't have enough money to buy here.");
 					return;
 				}else{
-                    /** @var EconomyLand $economyLand */
-                    $economyLand = $this->getServer()->getPluginManager()->getPlugin("EconomyLand");
-                    $start = new Vector2((float)$info["startX"], (float)$info["startZ"]);
-                    $end = new Vector2((float)$info["landX"], (float)$info["landZ"]);
+					/** @var EconomyLand $economyLand */
+					$economyLand = $this->getServer()->getPluginManager()->getPlugin("EconomyLand");
+					$start = new Vector2((float)$info["startX"], (float)$info["startZ"]);
+					$end = new Vector2((float)$info["landX"], (float)$info["landZ"]);
 					if (!empty($economyLand->getLandManager()->getLandsOn($start, $end, $level))) {
-                        $player->sendMessage("[EconomyProperty] Failed to buy the land because the land is trying to overlap.");
-                        return;
-                    }
+						$player->sendMessage("[EconomyProperty] Failed to buy the land because the land is trying to overlap.");
+						return;
+					}
 
 					$land = $economyLand->getLandManager()->createLand($start, $end, $level, $player, new LandOption([], false, true, false), new LandMeta(microtime(true)));
-                    $economyLand->getLandManager()->addLand($land);
-                    EconomyAPI::getInstance()->reduceMoney($player, $info["price"]);
-                    $player->sendMessage("Successfully bought land.");
-                    $this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
+					$economyLand->getLandManager()->addLand($land);
+					EconomyAPI::getInstance()->reduceMoney($player, $info["price"]);
+					$player->sendMessage("Successfully bought land.");
+					$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 				}
 				$tile->close();
 				$level->setBlock($block, new Air());

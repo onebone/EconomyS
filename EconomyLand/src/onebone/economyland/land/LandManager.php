@@ -76,16 +76,16 @@ class LandManager {
 	}
 
 	public function getLandsOn(Vector2 $start, Vector2 $end, Level $level): array {
-	    $lands = [];
-	    foreach($this->lands as $land) {
-	        if($level->getFolderName() !== $land->getWorldName()) continue;
-            if(($start->getX() <= $land->getStart()->getX() or $land->getEnd()->getX() <= $end->getX()) or
-                ($start->getY() <= $land->getStart()->getY() or $land->getEnd()->getY() <= $end->getY())) {
-                $lands[] = $land;
-            }
-        }
-	    return $lands;
-    }
+		$lands = [];
+		foreach($this->lands as $land) {
+			if($level->getFolderName() !== $land->getWorldName()) continue;
+			if(($start->getX() <= $land->getStart()->getX() or $land->getEnd()->getX() <= $end->getX()) or
+				($start->getY() <= $land->getStart()->getY() or $land->getEnd()->getY() <= $end->getY())) {
+				$lands[] = $land;
+			}
+		}
+		return $lands;
+	}
 
 	public function getLandAt(int $x, int $z, string $worldName): ?Land {
 		foreach($this->lands as $land) {
