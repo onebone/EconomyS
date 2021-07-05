@@ -22,6 +22,9 @@ namespace onebone\economyproperty;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyland\EconomyLand;
+use onebone\economyland\land\Land;
+use onebone\economyland\land\LandMeta;
+use onebone\economyland\land\LandOption;
 use pocketmine\block\Air;
 use pocketmine\block\Block;
 use pocketmine\event\block\BlockBreakEvent;
@@ -31,6 +34,7 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
+use pocketmine\math\Vector2;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\nbt\tag\IntTag;
@@ -145,20 +149,20 @@ class EconomyProperty extends PluginBase implements Listener {
 					$player->sendMessage("You don't have enough money to buy here.");
 					return;
 				}else{
-					$result = EconomyLand::getInstance()->addLand($player->getName(), $info["startX"], $info["startZ"], $info["landX"], $info["landZ"], $info["level"], $info["rentTime"]);
-					switch ($result) {
-						case EconomyLand::RET_SUCCESS:
-							EconomyAPI::getInstance()->reduceMoney($player, $info["price"], true, "EconomyProperty");
-							$player->sendMessage("Successfully bought land.");
-							$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
-							break;
-						case EconomyLand::RET_LAND_OVERLAP:
-							$player->sendMessage("[EconomyProperty] Failed to buy the land because the land is trying to overlap.");
-							return;
-						case EconomyLand::RET_LAND_LIMIT:
-							$player->sendMessage("[EconomyProperty] Failed to buy the land due to land limitation.");
-							return;
+					/** @var EconomyLand $economyLand */
+					$economyLand = $this->getServer()->getPluginManager()->getPlugin("EconomyLand");
+					$start = new Vector2((float)$info["startX"], (float)$info["startZ"]);
+					$end = new Vector2((float)$info["landX"], (float)$info["landZ"]);
+					if (!empty($economyLand->getLandManager()->getLandsOn($start, $end, $level))) {
+						$player->sendMessage("[EconomyProperty] Failed to buy the land because the land is trying to overlap.");
+						return;
 					}
+
+					$land = $economyLand->getLandManager()->createLand($start, $end, $level, $player, new LandOption([], false, true, false), new LandMeta(microtime(true)));
+					$economyLand->getLandManager()->addLand($land);
+					EconomyAPI::getInstance()->reduceMoney($player, $info["price"]);
+					$player->sendMessage("Successfully bought land.");
+					$this->property->exec("DELETE FROM Property WHERE landNum = $info[landNum]");
 				}
 				$tile->close();
 				$level->setBlock($block, new Air());
@@ -236,7 +240,9 @@ class EconomyProperty extends PluginBase implements Listener {
 		if($this->checkOverlapping($first, $sec, $level)) {
 			return false;
 		}
-		if(EconomyLand::getInstance()->checkOverlap($first[0], $sec[0], $first[1], $sec[1], $level)) {
+		/** @var EconomyLand $economyLand */
+		$economyLand = $this->getServer()->getPluginManager()->getPlugin("EconomyLand");
+		if(!empty($economyLand->getLandManager()->getLandsOn(new Vector2((float)$first[0], (float)$first[1]), new Vector2((float)$sec[0], (float)$sec[1]), $level))) {
 			return false;
 		}
 
