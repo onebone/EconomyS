@@ -6,3 +6,4 @@ Economy*/*.*
 !/LICENSE
 !/README.md
 !.gitignore
+!.editorconfig
