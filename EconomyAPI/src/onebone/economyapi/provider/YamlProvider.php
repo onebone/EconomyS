@@ -21,8 +21,12 @@
 namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
+use onebone\economyapi\provider\RevertAction;
 use onebone\economyapi\task\YamlSortTask;
 use onebone\economyapi\util\Promise;
+use onebone\economyapi\util\Transaction;
+use onebone\economyapi\util\TransactionAction;
+use onebone\economyapi\util\TransactionResult;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
@@ -94,20 +98,22 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, float $amount): bool {
+	public function setMoney($player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		if(isset($this->money["money"][$player])) {
+			$old = $this->money["money"][$player];
 			$this->money["money"][$player] = $amount;
-			return true;
+			return $old;
 		}
-		return false;
+
+		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
-	public function addMoney($player, float $amount): bool {
+	public function addMoney($player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -115,22 +121,27 @@ class YamlProvider implements Provider {
 
 		if(isset($this->money["money"][$player])) {
 			$this->money["money"][$player] += $amount;
-			return true;
+			return EconomyAPI::RET_SUCCESS;
 		}
-		return false;
+
+		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
-	public function reduceMoney($player, float $amount): bool {
+	public function reduceMoney($player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
 		$player = strtolower($player);
 
 		if(isset($this->money["money"][$player])) {
+			if($this->money['money'][$player] - $amount < 0)
+				return EconomyAPI::RET_UNAVAILABLE;
+
 			$this->money["money"][$player] -= $amount;
-			return true;
+			return EconomyAPI::RET_SUCCESS;
 		}
-		return false;
+
+		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
 	public function getAll(): array {
@@ -144,6 +155,78 @@ class YamlProvider implements Provider {
 		$this->plugin->getServer()->getAsyncPool()->submitTask($task);
 
 		return $promise;
+	}
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return TransactionResult
+	 */
+	public function executeTransaction(array $actions): TransactionResult {
+		if(!$this->validateTransaction($actions))
+			// TODO set result properly
+			return new TransactionResult(TransactionResult::FAILURE, EconomyAPI::RET_UNAVAILABLE, []);
+
+		$revertActions = [];
+		foreach($actions as $action) {
+			$player = strtolower($action->getPlayer());
+			$amount = $action->getAmount();
+			$type = $action->getType();
+
+			switch($type) {
+				case Transaction::ACTION_SET:
+					$oldMoney = $this->money['money'][$player];
+					$this->money['money'][$player] = $amount;
+
+					$delta = $amount - $oldMoney;
+					if($delta > 0) {
+						$revertActions[] = new RevertAction(RevertAction::REDUCE, $player, $delta);
+					}else if($delta < 0) {
+						$revertActions[] = new RevertAction(RevertAction::ADD, $player, -$delta);
+					}
+					break;
+				case Transaction::ACTION_ADD:
+					$this->money['money'][$player] += $amount;
+
+					$revertActions[] = new RevertAction(RevertAction::REDUCE, $player, $amount);
+					break;
+				case Transaction::ACTION_REDUCE:
+					$this->money['money'][$player] -= $amount;
+
+					$revertActions[] = new RevertAction(RevertAction::ADD, $player, $amount);
+					break;
+			}
+		}
+
+		return new TransactionResult(TransactionResult::SUCCESS, EconomyAPI::RET_SUCCESS, $revertActions);
+	}
+
+	/**
+	 * @param TransactionAction[] $actions
+	 * @return bool
+	 */
+	private function validateTransaction(array $actions): bool {
+		foreach($actions as $action) {
+			$player = strtolower($action->getPlayer());
+			$amount = $action->getAmount();
+			$type = $action->getType();
+
+			switch($type) {
+				case Transaction::ACTION_SET:
+					if($amount < 0) return false;
+					break;
+				case Transaction::ACTION_REDUCE:
+					if(!isset($this->money['money'][$player])) return false;
+
+					$money = $this->money['money'][$player];
+					if($money - $amount < 0) return false;
+					break;
+				case Transaction::ACTION_ADD:
+					if(!isset($this->money['money'][$player])) return false;
+					break;
+			}
+		}
+
+		return true;
 	}
 
 	public function getName(): string {
