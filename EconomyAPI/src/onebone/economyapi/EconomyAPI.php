@@ -817,7 +817,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			return false;
 		}
 
-		$this->currencies[$id] = new CurrencyHolder($id, $currency, $provider);
+		$this->currencies[$id] = new CurrencyHolder($this, $id, $currency, $provider);
 		return true;
 	}
 
