@@ -730,11 +730,11 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->defaultCurrency;
 	}
 
-	public function onLoad() {
+	public function onLoad():void {
 		self::$instance = $this;
 	}
 
-	public function onEnable() {
+	public function onEnable():void {
 		/*
 		 * 디폴트 설정 파일을 먼저 생성하게 되면 데이터 폴더 파일이 자동 생성되므로
 		 * 'Failed to open stream: No such file or directory' 경고 메시지를 없앨 수 있습니다
@@ -949,7 +949,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 	}
 
-	public function onDisable() {
+	public function onDisable():void {
 		foreach($this->currencies as $currency) {
 			$currency->getProvider()->close();
 		}
