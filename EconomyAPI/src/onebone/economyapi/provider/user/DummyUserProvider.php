@@ -68,6 +68,6 @@ class DummyUserProvider implements UserProvider {
 
 	public function getUserInfo(string $username): UserInfo {
 		$plugin = EconomyAPI::getInstance();
-		return new UserInfo($username, $plugin->getPluginConfig()->getDefaultLanguage(), $plugin->getDefaultCurrency());
+		return new UserInfo($username, $plugin->getPluginConfig()->getDefaultLanguage(), $plugin->getDefaultCurrencyId());
 	}
 }

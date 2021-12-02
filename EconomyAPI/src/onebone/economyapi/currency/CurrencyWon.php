@@ -20,7 +20,7 @@
 
 namespace onebone\economyapi\currency;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CurrencyWon implements Currency {
 	public function getName(): string {
@@ -28,7 +28,7 @@ class CurrencyWon implements Currency {
 	}
 
 	public function isAvailableTo(Player $player): bool {
-		return strtolower($player->getLevel()->getFolderName()) === 'korea';
+		return strtolower($player->getWorld()->getFolderName()) === 'korea';
 	}
 
 	public function isExposed(): bool {

@@ -2,44 +2,42 @@ name: EconomyAPI
 main: onebone\economyapi\EconomyAPI
 version: "3.0.0-SNAPSHOT"
 author: onebone
-api: 3.9.0
+api: "4.0.0"
 
 permissions:
   economyapi:
     default: op
     description: Allows to control all of functions in EconomyAPI
-    children:
-      economyapi.command:
-        default: op
-        description: Allows to use all of commands in EconomyAPI
-        children:
-          economyapi.command.setmoney:
-            default: op
-            description: Allows to set player's money
-          economyapi.command.mymoney:
-            description: Allows player to see his/her money
-            default: true
-          economyapi.command.givemoney:
-            description: Allows player to give money to others
-            default: op
-          economyapi.command.pay:
-            description: Allows player to pay to someone
-            default: true
-          economyapi.command.seemoney:
-            description: Allows player to see others' money
-            default: true
-          economyapi.command.setlang:
-            description: Allows player to set his/her language
-            default: true
-          economyapi.command.topmoney:
-            description: Allows player to see top money list
-            default: true
-          economyapi.command.mystatus:
-            description: Allows player to see his/her financial status
-            default: true
-          economyapi.command.takemoney:
-            description: Allows player to take money from others
-            default: op
-          economyapi.command.economy:
-            description: Command for player to control own configuration
-            default: true
+  economyapi.command:
+    default: op
+    description: Allows to use all of commands in EconomyAPI
+  economyapi.command.setmoney:
+    default: op
+    description: Allows to set player's money
+  economyapi.command.mymoney:
+    description: Allows player to see his/her money
+    default: true
+  economyapi.command.givemoney:
+    description: Allows player to give money to others
+    default: op
+  economyapi.command.pay:
+    description: Allows player to pay to someone
+    default: true
+  economyapi.command.seemoney:
+    description: Allows player to see others' money
+    default: true
+  economyapi.command.setlang:
+    description: Allows player to set his/her language
+    default: true
+  economyapi.command.topmoney:
+    description: Allows player to see top money list
+    default: true
+  economyapi.command.mystatus:
+    description: Allows player to see his/her financial status
+    default: true
+  economyapi.command.takemoney:
+    description: Allows player to take money from others
+    default: op
+  economyapi.command.economy:
+    description: Command for player to control own configuration
+    default: true

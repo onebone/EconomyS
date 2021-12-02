@@ -28,7 +28,7 @@ use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Transaction;
 use onebone\economyapi\util\TransactionAction;
 use onebone\economyapi\util\TransactionResult;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 /**
  * @internal
@@ -37,12 +37,9 @@ use pocketmine\Player;
  * THIS IS INTERNAL CLASS, AND IS SUBJECT TO CHANGE ANYTIME WITHOUT NOTICE.
  */
 class BalanceRepository {
-	/** @var Currency */
-	private $currency;
-	/** @var Provider */
-	private $provider;
-	/** @var ReversionProvider */
-	private $reversionProvider;
+	private Currency $currency;
+	private Provider $provider;
+	private ReversionProvider $reversionProvider;
 
 	public function __construct(Currency $currency, Provider $provider, ReversionProvider $reversionProvider) {
 		$this->currency = $currency;
@@ -82,20 +79,11 @@ class BalanceRepository {
 		return $this->provider->getAll();
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @return bool
-	 */
-	public function hasAccount($player): bool {
+	public function hasAccount(Player|string $player): bool {
 		return $this->provider->hasAccount($player);
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param float $defaultBalance
-	 * @return bool
-	 */
-	public function createAccount($player, float $defaultBalance): bool {
+	public function createAccount(Player|string $player, float $defaultBalance): bool {
 		return $this->provider->createAccount($player, $defaultBalance);
 	}
 
@@ -103,11 +91,7 @@ class BalanceRepository {
 		return $this->provider->sortByRange($from, $len);
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @return bool|float
-	 */
-	public function getMoney($player) {
+	public function getMoney(Player|string $player): bool|float {
 		$balance = $this->provider->getMoney($player);
 		if($balance === false) return $balance;
 
@@ -148,7 +132,7 @@ class BalanceRepository {
 	 *      <li>{@see EconomyAPI::RET_PROVIDER_FAILURE}: Provider attached to the Currency has failed to process the request</li>
 	 * </ul>
 	 */
-	public function addMoney($player, float $value, ?TransactionAction &$action): int {
+	public function addMoney(Player|string $player, float $value, ?TransactionAction &$action): int {
 		// TODO provider should check constraints such as limiting balance going over maximum value by itself
 
 		$result = $this->provider->addMoney($player, $value);
@@ -174,7 +158,7 @@ class BalanceRepository {
 	 *      <li>{@see EconomyAPI::RET_PROVIDER_FAILURE}: Provider attached to the Currency has failed to process the request</li>
 	 * </ul>
 	 */
-	public function reduceMoney($player, float $value, ?TransactionAction &$action): int {
+	public function reduceMoney(Player|string $player, float $value, ?TransactionAction &$action): int {
 		// TODO provider should check constraints such as limiting balance going to negative value by itself
 
 		$result = $this->provider->reduceMoney($player, $value);
@@ -200,7 +184,7 @@ class BalanceRepository {
 	 *      <li>Other values (>= 0): Operation has succeed, old balance value</li>
 	 * </ul>
 	 */
-	public function setMoney($player, float $value, ?TransactionAction &$action): int {
+	public function setMoney(Player|string $player, float $value, ?TransactionAction &$action): int {
 		// TODO provider should check constraints such as limiting balance going over maximum value or to negative value by itself
 
 		$result = $this->provider->setMoney($player, $value);

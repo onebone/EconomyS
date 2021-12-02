@@ -20,15 +20,12 @@
 
 namespace onebone\economyapi\event;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CommandIssuer implements Issuer {
-	/** @var Player */
-	private $player;
-	/** @var string */
-	private $command;
-	/** @var string */
-	private $line;
+	private Player $player;
+	private string $command;
+	private string $line;
 
 	public function __construct(Player $player, string $command, string $line) {
 		$this->player = $player;

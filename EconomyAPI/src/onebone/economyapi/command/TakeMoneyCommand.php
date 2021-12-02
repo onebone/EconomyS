@@ -22,15 +22,18 @@ namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\currency\CurrencyReplacer;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class TakeMoneyCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class TakeMoneyCommand extends Command implements PluginOwned {
+	public function __construct(private EconomyAPI $plugin) {
+		parent::__construct("takemoney");
+
 		$desc = $plugin->getCommandMessage("takemoney");
-		parent::__construct("takemoney", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -51,9 +54,8 @@ class TakeMoneyCommand extends PluginCommand {
 			return true;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
-		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		$plugin = $this->plugin;
+		if(($p = $plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
@@ -104,6 +106,10 @@ class TakeMoneyCommand extends PluginCommand {
 		}
 
 		return true;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }
 

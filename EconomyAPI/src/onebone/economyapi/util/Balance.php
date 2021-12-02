@@ -23,10 +23,8 @@ namespace onebone\economyapi\util;
 use onebone\economyapi\currency\Currency;
 
 class Balance {
-	/** @var Currency */
-	private $currency;
-	/** @var float */
-	private $amount;
+	private Currency $currency;
+	private float $amount;
 
 	public function __construct(Currency $currency, float $amount) {
 		$this->currency = $currency;

@@ -23,8 +23,7 @@ namespace onebone\economyapi\util;
 use pocketmine\utils\Config;
 
 final class PluginConfig {
-	/** @var Config $config */
-	private $config;
+	private Config $config;
 
 	public function __construct(Config $config) {
 		$this->config = $config;

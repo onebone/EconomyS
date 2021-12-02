@@ -23,14 +23,11 @@ namespace onebone\economyapi\currency;
 use onebone\economyapi\util\Replacer;
 
 class CurrencyReplacer implements Replacer {
-	/** @var Currency */
-	private $currency;
-	/** @var float */
-	private $amount;
+	public function __construct(
+		private Currency $currency,
+		private float $amount
+	) {
 
-	public function __construct(Currency $currency, float $amount) {
-		$this->currency = $currency;
-		$this->amount = $amount;
 	}
 
 	public function getRawText(): string {

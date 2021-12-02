@@ -23,61 +23,61 @@ namespace onebone\economyapi\provider;
 use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\TransactionAction;
 use onebone\economyapi\util\TransactionResult;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 // Provider is currency-related data provider
 interface Provider {
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @return bool
 	 */
-	public function hasAccount($player): bool;
+	public function hasAccount(Player|string $player): bool;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @param float $defaultMoney
 	 * @return bool
 	 */
-	public function createAccount($player, float $defaultMoney = 1000): bool;
+	public function createAccount(Player|string $player, float $defaultMoney = 1000): bool;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @return bool
 	 */
-	public function removeAccount($player): bool;
+	public function removeAccount(Player|string $player): bool;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @return float|bool
 	 */
-	public function getMoney($player);
+	public function getMoney(Player|string $player): float|bool;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @param float $amount
 	 * @return int Result code or old balance value, returns {@see EconomyAPI::RET_UNAVAILABLE}
 	 *          if the resulting amount is exceeding max balance, {@see EconomyAPI::RET_PROVIDER_FAILURE}
 	 *          if operations failed. Returns old balance value(>= 0) if operation had succeed.
 	 */
-	public function setMoney($player, float $amount): int;
+	public function setMoney(Player|string $player, float $amount): int;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @param float $amount
 	 * @return int Result code, returns {@see EconomyAPI::RET_UNAVAILABLE} if the resulting
 	 *           amount is exceeding max balance, {@see EconomyAPI::RET_PROVIDER_FAILURE}
 	 *           if operations failed.
 	 */
-	public function addMoney($player, float $amount): int;
+	public function addMoney(Player|string $player, float $amount): int;
 
 	/**
-	 * @param Player|string $player
+	 * @param string|Player $player
 	 * @param float $amount
 	 * @return int Result code, returns {@see EconomyAPI::RET_UNAVAILABLE} if the resulting
 	 *           amount is negative value, {@see EconomyAPI::RET_PROVIDER_FAILURE} if operations
 	 *           have failed.
 	 */
-	public function reduceMoney($player, float $amount): int;
+	public function reduceMoney(Player|string $player, float $amount): int;
 
 	public function getAll(): array;
 

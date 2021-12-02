@@ -24,12 +24,9 @@ class RevertAction {
 	public const ADD = 0;
 	public const REDUCE = 1;
 
-	/** @var int */
-	private $type;
-	/** @var string */
-	private $player;
-	/** @var float */
-	private $value;
+	private int $type;
+	private string $player;
+	private float $value;
 
 	public function __construct(int $type, string $player, float $value) {
 		$this->type = $type;

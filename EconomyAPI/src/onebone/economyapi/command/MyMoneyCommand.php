@@ -22,15 +22,18 @@ namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\currency\CurrencyReplacer;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class MyMoneyCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class MyMoneyCommand extends Command implements PluginOwned {
+	public function __construct(private EconomyAPI $plugin) {
+		parent::__construct("mymoney");
+
 		$desc = $plugin->getCommandMessage("mymoney");
-		parent::__construct("mymoney", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -43,8 +46,7 @@ class MyMoneyCommand extends PluginCommand {
 		}
 
 		if($sender instanceof Player) {
-			/** @var EconomyAPI $plugin */
-			$plugin = $this->getPlugin();
+			$plugin = $this->plugin;
 
 			$currencyId = array_shift($params);
 			if($currencyId !== null) {
@@ -65,7 +67,7 @@ class MyMoneyCommand extends PluginCommand {
 				foreach($plugin->getCurrencies() as $val) {
 					if($val->isExposed() and $val !== $currency) {
 						$money = $plugin->myMoney($sender, $val);
-						if($money === false or $money === 0) continue;
+						if($money === false or $money === 0.0) continue;
 
 						$sender->sendMessage($plugin->getMessage("mymoney-multiline", $sender, [
 							$val->getName(), $val->getSymbol(), new CurrencyReplacer($val, $money)
@@ -77,6 +79,10 @@ class MyMoneyCommand extends PluginCommand {
 		}
 		$sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
 		return true;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }
 

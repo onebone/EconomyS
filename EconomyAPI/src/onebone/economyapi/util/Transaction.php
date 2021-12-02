@@ -28,7 +28,7 @@ class Transaction {
 	const ACTION_REDUCE = 2;
 
 	/** @var TransactionAction[] */
-	private $actions = [];
+	private array $actions = [];
 
 	/**
 	 * @param TransactionAction[] $actions

@@ -28,13 +28,12 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 
 class YamlUserProvider implements UserProvider, Listener {
-	/** @var $api EconomyAPI */
-	private $api;
-	private $data = [];
+	private EconomyAPI $api;
+	private array $data = [];
 
-	private $root;
+	private string $root;
 
-	private $defaultSchema;
+	private array $defaultSchema;
 
 	public function __construct(EconomyAPI $api) {
 		$this->api = $api;

@@ -25,9 +25,14 @@ use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\event\EconomyAPIEvent;
 use onebone\economyapi\event\Issuer;
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 
 class AddMoneyEvent extends EconomyAPIEvent implements Cancellable {
-	private $username, $currency, $amount;
+	use CancellableTrait;
+
+	private Currency $currency;
+	private float $amount;
+	private string $username;
 
 	public function __construct(EconomyAPI $plugin, string $username, Currency $currency, float $amount, ?Issuer $issuer) {
 		parent::__construct($plugin, $issuer);

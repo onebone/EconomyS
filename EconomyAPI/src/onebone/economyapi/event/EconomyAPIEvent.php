@@ -24,11 +24,8 @@ use onebone\economyapi\EconomyAPI;
 use pocketmine\event\plugin\PluginEvent;
 
 class EconomyAPIEvent extends PluginEvent {
-	private $issuer;
-
-	public function __construct(EconomyAPI $plugin, ?Issuer $issuer) {
+	public function __construct(EconomyAPI $plugin, private ?Issuer $issuer) {
 		parent::__construct($plugin);
-		$this->issuer = $issuer;
 	}
 
 	public function getIssuer(): ?Issuer {

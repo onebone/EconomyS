@@ -23,15 +23,18 @@ namespace onebone\economyapi\command;
 use onebone\economyapi\currency\CurrencyReplacer;
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\form\AskPayForm;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class PayCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class PayCommand extends Command implements PluginOwned {
+	public function __construct(private EconomyAPI $plugin) {
+		parent::__construct("pay");
+
 		$desc = $plugin->getCommandMessage("pay");
-		parent::__construct("pay", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -57,8 +60,7 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->plugin;
 
 		if($currencyId === null) {
 			$currency = $plugin->getPlayerPreferredCurrency($player, false);
@@ -77,7 +79,7 @@ class PayCommand extends PluginCommand {
 			return true;
 		}
 
-		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		if(($p = $plugin->getServer()->getPlayerByPrefix($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
@@ -98,5 +100,9 @@ class PayCommand extends PluginCommand {
 
 		$sender->sendForm(new AskPayForm($plugin, $sender, $currency, $player, $amount, $label, $params));
 		return true;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }

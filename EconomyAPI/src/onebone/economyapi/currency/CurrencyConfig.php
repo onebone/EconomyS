@@ -22,11 +22,11 @@ namespace onebone\economyapi\currency;
 
 class CurrencyConfig {
 	/** @var Currency */
-	private $currency;
-	private $max;
-	private $default;
-	private $exchange;
-	private $isExposed;
+	private Currency $currency;
+	private float $max;
+	private ?float $default;
+	private array $exchange;
+	private bool $isExposed;
 
 	public function __construct(Currency $currency, float $max, ?float $default, array $exchange, bool $isExposed) {
 		$this->currency = $currency;

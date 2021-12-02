@@ -27,12 +27,12 @@ class Promise {
 	const STATE_FULFILLED = 1;
 	const STATE_REJECTED = 2;
 
-	private $state = self::STATE_PENDING;
+	private int $state = self::STATE_PENDING;
 
-	private $fulfill = [];
-	private $reject = [];
+	private array $fulfill = [];
+	private array $reject = [];
 
-	private $result = null;
+	private mixed $result = null;
 
 	public function then(callable $onFulfill): self {
 		if($this->state === self::STATE_FULFILLED) {

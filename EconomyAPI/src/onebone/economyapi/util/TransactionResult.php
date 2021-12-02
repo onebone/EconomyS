@@ -28,12 +28,10 @@ class TransactionResult {
 	public const SUCCESS = 0;
 	public const FAILURE = 1;
 
-	/** @var int */
-	private $state;
-	/** @var int */
-	private $reason;
+	private int $state;
+	private int $reason;
 	/** @var RevertAction[] */
-	private $revertActions = [];
+	private array $revertActions = [];
 
 	public function __construct(int $state, int $reason, array $revertActions) {
 		if($state < 0 or 1 < $state) throw new InvalidArgumentException('$state should be in the range of [0..1]');

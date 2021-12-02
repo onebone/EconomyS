@@ -22,15 +22,18 @@ namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\currency\CurrencyReplacer;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class SetMoneyCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class SetMoneyCommand extends Command implements PluginOwned {
+	public function __construct(private EconomyAPI $plugin) {
+		parent::__construct("setmoney");
+
 		$desc = $plugin->getCommandMessage("setmoney");
-		parent::__construct("setmoney", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -51,9 +54,8 @@ class SetMoneyCommand extends PluginCommand {
 			return true;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
-		if(($p = $plugin->getServer()->getPlayer($player)) instanceof Player) {
+		$plugin = $this->plugin;
+		if(($p = $plugin->getServer()->getPlayerExact($player)) instanceof Player) {
 			$player = $p->getName();
 		}
 
@@ -70,7 +72,7 @@ class SetMoneyCommand extends PluginCommand {
 
 		if(!$plugin->hasAccount($player, $currency)) {
 			if($plugin->hasAccount($player, $plugin->getDefaultCurrency())) {
-				$plugin->createAccount($player, $currency);
+				$plugin->createAccount($player, null, $currency);
 				$sender->sendMessage($plugin->getMessage('account-created', $sender, [
 					$player, $currency->getName(), $currency->getSymbol()
 				]));
@@ -108,5 +110,9 @@ class SetMoneyCommand extends PluginCommand {
 				$sender->sendMessage("WTF");
 		}
 		return true;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }

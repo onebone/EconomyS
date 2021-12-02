@@ -28,33 +28,18 @@ use onebone\economyapi\event\money\PayMoneyEvent;
 use onebone\economyapi\util\Transaction;
 use onebone\economyapi\util\TransactionAction;
 use pocketmine\form\Form;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class AskPayForm implements Form {
-	/** @var EconomyAPI */
-	private $plugin;
-	/** @var Player */
-	private $player;
-	/** @var Currency */
-	private $currency;
-	/** @var string */
-	private $target;
-	/** @var float */
-	private $amount;
+	public function __construct(
+		private EconomyAPI $plugin,
+		private Player $player,
+		private Currency $currency,
+		private string $target,
+		private float $amount,
+		private string $label, private array $params
+	) {
 
-	private $label;
-	private $params;
-
-	public function __construct(EconomyAPI $plugin, Player $player, Currency $currency,
-	                            string $target, float $amount, $label, $params) {
-		$this->plugin = $plugin;
-		$this->player = $player;
-		$this->currency = $currency;
-		$this->target = $target;
-		$this->amount = $amount;
-
-		$this->label = $label;
-		$this->params = $params;
 	}
 
 	public function handleResponse(Player $player, $data): void {

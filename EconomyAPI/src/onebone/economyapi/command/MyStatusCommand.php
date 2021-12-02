@@ -21,15 +21,18 @@
 namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class MyStatusCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class MyStatusCommand extends Command implements PluginOwned {
+	public function __construct(private EconomyAPI $plugin) {
+		parent::__construct("mystatus");
+
 		$desc = $plugin->getCommandMessage("mystatus");
-		parent::__construct("mystatus", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -46,8 +49,7 @@ class MyStatusCommand extends PluginCommand {
 			return true;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->plugin;
 
 		$money = $plugin->getAllMoney();
 
@@ -62,6 +64,10 @@ class MyStatusCommand extends PluginCommand {
 
 		$sender->sendMessage($plugin->getMessage("mystatus-show", $sender, [$topMoney]));
 		return true;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }
 

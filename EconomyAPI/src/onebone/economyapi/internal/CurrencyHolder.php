@@ -22,7 +22,6 @@ namespace onebone\economyapi\internal;
 
 use onebone\economyapi\currency\Currency;
 use onebone\economyapi\currency\CurrencyConfig;
-use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\provider\Provider;
 use onebone\economyapi\task\FlushRevertActionsTask;
 use pocketmine\scheduler\TaskScheduler;
@@ -33,28 +32,20 @@ use pocketmine\scheduler\TaskScheduler;
 // class anyway.
 /** @internal */
 final class CurrencyHolder {
-	/** @var TaskScheduler */
-	private $scheduler;
-	/** @var string */
-	private $id;
-	/** @var Currency */
-	private $currency;
-	/** @var BalanceRepository */
-	private $repository;
-	/** @var CurrencyConfig */
-	private $config = null;
-	/** @var FlushRevertActionsTask */
-	private $flushTask;
+	private BalanceRepository $repository;
+	private ?CurrencyConfig $config = null;
+	private FlushRevertActionsTask $flushTask;
 
-	public function __construct(EconomyAPI $plugin, string $id, Currency $currency, Provider $provider) {
-		$this->id = $id;
-		$this->currency = $currency;
+	public function __construct(
+		TaskScheduler $scheduler,
+		private string $id,
+		private Currency $currency,
+		Provider $provider
+	) {
 		$this->repository = new BalanceRepository($currency, $provider, new ReversionProviderImpl());
 
 		$this->flushTask = new FlushRevertActionsTask($this->repository);
-
-		$this->scheduler = $plugin->getScheduler();
-		$this->scheduler->scheduleRepeatingTask($this->flushTask, 20 * 60);
+		$scheduler->scheduleRepeatingTask($this->flushTask, 20 * 60);
 	}
 
 	public function getId(): string {
@@ -82,12 +73,7 @@ final class CurrencyHolder {
 	}
 
 	public function close() {
-		if($this->flushTask !== null) {
-			$id = $this->flushTask->getTaskId();
-			$this->scheduler->cancelTask($id);
-
-			$this->flushTask = null;
-		}
+		$this->flushTask?->getHandler()?->cancel();
 
 		$this->repository->close();
 	}

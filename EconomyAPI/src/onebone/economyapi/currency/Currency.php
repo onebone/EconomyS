@@ -20,7 +20,7 @@
 
 namespace onebone\economyapi\currency;
 
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 interface Currency {
 	public function getName(): string;

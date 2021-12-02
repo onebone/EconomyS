@@ -21,25 +21,20 @@
 namespace onebone\economyapi\provider;
 
 use onebone\economyapi\EconomyAPI;
-use onebone\economyapi\provider\RevertAction;
 use onebone\economyapi\task\YamlSortTask;
 use onebone\economyapi\util\Promise;
 use onebone\economyapi\util\Transaction;
 use onebone\economyapi\util\TransactionAction;
 use onebone\economyapi\util\TransactionResult;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\utils\Config;
 
 class YamlProvider implements Provider {
-	/**
-	 * @var Config
-	 */
-	private $config;
+	private Config $config;
 
-	/** @var EconomyAPI */
-	private $plugin;
+	private EconomyAPI $plugin;
 
-	private $money;
+	private array $money;
 
 	public function __construct(EconomyAPI $plugin, string $fileName) {
 		$this->plugin = $plugin;
@@ -51,7 +46,7 @@ class YamlProvider implements Provider {
 		$this->money = $this->config->getAll();
 	}
 
-	public function hasAccount($player): bool {
+	public function hasAccount(Player|string $player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -60,7 +55,7 @@ class YamlProvider implements Provider {
 		return isset($this->money["money"][$player]);
 	}
 
-	public function createAccount($player, float $defaultMoney = 1000): bool {
+	public function createAccount(Player|string $player, float $defaultMoney = 1000): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -73,7 +68,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function removeAccount($player): bool {
+	public function removeAccount(Player|string $player): bool {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -86,7 +81,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function getMoney($player) {
+	public function getMoney(Player|string $player): bool|float {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -98,7 +93,7 @@ class YamlProvider implements Provider {
 		return false;
 	}
 
-	public function setMoney($player, float $amount): int {
+	public function setMoney(Player|string $player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -113,7 +108,7 @@ class YamlProvider implements Provider {
 		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
-	public function addMoney($player, float $amount): int {
+	public function addMoney(Player|string $player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -127,7 +122,7 @@ class YamlProvider implements Provider {
 		return EconomyAPI::RET_NO_ACCOUNT;
 	}
 
-	public function reduceMoney($player, float $amount): int {
+	public function reduceMoney(Player|string $player, float $amount): int {
 		if($player instanceof Player) {
 			$player = $player->getName();
 		}
@@ -145,7 +140,7 @@ class YamlProvider implements Provider {
 	}
 
 	public function getAll(): array {
-		return isset($this->money["money"]) ? $this->money["money"] : [];
+		return $this->money["money"] ?? [];
 	}
 
 	public function sortByRange(int $from, ?int $len): Promise {

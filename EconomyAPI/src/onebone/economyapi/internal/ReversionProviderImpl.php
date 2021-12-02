@@ -29,7 +29,7 @@ use onebone\economyapi\provider\RevertAction;
  */
 class ReversionProviderImpl implements ReversionProvider {
 	/** @var RevertAction[] */
-	private $pending = [];
+	private array $pending = [];
 
 	public function __construct() {
 		// TODO load pending from files

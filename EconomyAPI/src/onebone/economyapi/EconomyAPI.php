@@ -60,7 +60,7 @@ use onebone\economyapi\util\TransactionResult;
 use pocketmine\command\CommandSender;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 use pocketmine\utils\Internet;
@@ -99,25 +99,21 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	const FALLBACK_LANGUAGE = "en";
 
-	private static $instance = null;
+	private static ?EconomyAPI $instance = null;
 
-	/** @var PluginConfig $pluginConfig */
-	private $pluginConfig;
+	private PluginConfig $pluginConfig;
 
 	/** @var CurrencyHolder[] */
-	private $currencies = [];
-	/** @var CurrencyHolder */
-	private $defaultCurrency;
+	private array $currencies = [];
+	private CurrencyHolder $defaultCurrency;
 
-	/** @var CurrencySelector */
-	private $currencySelector = null;
+	private ?CurrencySelector $currencySelector = null;
 
-	/** @var UserProvider */
-	private $provider;
+	private UserProvider $provider;
 
 	const USER_DEFINED = 'user-define';
 
-	private $lang = [];
+	private array $lang = [];
 
 	/**
 	 * Returns instance of EconomyAPI. Should be called after onLoad() phase.
@@ -151,14 +147,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return array_keys($this->lang);
 	}
 
-	/**
-	 * @param string $key
-	 * @param array $params
-	 * @param CommandSender|string $sender
-	 *
-	 * @return string
-	 */
-	public function getMessage(string $key, $sender, array $params = []): string {
+	public function getMessage(string $key, string|CommandSender $sender, array $params = []): string {
 		if($sender instanceof CommandSender) {
 			$sender = $sender->getName();
 		}
@@ -266,11 +255,11 @@ class EconomyAPI extends PluginBase implements Listener {
 	/**
 	 * Checks if currency is available to player if $player is instance of Player
 	 *
-	 * @param CommandSender|string $player
-	 * @param Currency|string $currency
+	 * @param string|CommandSender $player
+	 * @param string|Currency $currency
 	 * @return bool
 	 */
-	public function setPlayerPreferredCurrency($player, $currency): bool {
+	public function setPlayerPreferredCurrency(string|CommandSender $player, Currency|string $currency): bool {
 		if($currency instanceof Currency) {
 			$id = $this->getCurrencyId($currency);
 			if($id === null) return false;
@@ -297,11 +286,11 @@ class EconomyAPI extends PluginBase implements Listener {
 	}
 
 	/**
-	 * @param CommandSender|string $player
+	 * @param string|CommandSender $player
 	 * @param bool $allowNull Allows null on return value. If set false, it will return default currency by default.
 	 * @return Currency|null
 	 */
-	public function getPlayerPreferredCurrency($player, bool $allowNull = true): ?Currency {
+	public function getPlayerPreferredCurrency(string|CommandSender $player, bool $allowNull = true): ?Currency {
 		if($player instanceof CommandSender) {
 			$player = $player->getName();
 		}
@@ -321,12 +310,12 @@ class EconomyAPI extends PluginBase implements Listener {
 	 * @param string|Currency $val
 	 * @return bool
 	 */
-	public function hasCurrency($val): bool {
+	public function hasCurrency(Currency|string $val): bool {
 		if(is_string($val)) {
 			return isset($this->currencies[$val]);
 		}elseif($val instanceof Currency) {
-			foreach($this->currencies as $id => $cur) {
-				if($cur === $val) return true;
+			foreach($this->currencies as $cur) {
+				if($cur->getCurrency() === $val) return true;
 			}
 		}
 
@@ -350,41 +339,20 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->hasAccount($player, $currency);
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param ?Currency $currency
-	 *
-	 * @return bool
-	 */
-	public function hasAccount($player, ?Currency $currency = null): bool {
+	public function hasAccount(Player|string $player, ?Currency $currency = null): bool {
 		$holder = $this->findCurrencyHolder($currency, null);
 		if($holder === null) return false;
 
 		return $holder->getBalanceRepository()->hasAccount($player);
 	}
 
-	/**
-	 * @param Player|string $player
-	 * @param ?Currency $currency
-	 *
-	 * @return float|bool
-	 */
-	public function myMoney($player, ?Currency $currency = null) {
+	public function myMoney(Player|string $player, ?Currency $currency = null): float|bool {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		return $holder->getBalanceRepository()->getMoney($player);
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param float $amount
-	 * @param ?Currency $currency
-	 * @param ?Issuer $issuer
-	 * @param bool $force
-	 *
-	 * @return int
-	 */
-	public function setMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
+	public function setMoney(Player|string $player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canSetMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -432,16 +400,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return self::RET_NO_ACCOUNT;
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param float $amount
-	 * @param ?Currency $currency
-	 * @param ?Issuer $issuer
-	 * @param bool $force
-	 *
-	 * @return int
-	 */
-	public function addMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
+	public function addMoney(Player|string $player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canAddMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -463,7 +422,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $ret;
 	}
 
-	private function canAddMoney($player, float $amount, bool $force, ?Issuer $issuer, Currency $currency): int {
+	private function canAddMoney(Player|string $player, float $amount, bool $force, ?Issuer $issuer, Currency $currency): int {
 		if($amount < 0) {
 			return self::RET_INVALID;
 		}
@@ -480,7 +439,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev = new AddMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 
-			if($ev->setCancelled() and $force === false) {
+			if($ev->cancel() and $force === false) {
 				return self::RET_CANCELLED;
 			}
 
@@ -490,16 +449,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		}
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param float $amount
-	 * @param ?Currency $currency
-	 * @param ?Issuer $issuer
-	 * @param bool $force
-	 *
-	 * @return int
-	 */
-	public function reduceMoney($player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
+	public function reduceMoney(Player|string $player, float $amount, ?Currency $currency = null, ?Issuer $issuer = null, bool $force = false): int {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		$ret = $this->canReduceMoney($player, $amount, $force, $issuer, $holder->getCurrency());
@@ -570,15 +520,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->defaultCurrency->getId();
 	}
 
-	/**
-	 * @param string|Player $player
-	 * @param string|?Currency $currency
-	 * @param float|bool $defaultMoney
-	 * @param ?Issuer $issuer
-	 *
-	 * @return bool
-	 */
-	public function createAccount($player, $currency = null, $defaultMoney = false, ?Issuer $issuer = null): bool {
+	public function createAccount(Player|string $player, float|bool $defaultMoney, Currency|string $currency = null, ?Issuer $issuer = null): bool {
 		$holder = $this->findCurrencyHolder($currency, $player);
 
 		if($player instanceof Player) {
@@ -702,11 +644,11 @@ class EconomyAPI extends PluginBase implements Listener {
 		return $this->defaultCurrency;
 	}
 
-	public function onLoad() {
+	public function onLoad() : void {
 		self::$instance = $this;
 	}
 
-	public function onEnable() {
+	public function onEnable() : void {
 		/*
 		 * 디폴트 설정 파일을 먼저 생성하게 되면 데이터 폴더 파일이 자동 생성되므로
 		 * 'Failed to open stream: No such file or directory' 경고 메시지를 없앨 수 있습니다
@@ -775,7 +717,8 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function checkUpdate(): bool {
 		try{
-			$info = json_decode(Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION), true);
+			$result = Internet::getURL($this->pluginConfig->getUpdateHost() . "?version=" . $this->getDescription()->getVersion() . "&package_version=" . self::PACKAGE_VERSION);
+			$info = json_decode($result->getBody(), true);
 			if(!isset($info["status"]) or $info["status"] !== true) {
 				$this->getLogger()->notice("Something went wrong on update server.");
 				return false;
@@ -805,7 +748,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			return false;
 		}
 
-		$this->currencies[$id] = new CurrencyHolder($this, $id, $currency, $provider);
+		$this->currencies[$id] = new CurrencyHolder($this->getScheduler(), $id, $currency, $provider);
 		return true;
 	}
 
@@ -846,7 +789,7 @@ class EconomyAPI extends PluginBase implements Listener {
 		$this->registerCurrency('won', new CurrencyWon(), $this->parseProvider('Won.yml'));
 	}
 
-	private function parseProvider($file) {
+	private function parseProvider($file): Provider {
 		switch(strtolower($this->getPluginConfig()->getProvider())) {
 			case 'yaml':
 				return new YamlProvider($this, $file);
@@ -890,7 +833,7 @@ class EconomyAPI extends PluginBase implements Listener {
 
 	private function initializeLanguage() {
 		foreach($this->getResources() as $resource) {
-			if($resource->isFile() and substr(($filename = $resource->getFilename()), 0, 5) === "lang_") {
+			if($resource->isFile() and str_starts_with(($filename = $resource->getFilename()), "lang_")) {
 				$this->lang[substr($filename, 5, -5)] = json_decode(file_get_contents($resource->getPathname()), true);
 			}
 		}
@@ -918,11 +861,11 @@ class EconomyAPI extends PluginBase implements Listener {
 
 		if(!$this->defaultCurrency->getBalanceRepository()->hasAccount($player)) {
 			$this->getLogger()->debug("UserInfo of '" . $player->getName() . "' is not found. Creating account...");
-			$this->createAccount($player, $this->defaultCurrency->getCurrency());
+			$this->createAccount($player, false, $this->defaultCurrency->getCurrency());
 		}
 	}
 
-	public function onDisable() {
+	public function onDisable() : void {
 		foreach($this->currencies as $currency) {
 			$currency->close();
 		}

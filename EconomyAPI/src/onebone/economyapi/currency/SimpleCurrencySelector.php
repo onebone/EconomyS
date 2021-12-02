@@ -4,13 +4,11 @@
 namespace onebone\economyapi\currency;
 
 use onebone\economyapi\EconomyAPI;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class SimpleCurrencySelector implements CurrencySelector {
-	private $plugin;
+	public function __construct(private EconomyAPI $plugin) {
 
-	public function __construct(EconomyAPI $plugin) {
-		$this->plugin = $plugin;
 	}
 
 	public function getDefaultCurrency(Player $player): Currency {

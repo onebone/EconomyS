@@ -22,15 +22,20 @@ namespace onebone\economyapi\command;
 
 use onebone\economyapi\EconomyAPI;
 use onebone\economyapi\form\CurrencySelectionForm;
+use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
-use pocketmine\command\PluginCommand;
-use pocketmine\Player;
+use pocketmine\player\Player;
+use pocketmine\plugin\Plugin;
+use pocketmine\plugin\PluginOwned;
 use pocketmine\utils\TextFormat;
 
-class EconomyCommand extends PluginCommand {
-	public function __construct(EconomyAPI $plugin) {
+class EconomyCommand extends Command implements PluginOwned {
+	public function __construct(
+		private EconomyAPI $plugin
+	) {
+		parent::__construct("economy");
+
 		$desc = $plugin->getCommandMessage("economy");
-		parent::__construct("economy", $plugin);
 		$this->setDescription($desc["description"]);
 		$this->setUsage($desc["usage"]);
 
@@ -42,8 +47,7 @@ class EconomyCommand extends PluginCommand {
 			return false;
 		}
 
-		/** @var EconomyAPI $plugin */
-		$plugin = $this->getPlugin();
+		$plugin = $this->plugin;
 
 		$mode = strtolower(array_shift($args));
 		$val = array_shift($args);
@@ -63,9 +67,6 @@ class EconomyCommand extends PluginCommand {
 				}
 				return true;
 			case 'currency':
-				/** @var EconomyAPI $plugin */
-				$plugin = $this->getPlugin();
-
 				if(trim($val) === '') {
 					if(!$sender instanceof Player) {
 						$sender->sendMessage($plugin->getMessage('economy-currency-specify', $sender));
@@ -96,5 +97,9 @@ class EconomyCommand extends PluginCommand {
 
 		$sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
 		return false;
+	}
+
+	public function getOwningPlugin(): Plugin {
+		return $this->plugin;
 	}
 }

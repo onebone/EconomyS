@@ -24,14 +24,13 @@ use onebone\economyapi\internal\BalanceRepository;
 use pocketmine\scheduler\Task;
 
 class FlushRevertActionsTask extends Task {
-	/** @var BalanceRepository */
-	private $repository;
+	private BalanceRepository $repository;
 
 	public function __construct(BalanceRepository $repository) {
 		$this->repository = $repository;
 	}
 
-	public function onRun(int $currentTick) {
+	public function onRun(): void {
 		$this->repository->tryFlushPending();
 	}
 }

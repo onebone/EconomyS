@@ -27,11 +27,10 @@ use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
 use pocketmine\network\mcpe\protocol\types\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\CommandParameter;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class EventListener implements Listener {
-	/** @var EconomyAPI */
-	private $plugin;
+	private EconomyAPI $plugin;
 
 	public function __construct(EconomyAPI $plugin) {
 		$this->plugin = $plugin;

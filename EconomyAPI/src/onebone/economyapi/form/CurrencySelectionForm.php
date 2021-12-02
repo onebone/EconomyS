@@ -5,22 +5,23 @@ namespace onebone\economyapi\form;
 use onebone\economyapi\currency\Currency;
 use onebone\economyapi\EconomyAPI;
 use pocketmine\form\Form;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class CurrencySelectionForm implements Form {
-	private $plugin;
-	private $currencies;
-	private $player;
+	/** @var Currency[] */
+	private array $currencies;
 
 	/**
 	 * @param EconomyAPI $plugin
 	 * @param Currency[]  $currencies
 	 * @param Player $player
 	 */
-	public function __construct(EconomyAPI $plugin, array $currencies, Player $player) {
-		$this->plugin = $plugin;
+	public function __construct(
+		private EconomyAPI $plugin,
+		array $currencies,
+		private Player $player
+	) {
 		$this->currencies = array_values($currencies);
-		$this->player = $player;
 	}
 
 	public function handleResponse(Player $player, $data): void {
