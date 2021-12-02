@@ -29,6 +29,7 @@ use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
 use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\player\Player;
 
+/** @internal */
 class EventListener implements Listener {
 	private EconomyAPI $plugin;
 
