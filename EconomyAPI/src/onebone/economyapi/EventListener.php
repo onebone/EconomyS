@@ -25,8 +25,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\DataPacketSendEvent;
 use pocketmine\network\mcpe\protocol\AvailableCommandsPacket;
-use pocketmine\network\mcpe\protocol\types\CommandEnum;
-use pocketmine\network\mcpe\protocol\types\CommandParameter;
+use pocketmine\network\mcpe\protocol\types\command\CommandEnum;
+use pocketmine\network\mcpe\protocol\types\command\CommandParameter;
 use pocketmine\player\Player;
 
 class EventListener implements Listener {
@@ -37,36 +37,44 @@ class EventListener implements Listener {
 	}
 
 	public function onDataPacketSend(DataPacketSendEvent $event) {
-		$pk = $event->getPacket();
-		if(!$pk instanceof AvailableCommandsPacket) return;
+		$packets = $event->getPackets();
+		$targets = $event->getTargets();
 
-		$player = $event->getPlayer();
+		// only hook that points to a single player
+		if(count($targets) !== 1) return;
 
-		$currencies = self::also(new CommandParameter(), function(CommandParameter $it) {
-			$it->paramName = 'currency ID';
-			$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-			$it->isOptional = true;
-			$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
-				$enum->enumName = 'currencies';
-				$enum->enumValues = array_keys($this->plugin->getCurrencies());
-			});
-		});
-		$amount = self::also(new CommandParameter(), function(CommandParameter $it) {
-			$it->paramName = 'amount';
-			$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_FLOAT;
-			$it->isOptional = false;
-		});
-		$players = self::also(new CommandParameter(), function(CommandParameter $it) {
-			$it->paramName = 'players';
-			$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-			$it->isOptional = false;
-			$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
-				$enum->enumName = 'players';
-				$enum->enumValues = array_map(function(Player $player) {
-					return $player->getName();
-				}, $this->plugin->getServer()->getOnlinePlayers());
-			});
-		});
+		$player = $targets[0]->getPlayer();
+		if($player === null) return;
+
+		foreach($packets as $packet) {
+			if($packet instanceof AvailableCommandsPacket) {
+				$this->processAvailableCommandPacket($packet, $player);
+			}
+		}
+	}
+
+	private function processAvailableCommandPacket(AvailableCommandsPacket $pk, Player $player) {
+		$currencies = CommandParameter::enum(
+			name: 'currency ID',
+			enum: new CommandEnum('currencies', array_keys($this->plugin->getCurrencies())),
+			flags: AvailableCommandsPacket::ARG_TYPE_STRING,
+			optional: true
+		);
+
+		$amount = CommandParameter::standard(
+			name: 'amount',
+			type: AvailableCommandsPacket::ARG_TYPE_FLOAT,
+			optional: false
+		);
+
+		$players = CommandParameter::enum(
+			name: 'players',
+			enum: new CommandEnum('players', array_map(function(Player $player) {
+				return $player->getName();
+			}, $this->plugin->getServer()->getOnlinePlayers())),
+			flags: AvailableCommandsPacket::ARG_TYPE_STRING,
+			optional: false
+		);
 
 		if(isset($pk->commandData['mymoney'])) {
 			$data = $pk->commandData['mymoney'];
@@ -99,19 +107,15 @@ class EventListener implements Listener {
 
 			$data->overloads = [
 				[
-					self::also(new CommandParameter(), function(CommandParameter $it) use ($player) {
-						$it->paramName = 'target';
-						$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-						$it->isOptional = false;
-						$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) use ($player) {
-							$enum->enumName = 'target';
-							$enum->enumValues = array_filter(array_map(function(Player $player){
-								return $player->getName();
-							}, $this->plugin->getServer()->getOnlinePlayers()), function($p) use ($player) {
-								return $player->getName() !== $p;
-							});
-						});
-					}),
+					CommandParameter::enum(
+						name: 'target',
+						enum: new CommandEnum('player', array_filter(array_map(function(Player $player) {
+							return $player->getName();
+						}, $this->plugin->getServer()->getOnlinePlayers()), function($p) use ($player) {
+							return $player->getName() !== $p;
+						})),
+						flags: AvailableCommandsPacket::ARG_TYPE_STRING
+					),
 					$amount, $currencies
 				]
 			];
@@ -124,36 +128,27 @@ class EventListener implements Listener {
 
 			$data->overloads = [
 				[
-					self::also(new CommandParameter(), function(CommandParameter $it) {
-						$it->paramName = 'property';
-						$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-						$it->isOptional = false;
-						$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
-							$enum->enumName = 'currency';
-							$enum->enumValues = ['currency'];
-						});
-					}),
+					CommandParameter::enum(
+						name: 'property',
+						enum: new CommandEnum('currency', ['currency']),
+						flags: AvailableCommandsPacket::ARG_TYPE_STRING,
+						optional: false
+					),
 					$currencies
 				],
 				[
-					self::also(new CommandParameter(), function(CommandParameter $it) {
-						$it->paramName = 'property';
-						$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-						$it->isOptional = false;
-						$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
-							$enum->enumName = 'language';
-							$enum->enumValues = ['language'];
-						});
-					}),
-					self::also(new CommandParameter(), function(CommandParameter $it) {
-						$it->paramName = 'language';
-						$it->paramType = AvailableCommandsPacket::ARG_FLAG_VALID | AvailableCommandsPacket::ARG_TYPE_STRING;
-						$it->isOptional = false;
-						$it->enum = self::also(new CommandEnum(), function(CommandEnum $enum) {
-							$enum->enumName = 'languages';
-							$enum->enumValues = $this->plugin->getLanguages();
-						});
-					})
+					CommandParameter::enum(
+						name: 'property',
+						enum: new CommandEnum('language', ['language']),
+						flags: AvailableCommandsPacket::ARG_TYPE_STRING,
+						optional: false
+					),
+					CommandParameter::enum(
+						name: 'language',
+						enum: new CommandEnum('languages', $this->plugin->getLanguages()),
+						flags: AvailableCommandsPacket::ARG_TYPE_STRING,
+						optional: false
+					),
 				]
 			];
 
@@ -164,19 +159,14 @@ class EventListener implements Listener {
 	/** @noinspection PhpUnusedParameterInspection */
 	public function onPlayerJoin(PlayerJoinEvent $_) {
 		foreach($this->plugin->getServer()->getOnlinePlayers() as $player) {
-			$player->sendCommandData();
+			$player->getNetworkSession()->syncAvailableCommands();
 		}
 	}
 
 	/** @noinspection PhpUnusedParameterInspection */
 	public function onPlayerQuit(PlayerQuitEvent $_) {
 		foreach($this->plugin->getServer()->getOnlinePlayers() as $player) {
-			$player->sendCommandData();
+			$player->getNetworkSession()->syncAvailableCommands();
 		}
-	}
-
-	public static function also($object, $block) {
-		$block($object);
-		return $object;
 	}
 }
