@@ -2,11 +2,11 @@
   "language": "jp",
   "commands": {
     "mymoney": {
-      "uasge": "/mymoney",
+      "usage": "/mymoney",
       "description": "自分の持っている所持金を表示します"
     },
     "topmoney": {
-      "uasge": "/topmoney [ページ]",
+      "usage": "/topmoney [ページ]",
       "description": "このサーバーのプレーヤー所持金ランキングを表示します"
     },
     "setmoney": {
