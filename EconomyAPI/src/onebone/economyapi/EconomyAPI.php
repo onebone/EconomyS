@@ -439,7 +439,7 @@ class EconomyAPI extends PluginBase implements Listener {
 			$ev = new AddMoneyEvent($this, $player, $holder->getCurrency(), $amount, $issuer);
 			$ev->call();
 
-			if($ev->cancel() and $force === false) {
+			if($ev->isCancelled() and $force === false) {
 				return self::RET_CANCELLED;
 			}
 
